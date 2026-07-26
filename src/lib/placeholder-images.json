@@ -1,0 +1,148 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-1",
+      "description": "Premium Home Physiotherapy",
+      "imageUrl": "/hero/physio-hero.png",
+      "imageHint": "home physiotherapy session"
+    },
+    {
+      "id": "hero-2",
+      "description": "Professional Home Nursing Care",
+      "imageUrl": "/hero/nursing-hero.png",
+      "imageHint": "home nursing vitals check"
+    },
+    {
+      "id": "hero-3",
+      "description": "Post-Surgical Recovery Excellence",
+      "imageUrl": "/hero/post-op-hero.png",
+      "imageHint": "post-op rehabilitation at home"
+    },
+    {
+      "id": "hero-4",
+      "description": "Acupuncture and Dry Needling",
+      "imageUrl": "/hero/dry-needling.jpg",
+      "imageHint": "dry needling therapy"
+    },
+    {
+      "id": "hero-5",
+      "description": "Foam Roller Rehabilitation Exercise",
+      "imageUrl": "/hero/foam-roller.jpg",
+      "imageHint": "foam roller rehab"
+    },
+    {
+      "id": "therapist-1",
+      "description": "Portrait of Dr. Emily Carter.",
+      "imageUrl": "https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&w=1000",
+      "imageHint": "physical therapist female"
+    },
+    {
+      "id": "therapist-2",
+      "description": "Portrait of Dr. Ben Adams.",
+      "imageUrl": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=1000",
+      "imageHint": "physical therapist male"
+    },
+    {
+      "id": "therapist-3",
+      "description": "Portrait of Dr. Chloe Davis.",
+      "imageUrl": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=1000",
+      "imageHint": "healthcare worker"
+    },
+    {
+      "id": "therapist-4",
+      "description": "Portrait of Dr. Sam Evans.",
+      "imageUrl": "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=1000",
+      "imageHint": "physiotherapist"
+    },
+    {
+      "id": "leader-1",
+      "description": "Portrait of Mr. Akshay Patel, Founder & CEO.",
+      "imageUrl": "/images/team/akshay-patel.png",
+      "imageHint": "clinical director"
+    },
+    {
+      "id": "leader-coo",
+      "description": "Portrait of Ms. Karishma Rathod, COO.",
+      "imageUrl": "/images/team/karishma-rathod.png",
+      "imageHint": "corporate executive"
+    },
+    {
+      "id": "leader-3",
+      "description": "Portrait of Rajesh Gupta.",
+      "imageUrl": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=1000",
+      "imageHint": "expert doctor"
+    },
+    {
+      "id": "leader-4",
+      "description": "Portrait of Meera Iyer.",
+      "imageUrl": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=1000",
+      "imageHint": "senior therapist"
+    },
+    {
+      "id": "location-map",
+      "description": "A static map image showing a pin on a city.",
+      "imageUrl": "https://images.unsplash.com/photo-1619468129361-605ebea04b44?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjaXR5JTIwbWFwfGVufDB8fHx8MTc2ODQzMjI2Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city map"
+    },
+    {
+      "id": "blog-1",
+      "description": "An image showing a person stretching their back.",
+      "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1000",
+      "imageHint": "physiotherapy recovery"
+    },
+    {
+      "id": "blog-2",
+      "description": "An image showing healthy food ingredients on a table.",
+      "imageUrl": "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=1000",
+      "imageHint": "chronic pain relief"
+    },
+    {
+      "id": "blog-3",
+      "description": "A medical professional showing a knee joint model.",
+      "imageUrl": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1000",
+      "imageHint": "knee rehabilitation"
+    },
+    {
+      "id": "blog-4",
+      "description": "An athlete performing sports rehab exercises.",
+      "imageUrl": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1000",
+      "imageHint": "sports injury care"
+    },
+    {
+      "id": "blog-5",
+      "description": "A stroke survivor practicing neuro-rehab exercises.",
+      "imageUrl": "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=1000",
+      "imageHint": "neuro rehab"
+    },
+    {
+      "id": "blog-6",
+      "description": "A person using a laptop with proper ergonomic posture.",
+      "imageUrl": "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=1000",
+      "imageHint": "home ergonomics"
+    },
+    {
+      "id": "blog-7",
+      "description": "An elderly person practicing balance exercises.",
+      "imageUrl": "https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&w=1000",
+      "imageHint": "elderly care"
+    },
+    {
+      "id": "condition-knee-pain",
+      "description": "A diagram of a knee with pain highlighted.",
+      "imageUrl": "https://images.unsplash.com/photo-1555301989-b1a6b0f1c0b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxrbmVlJTIwcGFpbnxlbnwwfHx8fDE3Njg0NjcwMjF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "knee pain"
+    },
+    {
+      "id": "condition-back-pain",
+      "description": "A diagram of a person's back with pain highlighted.",
+      "imageUrl": "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxiYWNrJTIwcGFpbnxlbnwwfHx8fDE3Njg0NTQ1NDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "back pain"
+    },
+    {
+      "id": "condition-placeholder",
+      "description": "A placeholder image for a medical condition.",
+      "imageUrl": "https://images.unsplash.com/photo-1621862845248-f60ffaddced3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtZWRpY2FsJTIwY29uZGl0aW9ufGVufDB8fHx8MTc2ODQ2NzAyMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "medical condition"
+    }
+  ]
+}

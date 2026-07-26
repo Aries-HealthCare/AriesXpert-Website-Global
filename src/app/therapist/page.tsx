@@ -1,0 +1,334 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+    Star, MapPin, Clock, Award, Phone, MessageCircle,
+    ChevronRight, HeartPulse, Shield, Loader2, RefreshCw,
+    CheckCircle2, Users, Search
+} from 'lucide-react';
+import BookAppointmentButton from '@/components/book-appointment-button';
+import { getOrganizationSchema, getBreadcrumbSchema } from '@/lib/seo-schemas';
+import { useTherapists, type TherapistCard } from '@/hooks/use-therapists';
+
+// Static fallback therapists (shown if backend is down / token not set)
+const FALLBACK_THERAPISTS: TherapistCard[] = [
+    { id: 't1', slug: 'dr-kajal-vora', name: 'Dr. Kajal Vora', qualification: 'MPT (Orthopedics)', experience: '8 Years', specialization: 'Orthopedic & Sports Physiotherapy', areas: ['Andheri', 'Bandra', 'Santacruz'], city: 'Mumbai', state: 'Maharashtra', rating: 4.9, reviewCount: 142, imageUrl: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=400', isAvailable: true, languages: ['English', 'Hindi', 'Gujarati'], services: ['Orthopedic Rehab', 'Sports Injury', 'Post-Surgery Recovery'], bio: '', isVerified: true, education: ['MPT (Orthopedics)'], feedback: [] },
+    { id: 't2', slug: 'dr-dhvani-jain', name: 'Dr. Dhvani Jain', qualification: 'MPT (Neurology)', experience: '10 Years', specialization: 'Neurological Rehabilitation', areas: ['Dadar', 'Matunga', 'Sion'], city: 'Mumbai', state: 'Maharashtra', rating: 4.8, reviewCount: 98, imageUrl: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=400', isAvailable: true, languages: ['English', 'Hindi'], services: ['Stroke Rehab', 'Parkinson\'s Care', 'Neuro Rehab'], bio: '', isVerified: true, education: ['MPT (Neurology)'], feedback: [] },
+    { id: 't3', slug: 'dr-charmi-dedhia', name: 'Dr. Charmi Dedhia', qualification: 'BPT, MIAP', experience: '6 Years', specialization: 'Women\'s Health & Pediatric Physiotherapy', areas: ['Mulund', 'Ghatkopar', 'Vikhroli'], city: 'Mumbai', state: 'Maharashtra', rating: 4.9, reviewCount: 76, imageUrl: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=400', isAvailable: true, languages: ['English', 'Hindi', 'Marathi'], services: ['Pediatric Physio', 'Women\'s Health', 'Post-Natal Care'], bio: '', isVerified: true, education: ['BPT, MIAP'], feedback: [] },
+    { id: 't4', slug: 'dr-twinkle-patel', name: 'Dr. Twinkle Patel', qualification: 'MPT (Sports)', experience: '12 Years', specialization: 'Sports Physiotherapy & Orthopedics', areas: ['Vile Parle', 'Juhu', 'Goregaon'], city: 'Mumbai', state: 'Maharashtra', rating: 5.0, reviewCount: 204, imageUrl: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=400', isAvailable: true, languages: ['English', 'Hindi', 'Gujarati'], services: ['Sports Injury', 'Performance Enhancement', 'Orthopedic Rehab'], bio: '', isVerified: true, education: ['MPT (Sports)'], feedback: [] },
+    { id: 't5', slug: 'dr-darshita-damania', name: 'Dr. Darshita Damania', qualification: 'MPT (Geriatrics)', experience: '7 Years', specialization: 'Geriatric Physiotherapy', areas: ['Thane West', 'Kopri', 'Naupada'], city: 'Thane', state: 'Maharashtra', rating: 4.8, reviewCount: 63, imageUrl: 'https://images.unsplash.com/photo-1638604813811-6f3c53deff9c?auto=format&fit=crop&q=80&w=400', isAvailable: true, languages: ['English', 'Hindi', 'Marathi'], services: ['Geriatric Care', 'Fall Prevention', 'Balance Training'], bio: '', isVerified: true, education: ['MPT (Geriatrics)'], feedback: [] },
+    { id: 't6', slug: 'dr-sumangala-poojari', name: 'Dr. Sumangala Poojari', qualification: 'MPT (Orthopedics)', experience: '9 Years', specialization: 'Orthopedic & Pain Management', areas: ['Thane East', 'Majiwada', 'Manpada'], city: 'Thane', state: 'Maharashtra', rating: 4.7, reviewCount: 89, imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=400', isAvailable: false, languages: ['English', 'Hindi', 'Kannada'], services: ['Pain Management', 'Orthopedic Rehab', 'Spine Care'], bio: '', isVerified: true, education: ['MPT (Orthopedics)'], feedback: [] },
+];
+
+const CITIES = ['All', 'Mumbai', 'Pune', 'Bangalore', 'Delhi', 'Hyderabad', 'Chennai', 'Kolkata', 'Ahmedabad'];
+const SPECS = ['All', 'Orthopedics', 'Neurology', 'Sports', 'Pediatrics', 'Geriatrics', "Women's Health", 'Pain Management'];
+
+export default function TherapistsPage() {
+    const [selectedCity, setSelectedCity] = useState('');
+    const [selectedSpec, setSelectedSpec] = useState('');
+    const [searchQ, setSearchQ] = useState('');
+
+    const { therapists: liveTherapists, isLoading, source, refetch } = useTherapists({
+        city: selectedCity || undefined,
+        specialization: selectedSpec || undefined,
+        limit: 1000,
+    });
+
+    const displayList = liveTherapists.length > 0 ? liveTherapists : FALLBACK_THERAPISTS;
+
+    // Client-side search filter
+    const filtered = displayList.filter(t => {
+        const q = searchQ.toLowerCase();
+        if (!q) return true;
+        return (
+            t.name.toLowerCase().includes(q) ||
+            t.specialization.toLowerCase().includes(q) ||
+            t.city.toLowerCase().includes(q) ||
+            t.areas.some(a => a.toLowerCase().includes(q))
+        );
+    });
+
+    const jsonLd = [
+        getOrganizationSchema(),
+        getBreadcrumbSchema([{ name: 'Home', url: '/' }, { name: 'Our Therapists', url: '/therapist' }]),
+    ];
+
+    return (
+        <>
+            {jsonLd.map((schema, i) => (
+                <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+            ))}
+
+            <div className="flex flex-col min-h-screen">
+
+                {/* ── Hero ─────────────────────────────────────────────── */}
+                <section className="relative pt-20 pb-12 md:pt-32 md:pb-24 overflow-hidden bg-primary">
+                    <div className="absolute inset-0 z-0">
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.1)_0%,transparent_60%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(255,255,255,0.05)_0%,transparent_60%)]" />
+                    </div>
+                    <div className="container mx-auto px-4 md:px-6 relative z-10">
+                        <nav className="flex items-center gap-2 text-white/60 text-xs mb-8" aria-label="Breadcrumb">
+                            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+                            <ChevronRight className="w-3 h-3" />
+                            <span className="text-white font-semibold">Our Therapists</span>
+                        </nav>
+                        <div className="max-w-4xl mx-auto text-center space-y-6">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-xs font-bold uppercase tracking-widest">
+                                <Shield className="w-4 h-4 text-accent" /> 450+ Verified Specialists
+                            </div>
+                            <h1 className="font-headline text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-[1.15]">
+                                Meet Our Expert<br /><span className="text-accent">Physiotherapists</span>
+                            </h1>
+                            <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
+                                Every Aries therapist is rigorously vetted, BPT/MPT certified, and trained to deliver hospital-grade care at your home.
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                <BookAppointmentButton size="lg" className="h-14 px-10 text-base font-bold neon-accent-border">
+                                    Book Home Visit Now
+                                </BookAppointmentButton>
+                                <Button asChild size="lg" variant="outline" className="h-14 px-10 text-base font-bold text-white border-white/40 hover:bg-white/10 bg-transparent">
+                                    <a href="tel:+919136447006" className="flex items-center gap-2">
+                                        <Phone className="w-4 h-4" /> Call +91 9136447006
+                                    </a>
+                                </Button>
+                            </div>
+                            <div className="grid grid-cols-3 gap-6 pt-4 max-w-xl mx-auto">
+                                {[{ label: 'Expert Therapists', value: '450+' }, { label: 'Cities Covered', value: '9+' }, { label: 'Happy Patients', value: '50,000+' }].map((s, i) => (
+                                    <div key={i} className="text-center">
+                                        <div className="text-2xl md:text-3xl font-black text-accent">{s.value}</div>
+                                        <div className="text-white/70 text-xs font-medium mt-1">{s.label}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── Trust Strip ──────────────────────────────────────── */}
+                <section className="py-8 bg-secondary/30 border-b">
+                    <div className="container mx-auto px-4 md:px-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {[
+                                { icon: Shield, title: 'BPT/MPT Certified', desc: 'Recognised physiotherapy degrees' },
+                                { icon: Award, title: 'Multi-stage Vetting', desc: 'Clinical competency screening' },
+                                { icon: HeartPulse, title: 'Advanced Equipment', desc: 'Portable IFT, Laser, Ultrasound' },
+                                { icon: Clock, title: 'Punctual & Reliable', desc: 'On-time with real-time tracking' },
+                            ].map((f, i) => (
+                                <div key={i} className="flex flex-col items-center text-center gap-2 p-4">
+                                    <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                                        <f.icon className="w-5 h-5" />
+                                    </div>
+                                    <div className="font-bold text-sm">{f.title}</div>
+                                    <div className="text-xs text-muted-foreground leading-relaxed">{f.desc}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── Filters & Grid ───────────────────────────────────── */}
+                <section className="py-16 md:py-20 bg-background">
+                    <div className="container mx-auto px-4 md:px-6">
+                        <div className="text-center mb-10">
+                            <h2 className="font-headline text-3xl md:text-4xl font-bold mb-3">
+                                Find the Right <span className="text-primary">Specialist</span>
+                            </h2>
+                            <p className="text-muted-foreground max-w-xl mx-auto text-sm">
+                                Filter by city or specialization. All therapists are live-synced from our therapist management system.
+                            </p>
+                        </div>
+
+                        {/* Filter row */}
+                        <div className="flex flex-wrap md:flex-nowrap gap-3 mb-10 justify-center items-center overflow-x-auto pb-4 no-scrollbar">
+                            {/* Search */}
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <input
+                                    type="text"
+                                    placeholder="Search name, area, specialty…"
+                                    value={searchQ}
+                                    onChange={e => setSearchQ(e.target.value)}
+                                    className="pl-9 pr-4 h-11 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 w-[240px] sm:w-64"
+                                />
+                            </div>
+
+                            {/* City filter */}
+                            <select
+                                value={selectedCity}
+                                onChange={e => setSelectedCity(e.target.value === 'All' ? '' : e.target.value)}
+                                className="h-11 px-3 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 min-w-[120px]"
+                            >
+                                {CITIES.map(c => <option key={c} value={c === 'All' ? '' : c}>{c === 'All' ? 'All Cities' : c}</option>)}
+                            </select>
+
+                            {/* Specialization filter */}
+                            <select
+                                value={selectedSpec}
+                                onChange={e => setSelectedSpec(e.target.value === 'All' ? '' : e.target.value)}
+                                className="h-11 px-3 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 min-w-[140px]"
+                            >
+                                {SPECS.map(s => <option key={s} value={s === 'All' ? '' : s}>{s === 'All' ? 'All Specializations' : s}</option>)}
+                            </select>
+
+                            {/* Refresh */}
+                            <Button variant="outline" size="sm" className="h-11 gap-2 font-semibold shadow-sm px-5" onClick={refetch}>
+                                <RefreshCw className="w-4 h-4" /> Refresh
+                            </Button>
+                        </div>
+
+                        {/* Status bar */}
+                        <div className="flex items-center justify-between mb-6 text-sm">
+                            <span className="text-muted-foreground">
+                                {isLoading ? 'Loading…' : `Showing ${filtered.length} specialist${filtered.length !== 1 ? 's' : ''}`}
+                                {source === 'live' && <span className="ml-2 text-green-600 text-xs font-semibold">● Live Data</span>}
+                            </span>
+                        </div>
+
+                        {/* Grid */}
+                        {isLoading ? (
+                            <div className="flex flex-col items-center justify-center py-20 gap-4">
+                                <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                                <p className="text-muted-foreground text-sm">Loading specialists from dashboard…</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {filtered.map(t => (
+                                    <Card key={t.id || t.slug} className="group glassmorphic overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-1">
+                                        <div className="relative">
+                                            <div className="aspect-[4/3] relative overflow-hidden bg-secondary/20">
+                                                <Image
+                                                    src={t.imageUrl}
+                                                    alt={`${t.name} — ${t.specialization}`}
+                                                    fill
+                                                    className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                                            </div>
+
+                                            {/* Availability */}
+                                            <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold ${t.isAvailable ? 'bg-green-500 text-white' : 'bg-secondary text-muted-foreground'}`}>
+                                                {t.isAvailable ? '✓ Available Today' : 'Fully Booked'}
+                                            </div>
+
+                                            {/* Verified */}
+                                            {t.isVerified && (
+                                                <div className="absolute top-3 left-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow">
+                                                    <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                                                </div>
+                                            )}
+
+                                            {/* Rating */}
+                                            <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1.5 rounded-full">
+                                                <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                                                <span className="text-white text-xs font-bold">{t.rating}</span>
+                                                {t.reviewCount > 0 && <span className="text-white/60 text-xs">({t.reviewCount})</span>}
+                                            </div>
+                                        </div>
+
+                                        <CardContent className="p-6 space-y-4">
+                                            <div>
+                                                <h3 className="font-headline text-xl font-bold group-hover:text-primary transition-colors">{t.name}</h3>
+                                                <p className="text-sm text-primary font-semibold mt-0.5">{t.qualification}</p>
+                                                <p className="text-sm text-muted-foreground">{t.specialization}</p>
+                                            </div>
+
+                                            <div className="flex items-center gap-4 text-sm">
+                                                {t.experience && (
+                                                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                                                        <Award className="w-4 h-4 text-accent" /><span className="font-medium">{t.experience}</span>
+                                                    </div>
+                                                )}
+                                                {t.city && (
+                                                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                                                        <MapPin className="w-4 h-4 text-primary" /><span>{t.city}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {t.areas.length > 0 && (
+                                                <div>
+                                                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Covers</p>
+                                                    <div className="flex flex-wrap gap-1.5">
+                                                        {t.areas.slice(0, 3).map(area => (
+                                                            <Badge key={area} variant="secondary" className="text-xs px-2 py-0.5 font-medium">{area}</Badge>
+                                                        ))}
+                                                        {t.areas.length > 3 && <Badge variant="outline" className="text-xs px-2 py-0.5">+{t.areas.length - 3} more</Badge>}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            <div className="flex gap-2 pt-1">
+                                                <BookAppointmentButton className="flex-1 h-10 text-sm font-bold" size="sm">
+                                                    Book Appointment
+                                                </BookAppointmentButton>
+                                                <Button asChild variant="outline" size="sm" className="h-10 px-3">
+                                                    <Link href={`/therapist/${t.slug}`}>
+                                                        Profile <ChevronRight className="w-4 h-4 ml-1" />
+                                                    </Link>
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                        )}
+
+                        {filtered.length === 0 && !isLoading && (
+                            <div className="text-center py-16">
+                                <p className="text-muted-foreground mb-4">No specialists found matching your filters.</p>
+                                <Button variant="outline" onClick={() => { setSelectedCity(''); setSelectedSpec(''); setSearchQ(''); }}>
+                                    Clear Filters
+                                </Button>
+                            </div>
+                        )}
+
+                        {/* CTA */}
+                        <div className="text-center mt-12">
+                            <p className="text-muted-foreground mb-4 text-sm">
+                                {source === 'live'
+                                    ? `Showing ${filtered.length} active specialists. Call us to find the perfect match.`
+                                    : 'Showing sample therapists. Live data loads when the backend token is configured.'}
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                <Button asChild size="lg" className="h-12 px-8 font-bold">
+                                    <a href="tel:+919136447006" className="flex items-center gap-2">
+                                        <Phone className="w-4 h-4" /> Call +91 9136447006
+                                    </a>
+                                </Button>
+                                <Button asChild size="lg" variant="outline" className="h-12 px-8 font-bold">
+                                    <a href="https://wa.me/917372681410" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                                        <MessageCircle className="w-4 h-4" /> WhatsApp Us
+                                    </a>
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── Join as Therapist CTA ────────────────────────────── */}
+                <section className="py-16 bg-primary/5 border-t">
+                    <div className="container mx-auto px-4 md:px-6 text-center max-w-2xl">
+                        <div className="flex items-center justify-center gap-2 mb-4">
+                            <Users className="w-5 h-5 text-primary" />
+                            <span className="text-xs font-bold uppercase tracking-widest text-primary">Are You a Physiotherapist?</span>
+                        </div>
+                        <h2 className="font-headline text-2xl md:text-3xl font-bold mb-4">Join the Aries PhysioCare Network</h2>
+                        <p className="text-muted-foreground mb-6 leading-relaxed text-sm">
+                            Be part of India's fastest-growing home healthcare network. Get consistent bookings, flexible timing, and a premium brand behind you.
+                        </p>
+                        <Button asChild size="lg" className="h-12 px-8 font-bold">
+                            <Link href="/work-with-us/for-physiotherapists">Apply as a Therapist</Link>
+                        </Button>
+                    </div>
+                </section>
+            </div>
+        </>
+    );
+}

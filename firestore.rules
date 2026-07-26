@@ -1,0 +1,190 @@
+/**
+ * Core Philosophy:
+ * This ruleset is designed for a public-facing website where most of the data is for display purposes.
+ * It establishes a "read-only" security model for content like services, blogs, and therapist information,
+ * which is presumed to be managed through a separate, secure admin panel. It then provides specific,
+ * narrow "write" access for public users to submit data through forms, such as booking appointments,
+ * applying for jobs, or sending contact messages. This data is write-once and cannot be read or
+ * modified by other public users, ensuring privacy.
+ *
+ * Data Structure:
+ * The data is organized into a flat structure of top-level collections. There is no nesting of user-specific
+ * data. This segregation simplifies security rules, as each collection has a uniform access policy.
+ * For example, all documents in `/blogs` are public, while all documents in `/appointments` are private.
+ *
+ * Key Security Decisions:
+ * - Public Read, Admin Write: Collections like `/services`, `/therapists`, `/locations`, `/blogs`, `/jobOpenings`,
+ *   `/faqs`, `/appointmentSlots`, and `/aiPrecisionRecovery` are publicly readable by anyone but cannot be
+ *   written to. This protects the integrity of the website's content.
+ * - Public Create-Only (Write-Once): Collections for user submissions (`/appointments`, `/jobApplications`,
+ *   `/contactFormSubmissions`) allow any user (authenticated or not) to create a document. However,
+ *   read, update, and delete permissions are explicitly denied to protect the privacy of submitted data (PII).
+ * - No User Authentication Required for Writes: The model allows anonymous submissions for key user actions
+ *   (appointments, job applications, contact forms) to reduce friction. Security relies on locking down
+ *   read/update/delete access rather than on user identity.
+ * - Default Deny: Any path not explicitly matched is inaccessible.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Publicly readable content about services. This rule is simplified to grant broad public read access and resolve permission issues.
+     * @path        /services/{serviceId}
+     * @allow       Anyone can (read) services.
+     * @deny        No one can (write) to services.
+     * @principle   Protects public content by making it read-only for clients.
+     */
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    /**
+     * @description Publicly readable content about therapists. This rule is simplified to grant broad public read access to resolve persistent permission issues, while explicitly denying all write access.
+     * @path        /therapists/{therapistId}
+     * @allow       Anyone can (read) therapists.
+     * @deny        No one can (write) to therapists.
+     * @principle   Protects public content by making it read-only for clients.
+     */
+    match /therapists/{therapistId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    /**
+     * @description Publicly readable content about locations. Writes are disabled.
+     * @path        /locations/{locationId}
+     * @allow       Anyone can (get) or (list) locations.
+     * @deny        No one can (create), (update), or (delete) locations.
+     * @principle   Protects public content by making it read-only for clients.
+     */
+    match /locations/{locationId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Publicly readable blog posts. Writes are disabled.
+     * @path        /blogs/{blogId}
+     * @allow       Anyone can (get) or (list) blog posts.
+     * @deny        No one can (create), (update), or (delete) blog posts.
+     * @principle   Protects public content by making it read-only for clients.
+     */
+    match /blogs/{blogId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Publicly readable job openings. Writes are disabled.
+     * @path        /jobOpenings/{jobOpeningId}
+     * @allow       Anyone can (get) or (list) job openings.
+     * @deny        No one can (create), (update), or (delete) job openings.
+     * @principle   Protects public content by making it read-only for clients.
+     */
+    match /jobOpenings/{jobOpeningId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Publicly readable FAQs. Writes are disabled.
+     * @path        /faqs/{faqId}
+     * @allow       Anyone can (get) or (list) FAQs.
+     * @deny        No one can (create), (update), or (delete) FAQs.
+     * @principle   Protects public content by making it read-only for clients.
+     */
+    match /faqs/{faqId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Publicly readable appointment slots for booking. Writes are disabled.
+     * @path        /appointmentSlots/{appointmentSlotId}
+     * @allow       Anyone can (get) or (list) available appointment slots.
+     * @deny        No one can (create), (update), or (delete) slots.
+     * @principle   Protects public content by making it read-only for clients.
+     */
+    match /appointmentSlots/{appointmentSlotId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Allows anyone to book an appointment. Data is write-once and private.
+     * @path        /appointments/{appointmentId}
+     * @allow       Anyone can (create) an appointment.
+     * @deny        No one can (get), (list), (update), or (delete) appointments to protect patient privacy.
+     * @principle   Enables public write access for specific actions while protecting submitted PII.
+     */
+    match /appointments/{appointmentId} {
+      allow get: if false;
+      allow list: if false;
+      allow create: if true;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Allows anyone to apply for a job. Data is write-once and private.
+     * @path        /jobApplications/{jobApplicationId}
+     * @allow       Anyone can (create) a job application.
+     * @deny        No one can (get), (list), (update), or (delete) applications to protect applicant privacy.
+     * @principle   Enables public write access for specific actions while protecting submitted PII.
+     */
+    match /jobApplications/{jobApplicationId} {
+      allow get: if false;
+      allow list: if false;
+      allow create: if true;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Allows anyone to submit a contact form. Data is write-once and private.
+     * @path        /contactFormSubmissions/{contactFormSubmissionId}
+     * @allow       Anyone can (create) a contact form submission.
+     * @deny        No one can (get), (list), (update), or (delete) submissions to protect user privacy.
+     * @principle   Enables public write access for specific actions while protecting submitted PII.
+     */
+    match /contactFormSubmissions/{contactFormSubmissionId} {
+      allow get: if false;
+      allow list: if false;
+      allow create: if true;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Publicly readable content for the AI Precision Recovery feature. Writes are disabled.
+     * @path        /aiPrecisionRecovery/{aiPrecisionRecoveryId}
+     * @allow       Anyone can (get) or (list) AI recovery data.
+     * @deny        No one can (create), (update), or (delete) this data.
+     * @principle   Protects public content by making it read-only for clients.
+     */
+    match /aiPrecisionRecovery/{aiPrecisionRecoveryId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}
