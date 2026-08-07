@@ -191,7 +191,7 @@ export default function LoginPage() {
       };
       const validToken = createValidJwt(fallbackUser);
       executeDashboardLogin(validToken, fallbackUser);
-    } fontally: {
+    } finally {
       setIsLoading(false);
     }
   };
