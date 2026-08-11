@@ -125,6 +125,14 @@ function run() {
   );
   assert.ok(urlGen.stdout.trim().endsWith('/website/therapists?city=Mumbai&limit=50'));
 
+  const apiLib = read('src/lib/api.ts');
+  assert.ok(!apiLib.includes(OBSOLETE_RENDER), 'src/lib/api.ts must not reference obsolete Render URL');
+  assert.ok(apiLib.includes('api.ariesxpert.com'), 'src/lib/api.ts must default to production API');
+  assert.ok(apiLib.includes('onrender.com'), 'src/lib/api.ts must guard against Render in production');
+
+  const leadLegacy = read('src/services/lead-submission.ts');
+  assert.ok(leadLegacy.includes('LEGACY_LEAD_SUBMISSION_REMOVED'), 'lead-submission.ts must be gated/disabled');
+
   console.log('All website therapist proxy contract tests passed.');
 }
 

@@ -9,7 +9,22 @@
  */
 
 // Public-facing base (used by server route handlers)
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://ariesxpert-backend.onrender.com/api/v1';
+const PRODUCTION_API_BASE = 'https://api.ariesxpert.com/api/v1';
+
+export const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  PRODUCTION_API_BASE;
+
+if (
+  typeof process !== 'undefined' &&
+  process.env.NODE_ENV === 'production' &&
+  API_BASE.includes('onrender.com')
+) {
+  throw new Error(
+    'Invalid production API base: Render fallback is not allowed. Set NEXT_PUBLIC_API_BASE_URL to https://api.ariesxpert.com/api/v1',
+  );
+}
 
 // ─── Generic helpers ──────────────────────────────────────────────────────────
 
