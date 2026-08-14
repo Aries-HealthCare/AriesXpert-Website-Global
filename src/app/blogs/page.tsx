@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { blogPosts } from "@/lib/placeholder-data";
+import { fetchGrowthBlogPosts } from "@/lib/growth-blog-posts";
 import { services } from "@/lib/placeholder-data";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,29 @@ export const metadata = {
     keywords: "Healthcare Blog, Physiotherapy Tips, Home Care, Wellness, Aries PhysioCare, Recovery Advice"
 };
 
-export default function BlogsPage() {
+export default async function BlogsPage() {
+  const growthPosts = await fetchGrowthBlogPosts();
+  const growthSlugs = new Set(growthPosts.map((p) => p.slug));
+  const staticPosts = blogPosts.filter((p) => !growthSlugs.has(p.slug));
+  const allPosts = [
+    ...growthPosts.map((p) => ({
+      id: p.id,
+      slug: p.slug,
+      title: p.title,
+      summary: p.summary,
+      serviceTag: p.territory || p.topic || 'AI Insights',
+      readTime: `${Math.max(3, Math.ceil((p.content?.length || 400) / 900))} min read`,
+      date: p.publishedAt
+        ? new Date(p.publishedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })
+        : 'Recently',
+      author: 'Aries Growth Engine',
+      imageUrl: '/images/blog-default.jpg',
+      imageHint: 'healthcare blog',
+      isGrowth: true,
+    })),
+    ...staticPosts.map((p) => ({ ...p, isGrowth: false })),
+  ];
+
   return (
     <div className="bg-background min-h-screen">
       {/* Elegant Hero Section */}
@@ -78,10 +101,11 @@ export default function BlogsPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12">
-            {blogPosts.map((post) => (
+            {allPosts.map((post) => (
               <Card key={post.id} className="group border-none bg-transparent shadow-none flex flex-col">
                 <CardHeader className="p-0 mb-6">
                   <Link href={`/blogs/${post.slug}`} className="block relative aspect-[16/10] w-full rounded-2xl overflow-hidden shadow-md">
+                    {!('isGrowth' in post && post.isGrowth) ? (
                     <Image
                       src={post.imageUrl}
                       alt={post.title}
@@ -90,6 +114,11 @@ export default function BlogsPage() {
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                       data-ai-hint={post.imageHint}
                     />
+                    ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                      <span className="text-xs font-bold uppercase tracking-widest text-primary">Growth Engine</span>
+                    </div>
+                    )}
                     <div className="absolute top-4 left-4">
                       <Badge className="bg-white/90 dark:bg-black/80 text-foreground dark:text-white backdrop-blur-sm border-none shadow-sm font-bold text-[10px] uppercase tracking-wider px-3">
                         {post.serviceTag}
