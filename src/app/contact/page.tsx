@@ -17,6 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { submitContactLead } from '../actions/lead-actions';
 import { withStoredAttribution } from '@/lib/growth-attribution';
 import { useToast } from '@/hooks/use-toast';
+import { trackEvent } from '@/lib/analytics';
 
 const countryContacts = [
     { name: "India", email: "india@ariesphysiocare.com", phone: "+91 98765 43210", flag: "🇮🇳" },
@@ -53,6 +54,7 @@ export default function ContactPage() {
         if (result.error) {
             toast({ variant: 'destructive', title: 'Submission Failed', description: result.error });
         } else {
+            trackEvent('generate_lead_contact', { enquiry_type: data.enquiryType });
             setIsSubmitted(true);
         }
         setIsLoading(false);

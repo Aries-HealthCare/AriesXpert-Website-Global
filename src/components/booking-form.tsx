@@ -19,6 +19,7 @@ import { TimeSlots } from './TimeSlots';
 import { submitAppointmentLead } from '@/app/actions/lead-actions';
 import { getStoredAttribution } from '@/lib/growth-attribution';
 import { useToast } from '@/hooks/use-toast';
+import { trackEvent } from '@/lib/analytics';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
@@ -116,6 +117,7 @@ export default function BookingForm({ service, condition, onSubmitted, className
     if (result.error) {
         toast({ variant: "destructive", title: "Submission Failed", description: result.error });
     } else {
+        trackEvent('generate_lead_appointment', { service: data.service });
         setIsSubmitted(true);
     }
     setIsLoading(false);

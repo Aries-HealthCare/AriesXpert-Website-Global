@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -11,6 +12,11 @@ import MobileCtaFooter from "@/components/mobile-cta-footer";
 import { FirebaseClientProvider } from "@/firebase";
 import WhatsAppButton from "@/components/whatsapp-button";
 import { AttributionCapture } from "@/components/attribution-capture";
+
+// 🔴 ACTION REQUIRED: Set NEXT_PUBLIC_GA_MEASUREMENT_ID in the environment to
+// activate GA4. Until a real measurement ID (G-XXXXXXXXXX) is provisioned by
+// the business owner, gtag.js is not loaded and no analytics traffic is sent.
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 const inter = Inter({
   subsets: ["latin"],
@@ -110,6 +116,22 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased flex flex-col min-h-screen`}>
+        {GA_MEASUREMENT_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_MEASUREMENT_ID}');
+              `}
+            </Script>
+          </>
+        )}
         <ThemeProvider>
           <FirebaseClientProvider>
             <RequestCallbackProvider>
