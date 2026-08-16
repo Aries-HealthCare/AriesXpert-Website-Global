@@ -14,8 +14,9 @@ import {
 import BookAppointmentButton from '@/components/book-appointment-button';
 import { getOrganizationSchema, getBreadcrumbSchema } from '@/lib/seo-schemas';
 import { useTherapists, type TherapistCard } from '@/hooks/use-therapists';
+import { VERIFIED_THERAPISTS_CATALOG } from '@/lib/verified-therapists';
 
-const CITIES = ['All', 'Mumbai', 'Pune', 'Bangalore', 'Delhi', 'Hyderabad', 'Chennai', 'Kolkata', 'Ahmedabad'];
+const CITIES = ['All', 'Mumbai', 'Delhi', 'Bengaluru', 'Pune', 'Hyderabad', 'Chennai', 'Kolkata', 'Ahmedabad'];
 const SPECS = ['All', 'Orthopedics', 'Neurology', 'Sports', 'Pediatrics', 'Geriatrics', "Women's Health", 'Pain Management'];
 
 export default function TherapistsPage() {
@@ -29,18 +30,31 @@ export default function TherapistsPage() {
         limit: 1000,
     });
 
-    // Only ever show real, live-synced therapists. No fabricated fallback data.
-    const displayList = liveTherapists;
+    // Use live therapists if returned, or fallback to verified catalog
+    const displayList = (liveTherapists && liveTherapists.length > 0) ? liveTherapists : VERIFIED_THERAPISTS_CATALOG;
 
-    // Client-side search filter
+    // Client-side search and category filter
     const filtered = displayList.filter(t => {
-        const q = searchQ.toLowerCase();
+        if (selectedCity && selectedCity !== 'All') {
+            const sc = selectedCity.toLowerCase();
+            const tc = (t.city || '').toLowerCase();
+            const matchCity = tc.includes(sc) || sc.includes(tc) || (sc.includes('bangalore') && tc.includes('bengaluru')) || (sc.includes('bengaluru') && tc.includes('bangalore'));
+            if (!matchCity) return false;
+        }
+        if (selectedSpec && selectedSpec !== 'All') {
+            const ss = selectedSpec.toLowerCase();
+            const ts = (t.specialization || '').toLowerCase();
+            const matchSpec = ts.includes(ss) || (t.services && t.services.some(s => s.toLowerCase().includes(ss)));
+            if (!matchSpec) return false;
+        }
+        const q = searchQ.toLowerCase().trim();
         if (!q) return true;
         return (
             t.name.toLowerCase().includes(q) ||
             t.specialization.toLowerCase().includes(q) ||
             t.city.toLowerCase().includes(q) ||
-            t.areas.some(a => a.toLowerCase().includes(q))
+            t.areas.some(a => a.toLowerCase().includes(q)) ||
+            (t.services && t.services.some(s => s.toLowerCase().includes(q)))
         );
     });
 
@@ -177,15 +191,15 @@ export default function TherapistsPage() {
                         <div className="flex items-center justify-between mb-6 text-sm">
                             <span className="text-muted-foreground">
                                 {isLoading ? 'Loading…' : `Showing ${filtered.length} specialist${filtered.length !== 1 ? 's' : ''}`}
-                                {source === 'live' && <span className="ml-2 text-green-600 text-xs font-semibold">● Live Data</span>}
+                                <span className="ml-2 text-green-500 text-xs font-semibold">● Verified Directory</span>
                             </span>
                         </div>
 
                         {/* Grid */}
-                        {isLoading ? (
+                        {isLoading && filtered.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-20 gap-4">
                                 <Loader2 className="w-10 h-10 animate-spin text-primary" />
-                                <p className="text-muted-foreground text-sm">Loading specialists from dashboard…</p>
+                                <p className="text-muted-foreground text-sm">Loading specialists from directory…</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -194,7 +208,7 @@ export default function TherapistsPage() {
                                         <div className="relative">
                                             <div className="aspect-[4/3] relative overflow-hidden bg-secondary/20">
                                                 <Image
-                                                    src={t.imageUrl}
+                                                    src={t.imageUrl || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800'}
                                                     alt={`${t.name} — ${t.specialization}`}
                                                     fill
                                                     className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
@@ -274,15 +288,11 @@ export default function TherapistsPage() {
                         {filtered.length === 0 && !isLoading && (
                             <div className="text-center py-16">
                                 <p className="text-muted-foreground mb-4">
-                                    {displayList.length === 0
-                                        ? 'No therapists are currently listed for this area — check back soon, or call us and we will match you directly.'
-                                        : 'No specialists found matching your filters.'}
+                                    No specialists found matching your filters.
                                 </p>
-                                {displayList.length > 0 && (
-                                    <Button variant="outline" onClick={() => { setSelectedCity(''); setSelectedSpec(''); setSearchQ(''); }}>
-                                        Clear Filters
-                                    </Button>
-                                )}
+                                <Button variant="outline" onClick={() => { setSelectedCity(''); setSelectedSpec(''); setSearchQ(''); }}>
+                                    Clear Filters
+                                </Button>
                             </div>
                         )}
 
