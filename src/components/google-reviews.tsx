@@ -21,21 +21,44 @@ interface GoogleReviewsProps {
 
 export default function GoogleReviews({ locationName, className }: GoogleReviewsProps) {
   const [reviews, setReviews] = useState<GmbReview[]>([]);
-  const [error, setError] = useState('');
+  // 'loading' | 'unavailable' | 'ready'
+  // The widget renders nothing at all in the 'unavailable' state instead of a
+  // visible "temporarily unavailable" message — see P1-08. Real GMB OAuth
+  // credentials are still required from the business owner to ever reach 'ready'.
+  const [status, setStatus] = useState<'loading' | 'unavailable' | 'ready'>('loading');
 
   useEffect(() => {
+    let cancelled = false;
     getGoogleReviews('local-hub')
-      .then(setReviews)
-      .catch((requestError) => {
-        setError(requestError instanceof Error ? requestError.message : 'Google reviews are unavailable');
+      .then((data) => {
+        if (cancelled) return;
+        if (data.length > 0) {
+          setReviews(data);
+          setStatus('ready');
+        } else {
+          setStatus('unavailable');
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setStatus('unavailable');
       });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  // Fail silently: no live GMB integration is configured yet, so instead of a
+  // permanently visible "temporarily unavailable" banner on every page, the
+  // entire section is simply omitted until real reviews are available.
+  if (status !== 'ready' || reviews.length === 0) {
+    return null;
+  }
 
   return (
     <section className={cn("py-12 md:py-16 relative overflow-hidden bg-background", className)}>
       {/* Atmospheric Background Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(var(--primary),0.02)_0%,transparent_70%)] pointer-events-none" />
-      
+
       <div className="container mx-auto px-4 relative z-10">
         {/* Centered Clinical Staging */}
         <div className="max-w-4xl mx-auto text-center mb-12 space-y-6 animate-reveal-up">
@@ -45,11 +68,6 @@ export default function GoogleReviews({ locationName, className }: GoogleReviews
           <h2 className="font-headline text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-tight">
             What Patients Say in <span className="text-primary">{locationName}</span>
           </h2>
-          {error && (
-            <p role="status" className="text-sm text-muted-foreground">
-              Verified Google reviews are temporarily unavailable.
-            </p>
-          )}
         </div>
 
         {reviews.length > 0 && <Carousel

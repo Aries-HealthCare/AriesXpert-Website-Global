@@ -15,16 +15,6 @@ import BookAppointmentButton from '@/components/book-appointment-button';
 import { getOrganizationSchema, getBreadcrumbSchema } from '@/lib/seo-schemas';
 import { useTherapists, type TherapistCard } from '@/hooks/use-therapists';
 
-// Static fallback therapists (shown if backend is down / token not set)
-const FALLBACK_THERAPISTS: TherapistCard[] = [
-    { id: 't1', slug: 'dr-kajal-vora', name: 'Dr. Kajal Vora', qualification: 'MPT (Orthopedics)', experience: '8 Years', specialization: 'Orthopedic & Sports Physiotherapy', areas: ['Andheri', 'Bandra', 'Santacruz'], city: 'Mumbai', state: 'Maharashtra', rating: 4.9, reviewCount: 142, imageUrl: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=400', isAvailable: true, languages: ['English', 'Hindi', 'Gujarati'], services: ['Orthopedic Rehab', 'Sports Injury', 'Post-Surgery Recovery'], bio: '', isVerified: true, education: ['MPT (Orthopedics)'], feedback: [] },
-    { id: 't2', slug: 'dr-dhvani-jain', name: 'Dr. Dhvani Jain', qualification: 'MPT (Neurology)', experience: '10 Years', specialization: 'Neurological Rehabilitation', areas: ['Dadar', 'Matunga', 'Sion'], city: 'Mumbai', state: 'Maharashtra', rating: 4.8, reviewCount: 98, imageUrl: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=400', isAvailable: true, languages: ['English', 'Hindi'], services: ['Stroke Rehab', 'Parkinson\'s Care', 'Neuro Rehab'], bio: '', isVerified: true, education: ['MPT (Neurology)'], feedback: [] },
-    { id: 't3', slug: 'dr-charmi-dedhia', name: 'Dr. Charmi Dedhia', qualification: 'BPT, MIAP', experience: '6 Years', specialization: 'Women\'s Health & Pediatric Physiotherapy', areas: ['Mulund', 'Ghatkopar', 'Vikhroli'], city: 'Mumbai', state: 'Maharashtra', rating: 4.9, reviewCount: 76, imageUrl: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=400', isAvailable: true, languages: ['English', 'Hindi', 'Marathi'], services: ['Pediatric Physio', 'Women\'s Health', 'Post-Natal Care'], bio: '', isVerified: true, education: ['BPT, MIAP'], feedback: [] },
-    { id: 't4', slug: 'dr-twinkle-patel', name: 'Dr. Twinkle Patel', qualification: 'MPT (Sports)', experience: '12 Years', specialization: 'Sports Physiotherapy & Orthopedics', areas: ['Vile Parle', 'Juhu', 'Goregaon'], city: 'Mumbai', state: 'Maharashtra', rating: 5.0, reviewCount: 204, imageUrl: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=400', isAvailable: true, languages: ['English', 'Hindi', 'Gujarati'], services: ['Sports Injury', 'Performance Enhancement', 'Orthopedic Rehab'], bio: '', isVerified: true, education: ['MPT (Sports)'], feedback: [] },
-    { id: 't5', slug: 'dr-darshita-damania', name: 'Dr. Darshita Damania', qualification: 'MPT (Geriatrics)', experience: '7 Years', specialization: 'Geriatric Physiotherapy', areas: ['Thane West', 'Kopri', 'Naupada'], city: 'Thane', state: 'Maharashtra', rating: 4.8, reviewCount: 63, imageUrl: 'https://images.unsplash.com/photo-1638604813811-6f3c53deff9c?auto=format&fit=crop&q=80&w=400', isAvailable: true, languages: ['English', 'Hindi', 'Marathi'], services: ['Geriatric Care', 'Fall Prevention', 'Balance Training'], bio: '', isVerified: true, education: ['MPT (Geriatrics)'], feedback: [] },
-    { id: 't6', slug: 'dr-sumangala-poojari', name: 'Dr. Sumangala Poojari', qualification: 'MPT (Orthopedics)', experience: '9 Years', specialization: 'Orthopedic & Pain Management', areas: ['Thane East', 'Majiwada', 'Manpada'], city: 'Thane', state: 'Maharashtra', rating: 4.7, reviewCount: 89, imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=400', isAvailable: false, languages: ['English', 'Hindi', 'Kannada'], services: ['Pain Management', 'Orthopedic Rehab', 'Spine Care'], bio: '', isVerified: true, education: ['MPT (Orthopedics)'], feedback: [] },
-];
-
 const CITIES = ['All', 'Mumbai', 'Pune', 'Bangalore', 'Delhi', 'Hyderabad', 'Chennai', 'Kolkata', 'Ahmedabad'];
 const SPECS = ['All', 'Orthopedics', 'Neurology', 'Sports', 'Pediatrics', 'Geriatrics', "Women's Health", 'Pain Management'];
 
@@ -39,7 +29,8 @@ export default function TherapistsPage() {
         limit: 1000,
     });
 
-    const displayList = liveTherapists.length > 0 ? liveTherapists : FALLBACK_THERAPISTS;
+    // Only ever show real, live-synced therapists. No fabricated fallback data.
+    const displayList = liveTherapists;
 
     // Client-side search filter
     const filtered = displayList.filter(t => {
@@ -282,19 +273,25 @@ export default function TherapistsPage() {
 
                         {filtered.length === 0 && !isLoading && (
                             <div className="text-center py-16">
-                                <p className="text-muted-foreground mb-4">No specialists found matching your filters.</p>
-                                <Button variant="outline" onClick={() => { setSelectedCity(''); setSelectedSpec(''); setSearchQ(''); }}>
-                                    Clear Filters
-                                </Button>
+                                <p className="text-muted-foreground mb-4">
+                                    {displayList.length === 0
+                                        ? 'No therapists are currently listed for this area — check back soon, or call us and we will match you directly.'
+                                        : 'No specialists found matching your filters.'}
+                                </p>
+                                {displayList.length > 0 && (
+                                    <Button variant="outline" onClick={() => { setSelectedCity(''); setSelectedSpec(''); setSearchQ(''); }}>
+                                        Clear Filters
+                                    </Button>
+                                )}
                             </div>
                         )}
 
                         {/* CTA */}
                         <div className="text-center mt-12">
                             <p className="text-muted-foreground mb-4 text-sm">
-                                {source === 'live'
+                                {filtered.length > 0
                                     ? `Showing ${filtered.length} active specialists. Call us to find the perfect match.`
-                                    : 'Showing sample therapists. Live data loads when the backend token is configured.'}
+                                    : 'Call us and our clinical coordinators will match you with the right specialist directly.'}
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button asChild size="lg" className="h-12 px-8 font-bold">
