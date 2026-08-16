@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Carousel,
@@ -12,11 +13,26 @@ import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useRequestCallback } from '@/components/request-callback-provider';
 import BookAppointmentButton from "../book-appointment-button";
+import type { WebsiteStats } from "@/app/api/stats/route";
 
 const heroImages = PlaceHolderImages.filter(p => p.id.startsWith('hero-'));
 
+function formatCount(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M+`;
+  if (n >= 1_000) return `${Math.floor(n / 1_000)}k+`;
+  return `${n}+`;
+}
+
 export default function Hero() {
   const { openModal } = useRequestCallback();
+  const [stats, setStats] = useState<WebsiteStats | null>(null);
+
+  useEffect(() => {
+    fetch('/api/stats')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setStats(data); })
+      .catch(() => {}); // Non-blocking: hero renders fine without stats
+  }, []);
 
   return (
     <section className="relative w-full h-[85vh] md:h-[95vh] min-h-[700px] overflow-hidden bg-black">
@@ -55,10 +71,10 @@ export default function Hero() {
             <div className="flex flex-wrap gap-3 mb-8 animate-in fade-in slide-in-from-left-8 duration-700 delay-100 fill-mode-both">
               <div className="glassmorphic py-1.5 px-4 rounded-full border border-white/20 flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-white">ISO 9001:2015 Certified</span>
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-white">Home Healthcare Services</span>
               </div>
               <div className="glassmorphic py-1.5 px-4 rounded-full border border-white/20 flex items-center gap-2">
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-primary-foreground">★ 4.9/5 Rating</span>
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-primary-foreground">Appointment Requests Online</span>
               </div>
             </div>
 
@@ -69,7 +85,7 @@ export default function Hero() {
             </h1>
             
             <p className="mt-8 text-lg sm:text-xl md:text-2xl text-white/80 font-medium max-w-2xl leading-relaxed animate-in slide-in-from-left-8 duration-1000 delay-400 fill-mode-both drop-shadow">
-              Experience hospital-grade clinical excellence with India's most trusted home physiotherapy & professional nursing providers.
+              Request home physiotherapy and professional nursing services from the Aries clinical network.
             </p>
 
             <div className="mt-12 flex flex-col sm:flex-row gap-5 animate-in slide-in-from-left-4 duration-1000 delay-600 fill-mode-both">
@@ -91,12 +107,16 @@ export default function Hero() {
             {/* Key Trust Stats */}
             <div className="mt-16 pt-8 border-t border-white/10 flex flex-wrap gap-8 md:gap-16 animate-in fade-in duration-1000 delay-800 fill-mode-both">
               <div>
-                <p className="text-3xl md:text-4xl font-black text-white">450+</p>
+                <p className="text-3xl md:text-4xl font-black text-white">
+                  {stats ? formatCount(stats.therapistCount) : '—'}
+                </p>
                 <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/50">Specialists</p>
               </div>
               <div>
-                <p className="text-3xl md:text-4xl font-black text-white">250k+</p>
-                <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/50">Home Visits</p>
+                <p className="text-3xl md:text-4xl font-black text-white">
+                  {stats ? formatCount(stats.patientCount) : '—'}
+                </p>
+                <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/50">Patients Served</p>
               </div>
               <div>
                 <p className="text-3xl md:text-4xl font-black text-white">Same-Day</p>

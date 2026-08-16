@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle, Loader2 } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { submitCorporateLead } from '@/app/actions/lead-actions';
+import { withStoredAttribution } from '@/lib/growth-attribution';
 import { useToast } from '@/hooks/use-toast';
 
 const valueProps = [
@@ -46,7 +47,7 @@ export default function ForCorporatesPage() {
 
     const onSubmit = async (data: FormValues) => {
         setIsLoading(true);
-        const result = await submitCorporateLead(data);
+        const result = await submitCorporateLead(withStoredAttribution(data));
         if (result.error) {
             toast({ variant: 'destructive', title: 'Submission Failed', description: result.error });
         } else {

@@ -8,6 +8,11 @@ interface PageProps {
     params: Promise<{ therapistSlug: string }>;
 }
 
+// Therapist profiles are operational data. Render them from the live directory
+// at request time instead of making a production build depend on a reachable
+// backend or baking a stale practitioner roster into the deployment.
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { therapistSlug } = await params;
     const therapists = await fetchTherapistsServer({ slug: therapistSlug });
@@ -31,12 +36,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             images: [{ url: therapist.imageUrl, width: 800, height: 600, alt: therapist.name }],
         },
     };
-}
-
-export async function generateStaticParams() {
-    // We only pre-generate the top therapists to save build time
-    const therapists = await fetchTherapistsServer({ limit: 1000 });
-    return therapists.map(t => ({ therapistSlug: t.slug }));
 }
 
 export default async function TherapistProfilePage({ params }: PageProps) {
@@ -76,4 +75,3 @@ export default async function TherapistProfilePage({ params }: PageProps) {
         </>
     );
 }
-

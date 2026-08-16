@@ -35,6 +35,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { submitAppointmentLead } from '@/app/actions/lead-actions';
+import { withStoredAttribution } from '@/lib/growth-attribution';
 import LocalizedFaqSection from '@/components/localized-faq-section';
 import GoogleReviews from '@/components/google-reviews';
 import WhatWeTreat from '@/components/landing/what-we-treat';
@@ -124,7 +125,7 @@ export default function ServiceLocationClient({ serviceSlug, location }: Service
             return;
         }
         setIsSubmitting(true);
-        const result = await submitAppointmentLead({
+        const result = await submitAppointmentLead(withStoredAttribution({
             ...data,
             service: service.name,
             country: 'India',
@@ -134,7 +135,8 @@ export default function ServiceLocationClient({ serviceSlug, location }: Service
             date: new Date(),
             time: 'Asap',
             address: `Lead from Local SEO: ${subAreaName}`,
-        });
+            email: data.email || `${data.phone.replace(/\D/g, '')}@lead.ariesxpert.com`,
+        }));
 
         if (result.success) {
             toast({ title: "Enquiry Received", description: `A specialist will call you shortly.` });

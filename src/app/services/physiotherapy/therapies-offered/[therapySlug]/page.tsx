@@ -3,11 +3,12 @@ import { getDetailedTherapyBySlug, therapyList, toSlug } from '@/lib/placeholder
 import TherapyClient from './therapy-client';
 
 type Props = {
-    params: { therapySlug: string }
+    params: Promise<{ therapySlug: string }>
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const therapy = getDetailedTherapyBySlug(params.therapySlug);
+    const { therapySlug } = await params;
+    const therapy = getDetailedTherapyBySlug(therapySlug);
 
     if (!therapy) {
         return {
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             title,
             description,
             type: 'article',
-            url: `https://ariesxpert.com/services/physiotherapy/therapies-offered/${params.therapySlug}`,
+            url: `https://ariesxpert.com/services/physiotherapy/therapies-offered/${therapySlug}`,
             images: [
                 {
                     url: therapy.imageUrl || 'https://ariesxpert.com/default-therapy-og.jpg',
@@ -56,7 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             images: [therapy.imageUrl || 'https://ariesxpert.com/default-therapy-og.jpg'],
         },
         alternates: {
-            canonical: `https://ariesxpert.com/services/physiotherapy/therapies-offered/${params.therapySlug}`,
+            canonical: `https://ariesxpert.com/services/physiotherapy/therapies-offered/${therapySlug}`,
         },
     };
 }
@@ -67,6 +68,6 @@ export async function generateStaticParams() {
     }));
 }
 
-export default function Page({ params }: Props) {
+export default function Page() {
     return <TherapyClient />;
 }

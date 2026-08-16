@@ -5,14 +5,7 @@ export type TeleTherapist = {
   experience: string;
   specialization: string;
   imageUrl: string;
-  isOnline: boolean;
-};
-
-export type ConsultationSession = {
-  sessionId: string;
-  googleMeetLink: string;
-  therapistName: string;
-  startTime: string;
+  isAvailable: boolean;
 };
 
 export type IntakeFormValues = {

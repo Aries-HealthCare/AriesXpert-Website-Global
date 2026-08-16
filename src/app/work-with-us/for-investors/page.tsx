@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { submitInvestorLead } from '@/app/actions/lead-actions';
+import { withStoredAttribution } from '@/lib/growth-attribution';
 import { useToast } from '@/hooks/use-toast';
 
 
@@ -39,7 +40,7 @@ export default function ForInvestorsPage() {
 
     const onSubmit = async (data: FormValues) => {
         setIsLoading(true);
-        const result = await submitInvestorLead(data);
+        const result = await submitInvestorLead(withStoredAttribution(data));
         if (result.error) {
             toast({ variant: 'destructive', title: 'Submission Failed', description: result.error });
         } else {

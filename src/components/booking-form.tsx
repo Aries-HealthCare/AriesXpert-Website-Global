@@ -17,6 +17,7 @@ import { ArrowLeft, ArrowRight, CheckCircle, Loader2, CreditCard, Smartphone, Ba
 import AppointmentCalendar from './AppointmentCalendar';
 import { TimeSlots } from './TimeSlots';
 import { submitAppointmentLead } from '@/app/actions/lead-actions';
+import { getStoredAttribution } from '@/lib/growth-attribution';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -25,7 +26,7 @@ import { cn } from '@/lib/utils';
 const steps = [
   { id: 'profile', title: 'Profile' },
   { id: 'schedule', title: 'Schedule' },
-  { id: 'payment', title: 'Payment' },
+  { id: 'payment', title: 'Payment Preference' },
   { id: 'confirm', title: 'Finalize' },
 ];
 
@@ -106,8 +107,11 @@ export default function BookingForm({ service, condition, onSubmitted, className
 
   const onSubmit = async (data: BookingFormValues) => {
     setIsLoading(true);
-    // Simulated backend call
-    const result = await submitAppointmentLead({ ...data, country: 'India' } as any);
+    const result = await submitAppointmentLead({
+      ...data,
+      country: 'India',
+      ...getStoredAttribution(),
+    } as any);
     
     if (result.error) {
         toast({ variant: "destructive", title: "Submission Failed", description: result.error });
@@ -123,9 +127,9 @@ export default function BookingForm({ service, condition, onSubmitted, className
         <div className="mx-auto bg-green-500/10 text-green-500 p-6 rounded-full w-fit mb-6 shadow-inner">
           <CheckCircle className="h-12 w-12" />
         </div>
-        <h3 className="font-headline text-3xl font-bold tracking-tight">Appointment Booked!</h3>
+        <h3 className="font-headline text-3xl font-bold tracking-tight">Appointment Request Received</h3>
         <p className="text-muted-foreground mt-4 max-w-sm font-medium leading-relaxed">
-          Thank you for choosing Aries PhysioCare. Our clinical coordinator will call you within 15 minutes to finalize your expert visit.
+          Your preferred visit details were submitted. A clinical coordinator will confirm the therapist, time, and payment instructions before the appointment is booked.
         </p>
         <Button onClick={onSubmitted} className="mt-10 h-14 px-10 rounded-xl font-black text-xs uppercase tracking-widest neon-accent-border">
           Return to Hub
@@ -273,7 +277,7 @@ export default function BookingForm({ service, condition, onSubmitted, className
                       name="time"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-[11px] font-black uppercase tracking-widest">Available Slots</FormLabel>
+                          <FormLabel className="text-[11px] font-black uppercase tracking-widest">Preferred Times</FormLabel>
                             <TimeSlots 
                                 slots={timeSlots}
                                 selected={selectedTime}
@@ -300,7 +304,7 @@ export default function BookingForm({ service, condition, onSubmitted, className
                   <div className="w-16 h-16 rounded-full bg-primary/5 text-primary flex items-center justify-center mx-auto shadow-inner">
                     <ShieldCheck className="w-8 h-8" />
                   </div>
-                  <h3 className="text-xl font-bold font-headline">Select Payment Mode</h3>
+                  <h3 className="text-xl font-bold font-headline">Select Payment Preference</h3>
                   <p className="text-sm text-muted-foreground">Clinical sessions are billed as per actual assessment. No upfront charges.</p>
                 </div>
 
@@ -382,8 +386,8 @@ export default function BookingForm({ service, condition, onSubmitted, className
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent-foreground"><Smartphone className="w-5 h-5"/></div>
                           <div>
-                            <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Payment Method</p>
-                            <p className="text-sm font-bold uppercase tracking-wider">{form.getValues('paymentMethod')} - Pay Post Assessment</p>
+                            <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Payment Preference</p>
+                            <p className="text-sm font-bold uppercase tracking-wider">{form.getValues('paymentMethod')} - instructions pending confirmation</p>
                           </div>
                         </div>
                         <div className="text-center sm:text-right">
@@ -409,7 +413,7 @@ export default function BookingForm({ service, condition, onSubmitted, className
                   </Button>
               ) : (
                   <Button type="submit" disabled={isLoading} className="w-full h-16 rounded-xl font-black uppercase text-sm tracking-[0.2em] neon-accent-border shadow-2xl healthcare-motion transform hover:-translate-y-1">
-                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Initializing Visit...</> : 'Finalize Expert Booking'}
+                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting Request...</> : 'Submit Appointment Request'}
                   </Button>
               )}
             </div>

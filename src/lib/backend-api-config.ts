@@ -33,3 +33,7 @@ export function getBackendApiBaseUrl(): string {
 export function getWebsiteTherapistsUrl(params: URLSearchParams): string {
   return `${getBackendApiBaseUrl()}/website/therapists?${params.toString()}`;
 }
+
+export function getWebsiteStatsUrl(): string {
+  return `${getBackendApiBaseUrl()}/website/stats`;
+}

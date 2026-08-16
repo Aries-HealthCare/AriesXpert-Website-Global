@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Loader2, CheckCircle } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { submitCallbackLead } from '@/app/actions/lead-actions';
+import { withStoredAttribution } from '@/lib/growth-attribution';
 import { useToast } from '@/hooks/use-toast';
 
 interface RequestCallbackModalProps {
@@ -40,7 +41,7 @@ export default function RequestCallbackModal({ isOpen, onClose }: RequestCallbac
 
   const handleSubmit = async (data: FormValues) => {
     setIsLoading(true);
-    const result = await submitCallbackLead(data);
+    const result = await submitCallbackLead(withStoredAttribution(data));
     if(result.error) {
         toast({
             variant: 'destructive',

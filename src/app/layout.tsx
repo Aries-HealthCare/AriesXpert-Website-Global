@@ -10,6 +10,7 @@ import { RequestCallbackProvider } from "@/components/request-callback-provider"
 import MobileCtaFooter from "@/components/mobile-cta-footer";
 import { FirebaseClientProvider } from "@/firebase";
 import WhatsAppButton from "@/components/whatsapp-button";
+import { AttributionCapture } from "@/components/attribution-capture";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -112,6 +113,7 @@ export default function RootLayout({
         <ThemeProvider>
           <FirebaseClientProvider>
             <RequestCallbackProvider>
+              <AttributionCapture />
               <Header />
               <main className="flex-1">
                 {children}

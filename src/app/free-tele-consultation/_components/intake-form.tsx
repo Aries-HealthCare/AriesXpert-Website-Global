@@ -11,8 +11,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Loader2, Video, Calendar as CalendarIcon, UploadCloud, CheckCircle2, ArrowLeft, ArrowRight } from 'lucide-react';
-import { startInstantConsultation, scheduleConsultation } from '@/services/telehealth-api';
+import { Loader2, Calendar as CalendarIcon, CheckCircle2, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { scheduleConsultation } from '@/services/telehealth-api';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import AppointmentCalendar from '@/components/AppointmentCalendar';
@@ -33,7 +33,7 @@ const intakeSchema = z.object({
 type FormValues = z.infer<typeof intakeSchema>;
 
 export default function IntakeForm({ therapistId }: { therapistId: string }) {
-  const [isSubmitting, setIsSubmitting] = useState<'instant' | 'schedule' | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showScheduler, setShowScheduler] = useState(false);
   const [isBooked, setIsBooked] = useState(false);
   const router = useRouter();
@@ -57,36 +57,40 @@ export default function IntakeForm({ therapistId }: { therapistId: string }) {
 
   const timeSlots = ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM'];
 
-  const handleAction = async (type: 'instant' | 'schedule') => {
+  const handleAction = async () => {
     const isValid = await form.trigger(['fullName', 'age', 'gender', 'address', 'mobile', 'email', 'condition']);
     if (!isValid) return;
 
-    if (type === 'schedule' && !showScheduler) {
+    if (!therapistId) {
+      toast({ variant: 'destructive', title: 'Specialist Required', description: 'Please return to the directory and select an approved specialist.' });
+      return;
+    }
+
+    if (!showScheduler) {
       setShowScheduler(true);
       return;
     }
 
-    if (type === 'schedule' && (!selectedDate || !selectedTime)) {
+    if (!selectedDate || !selectedTime) {
       toast({ variant: 'destructive', title: 'Selection Required', description: 'Please select a date and time slot.' });
       return;
     }
 
-    setIsSubmitting(type);
+    setIsSubmitting(true);
     const data = form.getValues() as any;
 
     try {
-      if (type === 'instant') {
-        const session = await startInstantConsultation(data, therapistId);
-        router.push(`/free-tele-consultation/session?meetLink=${encodeURIComponent(session.googleMeetLink)}&therapist=${encodeURIComponent(session.therapistName)}`);
-      } else {
-        await scheduleConsultation(data, therapistId, selectedDate!, selectedTime!);
-        setIsBooked(true);
-        toast({ title: "Booking Successful", description: "Your consultation has been scheduled. Check your email for details." });
-      }
+      await scheduleConsultation(data, therapistId, selectedDate, selectedTime);
+      setIsBooked(true);
+      toast({ title: 'Request Received', description: 'Our team will verify the specialist and preferred time before confirming.' });
     } catch (error) {
-      toast({ variant: 'destructive', title: 'Action Failed', description: 'Could not process request. Please try again.' });
+      toast({
+        variant: 'destructive',
+        title: 'Request Failed',
+        description: error instanceof Error ? error.message : 'Could not submit the request.',
+      });
     } finally {
-      setIsSubmitting(null);
+      setIsSubmitting(false);
     }
   };
 
@@ -96,9 +100,9 @@ export default function IntakeForm({ therapistId }: { therapistId: string }) {
         <div className="mx-auto w-20 h-20 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mb-6">
           <CheckCircle2 className="w-10 h-10" />
         </div>
-        <h2 className="font-headline text-3xl font-bold mb-4">Consultation Booked!</h2>
+        <h2 className="font-headline text-3xl font-bold mb-4">Consultation Request Received</h2>
         <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
-          Your free tele-health session has been scheduled. A calendar invite with the meeting link has been sent to your email.
+          Your preferred date and time were submitted. This is not yet a confirmed appointment; our team will contact you with availability and secure joining details.
         </p>
         <Button size="lg" className="px-12" onClick={() => router.push('/')}>Return Home</Button>
       </Card>
@@ -151,39 +155,23 @@ export default function IntakeForm({ therapistId }: { therapistId: string }) {
                   <FormItem><FormLabel>Condition / Problem Description</FormLabel><FormControl><Textarea rows={4} placeholder="Describe your symptoms and how long they have lasted..." {...field} className="bg-background/50" /></FormControl><FormMessage /></FormItem>
                 )} />
 
-                <div className="space-y-3">
-                  <Label>Upload Medical Reports (X-Ray, MRI, Prescriptions)</Label>
-                  <div className="relative group">
-                    <input type="file" id="report-picker" className="hidden" multiple />
-                    <Label htmlFor="report-picker" className="flex flex-col items-center justify-center gap-2 py-10 border-2 border-dashed border-primary/20 rounded-2xl cursor-pointer hover:border-primary/50 transition-colors bg-primary/5 group-hover:bg-primary/10">
-                      <UploadCloud className="w-10 h-10 text-primary/60" />
-                      <span className="font-bold text-primary">Browse Files</span>
-                      <span className="text-xs text-muted-foreground">PDF, JPG, PNG (Max 10MB per file)</span>
-                    </Label>
-                  </div>
+                <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-muted-foreground">
+                  <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  Medical report upload is not available in this request form. Do not send reports or other sensitive records until the clinical team provides an approved secure channel.
                 </div>
               </CardContent>
             </Card>
 
-            <div className="grid sm:grid-cols-2 gap-6 mt-8">
-              <Button 
-                type="button" 
-                size="lg" 
-                className="h-20 text-xl font-bold bg-green-600 hover:bg-green-700 shadow-xl neon-accent-border"
-                disabled={!!isSubmitting}
-                onClick={() => handleAction('instant')}
-              >
-                {isSubmitting === 'instant' ? <><Loader2 className="mr-2 animate-spin" /> Connecting...</> : <><Video className="mr-3 w-6 h-6" /> Start Session Now</>}
-              </Button>
+            <div className="mt-8">
               <Button 
                 type="button" 
                 variant="outline" 
                 size="lg" 
-                className="h-20 text-xl font-bold glassmorphic border-primary/30"
-                disabled={!!isSubmitting}
-                onClick={() => handleAction('schedule')}
+                disabled={isSubmitting}
+                onClick={handleAction}
+                className="h-20 w-full text-xl font-bold glassmorphic border-primary/30"
               >
-                <CalendarIcon className="mr-3 w-6 h-6 text-primary" /> Schedule for Later
+                <CalendarIcon className="mr-3 w-6 h-6 text-primary" /> Choose Preferred Time
               </Button>
             </div>
           </div>
@@ -213,7 +201,7 @@ export default function IntakeForm({ therapistId }: { therapistId: string }) {
                   name="time"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[11px] font-black uppercase tracking-widest">Available Slots</FormLabel>
+                      <FormLabel className="text-[11px] font-black uppercase tracking-widest">Preferred Times</FormLabel>
                         <TimeSlots 
                             slots={timeSlots}
                             selected={selectedTime || null}
@@ -234,13 +222,13 @@ export default function IntakeForm({ therapistId }: { therapistId: string }) {
             <Button 
               type="button"
               className="w-full h-20 text-2xl font-black rounded-2xl neon-accent-border shadow-2xl transition-all"
-              onClick={() => handleAction('schedule')}
-              disabled={!!isSubmitting || !selectedDate || !selectedTime}
+              onClick={handleAction}
+              disabled={isSubmitting || !selectedDate || !selectedTime}
             >
-              {isSubmitting === 'schedule' ? (
-                <><Loader2 className="mr-2 animate-spin" /> Finalizing Booking...</>
+              {isSubmitting ? (
+                <><Loader2 className="mr-2 animate-spin" /> Submitting Request...</>
               ) : (
-                <><CheckCircle2 className="mr-3 w-6 h-6" /> Confirm Scheduled Visit</>
+                <><CheckCircle2 className="mr-3 w-6 h-6" /> Submit Consultation Request</>
               )}
             </Button>
           </div>

@@ -15,6 +15,7 @@ import { useRequestCallback } from "@/components/request-callback-provider";
 import BookAppointmentButton from "@/components/book-appointment-button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { submitContactLead } from '../actions/lead-actions';
+import { withStoredAttribution } from '@/lib/growth-attribution';
 import { useToast } from '@/hooks/use-toast';
 
 const countryContacts = [
@@ -48,7 +49,7 @@ export default function ContactPage() {
 
     const onSubmit = async (data: FormValues) => {
         setIsLoading(true);
-        const result = await submitContactLead(data);
+        const result = await submitContactLead(withStoredAttribution(data));
         if (result.error) {
             toast({ variant: 'destructive', title: 'Submission Failed', description: result.error });
         } else {

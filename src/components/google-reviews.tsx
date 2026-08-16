@@ -21,10 +21,14 @@ interface GoogleReviewsProps {
 
 export default function GoogleReviews({ locationName, className }: GoogleReviewsProps) {
   const [reviews, setReviews] = useState<GmbReview[]>([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Simulate fetching from GMB API
-    getGoogleReviews('local-hub').then(setReviews);
+    getGoogleReviews('local-hub')
+      .then(setReviews)
+      .catch((requestError) => {
+        setError(requestError instanceof Error ? requestError.message : 'Google reviews are unavailable');
+      });
   }, []);
 
   return (
@@ -41,21 +45,14 @@ export default function GoogleReviews({ locationName, className }: GoogleReviews
           <h2 className="font-headline text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-tight">
             What Patients Say in <span className="text-primary">{locationName}</span>
           </h2>
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-            <div className="flex items-center gap-2 bg-white/50 dark:bg-card/40 px-4 py-2 rounded-full border border-primary/10 shadow-sm">
-              <div className="flex text-yellow-500">
-                {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-current" />)}
-              </div>
-              <span className="text-xs font-black uppercase tracking-widest">4.9/5 Rating</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white/50 dark:bg-card/40 px-4 py-2 rounded-full border border-primary/10 shadow-sm">
-              <img src="https://www.gstatic.com/images/branding/googleg/1x/googleg_standard_color_128dp.png" alt="Google" className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Verified Google Reviews</span>
-            </div>
-          </div>
+          {error && (
+            <p role="status" className="text-sm text-muted-foreground">
+              Verified Google reviews are temporarily unavailable.
+            </p>
+          )}
         </div>
 
-        <Carousel
+        {reviews.length > 0 && <Carousel
           opts={{
             align: "start",
             loop: true,
@@ -119,7 +116,7 @@ export default function GoogleReviews({ locationName, className }: GoogleReviews
               <ChevronRight className="w-5 h-5" />
             </CarouselNext>
           </div>
-        </Carousel>
+        </Carousel>}
 
         <div className="mt-16 text-center animate-reveal-up stagger-4 opacity-0 [animation-fill-mode:forwards]">
           <p className="text-[9px] font-black text-primary/30 uppercase tracking-[0.4em]">
