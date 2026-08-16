@@ -29,6 +29,7 @@ import {
 import { ARIES_CLINICS_DIRECTORY } from '@/lib/clinics-data';
 import BookAppointmentButton from '@/components/book-appointment-button';
 import { getOrganizationSchema, getBreadcrumbSchema, getMedicalClinicSchema } from '@/lib/seo-schemas';
+import { cn } from '@/lib/utils';
 
 export default function ClinicsPage() {
   const clinic = ARIES_CLINICS_DIRECTORY[0];
@@ -307,29 +308,47 @@ export default function ClinicsPage() {
               <div className="space-y-6">
                 <div>
                   <div className="inline-flex items-center gap-1.5 text-primary text-xs font-black uppercase tracking-widest">
-                    <Award className="w-3.5 h-3.5" /> Lead Specialists
+                    <Award className="w-3.5 h-3.5" /> Lead Specialists & Consultants
                   </div>
                   <h2 className="font-headline text-2xl md:text-3xl font-black text-foreground mt-1">
-                    Consultants Practicing at Borivali West Center
+                    Consultants & Timings at Borivali West Center
                   </h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {clinic.doctors.map((doc, dIdx) => (
-                    <Card key={dIdx} className="rounded-3xl border border-border/80 bg-card p-6 flex items-center gap-5 shadow-lg">
-                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shrink-0 border border-primary/20">
-                        <Image src={doc.imageUrl} alt={doc.name} fill className="object-cover" />
-                      </div>
-                      <div className="space-y-1 flex-1">
-                        <h3 className="font-headline text-base sm:text-lg font-bold text-foreground">{doc.name}</h3>
-                        <p className="text-xs text-primary font-semibold">{doc.qualification}</p>
-                        <p className="text-xs text-muted-foreground">{doc.specialization}</p>
-                        <Badge variant="outline" className="text-[10px] border-accent/40 text-accent font-bold mt-1">
-                          {doc.experience}
-                        </Badge>
-                      </div>
-                    </Card>
-                  ))}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {clinic.doctors.map((doc, dIdx) => {
+                    const isLogo = !doc.imageUrl || doc.imageUrl.includes('aries-emblem') || doc.imageUrl.includes('default-avatar');
+                    return (
+                      <Card key={dIdx} className="rounded-3xl border border-border/80 bg-card p-6 flex flex-col justify-between shadow-xl hover:border-primary/40 transition-all duration-300 group">
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-4">
+                            <div className={cn("relative w-20 h-20 rounded-2xl overflow-hidden shrink-0 border-2 border-primary/20", isLogo ? "bg-gradient-to-br from-[#3b0d5c] via-[#1f0730] to-[#0d0214] flex items-center justify-center p-3" : "")}>
+                              <Image src={doc.imageUrl} alt={doc.name} fill className={cn(isLogo ? "object-contain p-3 drop-shadow-[0_4px_12px_rgba(234,179,8,0.3)]" : "object-cover")} />
+                            </div>
+                            <div className="space-y-0.5 flex-1 min-w-0">
+                              <h3 className="font-headline text-lg font-bold text-foreground group-hover:text-primary transition-colors leading-snug">{doc.name}</h3>
+                              <p className="text-xs text-primary font-semibold">{doc.qualification}</p>
+                              <Badge variant="outline" className="text-[10px] border-accent/40 text-accent font-bold mt-1">
+                                {doc.experience}
+                              </Badge>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5 text-xs pt-1">
+                            <p className="text-muted-foreground line-clamp-2">{doc.specialization}</p>
+                          </div>
+                        </div>
+
+                        <div className="pt-4 mt-4 border-t border-border/50 flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-bold">
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>{doc.timings}</span>
+                          </div>
+                          <span className="text-[11px] text-muted-foreground font-medium">Available Daily</span>
+                        </div>
+                      </Card>
+                    );
+                  })}
                 </div>
               </div>
             </div>

@@ -1,3 +1,12 @@
+export interface ClinicDoctor {
+  name: string;
+  qualification: string;
+  specialization: string;
+  experience: string;
+  timings: string;
+  imageUrl: string;
+}
+
 export interface ClinicBranch {
   id: string;
   slug: string;
@@ -24,13 +33,7 @@ export interface ClinicBranch {
   specialties: string[];
   amenities: string[];
   equipment: string[];
-  doctors: Array<{
-    name: string;
-    qualification: string;
-    specialization: string;
-    experience: string;
-    imageUrl: string;
-  }>;
+  doctors: ClinicDoctor[];
   consultationFee: string;
   description: string;
 }
@@ -95,17 +98,27 @@ export const ARIES_CLINICS_DIRECTORY: ClinicBranch[] = [
     ],
     doctors: [
       {
-        name: "Dr. Kajal Vora, PT",
-        qualification: "MPT (Neurology), BPT, MIAP",
-        specialization: "Senior Neuro Consultant & Clinical Lead",
-        experience: "12+ Years Experience",
+        name: "Dr. Hitali Sankhe, PT",
+        qualification: "BPT, MIAP · Expert Physiotherapist",
+        specialization: "Orthopedic & Neurological Rehabilitation Specialist",
+        experience: "Expert Physiotherapist",
+        timings: "9:00 AM – 1:00 PM",
         imageUrl: "/images/aries-emblem.png",
       },
       {
-        name: "Dr. Twinkle Patel, PT",
-        qualification: "BPT, MIAP, Certified Manual Therapist",
-        specialization: "Orthopedic & Spine Rehabilitation Specialist",
-        experience: "10+ Years Experience",
+        name: "Dr. Anu Desai, PT",
+        qualification: "BPT, MIAP · Senior Consultant Physiotherapist",
+        specialization: "Senior Clinical Advisor & Comprehensive Rehabilitation",
+        experience: "50+ Years Experience",
+        timings: "1:00 PM – 4:00 PM",
+        imageUrl: "https://aries-physiohealthcare.s3.ap-south-1.amazonaws.com/1757059872029.jpg",
+      },
+      {
+        name: "Dr. Pallavi Sharma, PT",
+        qualification: "BPT, MIAP · Expert Physiotherapist",
+        specialization: "Spine Care, Joint Mobilization & Pain Management Specialist",
+        experience: "Expert Physiotherapist",
+        timings: "4:00 PM – 9:00 PM",
         imageUrl: "/images/aries-emblem.png",
       },
     ],

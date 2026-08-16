@@ -86,7 +86,7 @@ export default function TherapistsPage() {
                         </nav>
                         <div className="max-w-4xl mx-auto text-center space-y-6">
                             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-xs font-bold uppercase tracking-widest">
-                                <Shield className="w-4 h-4 text-accent" /> 450+ Verified Specialists
+                                <Shield className="w-4 h-4 text-accent" /> 474+ Verified Specialists
                             </div>
                             <h1 className="font-headline text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-[1.15]">
                                 Meet Our Expert<br /><span className="text-accent">Physiotherapists</span>
