@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -22,6 +23,9 @@ import {
   CalendarCheck,
   Activity,
   Layers,
+  Home,
+  Tag,
+  AlertCircle
 } from 'lucide-react';
 import { ARIES_CLINICS_DIRECTORY, type ClinicBranch } from '@/lib/clinics-data';
 import BookAppointmentButton from '@/components/book-appointment-button';
@@ -33,38 +37,28 @@ interface ClinicPageProps {
 }
 
 export async function generateStaticParams() {
-  return ARIES_CLINICS_DIRECTORY.map((clinic) => ({
-    clinicSlug: clinic.slug,
+  return ARIES_CLINICS_DIRECTORY.map((c) => ({
+    clinicSlug: c.slug,
   }));
 }
 
 export async function generateMetadata({ params }: ClinicPageProps): Promise<Metadata> {
   const { clinicSlug } = await params;
-  const clinic = ARIES_CLINICS_DIRECTORY.find((c) => c.slug === clinicSlug || c.id === clinicSlug);
+  const clinic = ARIES_CLINICS_DIRECTORY.find((c) => c.slug === clinicSlug) || ARIES_CLINICS_DIRECTORY[0];
 
   if (!clinic) {
     return { title: 'Clinic Not Found | Aries PhysioCare' };
   }
 
   return {
-    title: `${clinic.name} - ${clinic.subArea}, ${clinic.city} | Aries PhysioCare`,
-    description: `Visit ${clinic.name} in ${clinic.subArea}, ${clinic.city}. Hospital-grade physiotherapy, Class IV Laser, IFT, Spinal Decompression, and certified BPT/MPT specialists.`,
-    keywords: [
-      clinic.name,
-      `physiotherapy clinic in ${clinic.subArea}`,
-      `best physiotherapist in ${clinic.city}`,
-      'Aries PhysioCare clinic',
-      'integrated wellness center',
-      clinic.subArea,
-      clinic.pincode,
-    ],
+    title: `${clinic.name} | Top Physiotherapy Center in ${clinic.subArea}`,
+    description: `${clinic.description} Located at ${clinic.address}. Open daily ${clinic.workingHours}. Call ${clinic.phone}.`,
     alternates: {
-      canonical: `https://www.ariesphysiocare.com/clinic/${clinic.slug}`,
+      canonical: `/clinic/${clinic.slug}`,
     },
     openGraph: {
-      title: `${clinic.name} | Aries PhysioCare`,
-      description: clinic.description,
-      url: `https://www.ariesphysiocare.com/clinic/${clinic.slug}`,
+      title: `${clinic.name} · Borivali West Mumbai`,
+      description: clinic.tagline,
       images: [{ url: clinic.imageUrl, width: 1200, height: 630, alt: clinic.name }],
     },
   };
@@ -72,13 +66,18 @@ export async function generateMetadata({ params }: ClinicPageProps): Promise<Met
 
 export default async function ClinicDetailPage({ params }: ClinicPageProps) {
   const { clinicSlug } = await params;
-  const clinic = ARIES_CLINICS_DIRECTORY.find((c) => c.slug === clinicSlug || c.id === clinicSlug);
+  const clinic = ARIES_CLINICS_DIRECTORY.find((c) => c.slug === clinicSlug) || ARIES_CLINICS_DIRECTORY[0];
 
   if (!clinic) {
     notFound();
   }
 
   const jsonLd = [
+    getBreadcrumbSchema([
+      { name: 'Home', url: '/' },
+      { name: 'Clinics', url: '/clinic' },
+      { name: clinic.name, url: `/clinic/${clinic.slug}` },
+    ]),
     getMedicalClinicSchema({
       name: clinic.name,
       description: clinic.description,
@@ -91,11 +90,6 @@ export default async function ClinicDetailPage({ params }: ClinicPageProps) {
       rating: clinic.googleRating,
       reviewCount: clinic.reviewCount,
     }),
-    getBreadcrumbSchema([
-      { name: 'Home', url: '/' },
-      { name: 'Clinics', url: '/clinic' },
-      { name: clinic.subArea, url: `/clinic/${clinic.slug}` },
-    ]),
   ];
 
   return (
@@ -109,74 +103,68 @@ export default async function ClinicDetailPage({ params }: ClinicPageProps) {
       ))}
 
       <div className="flex flex-col min-h-screen bg-background text-foreground">
-        {/* ── BREADCRUMB & HEADER ──────────────────────────────────── */}
-        <section className="pt-24 pb-8 md:pt-32 md:pb-12 bg-gradient-to-b from-primary/10 via-background to-background border-b border-border/40">
-          <div className="container mx-auto px-4 md:px-6">
-            <nav className="flex items-center gap-2 text-muted-foreground text-xs mb-6" aria-label="Breadcrumb">
+        {/* ── HERO HEADER ──────────────────────────────────────────── */}
+        <section className="relative pt-24 pb-14 md:pt-36 md:pb-20 overflow-hidden bg-gradient-to-b from-primary/15 via-background to-background">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(ellipse_at_top,rgba(225,29,72,0.2),transparent_70%)] pointer-events-none" />
+
+          <div className="container mx-auto px-4 md:px-6 relative z-10">
+            {/* Breadcrumb */}
+            <nav className="flex items-center gap-2 text-muted-foreground text-xs mb-8" aria-label="Breadcrumb">
               <Link href="/" className="hover:text-primary transition-colors">Home</Link>
               <ChevronRight className="w-3 h-3" />
               <Link href="/clinic" className="hover:text-primary transition-colors">Clinics</Link>
               <ChevronRight className="w-3 h-3" />
-              <span className="text-foreground font-semibold">{clinic.subArea}</span>
+              <span className="text-foreground font-semibold truncate max-w-xs">{clinic.name}</span>
             </nav>
 
-            <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6">
-              <div className="space-y-3 max-w-3xl">
-                <div className="flex items-center gap-2 flex-wrap">
-                  {clinic.badge && (
-                    <Badge className="bg-primary text-white text-[11px] font-black uppercase tracking-wider px-3 py-1">
-                      {clinic.badge}
-                    </Badge>
-                  )}
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold">
-                    <Star className="w-3.5 h-3.5 fill-amber-400" />
-                    {clinic.googleRating} · {clinic.reviewCount}+ Google Reviews
-                  </div>
-                  <span className="flex items-center gap-1 text-xs text-emerald-500 font-bold">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    Open Today ({clinic.workingHours})
-                  </span>
-                </div>
-
-                <h1 className="font-headline text-2xl sm:text-4xl md:text-5xl font-black text-foreground leading-tight">
-                  {clinic.name}
-                </h1>
-
-                <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                  {clinic.tagline}
-                </p>
+            <div className="max-w-4xl mx-auto text-center space-y-6">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-black uppercase tracking-widest">
+                <Building2 className="w-4 h-4" />
+                {clinic.badge || 'Official Clinic Center'}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto shrink-0">
+              <h1 className="font-headline text-3xl sm:text-4xl md:text-6xl font-black tracking-tight leading-[1.12]">
+                {clinic.name}
+              </h1>
+
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                {clinic.tagline}
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
                 <Button
                   asChild
-                  className="h-12 px-6 rounded-xl bg-gradient-to-r from-primary to-rose-600 hover:from-primary/90 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-primary/20"
+                  size="lg"
+                  className="h-14 px-8 text-base font-black bg-gradient-to-r from-primary to-rose-600 hover:from-primary/90 text-white rounded-2xl shadow-xl shadow-primary/25"
                 >
                   <a href={clinic.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                    <Navigation className="w-4 h-4" /> Navigate on Google Maps <ExternalLink className="w-3.5 h-3.5" />
+                    <Navigation className="w-4 h-4" /> Open in Google Maps
+                    <ExternalLink className="w-3.5 h-3.5 ml-0.5" />
                   </a>
                 </Button>
-                <BookAppointmentButton className="h-12 px-6 rounded-xl font-bold text-xs">
-                  Book In-Clinic Slot
-                </BookAppointmentButton>
+                <Button asChild size="lg" variant="outline" className="h-14 px-8 text-base font-bold rounded-2xl border-border hover:bg-secondary/60">
+                  <a href="tel:+919136447006" className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-emerald-500" /> Call Front Desk
+                  </a>
+                </Button>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ── GALLERY & QUICK INFO ──────────────────────────────────── */}
+        {/* ── PHOTO GALLERY & SIDEBAR ──────────────────────────────── */}
         <section className="py-12 bg-background">
           <div className="container mx-auto px-4 md:px-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Main Image and Gallery */}
+              {/* Photo Gallery Grid */}
               <div className="lg:col-span-2 space-y-4">
-                <div className="relative aspect-[16/10] w-full rounded-3xl overflow-hidden border border-border shadow-2xl">
+                <div className="relative aspect-[16/10] rounded-3xl overflow-hidden shadow-2xl border border-border/80">
                   <Image
                     src={clinic.imageUrl}
                     alt={clinic.name}
                     fill
-                    className="object-cover"
                     priority
+                    className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 66vw"
                   />
                 </div>
@@ -212,15 +200,19 @@ export default async function ClinicDetailPage({ params }: ClinicPageProps) {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      <Phone className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <div className="flex items-start gap-3">
+                      <Phone className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                       <div>
-                        <div className="font-bold text-foreground">Direct Telephones:</div>
-                        <div className="text-muted-foreground mt-0.5">
-                          <a href={`tel:${clinic.phone.replace(/[^0-9+]/g, '')}`} className="hover:text-primary font-mono">{clinic.phone}</a>
-                          {clinic.alternatePhone && (
-                            <> · <a href={`tel:${clinic.alternatePhone.replace(/[^0-9+]/g, '')}`} className="hover:text-primary font-mono">{clinic.alternatePhone}</a></>
-                          )}
+                        <div className="font-bold text-foreground">Direct Mobile Numbers:</div>
+                        <div className="flex flex-wrap gap-x-2 gap-y-1 mt-1 font-mono font-bold">
+                          {clinic.phones.map((phone, pIdx) => (
+                            <React.Fragment key={pIdx}>
+                              <a href={`tel:${phone.replace(/[^0-9+]/g, '')}`} className="text-primary hover:underline">
+                                {phone}
+                              </a>
+                              {pIdx < clinic.phones.length - 1 && <span className="text-muted-foreground">·</span>}
+                            </React.Fragment>
+                          ))}
                         </div>
                       </div>
                     </div>
@@ -228,8 +220,8 @@ export default async function ClinicDetailPage({ params }: ClinicPageProps) {
                     <div className="flex items-center gap-3">
                       <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
                       <div>
-                        <div className="font-bold text-foreground">Consultation Rates:</div>
-                        <div className="text-emerald-500 font-bold mt-0.5">{clinic.consultationFee}</div>
+                        <div className="font-bold text-foreground">Consultation / Regular Session:</div>
+                        <div className="text-emerald-500 font-bold font-mono text-sm mt-0.5">{clinic.consultationFee}</div>
                       </div>
                     </div>
                   </div>
@@ -238,17 +230,106 @@ export default async function ClinicDetailPage({ params }: ClinicPageProps) {
                     <Button asChild variant="outline" className="w-full h-11 rounded-xl text-xs font-bold border-border hover:bg-secondary">
                       <a href={`tel:${clinic.phone.replace(/[^0-9+]/g, '')}`} className="flex items-center justify-center gap-2">
                         <Phone className="w-3.5 h-3.5 text-emerald-500" />
-                        Call Front Desk
+                        Call Front Desk (+91 9136447006)
                       </a>
                     </Button>
                     <Button asChild variant="outline" className="w-full h-11 rounded-xl text-xs font-bold border-border hover:bg-secondary text-emerald-500">
                       <a href={`https://wa.me/${clinic.whatsapp}?text=${encodeURIComponent(`Hello Aries PhysioCare, I would like to book an appointment at ${clinic.name}`)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
                         <MessageCircle className="w-3.5 h-3.5" />
-                        WhatsApp Desk
+                        WhatsApp Front Desk
                       </a>
                     </Button>
                   </div>
                 </Card>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── OFFICIAL FEES & PACKAGES SECTION ─────────────────────── */}
+        <section className="py-16 bg-card/40 border-y border-border">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="max-w-5xl mx-auto space-y-10">
+              <div className="text-center space-y-2">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-black uppercase tracking-widest">
+                  <Tag className="w-3.5 h-3.5" /> Standard Clinical Tariff
+                </div>
+                <h2 className="font-headline text-3xl md:text-4xl font-black text-foreground underline decoration-primary/50 underline-offset-8">
+                  Fees For Physiotherapy
+                </h2>
+              </div>
+
+              {/* Consultation Block */}
+              <div className="p-8 rounded-3xl bg-gradient-to-r from-card via-card to-primary/10 border-2 border-primary/40 shadow-xl text-center max-w-xl mx-auto space-y-2">
+                <h3 className="font-headline text-xl font-bold text-foreground">Consultation / Regular Therapy</h3>
+                <div className="font-headline text-4xl sm:text-5xl font-black text-primary">₹ 800/-</div>
+              </div>
+
+              {/* Packages Block */}
+              <div className="space-y-6">
+                <div className="text-center">
+                  <h3 className="font-headline text-xl sm:text-2xl font-black text-foreground">
+                    Physiotherapy Packages <span className="text-xs sm:text-sm font-semibold text-primary block sm:inline sm:ml-2">(Only on 100% Advance Payments)</span>
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {clinic.packages.map((pkg, idx) => (
+                    <Card
+                      key={idx}
+                      className={cn(
+                        "rounded-3xl overflow-hidden border-2 transition-all duration-300 flex flex-col justify-between relative shadow-xl hover:-translate-y-1",
+                        pkg.isPopular
+                          ? "border-primary bg-gradient-to-b from-primary/10 via-card to-card shadow-primary/20"
+                          : "border-border/80 bg-card hover:border-primary/40"
+                      )}
+                    >
+                      {pkg.isPopular && (
+                        <div className="bg-primary text-white text-[10px] font-black uppercase tracking-widest py-1 text-center">
+                          ★ Most Recommended
+                        </div>
+                      )}
+
+                      <div className="p-6 text-center space-y-4">
+                        <div className="p-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-headline text-2xl font-black shadow-md">
+                          {pkg.duration}
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-muted-foreground uppercase">Per Session</div>
+                          <div className="font-headline text-lg font-black text-foreground">{pkg.perSession}</div>
+                        </div>
+
+                        <div className="py-3 px-4 rounded-2xl bg-secondary/50 border border-border space-y-0.5">
+                          <div className="text-[11px] text-muted-foreground">Total Price</div>
+                          <div className="font-headline text-2xl font-black text-foreground">{pkg.totalPrice}</div>
+                        </div>
+
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-black">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          {pkg.savings}
+                        </div>
+                      </div>
+
+                      <div className="p-6 pt-0">
+                        <BookAppointmentButton className="w-full h-11 rounded-xl text-xs font-bold">
+                          Book {pkg.duration}
+                        </BookAppointmentButton>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Policy Note */}
+                <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-center space-y-1 max-w-2xl mx-auto">
+                  <div className="text-rose-500 font-headline font-bold text-sm flex items-center justify-center gap-1.5">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    Bargaining is not permitted.
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    If there are any offers or discounts available, they will be clearly advertised or displayed on our board.
+                  </p>
+                </div>
               </div>
             </div>
           </div>

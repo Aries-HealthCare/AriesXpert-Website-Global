@@ -24,7 +24,9 @@ import {
   Zap,
   CalendarCheck,
   Home,
-  Check
+  Check,
+  AlertCircle,
+  Tag
 } from 'lucide-react';
 import { ARIES_CLINICS_DIRECTORY } from '@/lib/clinics-data';
 import BookAppointmentButton from '@/components/book-appointment-button';
@@ -92,7 +94,7 @@ export default function ClinicsPage() {
               </h1>
 
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Visit our physical rehabilitation facility in Borivali West, Mumbai. Fully equipped with hospital-grade Class IV Laser, High-Intensity IFT, Spinal Decompression, and certified senior physiotherapists.
+                Visit our premier physical rehabilitation facility in Borivali West, Mumbai. Fully equipped with hospital-grade Class IV Laser, High-Intensity IFT, Spinal Decompression, and senior clinical physiotherapists.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
@@ -116,10 +118,10 @@ export default function ClinicsPage() {
               {/* Quick Trust Highlights */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 max-w-3xl mx-auto">
                 {[
-                  { label: 'Google Rating', value: '4.9 ★ (280+ Reviews)' },
+                  { label: 'Google Rating', value: '4.9 ★ (285+ Reviews)' },
                   { label: 'Working Hours', value: '8:00 AM – 9:30 PM (365 Days)' },
                   { label: 'Location', value: 'New MHB Colony, Borivali West' },
-                  { label: 'Clinical Staff', value: '100% BPT/MPT Certified' },
+                  { label: 'Clinical Staff', value: '100% BPT Certified' },
                 ].map((item, idx) => (
                   <div key={idx} className="p-3.5 rounded-2xl bg-card/60 border border-border/80 backdrop-blur-md text-center">
                     <div className="text-xs text-muted-foreground font-medium">{item.label}</div>
@@ -216,21 +218,28 @@ export default function ClinicsPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2.5">
-                      <Phone className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <div className="flex items-start gap-2.5">
+                      <Phone className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                       <div>
-                        <span className="font-bold text-foreground">Telephones: </span>
-                        <a href="tel:+919136447006" className="text-primary hover:underline font-mono font-bold">+91 9136447006</a>
-                        <span className="text-muted-foreground"> · </span>
-                        <a href="tel:+919972267762" className="text-primary hover:underline font-mono font-bold">+91 9972267762</a>
+                        <span className="font-bold text-foreground">Clinic Mobile Numbers: </span>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 font-mono font-bold">
+                          {clinic.phones.map((phone, pIdx) => (
+                            <React.Fragment key={pIdx}>
+                              <a href={`tel:${phone.replace(/[^0-9+]/g, '')}`} className="text-primary hover:underline">
+                                {phone}
+                              </a>
+                              {pIdx < clinic.phones.length - 1 && <span className="text-muted-foreground">·</span>}
+                            </React.Fragment>
+                          ))}
+                        </div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2.5">
                       <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
                       <div>
-                        <span className="font-bold text-foreground">Assessment Fee: </span>
-                        <span className="text-emerald-500 font-bold font-mono">{clinic.consultationFee}</span>
+                        <span className="font-bold text-foreground">Consultation / Regular Session: </span>
+                        <span className="text-emerald-500 font-bold font-mono text-sm">{clinic.consultationFee}</span>
                       </div>
                     </div>
                   </div>
@@ -273,6 +282,114 @@ export default function ClinicsPage() {
                       </a>
                     </Button>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── OFFICIAL FEES & PACKAGES SECTION ─────────────────────── */}
+        <section className="py-16 md:py-24 bg-gradient-to-b from-card/40 via-card/80 to-card/40 border-y border-border relative">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="max-w-5xl mx-auto space-y-12">
+              
+              {/* Header */}
+              <div className="text-center space-y-3">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-black uppercase tracking-widest">
+                  <Tag className="w-3.5 h-3.5" /> Official Clinic Tariff
+                </div>
+                <h2 className="font-headline text-3xl sm:text-4xl md:text-5xl font-black text-foreground tracking-tight underline decoration-primary/50 underline-offset-8">
+                  Fees For Physiotherapy
+                </h2>
+                <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
+                  Transparent, standardized clinical charges with specialized advance payment package discounts.
+                </p>
+              </div>
+
+              {/* Single Session Banner Card */}
+              <div className="p-8 md:p-10 rounded-3xl bg-gradient-to-r from-card via-card to-primary/10 border-2 border-primary/40 shadow-2xl text-center max-w-2xl mx-auto space-y-3">
+                <h3 className="font-headline text-xl sm:text-2xl font-black text-foreground">
+                  Consultation / Regular Therapy
+                </h3>
+                <div className="font-headline text-4xl sm:text-6xl font-black text-primary tracking-tight">
+                  ₹ 800/-
+                </div>
+                <p className="text-xs text-muted-foreground font-medium">
+                  Includes comprehensive diagnostic assessment, electrotherapy modalities, and hands-on clinical therapy.
+                </p>
+              </div>
+
+              {/* Packages Subsection */}
+              <div className="space-y-6 pt-4">
+                <div className="text-center">
+                  <h3 className="font-headline text-xl sm:text-2xl md:text-3xl font-black text-foreground">
+                    Physiotherapy Packages <span className="text-xs sm:text-sm font-semibold text-primary block sm:inline sm:ml-2">(Only on 100% Advance Payments)</span>
+                  </h3>
+                </div>
+
+                {/* 3 Packages Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {clinic.packages.map((pkg, idx) => (
+                    <Card
+                      key={idx}
+                      className={cn(
+                        "rounded-3xl overflow-hidden border-2 transition-all duration-300 flex flex-col justify-between relative shadow-xl hover:-translate-y-1",
+                        pkg.isPopular
+                          ? "border-primary bg-gradient-to-b from-primary/10 via-card to-card shadow-primary/20"
+                          : "border-border/80 bg-card hover:border-primary/40"
+                      )}
+                    >
+                      {pkg.isPopular && (
+                        <div className="bg-primary text-white text-[10px] font-black uppercase tracking-widest py-1.5 text-center">
+                          ★ Most Recommended
+                        </div>
+                      )}
+
+                      <div className="p-6 text-center space-y-4">
+                        <div className="p-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-headline text-2xl font-black shadow-md">
+                          {pkg.duration}
+                        </div>
+
+                        <div className="space-y-1 pt-2">
+                          <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                            Per Session Rate
+                          </div>
+                          <div className="font-headline text-xl font-black text-foreground">
+                            {pkg.perSession}
+                          </div>
+                        </div>
+
+                        <div className="py-3 px-4 rounded-2xl bg-secondary/50 border border-border space-y-1">
+                          <div className="text-[11px] font-medium text-muted-foreground">Total Package Price</div>
+                          <div className="font-headline text-3xl font-black text-foreground tracking-tight">
+                            {pkg.totalPrice}
+                          </div>
+                        </div>
+
+                        <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-black">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          {pkg.savings}
+                        </div>
+                      </div>
+
+                      <div className="p-6 pt-0">
+                        <BookAppointmentButton className="w-full h-11 rounded-xl text-xs font-bold">
+                          Book {pkg.duration}
+                        </BookAppointmentButton>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Important Policy Notice Banner */}
+                <div className="p-5 rounded-2xl bg-rose-500/10 border-2 border-rose-500/30 text-center space-y-1 max-w-3xl mx-auto">
+                  <div className="text-rose-500 font-headline font-black text-base sm:text-lg flex items-center justify-center gap-2">
+                    <AlertCircle className="w-5 h-5 shrink-0" />
+                    Bargaining is not permitted.
+                  </div>
+                  <p className="text-xs text-muted-foreground font-medium">
+                    If there are any offers or discounts available, they will be clearly advertised or displayed on our board.
+                  </p>
                 </div>
               </div>
             </div>

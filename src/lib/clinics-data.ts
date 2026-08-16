@@ -7,6 +7,14 @@ export interface ClinicDoctor {
   imageUrl: string;
 }
 
+export interface ClinicPackage {
+  duration: string;
+  perSession: string;
+  totalPrice: string;
+  savings: string;
+  isPopular?: boolean;
+}
+
 export interface ClinicBranch {
   id: string;
   slug: string;
@@ -20,7 +28,7 @@ export interface ClinicBranch {
   state: string;
   pincode: string;
   phone: string;
-  alternatePhone?: string;
+  phones: string[];
   whatsapp: string;
   googleRating: number;
   reviewCount: number;
@@ -35,6 +43,9 @@ export interface ClinicBranch {
   equipment: string[];
   doctors: ClinicDoctor[];
   consultationFee: string;
+  regularSessionFee: string;
+  packages: ClinicPackage[];
+  pricingNotice: string;
   description: string;
 }
 
@@ -52,8 +63,8 @@ export const ARIES_CLINICS_DIRECTORY: ClinicBranch[] = [
     state: "Maharashtra",
     pincode: "400091",
     phone: "+91 9136447006",
-    alternatePhone: "+91 9972267762",
-    whatsapp: "917372681410",
+    phones: ["+91 9136447006", "+91 9372681410", "+91 8591981880"],
+    whatsapp: "919372681410",
     googleRating: 4.9,
     reviewCount: 285,
     googleMapsUrl: "https://share.google/rOlEnKQabSdOV2fpf",
@@ -122,7 +133,30 @@ export const ARIES_CLINICS_DIRECTORY: ClinicBranch[] = [
         imageUrl: "/images/aries-emblem.png",
       },
     ],
-    consultationFee: "₹600 In-Clinic Assessment · Home Care Sessions Available",
+    consultationFee: "₹ 800/-",
+    regularSessionFee: "₹ 800/- per session",
+    packages: [
+      {
+        duration: "10 Days",
+        perSession: "₹ 750 / session",
+        totalPrice: "₹ 7,500/-",
+        savings: "Save ₹ 500/-",
+      },
+      {
+        duration: "15 Days",
+        perSession: "₹ 700 / session",
+        totalPrice: "₹ 10,500/-",
+        savings: "Save ₹ 1,500/-",
+        isPopular: true,
+      },
+      {
+        duration: "30 Days",
+        perSession: "₹ 650 / session",
+        totalPrice: "₹ 19,500/-",
+        savings: "Save ₹ 4,500/-",
+      },
+    ],
+    pricingNotice: "Bargaining is not permitted. If there are any offers or discounts available, they will be clearly advertised or displayed on our board.",
     description: "Aries PhysioCare Center in New MHB Colony, Borivali West is our premier physical clinic and clinical wellness hub. Equipped with world-class electrotherapy modalities, private therapy suites, and senior hospital-trained specialists, we provide personalized healing for acute and chronic musculoskeletal, neurological, and post-operative conditions.",
   },
 ];
