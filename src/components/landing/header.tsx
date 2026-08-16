@@ -92,7 +92,7 @@ export default function Header() {
           <Link href="/therapist" className="text-[13px] 2xl:text-[15px] font-bold hover:text-primary transition-colors flex items-center gap-1 whitespace-nowrap px-1" prefetch={false}>
             <Users className="h-3.5 w-3.5" /> Therapists
           </Link>
-          <Link href="/clinic" className="hidden 2xl:flex text-[15px] font-bold hover:text-primary transition-colors items-center gap-1 whitespace-nowrap px-1" prefetch={false}>
+          <Link href="/clinic" className="text-[13px] 2xl:text-[15px] font-bold hover:text-primary transition-colors flex items-center gap-1 whitespace-nowrap px-1" prefetch={false}>
             <Building2 className="h-3.5 w-3.5" /> Clinic
           </Link>
           <Link href="/blogs" className="hidden 2xl:flex text-[15px] font-bold hover:text-primary transition-colors whitespace-nowrap px-1" prefetch={false}>Blog</Link>
