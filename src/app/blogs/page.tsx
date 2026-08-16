@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { blogPosts } from "@/lib/placeholder-data";
 import { fetchGrowthBlogPosts } from "@/lib/growth-blog-posts";
 import { services } from "@/lib/placeholder-data";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -18,26 +17,23 @@ export const metadata = {
 
 export default async function BlogsPage() {
   const growthPosts = await fetchGrowthBlogPosts();
-  const growthSlugs = new Set(growthPosts.map((p) => p.slug));
-  const staticPosts = blogPosts.filter((p) => !growthSlugs.has(p.slug));
-  const allPosts = [
-    ...growthPosts.map((p) => ({
-      id: p.id,
-      slug: p.slug,
-      title: p.title,
-      summary: p.summary,
-      serviceTag: p.territory || p.topic || 'AI Insights',
-      readTime: `${Math.max(3, Math.ceil((p.content?.length || 400) / 900))} min read`,
-      date: p.publishedAt
-        ? new Date(p.publishedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })
-        : 'Recently',
-      author: 'Aries Growth Engine',
-      imageUrl: '/images/blog-default.jpg',
-      imageHint: 'healthcare blog',
-      isGrowth: true,
-    })),
-    ...staticPosts.map((p) => ({ ...p, isGrowth: false })),
-  ];
+  // Only real, backend-sourced posts from the Growth Engine CMS feed are
+  // shown — the legacy static placeholder posts have been removed (P2-09).
+  const allPosts = growthPosts.map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    summary: p.summary,
+    serviceTag: p.territory || p.topic || 'AI Insights',
+    readTime: `${Math.max(3, Math.ceil((p.content?.length || 400) / 900))} min read`,
+    date: p.publishedAt
+      ? new Date(p.publishedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })
+      : 'Recently',
+    author: 'Aries Growth Engine',
+    imageUrl: '/images/blog-default.jpg',
+    imageHint: 'healthcare blog',
+    isGrowth: true,
+  }));
 
   return (
     <div className="bg-background min-h-screen">
@@ -100,6 +96,13 @@ export default async function BlogsPage() {
       {/* Blog Grid */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
+          {allPosts.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-muted-foreground">
+                No articles are published yet — check back soon for expert insights from our clinical team.
+              </p>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12">
             {allPosts.map((post) => (
               <Card key={post.id} className="group border-none bg-transparent shadow-none flex flex-col">
@@ -163,19 +166,7 @@ export default async function BlogsPage() {
               </Card>
             ))}
           </div>
-
-          {/* Pagination or Load More (Simulated) */}
-          <div className="mt-20 text-center">
-            <div className="inline-flex items-center gap-2 p-1 bg-secondary/30 rounded-full border border-border/10">
-              <Button variant="ghost" className="rounded-full px-6" disabled>Previous</Button>
-              <div className="flex items-center gap-1 px-4">
-                <span className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">1</span>
-                <span className="w-8 h-8 rounded-full hover:bg-background flex items-center justify-center text-xs font-medium cursor-pointer">2</span>
-                <span className="w-8 h-8 rounded-full hover:bg-background flex items-center justify-center text-xs font-medium cursor-pointer">3</span>
-              </div>
-              <Button variant="ghost" className="rounded-full px-6">Next</Button>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 

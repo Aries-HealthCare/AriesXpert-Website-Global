@@ -1,8 +1,10 @@
 'use client';
 
 import { useParams, notFound } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { getServiceBySlug, getConditionBySlug, getRelatedBlogPosts } from '@/lib/placeholder-data';
+import { getServiceBySlug, getConditionBySlug } from '@/lib/placeholder-data';
+import { fetchGrowthBlogPosts, type GrowthBlogPost } from '@/lib/growth-blog-posts';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, ArrowRight, MapPin, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
@@ -39,7 +41,26 @@ export default function ConditionDetailPage() {
   const condition = getConditionBySlug(service, params.conditionSlug as string);
   if (!condition) notFound();
 
-  const relatedPosts = getRelatedBlogPosts(service.name, 'none');
+  // Real, backend-sourced posts from the Growth Engine CMS feed only — the
+  // legacy fake related-posts matching against placeholder data has been
+  // removed (P2-09). Prefer posts tagged for this service; fall back to the
+  // latest published posts if none match.
+  const [relatedPosts, setRelatedPosts] = useState<GrowthBlogPost[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    fetchGrowthBlogPosts().then((posts) => {
+      if (cancelled) return;
+      const matching = posts.filter(
+        (p) => p.territory === service.name || p.topic === service.name,
+      );
+      setRelatedPosts((matching.length > 0 ? matching : posts).slice(0, 3));
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [service.name]);
+
   const relatedConditions = service.conditions.filter(c => c.slug !== condition.slug).slice(0, 10);
 
   return (
@@ -283,10 +304,10 @@ export default function ConditionDetailPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {relatedPosts.map((post) => (
                 <Card key={post.id} className="glassmorphic overflow-hidden flex flex-col hover:soft-shadow transition-all border-primary/10">
-                  <div className="relative aspect-video w-full">
-                    <Image src={post.imageUrl} alt={post.title} fill sizes="400px" className="object-cover" />
+                  <div className="relative aspect-video w-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                    <span className="text-xs font-bold uppercase tracking-widest text-primary">Growth Engine</span>
                     <div className="absolute top-4 left-4">
-                      <Badge className="bg-primary/90 text-white">{post.serviceTag}</Badge>
+                      <Badge className="bg-primary/90 text-white">{post.territory || post.topic || 'Insights'}</Badge>
                     </div>
                   </div>
                   <CardContent className="p-6 flex-grow">

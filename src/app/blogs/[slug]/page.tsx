@@ -1,7 +1,5 @@
 import { notFound } from 'next/navigation';
 import { fetchGrowthBlogBySlug } from '@/lib/growth-blog-posts';
-import { getBlogPostBySlug } from '@/lib/placeholder-data';
-import PlaceholderBlogPostClient from './placeholder-blog-post-client';
 import { GrowthBlogArticle } from './growth-blog-article';
 
 export default async function BlogPostPage({
@@ -11,12 +9,10 @@ export default async function BlogPostPage({
 }) {
   const { slug } = await params;
   const growthPost = await fetchGrowthBlogBySlug(slug);
-  if (growthPost) {
-    return <GrowthBlogArticle post={growthPost} />;
-  }
+  // Only real, backend-sourced Growth Engine posts are served — the legacy
+  // static placeholder fallback (with fake "Full long-form content..." body
+  // text) has been removed (P2-09).
+  if (!growthPost) notFound();
 
-  const placeholder = getBlogPostBySlug(slug);
-  if (!placeholder) notFound();
-
-  return <PlaceholderBlogPostClient />;
+  return <GrowthBlogArticle post={growthPost} />;
 }

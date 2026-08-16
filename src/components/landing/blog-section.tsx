@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { blogPosts } from "@/lib/placeholder-data";
+import { fetchGrowthBlogPosts } from "@/lib/growth-blog-posts";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Clock, BookOpen, ChevronRight } from "lucide-react";
@@ -8,8 +7,24 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 export default async function BlogSection() {
-  // Take top 3 for the home page display
-  const posts = blogPosts.slice(0, 3);
+  // Real, backend-sourced posts from the Growth Engine CMS feed only — the
+  // legacy static placeholder posts have been removed (P2-09).
+  const growthPosts = await fetchGrowthBlogPosts();
+  const posts = growthPosts.slice(0, 3).map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    summary: p.summary,
+    serviceTag: p.territory || p.topic || 'AI Insights',
+    readTime: `${Math.max(3, Math.ceil((p.content?.length || 400) / 900))} min read`,
+    date: p.publishedAt
+      ? new Date(p.publishedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })
+      : 'Recently',
+  }));
+
+  // No fabricated content, no "temporarily unavailable" banner — the section
+  // is simply omitted from the home page until real posts are published.
+  if (posts.length === 0) return null;
 
   return (
     <section className="py-6 md:py-10 relative overflow-hidden bg-background">
@@ -44,16 +59,8 @@ export default async function BlogSection() {
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
 
                 <CardHeader className="p-0 relative overflow-hidden w-full">
-                  <Link href={`/blogs/${post.slug}`} className="block relative aspect-[16/10] w-full overflow-hidden">
-                    <Image
-                      src={post.imageUrl}
-                      alt={post.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      data-ai-hint={post.imageHint}
-                    />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
+                  <Link href={`/blogs/${post.slug}`} className="block relative aspect-[16/10] w-full overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                    <span className="text-xs font-bold uppercase tracking-widest text-primary">Growth Engine</span>
                     <div className="absolute top-4 left-4">
                       <Badge className="bg-white/95 dark:bg-black/95 backdrop-blur-xl text-foreground dark:text-white border-none shadow-md font-bold text-[10px] uppercase tracking-[0.1em] px-4 py-1.5 rounded-full">
                         {post.serviceTag}

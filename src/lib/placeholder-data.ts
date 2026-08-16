@@ -1,4 +1,4 @@
-import type { Service, Speciality, Therapist, Location, BlogPost, Faq, Condition, GeoPath, SymptomDetail, TherapyDetail } from './types';
+import type { Service, Speciality, Therapist, Location, Faq, Condition, GeoPath, SymptomDetail, TherapyDetail } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 import { HeartPulse, Accessibility, Stethoscope, Users, CookingPot, BrainCircuit, Mic2 } from 'lucide-react';
 import { IndianStates } from './locations';
@@ -1091,106 +1091,10 @@ export const services: Service[] = [
   },
 ];
 
-export const blogPosts: BlogPost[] = [
-  {
-    id: '1',
-    slug: 'benefits-of-physiotherapy-at-home',
-    title: 'Benefits of Physiotherapy at Home for Faster Recovery',
-    summary: 'Discover why receiving physiotherapy in the comfort of your home can accelerate your recovery.',
-    content: 'Full long-form content...',
-    author: 'Aries PhysioCare Clinical Team',
-    date: 'July 20, 2024',
-    serviceTag: 'Physiotherapy',
-    relatedServiceSlug: 'physiotherapy',
-    readTime: '8 min read',
-    keywords: 'home physiotherapy, recovery',
-    ...findImage('blog-1')
-  },
-  {
-    id: '2',
-    slug: 'managing-chronic-pain',
-    title: 'Expert Tips for Managing Chronic Pain at Home',
-    summary: 'Learn how simple lifestyle adjustments and professional home care can reduce chronic discomfort.',
-    content: 'Full long-form content...',
-    author: 'Aries PhysioCare Clinical Team',
-    date: 'Aug 05, 2024',
-    serviceTag: 'Physiotherapy',
-    relatedServiceSlug: 'physiotherapy',
-    readTime: '10 min read',
-    keywords: 'chronic pain, management',
-    ...findImage('blog-2')
-  },
-  {
-    id: '3',
-    slug: 'post-operative-rehab-guide',
-    title: 'Recovering from TKR: A Step-by-Step Home Guide',
-    summary: 'A phased approach to regaining mobility and strength after Total Knee Replacement surgery.',
-    content: 'Full clinical content...',
-    author: 'Aries PhysioCare Clinical Team',
-    date: 'Sep 12, 2024',
-    serviceTag: 'Post-Op Care',
-    relatedServiceSlug: 'physiotherapy',
-    readTime: '12 min read',
-    keywords: 'TKR recovery, surgery rehab',
-    ...findImage('blog-3')
-  },
-  {
-    id: '4',
-    slug: 'sports-injury-prevention-tips',
-    title: 'Sports Physiotherapy: Essential Recovery Tips for Athletes',
-    summary: 'Learn how to prevent recurring strains and optimize your athletic performance through clinical screening.',
-    content: 'Full sports medicine content...',
-    author: 'Aries PhysioCare Clinical Team',
-    date: 'Oct 01, 2024',
-    serviceTag: 'Sports Physio',
-    relatedServiceSlug: 'physiotherapy',
-    readTime: '9 min read',
-    keywords: 'sports injury, athletic performance',
-    ...findImage('blog-4')
-  },
-  {
-    id: '5',
-    slug: 'neuro-rehab-at-home',
-    title: 'Restoring Independence: A Guide to Home Neuro-Rehabilitation',
-    summary: 'How specialized task-oriented training helps stroke and Parkinson’s patients regain motor control.',
-    content: 'Full neuro content...',
-    author: 'Aries PhysioCare Clinical Team',
-    date: 'Oct 15, 2024',
-    serviceTag: 'Neuro Rehab',
-    relatedServiceSlug: 'physiotherapy',
-    readTime: '15 min read',
-    keywords: 'neuro rehab, stroke recovery',
-    ...findImage('blog-5')
-  },
-  {
-    id: '6',
-    slug: 'cervical-spondylosis-management',
-    title: 'Clinical Insights: Managing Cervical Pain in the Digital Age',
-    summary: 'Expert advice on treating tech-neck and managing cervical spondylosis through home care protocols.',
-    content: 'Full clinical guide...',
-    author: 'Aries PhysioCare Clinical Team',
-    date: 'Nov 05, 2024',
-    serviceTag: 'Spine Care',
-    relatedServiceSlug: 'physiotherapy',
-    readTime: '11 min read',
-    keywords: 'neck pain, cervical spondylosis',
-    ...findImage('blog-6')
-  },
-  {
-    id: '7',
-    slug: 'geriatric-fall-prevention',
-    title: 'Geriatric Wellness: Proactive Fall Prevention for Seniors',
-    summary: 'Essential balance and stability strategies to maintain senior independence and safety at home.',
-    content: 'Full geriatric care content...',
-    author: 'Aries PhysioCare Clinical Team',
-    date: 'Nov 20, 2024',
-    serviceTag: 'Geriatric Care',
-    relatedServiceSlug: 'physiotherapy',
-    readTime: '10 min read',
-    keywords: 'fall prevention, elderly care',
-    ...findImage('blog-7')
-  }
-];
+// Legacy static placeholder blog posts (with fake "Full long-form content..."
+// bodies) have been removed — P2-09. The website now only shows real,
+// backend-sourced posts from the Growth Engine CMS feed (see
+// src/lib/growth-blog-posts.ts and src/app/blogs/page.tsx).
 
 export const faqs: Faq[] = [
   { id: '1', question: 'What services do you offer?', answer: 'We offer Physiotherapy, Occupational Therapy, Nursing Care, and more.' }
@@ -1208,7 +1112,6 @@ export const Countries = [
 
 export const getServiceBySlug = (slug: string) => services.find(s => s.slug === slug);
 export const getConditionBySlug = (service: Service, slug: string) => service.conditions.find(c => c.slug === slug);
-export const getBlogPostBySlug = (slug: string) => blogPosts.find(p => p.slug === slug);
 export const getSymptomBySlug = (slug: string) => symptomList.find(s => toSlug(s) === slug);
 export const getDetailedSymptomBySlug = (slug: string): SymptomDetail | null => {
   const name = symptomList.find(s => toSlug(s) === slug);
@@ -1221,10 +1124,6 @@ export const getDetailedTherapyBySlug = (slug: string): TherapyDetail | null => 
   return getTherapyClinicalInfo(name);
 };
 export const getTherapyBySlug = (slug: string) => therapyList.find(t => toSlug(t) === slug);
-
-export const getRelatedBlogPosts = (serviceTag: string, currentPostId: string) => {
-  return blogPosts.filter(p => p.serviceTag === serviceTag && p.id !== currentPostId).slice(0, 4);
-};
 
 export function getGeoPath(path: string[]): GeoPath | null {
   let geoPath: GeoPath = { country: null, state: null, city: null, area: null, subArea: null };
