@@ -530,3 +530,82 @@ export function calculateCustomPackages(basePrice: number) {
     },
   };
 }
+
+/**
+ * Return all subareas/areas for any city across India
+ */
+export function getAreasForCity(city: string, state?: string): string[] {
+  const c = (city || '').trim().toLowerCase();
+  const s = (state || '').trim().toLowerCase();
+  if (!c) return [];
+
+  const found = ALL_INDIA_LOCALITIES_2026.filter((l) => {
+    const cityMatch = l.city.toLowerCase() === c || l.city.toLowerCase().includes(c) || c.includes(l.city.toLowerCase());
+    if (s) {
+      const stateMatch = l.state.toLowerCase() === s || l.state.toLowerCase().includes(s) || s.includes(l.state.toLowerCase());
+      return cityMatch && stateMatch;
+    }
+    return cityMatch;
+  });
+
+  const areas = new Set<string>();
+  found.forEach((f) => {
+    areas.add(f.subArea);
+    f.keywords.forEach((k) => {
+      if (k.length > 3 && !k.includes('city') && !k.includes('state')) {
+        const cap = k.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        areas.add(cap);
+      }
+    });
+  });
+
+  return Array.from(areas);
+}
+
+/**
+ * Complete preloaded 2026 all-India session pricing dataset for initial load
+ */
+export const DEFAULT_ALL_INDIA_SESSION_PRICES = ALL_INDIA_LOCALITIES_2026.map((loc) => {
+  const tier = STANDARD_PRICING_TIERS[loc.tierId] || STANDARD_PRICING_TIERS.standard;
+  return {
+    tierId: loc.tierId,
+    tierName: tier.name,
+    country: 'India',
+    state: loc.state,
+    city: loc.city,
+    subArea: loc.subArea,
+    areas: [loc.subArea],
+    pincodes: loc.pincodes,
+    price: String(loc.basePrice),
+    currency: 'INR',
+    service: 'Physiotherapist',
+    serviceType: 'Home Visit',
+    packages: {
+      days10: {
+        days: 10,
+        ratePerSession: tier.packages.days10.ratePerSession,
+        totalPrice: tier.packages.days10.totalPrice,
+        totalSavings: tier.packages.days10.totalSavings,
+      },
+      days15: {
+        days: 15,
+        ratePerSession: tier.packages.days15.ratePerSession,
+        totalPrice: tier.packages.days15.totalPrice,
+        totalSavings: tier.packages.days15.totalSavings,
+      },
+      days20: {
+        days: 20,
+        ratePerSession: tier.packages.days20.ratePerSession,
+        totalPrice: tier.packages.days20.totalPrice,
+        totalSavings: tier.packages.days20.totalSavings,
+      },
+      days30: {
+        days: 30,
+        ratePerSession: tier.packages.days30.ratePerSession,
+        totalPrice: tier.packages.days30.totalPrice,
+        totalSavings: tier.packages.days30.totalSavings,
+      },
+    },
+  };
+});
+
