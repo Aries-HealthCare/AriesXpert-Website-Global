@@ -45,10 +45,10 @@ export const therapists: Therapist[] = [
     id: 't1',
     slug: 'dr-kajal-vora',
     name: 'Dr. Kajal Vora',
-    qualification: 'MPT (Neurology)',
+    qualification: 'MPT (Neurology), BPT',
     experience: '12 Years',
-    imageUrl: '/profile/bg.jpg',
-    imageHint: 'doctor portrait'
+    imageUrl: '/images/aries-emblem.png',
+    imageHint: 'certified physiotherapist'
   },
   {
     id: 't2',
@@ -56,8 +56,8 @@ export const therapists: Therapist[] = [
     name: 'Dr. Twinkle Patel',
     qualification: 'BPT, MIAP',
     experience: '10 Years',
-    imageUrl: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=800',
-    imageHint: 'therapist professional'
+    imageUrl: '/images/aries-emblem.png',
+    imageHint: 'certified physiotherapist'
   },
   {
     id: 't3',
@@ -65,8 +65,8 @@ export const therapists: Therapist[] = [
     name: 'Dr. Chloe Davis',
     qualification: 'MPT (Orthopedics)',
     experience: '8 Years',
-    imageUrl: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800',
-    imageHint: 'healthcare professional'
+    imageUrl: '/images/aries-emblem.png',
+    imageHint: 'certified physiotherapist'
   },
   {
     id: 't4',
@@ -74,8 +74,8 @@ export const therapists: Therapist[] = [
     name: 'Dr. Sam Evans',
     qualification: 'MPT (Sports)',
     experience: '15 Years',
-    imageUrl: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=800',
-    imageHint: 'physiotherapist smiling'
+    imageUrl: '/images/aries-emblem.png',
+    imageHint: 'certified physiotherapist'
   }
 ];
 

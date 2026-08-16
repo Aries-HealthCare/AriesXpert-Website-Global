@@ -15,6 +15,7 @@ import BookAppointmentButton from '@/components/book-appointment-button';
 import { getOrganizationSchema, getBreadcrumbSchema } from '@/lib/seo-schemas';
 import { useTherapists, type TherapistCard } from '@/hooks/use-therapists';
 import { VERIFIED_THERAPISTS_CATALOG } from '@/lib/verified-therapists';
+import { cn } from '@/lib/utils';
 
 const CITIES = ['All', 'Mumbai', 'Delhi', 'Bengaluru', 'Pune', 'Hyderabad', 'Chennai', 'Kolkata', 'Ahmedabad'];
 const SPECS = ['All', 'Orthopedics', 'Neurology', 'Sports', 'Pediatrics', 'Geriatrics', "Women's Health", 'Pain Management'];
@@ -203,39 +204,42 @@ export default function TherapistsPage() {
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {filtered.map(t => (
-                                    <Card key={t.id || t.slug} className="group glassmorphic overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-1">
-                                        <div className="relative">
-                                            <div className="aspect-[4/3] relative overflow-hidden bg-secondary/20">
-                                                <Image
-                                                    src={t.imageUrl || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800'}
-                                                    alt={`${t.name} — ${t.specialization}`}
-                                                    fill
-                                                    className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
-                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                                            </div>
-
-                                            {/* Availability */}
-                                            <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold ${t.isAvailable ? 'bg-green-500 text-white' : 'bg-secondary text-muted-foreground'}`}>
-                                                {t.isAvailable ? '✓ Available Today' : 'Fully Booked'}
-                                            </div>
-
-                                            {/* Verified */}
-                                            {t.isVerified && (
-                                                <div className="absolute top-3 left-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow">
-                                                    <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                                {filtered.map(t => {
+                                    const isLogo = !t.imageUrl || t.imageUrl.includes('aries-emblem') || t.imageUrl.includes('default-avatar') || t.imageUrl.includes('unsplash') || t.imageUrl.includes('placehold');
+                                    const displayImg = isLogo ? '/images/aries-emblem.png' : t.imageUrl;
+                                    return (
+                                        <Card key={t.id || t.slug} className="group glassmorphic overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-1">
+                                            <div className="relative">
+                                                <div className={cn("aspect-[4/3] relative overflow-hidden", isLogo ? "bg-gradient-to-br from-[#3b0d5c] via-[#1f0730] to-[#0d0214] flex items-center justify-center p-6" : "bg-secondary/20")}>
+                                                    <Image
+                                                        src={displayImg}
+                                                        alt={`${t.name} — ${t.specialization}`}
+                                                        fill
+                                                        className={cn(isLogo ? "object-contain p-6 group-hover:scale-110 drop-shadow-[0_10px_20px_rgba(234,179,8,0.3)]" : "object-cover object-top group-hover:scale-105", "transition-transform duration-700")}
+                                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                    />
+                                                    {!isLogo && <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />}
                                                 </div>
-                                            )}
 
-                                            {/* Rating */}
-                                            <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1.5 rounded-full">
-                                                <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-                                                <span className="text-white text-xs font-bold">{t.rating}</span>
-                                                {t.reviewCount > 0 && <span className="text-white/60 text-xs">({t.reviewCount})</span>}
+                                                {/* Availability */}
+                                                <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold ${t.isAvailable ? 'bg-green-500 text-white' : 'bg-secondary text-muted-foreground'}`}>
+                                                    {t.isAvailable ? '✓ Available Today' : 'Fully Booked'}
+                                                </div>
+
+                                                {/* Verified */}
+                                                {t.isVerified && (
+                                                    <div className="absolute top-3 left-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow">
+                                                        <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                                                    </div>
+                                                )}
+
+                                                {/* Rating */}
+                                                <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1.5 rounded-full">
+                                                    <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                                                    <span className="text-white text-xs font-bold">{t.rating}</span>
+                                                    {t.reviewCount > 0 && <span className="text-white/60 text-xs">({t.reviewCount})</span>}
+                                                </div>
                                             </div>
-                                        </div>
 
                                         <CardContent className="p-6 space-y-4">
                                             <div>
@@ -281,7 +285,8 @@ export default function TherapistsPage() {
                                             </div>
                                         </CardContent>
                                     </Card>
-                                ))}
+                                );
+                            })}
                             </div>
                         )}
 

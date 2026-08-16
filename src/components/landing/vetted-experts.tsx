@@ -38,29 +38,35 @@ function TherapistCard({ therapist, index }: { therapist: any, index: number }) 
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
 
         <CardHeader className="p-0 relative z-10 w-full">
-          <Link href={`/therapist/${therapist.slug}`} className="block relative aspect-[4/3] w-full bg-muted overflow-hidden cursor-pointer" prefetch={false}>
-            <Image
-              src={therapist.imageUrl || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=600'}
-              alt={`Portrait of ${therapist.name}`}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
-              className="object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-healthcare"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity group-hover:opacity-60"></div>
-            <div className="absolute top-4 right-4 z-20">
-              {therapist.isVerified && (
-                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-lg animate-pulse-slow">
-                  <CheckCircle2 className="w-5 h-5 text-white" />
+          {(() => {
+            const isLogo = !therapist.imageUrl || therapist.imageUrl.includes('aries-emblem') || therapist.imageUrl.includes('default-avatar') || therapist.imageUrl.includes('unsplash') || therapist.imageUrl.includes('placehold');
+            const displayImg = isLogo ? '/images/aries-emblem.png' : therapist.imageUrl;
+            return (
+              <Link href={`/therapist/${therapist.slug}`} className={cn("block relative aspect-[4/3] w-full overflow-hidden cursor-pointer", isLogo ? "bg-gradient-to-br from-[#3b0d5c] via-[#1f0730] to-[#0d0214] flex items-center justify-center p-6" : "bg-muted")} prefetch={false}>
+                <Image
+                  src={displayImg}
+                  alt={`Portrait of ${therapist.name}`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
+                  className={cn(isLogo ? "object-contain p-6 group-hover:scale-110 drop-shadow-[0_10px_20px_rgba(234,179,8,0.3)]" : "object-cover object-top group-hover:scale-105", "transition-transform duration-700 ease-healthcare")}
+                  loading="lazy"
+                />
+                {!isLogo && <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity group-hover:opacity-60"></div>}
+                <div className="absolute top-4 right-4 z-20">
+                  {therapist.isVerified && (
+                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-lg animate-pulse-slow">
+                      <CheckCircle2 className="w-5 h-5 text-white" />
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className="absolute bottom-4 left-4">
-              <Badge className="bg-white/95 dark:bg-black/95 backdrop-blur-xl text-foreground dark:text-white border-none shadow-md px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.1em] rounded-full">
-                {therapist.specialization}
-              </Badge>
-            </div>
-          </Link>
+                <div className="absolute bottom-4 left-4">
+                  <Badge className="bg-white/95 dark:bg-black/95 backdrop-blur-xl text-foreground dark:text-white border-none shadow-md px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.1em] rounded-full">
+                    {therapist.specialization}
+                  </Badge>
+                </div>
+              </Link>
+            );
+          })()}
         </CardHeader>
 
         <CardContent className="p-6 flex-grow space-y-4 relative z-10">

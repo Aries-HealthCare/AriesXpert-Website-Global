@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import BookAppointmentButton from '@/components/book-appointment-button';
 import { TherapistCard } from '@/types/therapist';
+import { cn } from '@/lib/utils';
 
 interface TherapistProfileTemplateProps {
     therapist: TherapistCard;
@@ -50,18 +51,24 @@ export default function TherapistProfileTemplate({ therapist }: TherapistProfile
 
                     <div className="grid lg:grid-cols-12 gap-10 items-end">
                         <div className="lg:col-span-8 flex flex-col md:flex-row gap-8 items-center md:items-end text-center md:text-left">
-                            <div className="relative group">
-                                <div className="absolute -inset-1 bg-gradient-to-tr from-accent to-white/20 rounded-3xl blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
-                                <div className="relative w-40 h-40 md:w-56 md:h-56 rounded-3xl overflow-hidden border-4 border-white/10 shadow-2xl">
-                                    <Image
-                                        src={therapist.imageUrl}
-                                        alt={therapist.name}
-                                        fill
-                                        className="object-cover object-top"
-                                        priority
-                                    />
-                                </div>
-                            </div>
+                            {(() => {
+                                const isLogo = !therapist.imageUrl || therapist.imageUrl.includes('aries-emblem') || therapist.imageUrl.includes('default-avatar') || therapist.imageUrl.includes('unsplash') || therapist.imageUrl.includes('placehold');
+                                const displayImg = isLogo ? '/images/aries-emblem.png' : therapist.imageUrl;
+                                return (
+                                    <div className="relative group">
+                                        <div className="absolute -inset-1 bg-gradient-to-tr from-accent to-white/20 rounded-3xl blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
+                                        <div className={cn("relative w-40 h-40 md:w-56 md:h-56 rounded-3xl overflow-hidden border-4 border-white/10 shadow-2xl", isLogo ? "bg-gradient-to-br from-[#3b0d5c] via-[#1f0730] to-[#0d0214] flex items-center justify-center p-6" : "")}>
+                                            <Image
+                                                src={displayImg}
+                                                alt={therapist.name}
+                                                fill
+                                                className={cn(isLogo ? "object-contain p-6 drop-shadow-[0_10px_20px_rgba(234,179,8,0.3)]" : "object-cover object-top")}
+                                                priority
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })()}
 
                             <div className="space-y-4 md:pb-2">
                                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">

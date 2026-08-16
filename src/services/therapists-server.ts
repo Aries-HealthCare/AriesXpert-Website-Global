@@ -64,7 +64,11 @@ function normalise(therapist: any): TherapistCard {
     ? `${rawExperience} Year${rawExperience === 1 ? '' : 's'}`
     : typeof rawExperience === 'string' ? rawExperience : '8+ Years';
 
-  const defaultAvatar = 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800';
+  const defaultAvatar = '/images/aries-emblem.png';
+  let imageUrl = typeof therapist.imageUrl === 'string' && therapist.imageUrl.trim() ? therapist.imageUrl.trim() : defaultAvatar;
+  if (imageUrl.includes('unsplash.com') || imageUrl.includes('placehold.co')) {
+    imageUrl = defaultAvatar;
+  }
 
   return {
     id: typeof therapist.id === 'string' ? therapist.id : `th-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
@@ -78,7 +82,7 @@ function normalise(therapist: any): TherapistCard {
     areas: Array.isArray(therapist.serviceAreas) && therapist.serviceAreas.length > 0 ? therapist.serviceAreas : ['City Wide'],
     rating: Number.isFinite(therapist.rating) && therapist.rating > 0 ? Number(therapist.rating) : 4.9,
     reviewCount: typeof therapist.reviewCount === 'number' ? therapist.reviewCount : 90,
-    imageUrl: typeof therapist.imageUrl === 'string' && therapist.imageUrl.trim() ? therapist.imageUrl.trim() : defaultAvatar,
+    imageUrl,
     isAvailable: therapist.acceptingTelehealthRequests !== false,
     languages: Array.isArray(therapist.languages) && therapist.languages.length > 0 ? therapist.languages : ['English', 'Hindi'],
     services: Array.isArray(therapist.serviceTypes) && therapist.serviceTypes.length > 0 ? therapist.serviceTypes : ['Home Visit Physiotherapy'],
