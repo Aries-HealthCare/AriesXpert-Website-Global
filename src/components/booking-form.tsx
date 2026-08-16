@@ -316,7 +316,7 @@ export default function BookingForm({ service, condition, onSubmitted, className
                       Select Treatment Plan (Location-Based Savings)
                     </Label>
                     <Badge variant="outline" className="text-[10px] font-mono text-cyan-400 border-cyan-500/30">
-                      {locationTier.name} [{locationTier.badge}]
+                      ₹{locationTier.basePrice} / session
                     </Badge>
                   </div>
 
