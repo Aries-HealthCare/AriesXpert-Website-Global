@@ -10,7 +10,6 @@ import BlogSection from "@/components/landing/blog-section";
 import FaqSection from "@/components/landing/faq-section";
 import GoogleReviews from "@/components/google-reviews";
 import FreeConsultationBlock from "@/components/landing/free-consultation-block";
-import TherapistCarousel from "@/components/therapist/therapist-carousel";
 import SchemaMarkup from "@/components/seo/schema-markup";
 import PricingPackagesSection from "@/components/landing/pricing-packages-section";
 
@@ -85,14 +84,6 @@ export default function Home() {
       <PricingPackagesSection />
       <GoogleReviews locationName="your city" className="bg-background" />
       <VettedExperts />
-
-      <TherapistCarousel
-        title="Home Healthcare & Nursing"
-        description="Certified nursing professionals and care takers for post-op, chronic illness, and elderly support."
-        specialization="nursing"
-        limit={8}
-      />
-
       <Locations />
       <WhatWeTreat />
       <BlogSection />
