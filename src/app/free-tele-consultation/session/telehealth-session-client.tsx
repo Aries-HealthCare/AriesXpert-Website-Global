@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 // The Agora App ID is not secret (it identifies the project, not a
 // credential) but it still must come from the environment — never
 // hardcode a real project's App ID in source.
-const AGORA_APP_ID = process.env.NEXT_PUBLIC_AGORA_APP_ID;
+const AGORA_APP_ID = process.env.NEXT_PUBLIC_AGORA_APP_ID || '';
 
 type CallState = 'missing-link' | 'connecting' | 'permission-denied' | 'in-call' | 'ended' | 'error';
 
@@ -129,8 +129,7 @@ export default function TelehealthSessionClient() {
 
         // uid 2 matches the patient uid the backend issues the RTC token
         // for (see appointment.controller.ts startTelehealth — uid 1 is
-        // reserved for the therapist app, uid 2 for the patient).
-        await client.join(AGORA_APP_ID, roomId, token, 2);
+        await client.join(AGORA_APP_ID, roomId as string, token as string, 2);
 
         const [audioTrack, videoTrack] = await Promise.all([
           AgoraRTC.createMicrophoneAudioTrack(),

@@ -12,6 +12,7 @@ import GoogleReviews from "@/components/google-reviews";
 import FreeConsultationBlock from "@/components/landing/free-consultation-block";
 import TherapistCarousel from "@/components/therapist/therapist-carousel";
 import SchemaMarkup from "@/components/seo/schema-markup";
+import PricingPackagesSection from "@/components/landing/pricing-packages-section";
 
 export default function Home() {
   const organizationSchema = {
@@ -81,6 +82,7 @@ export default function Home() {
       <AiPrecisionRecovery />
       <FreeConsultationBlock />
       <Specialities />
+      <PricingPackagesSection />
       <GoogleReviews locationName="your city" className="bg-background" />
       <VettedExperts />
 

@@ -13,6 +13,7 @@ import { type CitySeoData, citySeoPages } from '@/lib/city-seo-data';
 import { getLocalBusinessSchema, getBreadcrumbSchema, getFAQSchema, getHealthcareServiceSchema } from '@/lib/seo-schemas';
 import { services } from '@/lib/placeholder-data';
 import VettedExperts from '@/components/landing/vetted-experts';
+import PricingPackagesSection from '@/components/landing/pricing-packages-section';
 
 interface CityLandingPageTemplateProps {
     city: CitySeoData;
@@ -231,6 +232,9 @@ export default function CityLandingPageTemplate({ city }: CityLandingPageTemplat
                         </div>
                     </div>
                 </section>
+
+                {/* ── PRICING & RECOVERY PACKAGES ───────────────────── */}
+                <PricingPackagesSection initialLocationName={city.cityName} />
 
                 {/* ── POPULAR AREAS ─────────────────────────────────── */}
                 <section className="py-16 bg-background">

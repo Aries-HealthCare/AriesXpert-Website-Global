@@ -15,6 +15,7 @@ import { getLocalBusinessSchema, getBreadcrumbSchema, getHealthcareServiceSchema
 import { services } from '@/lib/placeholder-data';
 import { citySeoPages } from '@/lib/city-seo-data';
 import VettedExperts from '@/components/landing/vetted-experts';
+import PricingPackagesSection from '@/components/landing/pricing-packages-section';
 
 interface AreaLandingPageTemplateProps {
     location: LocationPageData;
@@ -329,6 +330,9 @@ export default function AreaLandingPageTemplate({ location }: AreaLandingPageTem
                         </div>
                     </div>
                 </section>
+
+                {/* ── PRICING & RECOVERY PACKAGES ───────────────────── */}
+                <PricingPackagesSection initialLocationName={location.locationName} />
 
                 {/* ── CONDITIONS ────────────────────────────────────── */}
                 <section className="py-16 bg-background">
