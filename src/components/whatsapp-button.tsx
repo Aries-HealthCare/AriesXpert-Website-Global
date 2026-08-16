@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 
-// Primary WhatsApp number from old site: +91 9372681410
-const WHATSAPP_NUMBER = "917372681410";
+// Official WhatsApp Front Desk: +91 8591981880
+const WHATSAPP_NUMBER = "918591981880";
 const WHATSAPP_MESSAGE = "Hi! I want to book a physiotherapy session with Aries PhysioCare.";
 
 export default function WhatsAppButton() {

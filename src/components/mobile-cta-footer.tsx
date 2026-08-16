@@ -37,7 +37,7 @@ export default function MobileCtaFooter() {
     return null;
   }
 
-  const whatsAppNumber = "917372681410"; // Official Aries PhysioCare WhatsApp
+  const whatsAppNumber = "918591981880"; // Official Aries PhysioCare WhatsApp Desk
   const prefilledMessage = "Hi, I'm looking for home physiotherapy services from Aries PhysioCare. Please share available slots.";
 
   return (

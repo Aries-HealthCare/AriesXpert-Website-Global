@@ -277,8 +277,8 @@ export default function ClinicsPage() {
                       className="h-12 rounded-xl border-border hover:bg-secondary text-foreground font-bold text-xs uppercase tracking-wider"
                     >
                       <a href={`https://wa.me/${clinic.whatsapp}?text=${encodeURIComponent('Hello Aries PhysioCare Borivali West Center, I would like to book a physiotherapy appointment.')}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-emerald-500">
-                        <MessageCircle className="w-4 h-4" />
-                        WhatsApp Front Desk
+                        <MessageCircle className="w-4 h-4 text-emerald-500" />
+                        WhatsApp Desk (+91 8591981880)
                       </a>
                     </Button>
                   </div>

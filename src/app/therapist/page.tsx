@@ -315,7 +315,7 @@ export default function TherapistsPage() {
                                     </a>
                                 </Button>
                                 <Button asChild size="lg" variant="outline" className="h-12 px-8 font-bold">
-                                    <a href="https://wa.me/917372681410" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                                    <a href="https://wa.me/918591981880" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                                         <MessageCircle className="w-4 h-4" /> WhatsApp Us
                                     </a>
                                 </Button>

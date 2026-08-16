@@ -93,7 +93,7 @@ export default function Header() {
             <Users className="h-3.5 w-3.5" /> Therapists
           </Link>
           <Link href="/clinic" className="hidden 2xl:flex text-[15px] font-bold hover:text-primary transition-colors items-center gap-1 whitespace-nowrap px-1" prefetch={false}>
-            <Building2 className="h-3.5 w-3.5" /> Clinics
+            <Building2 className="h-3.5 w-3.5" /> Clinic
           </Link>
           <Link href="/blogs" className="hidden 2xl:flex text-[15px] font-bold hover:text-primary transition-colors whitespace-nowrap px-1" prefetch={false}>Blog</Link>
           <div className="hidden 2xl:block"><WorkWithUsDropdown /></div>
@@ -238,7 +238,7 @@ function ServicesDropdown() {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/clinic" className="flex items-center gap-2" prefetch={false}>
-            <Building2 className="h-4 w-4 text-primary" /> Expert Centers
+            <Building2 className="h-4 w-4 text-primary" /> Our Clinic (Borivali West)
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -331,7 +331,7 @@ function MobileMenu({ currentLocationName }: { currentLocationName: string | nul
                     <Users className="h-4 w-4" /> Our Therapists
                   </Link>
                   <Link href="/clinic" className="text-base font-semibold text-primary transition-colors py-2 flex items-center gap-2" prefetch={false}>
-                    <Building2 className="h-4 w-4" /> Expert Centers
+                    <Building2 className="h-4 w-4" /> Our Clinic (Borivali West)
                   </Link>
                 </div>
               </CollapsibleContent>

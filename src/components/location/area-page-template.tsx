@@ -49,7 +49,7 @@ export default function AreaLandingPageTemplate({ location }: AreaLandingPageTem
     const cityPageSlug = `physiotherapy-in-${location.citySlug}`;
     const cityData = citySeoPages.find(c => c.citySlug === location.citySlug);
 
-    const WHATSAPP_URL = `https://wa.me/917372681410?text=${encodeURIComponent(`Hi! I need home physiotherapy in ${location.locationName}, ${location.cityName}. Please share details.`)}`;
+    const WHATSAPP_URL = `https://wa.me/918591981880?text=${encodeURIComponent(`Hi! I need home physiotherapy in ${location.locationName}, ${location.cityName}. Please share details.`)}`;
 
     // Build breadcrumb
     const breadcrumbs = [

@@ -236,7 +236,7 @@ export default async function ClinicDetailPage({ params }: ClinicPageProps) {
                     <Button asChild variant="outline" className="w-full h-11 rounded-xl text-xs font-bold border-border hover:bg-secondary text-emerald-500">
                       <a href={`https://wa.me/${clinic.whatsapp}?text=${encodeURIComponent(`Hello Aries PhysioCare, I would like to book an appointment at ${clinic.name}`)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
                         <MessageCircle className="w-3.5 h-3.5" />
-                        WhatsApp Front Desk
+                        WhatsApp Desk (+91 8591981880)
                       </a>
                     </Button>
                   </div>

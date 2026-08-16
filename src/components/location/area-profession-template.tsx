@@ -67,7 +67,7 @@ export default function AreaProfessionTemplate({
     const Icon = content.icon;
     const aboutText = typeof content.about === 'function' ? content.about(areaName, profession) : content.about;
 
-    const WHATSAPP_URL = `https://wa.me/917372681410?text=${encodeURIComponent(`Hi! I need ${profession} in ${areaName}. Please share details.`)}`;
+    const WHATSAPP_URL = `https://wa.me/918591981880?text=${encodeURIComponent(`Hi! I need ${profession} in ${areaName}. Please share details.`)}`;
 
     const breadcrumbs = [
         { name: 'Home', url: '/' },

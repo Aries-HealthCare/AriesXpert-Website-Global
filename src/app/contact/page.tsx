@@ -20,7 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { trackEvent } from '@/lib/analytics';
 
 const countryContacts = [
-    { name: "India", email: "india@ariesphysiocare.com", phone: "+91 98765 43210", flag: "🇮🇳" },
+    { name: "India", email: "support@ariesphysiocare.com", phone: "+91 9136447006", flag: "🇮🇳" },
     { name: "UAE", email: "uae@ariesphysiocare.com", phone: "+971 55 123 4567", flag: "🇦🇪" },
     { name: "UK", email: "uk@ariesphysiocare.com", phone: "+44 20 7123 4567", flag: "🇬🇧" },
 ];
@@ -82,9 +82,9 @@ export default function ContactPage() {
                                 <CardHeader><CardTitle className="font-headline text-2xl">Global Head Office</CardTitle></CardHeader>
                                 <CardContent className="space-y-4">
                                     <p className="text-muted-foreground">Aries HealthCare International Pvt Ltd</p>
-                                    <div className="flex items-center gap-4"><Mail className="h-5 w-5 text-primary" /><a href="mailto:info@ariesphysiocare.com" className="hover:text-primary">info@ariesphysiocare.com</a></div>
-                                    <div className="flex items-center gap-4"><Phone className="h-5 w-5 text-primary" /><span>+[Global Contact Number]</span></div>
-                                    <div className="flex items-center gap-4"><Clock className="h-5 w-5 text-primary" /><span>Mon–Sat | 8 AM – 8 PM</span></div>
+                                    <div className="flex items-center gap-4"><Mail className="h-5 w-5 text-primary" /><a href="mailto:support@ariesphysiocare.com" className="hover:text-primary">support@ariesphysiocare.com</a></div>
+                                    <div className="flex items-center gap-4"><Phone className="h-5 w-5 text-primary" /><a href="tel:+919136447006" className="hover:text-primary font-mono">+91 9136447006 / +91 8591981880</a></div>
+                                    <div className="flex items-center gap-4"><Clock className="h-5 w-5 text-primary" /><span>Mon–Sun | 8:00 AM – 9:30 PM</span></div>
                                 </CardContent>
                             </Card>
                             <div>

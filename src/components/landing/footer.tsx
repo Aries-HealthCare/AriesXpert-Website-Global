@@ -74,7 +74,7 @@ export default function Footer() {
             <ul className="space-y-4">
               <li><Link href="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">About Aries PhysioCare</Link></li>
               <li><Link href="/therapist" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">Our Expert Therapists</Link></li>
-              <li><Link href="/clinic" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">Expert Centers</Link></li>
+              <li><Link href="/clinic" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200 font-semibold text-primary">Our Clinic (Borivali West)</Link></li>
               <li><Link href="/blogs" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">Health Insights Blog</Link></li>
               <li><Link href="/work-with-us" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">Work With Us</Link></li>
               <li><Link href="/free-tele-consultation" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">Free Consultation</Link></li>
@@ -83,29 +83,31 @@ export default function Footer() {
 
           {/* Contact Section */}
           <div className="lg:col-span-3 space-y-6">
-            <h3 className="font-headline font-bold text-xs text-primary uppercase tracking-[0.2em]">Global HQ</h3>
-            <div className="space-y-5">
+            <h3 className="font-headline font-bold text-xs text-primary uppercase tracking-[0.2em]">Clinic & Support</h3>
+            <div className="space-y-4">
               <div className="flex items-start gap-4 group">
                 <div className="p-2.5 rounded-lg bg-primary/5 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
                   <MapPin className="h-4 w-4" />
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  <span className="font-bold text-foreground block mb-1">Aries HealthCare International</span>
-                  Mumbai, Maharashtra, India<br />
-                  Global Presence: India, UAE, UK
+                  <span className="font-bold text-foreground block mb-0.5">Aries PhysioCare Clinic</span>
+                  Shop No. 7, Parrk Riviera, New MHB Colony, Borivali West, Mumbai 400091
                 </p>
               </div>
               <div className="flex items-center gap-4 group">
                 <div className="p-2.5 rounded-lg bg-primary/5 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
                   <Phone className="h-4 w-4" />
                 </div>
-                <a href="tel:+919136447006" className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium tracking-tight">+91 9136447006</a>
+                <div className="text-sm text-muted-foreground flex flex-col font-medium">
+                  <a href="tel:+919136447006" className="hover:text-primary transition-colors">+91 9136447006</a>
+                  <a href="tel:+918591981880" className="hover:text-primary transition-colors text-xs text-emerald-500 font-bold">WhatsApp: +91 8591981880</a>
+                </div>
               </div>
               <div className="flex items-center gap-4 group">
                 <div className="p-2.5 rounded-lg bg-primary/5 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
                   <Mail className="h-4 w-4" />
                 </div>
-                <a href="mailto:help@ariesphysiocare.com" className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium">help@ariesphysiocare.com</a>
+                <a href="mailto:support@ariesphysiocare.com" className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium">support@ariesphysiocare.com</a>
               </div>
             </div>
           </div>

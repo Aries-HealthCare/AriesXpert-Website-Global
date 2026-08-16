@@ -64,7 +64,7 @@ export const ARIES_CLINICS_DIRECTORY: ClinicBranch[] = [
     pincode: "400091",
     phone: "+91 9136447006",
     phones: ["+91 9136447006", "+91 9372681410", "+91 8591981880"],
-    whatsapp: "919372681410",
+    whatsapp: "918591981880",
     googleRating: 4.9,
     reviewCount: 285,
     googleMapsUrl: "https://share.google/rOlEnKQabSdOV2fpf",

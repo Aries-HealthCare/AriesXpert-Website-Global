@@ -5,8 +5,9 @@
 
 export const BASE_URL = 'https://www.ariesphysiocare.com';
 export const ORG_PHONE = '+91-9136447006';
-export const ORG_WHATSAPP = '+91-9372681410';
-export const ORG_EMAIL = 'help@ariesphysiocare.com';
+export const ORG_PHONE_DISPLAY = '+91 9136447006';
+export const ORG_WHATSAPP = '+91-8591981880';
+export const ORG_EMAIL = 'support@ariesphysiocare.com';
 export const ORG_ADDRESS = {
     '@type': 'PostalAddress',
     streetAddress: 'Andheri West',
