@@ -1,17 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
-import CountryPopup from "@/components/landing/country-popup";
-import Header from "@/components/landing/header";
-import Footer from "@/components/landing/footer";
 import { RequestCallbackProvider } from "@/components/request-callback-provider";
-import MobileCtaFooter from "@/components/mobile-cta-footer";
 import { FirebaseClientProvider } from "@/firebase";
-import WhatsAppButton from "@/components/whatsapp-button";
 import { AttributionCapture } from "@/components/attribution-capture";
+import SiteLayoutWrapper from "@/components/SiteLayoutWrapper";
 
 // 🔴 ACTION REQUIRED: Set NEXT_PUBLIC_GA_MEASUREMENT_ID in the environment to
 // activate GA4. Until a real measurement ID (G-XXXXXXXXXX) is provisioned by
@@ -32,8 +28,25 @@ const spaceGrotesk = Space_Grotesk({
   preload: true,
 });
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+  ],
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.ariesphysiocare.com'),
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'AriesXpert',
+  },
   title: {
     default: 'Aries PhysioCare INDIA | Expert Home Physiotherapy Services',
     template: '%s | Aries PhysioCare',
@@ -136,15 +149,10 @@ export default function RootLayout({
           <FirebaseClientProvider>
             <RequestCallbackProvider>
               <AttributionCapture />
-              <Header />
-              <main className="flex-1">
+              <SiteLayoutWrapper>
                 {children}
-              </main>
-              <Footer />
+              </SiteLayoutWrapper>
               <Toaster />
-              <CountryPopup />
-              <MobileCtaFooter />
-              <WhatsAppButton />
             </RequestCallbackProvider>
           </FirebaseClientProvider>
         </ThemeProvider>

@@ -78,13 +78,11 @@ const nextConfig: NextConfig = {
       { source: '/doctors-login/', destination: '/login', permanent: true },
       { source: '/patients-login', destination: '/login', permanent: true },
       { source: '/patients-login/', destination: '/login', permanent: true },
-
-      // ── Book appointment redirect ─────────────────────────────
-      { source: '/book-appointment', destination: '/book-appointment', permanent: false },
     ];
   },
 
   images: {
+    unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
