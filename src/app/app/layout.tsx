@@ -68,15 +68,16 @@ const MOBILE_BOTTOM_TABS = [
 export default function ProviderAppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isDutyActive, toggleDutyStatus, logout, isAuthenticated } = useProviderAuth();
+  const { user, dutyStatus, toggleDutyStatus, logout, isAuthenticated } = useProviderAuth();
+  const isDutyActive = dutyStatus;
 
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [isSOSActive, setIsSOSActive] = useState(false);
 
-  const therapistName = user?.name || (user?.firstName ? `${user.firstName} ${user.lastName || ''}` : 'Dr. Rohan Sharma, BPT');
+  const therapistName = user?.fullName || user?.name || (user?.firstName ? `${user.firstName} ${user.lastName || ''}` : 'Dr. Rohan Sharma, BPT');
   const axId = user?.axId || 'AX-IND-4892';
-  const isApproved = user?.status === 'ACTIVE' || user?.onboardingStatus === 'approved';
-  const isUnderReview = user?.status === 'UNDER_REVIEW' || user?.onboardingStatus === 'pending';
+  const isApproved = user?.status === 'Active' || user?.status === 'Approved' || user?.status === 'ACTIVE';
+  const isUnderReview = user?.status === 'Pending' || user?.status === 'UNDER_REVIEW' || user?.status === 'Incomplete';
 
   const handleSOSTrigger = () => {
     setIsSOSActive(true);

@@ -29,12 +29,13 @@ import {
 import { Button } from '@/components/ui/button';
 
 export default function ProviderDashboardPage() {
-  const { user, isDutyActive, toggleDutyStatus } = useProviderAuth();
+  const { user, dutyStatus, toggleDutyStatus } = useProviderAuth();
+  const isDutyActive = dutyStatus;
   const [leads, setLeads] = useState<LeadBroadcast[]>([]);
   const [activeLeadIndex, setActiveLeadIndex] = useState(0);
   const [acceptedLeadMessage, setAcceptedLeadMessage] = useState('');
 
-  const therapistName = user?.name || (user?.firstName ? `${user.firstName} ${user.lastName || ''}` : 'Dr. Rohan Sharma, BPT');
+  const therapistName = user?.fullName || user?.name || (user?.firstName ? `${user.firstName} ${user.lastName || ''}` : 'Dr. Rohan Sharma, BPT');
   const axId = user?.axId || 'AX-IND-4892';
   const rating = user?.rating || 4.95;
   const walletBalance = user?.walletBalance || 14850;

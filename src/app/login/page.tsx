@@ -28,7 +28,7 @@ import { Label } from '@/components/ui/label';
 
 export default function ProviderLoginPage() {
   const router = useRouter();
-  const { login } = useProviderAuth();
+  const { loginWithPhoneOtp, loginWithEmail } = useProviderAuth();
 
   const [activeTab, setActiveTab] = useState<'mobile' | 'email'>('mobile');
   const [mobileNumber, setMobileNumber] = useState('9876543210');
@@ -57,7 +57,6 @@ export default function ProviderLoginPage() {
       setOtpSent(true);
       setOtpTimer(30);
       setSuccessMessage(res.message || 'Verification OTP sent to your phone.');
-      // Auto-focus OTP
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to send OTP. Please try again.');
     } finally {
@@ -78,8 +77,10 @@ export default function ProviderLoginPage() {
     setIsLoading(true);
     setErrorMessage('');
     try {
-      const { token, user } = await loginWithMobile(mobileNumber, otp);
-      login(token, user);
+      const ok = await loginWithPhoneOtp(mobileNumber, otp);
+      if (!ok) {
+        setErrorMessage('Invalid verification code. Please check and retry.');
+      }
     } catch (err: any) {
       setErrorMessage(err.message || 'Invalid verification code. Please check and retry.');
     } finally {
@@ -96,8 +97,10 @@ export default function ProviderLoginPage() {
     setIsLoading(true);
     setErrorMessage('');
     try {
-      const { token, user } = await loginWithEmail(email, password);
-      login(token, user);
+      const ok = await loginWithEmail(email, password);
+      if (!ok) {
+        setErrorMessage('Authentication failed. Please verify credentials.');
+      }
     } catch (err: any) {
       setErrorMessage(err.message || 'Authentication failed. Please verify credentials.');
     } finally {
@@ -110,8 +113,7 @@ export default function ProviderLoginPage() {
     setIsLoading(true);
     setErrorMessage('');
     try {
-      const { token, user } = await loginWithMobile('9876543210', '123456');
-      login(token, user);
+      await loginWithPhoneOtp('9876543210', '123456');
     } catch (err: any) {
       setErrorMessage('Quick login failed.');
     } finally {

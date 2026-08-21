@@ -1,129 +1,176 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import React, { useState } from 'react';
 import { useProviderAuth } from '@/services/provider-auth-context';
+import { providerApi, SOAPClinicalAssessment, FinalizeVisitPayload } from '@/services/provider-api';
 import {
   Navigation,
+  CheckCircle2,
+  Clock,
   MapPin,
   Phone,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  Play,
-  KeyRound,
-  FileSpreadsheet,
-  DollarSign,
   ShieldCheck,
-  Sparkles,
-  ArrowRight,
-  Activity,
-  Timer,
-  Check,
   Stethoscope,
+  Activity,
+  FileText,
+  CreditCard,
+  QrCode,
+  Banknote,
   Send,
-  Camera
+  Loader2,
+  Sparkles,
+  AlertCircle,
+  TrendingUp,
+  Plus,
+  Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-type VisitStage = 'IDLE' | 'TRAVELING' | 'ARRIVED' | 'IN_SESSION' | 'COMPLETED';
+type VisitStage =
+  | 'SCHEDULED'
+  | 'TRAVEL_STARTED'
+  | 'ARRIVED'
+  | 'OTP_CHECKIN'
+  | 'IN_SESSION'
+  | 'FINALIZE_PAYMENT'
+  | 'COMPLETED';
+
+interface VisitData {
+  appointmentId: string;
+  patientId: string;
+  patientName: string;
+  age: number;
+  gender: string;
+  phone: string;
+  address: string;
+  city: string;
+  condition: string;
+  packageType: string;
+  baseFee: number;
+  expectedStartTime: string;
+  checkInOtp: string;
+}
+
+const ACTIVE_VISIT: VisitData = {
+  appointmentId: 'apt_2026_84912',
+  patientId: 'pat_kul_71',
+  patientName: 'Dr. Arvind Kulkarni',
+  age: 71,
+  gender: 'Male',
+  phone: '+91 98204 11982',
+  address: 'B-1402, Raheja Heights, Dindoshi, Goregaon East',
+  city: 'Mumbai',
+  condition: 'Lumbar Canal Stenosis & Sciatica Relief (Session 4 of 10)',
+  packageType: '10-Session Spine Rehab Package',
+  baseFee: 1200,
+  expectedStartTime: '05:00 PM',
+  checkInOtp: '8492',
+};
+
+const ADDON_PRICING: Record<string, number> = {
+  Cupping: 500,
+  Needling: 500,
+  IASTM: 500,
+  'Kinesology Tapeing': 300,
+};
 
 export default function ProviderVisitsPage() {
   const { user, updateUserData } = useProviderAuth();
+  const [stage, setStage] = useState<VisitStage>('SCHEDULED');
+  const [enteredOtp, setEnteredOtp] = useState('');
+  const [otpError, setOtpError] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const [visitStage, setVisitStage] = useState<VisitStage>('IDLE');
-  const [etaMinutes, setEtaMinutes] = useState(18);
-  const [patientOtp, setPatientOtp] = useState('');
-  const [otpError, setOtpError] = useState('');
-  const [sessionSeconds, setSessionSeconds] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  // SOAP Clinical Assessment Form State
+  const [chiefComplaint, setChiefComplaint] = useState(
+    'Radiating lower back pain to left posterior thigh and calf, morning stiffness, difficulty walking beyond 200 meters.'
+  );
+  const [vasPainScore, setVasPainScore] = useState(6);
+  const [painNature, setPainNature] = useState('Throbbing & Burning');
+  const [rangeOfMotion, setRangeOfMotion] = useState('Lumbar flexion limited to 45°, extension limited to 10°.');
+  const [muscleStrengthMMT, setMuscleStrengthMMT] = useState('Grade 4/5 (Hip Abductors & Ankle Dorsiflexors)');
+  const [treatmentProvided, setTreatmentProvided] = useState<string[]>([
+    'Manual Spinal Traction',
+    'Lumbar Multifidus Activation',
+    'Neural Flossing (SLR Mobilization)',
+  ]);
+  const [selectedAddOns, setSelectedAddOns] = useState<string[]>(['Cupping']);
+  const [customAddOnName, setCustomAddOnName] = useState('');
+  const [customAddOnAmount, setCustomAddOnAmount] = useState('');
+  const [homeExercisePrescription, setHomeExercisePrescription] = useState(
+    '1. Pelvic tilts (2 sets of 10 reps)\n2. Cat-Camel lumbar mobilization (3 sets of 8 reps)\n3. Prone knee bends with lumbar stabilization (10 mins twice daily).'
+  );
 
-  // Digital SOAP Notes State
-  const [painScale, setPainScale] = useState(6);
-  const [subjectiveNote, setSubjectiveNote] = useState('Patient reports reduced morning stiffness in left lumbar region. Mild radiating pain down left thigh on prolonged standing.');
-  const [objectiveNote, setObjectiveNote] = useState('Lumbar flexion 55 deg with end-range discomfort. Straight Leg Raise (SLR) Left: 60 deg, Right: 75 deg. Core endurance test: 30 secs.');
-  const [assessmentNote, setAssessmentNote] = useState('L4-L5 discogenic radiculopathy improving. Muscle guarding in piriformis and erector spinae significantly reduced.');
-  const [planNote, setPlanNote] = useState('1. Pelvic bridging (3x10), 2. Cat-Camel mobilizations, 3. Bird-dog core stability, 4. Ice pack for 15 mins post therapy.');
+  // Payment Selection State
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'upi_qr' | 'online'>('upi_qr');
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  const [paymentCollected, setPaymentCollected] = useState(true);
-  const [sessionSuccess, setSessionSuccess] = useState(false);
+  // Calculate Total Amount
+  const addOnsTotal =
+    selectedAddOns.reduce((sum, item) => sum + (ADDON_PRICING[item] || 0), 0) +
+    (customAddOnAmount ? Number(customAddOnAmount) || 0 : 0);
+  const totalAmount = ACTIVE_VISIT.baseFee + addOnsTotal;
+  const therapistPayout = Math.round(totalAmount * 0.6);
 
-  // Active visit patient details
-  const patient = {
-    name: 'Dr. Arvind Kulkarni',
-    age: 71,
-    gender: 'Male',
-    phone: '+91 98204 11982',
-    condition: 'Lumbar Canal Stenosis & Balance Rehabilitation',
-    sessionNumber: 4,
-    totalSessions: 10,
-    address: 'Bungalow 7, Evershine Nagar, Malad West, Mumbai 400064',
-    sessionFee: 1200,
-    payoutAmount: 720,
-    otpCode: '8492',
-  };
-
-  // Timer logic for in-session workflow
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isTimerRunning) {
-      interval = setInterval(() => {
-        setSessionSeconds((prev) => prev + 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isTimerRunning]);
-
-  const formatTimer = (totalSecs: number) => {
-    const mins = Math.floor(totalSecs / 60);
-    const secs = totalSecs % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  };
-
-  const handleStartTravel = () => {
-    setVisitStage('TRAVELING');
-  };
-
-  const handleConfirmArrival = () => {
-    setVisitStage('ARRIVED');
-  };
-
-  const handleVerifyOtp = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (patientOtp === patient.otpCode || patientOtp === '1234' || patientOtp.length === 4) {
-      setVisitStage('IN_SESSION');
-      setIsTimerRunning(true);
-      setOtpError('');
+  const toggleAddOn = (addon: string) => {
+    if (selectedAddOns.includes(addon)) {
+      setSelectedAddOns(selectedAddOns.filter((a) => a !== addon));
     } else {
-      setOtpError(`Invalid OTP. Ask patient for the 4-digit code (Demo: ${patient.otpCode}).`);
+      setSelectedAddOns([...selectedAddOns, addon]);
     }
   };
 
-  const handleCompleteSession = () => {
-    setIsTimerRunning(false);
-    setVisitStage('COMPLETED');
-    setSessionSuccess(true);
-    // Credit wallet
-    if (user?.walletBalance !== undefined) {
+  const handleVerifyOtp = () => {
+    if (enteredOtp === ACTIVE_VISIT.checkInOtp || enteredOtp === '1234') {
+      setOtpError(false);
+      setStage('IN_SESSION');
+    } else {
+      setOtpError(true);
+    }
+  };
+
+  const handleFinalizeVisit = async () => {
+    setIsProcessing(true);
+    try {
+      const payload: FinalizeVisitPayload = {
+        appointmentId: ACTIVE_VISIT.appointmentId,
+        paymentMethod,
+        totalAmount,
+        addOns: selectedAddOns,
+        packageId: 'pkg_spine_10',
+        packageName: ACTIVE_VISIT.packageType,
+      };
+
+      await providerApi.finalizeVisit(payload);
+
+      // Trigger referral earning background check
+      providerApi.calculateReferralEarning(ACTIVE_VISIT.patientId, totalAmount, ACTIVE_VISIT.appointmentId);
+
+      // Update local wallet
+      const currentBal = user?.walletBalance || 14850;
+      const currentEarn = user?.totalEarnings || 86400;
+      const currentCount = user?.completedVisitsCount || 94;
+
       updateUserData({
-        walletBalance: user.walletBalance + patient.payoutAmount,
-        completedVisitsCount: (user.completedVisitsCount || 0) + 1,
+        walletBalance: currentBal + therapistPayout,
+        totalEarnings: currentEarn + therapistPayout,
+        completedVisitsCount: currentCount + 1,
       });
-    }
-  };
 
-  const handleResetForNext = () => {
-    setVisitStage('IDLE');
-    setSessionSuccess(false);
-    setSessionSeconds(0);
-    setPatientOtp('');
+      setPaymentSuccess(true);
+      setStage('COMPLETED');
+    } catch (e: any) {
+      alert('Finalize visit error: ' + e.message);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
-      {/* Top Header */}
+    <div className="space-y-6 max-w-4xl mx-auto">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
@@ -133,344 +180,410 @@ export default function ProviderVisitsPage() {
             <h1 className="text-2xl font-extrabold tracking-tight">Doorstep Clinical Visit Engine</h1>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            Complete doorstep clinical workflow with GPS tracking, patient OTP unlock, digital SOAP notes & payout.
+            Real-time travel tracking, OTP fraud prevention, clinical SOAP assessment, and instant 60/40 payout settlement.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 font-mono text-xs">
-          <span className="text-muted-foreground">Session Timer:</span>
-          <span className="font-extrabold px-3 py-1 bg-card border rounded-xl shadow-sm text-foreground">
-            {formatTimer(sessionSeconds)}
-          </span>
-        </div>
+        <span className="text-xs font-mono font-bold px-3 py-1.5 bg-muted rounded-xl border border-border">
+          Status: <strong className="text-primary uppercase">{stage.replace('_', ' ')}</strong>
+        </span>
       </div>
 
-      {/* Main Workflow Stage Card */}
-      <div className="bg-card border-2 border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm relative overflow-hidden">
-        {/* Step Indicator */}
-        <div className="grid grid-cols-4 gap-2 border-b border-border/60 pb-6 mb-6 text-center">
-          {[
-            { stage: 'TRAVELING', label: '1. Start Travel' },
-            { stage: 'ARRIVED', label: '2. Check-In OTP' },
-            { stage: 'IN_SESSION', label: '3. Clinical SOAP' },
-            { stage: 'COMPLETED', label: '4. Complete & Paid' },
-          ].map((item, idx) => {
-            const stages = ['TRAVELING', 'ARRIVED', 'IN_SESSION', 'COMPLETED'];
-            const currentIdx = stages.indexOf(visitStage);
-            const thisIdx = idx;
-            const isDone = currentIdx > thisIdx || visitStage === 'COMPLETED';
-            const isCurrent = visitStage === item.stage || (visitStage === 'IDLE' && idx === 0);
-
-            return (
-              <div key={item.stage} className="flex flex-col items-center">
-                <div
-                  className={`text-xs font-bold px-3 py-1 rounded-full mb-1 transition-all ${
-                    isDone
-                      ? 'bg-emerald-500 text-white'
-                      : isCurrent
-                      ? 'bg-primary text-white ring-2 ring-primary/20'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  {isDone ? '✓' : idx + 1}
-                </div>
-                <span className="text-[11px] font-bold text-foreground">{item.label}</span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Patient Summary Bar */}
-        <div className="p-4 bg-muted/40 rounded-2xl border border-border/60 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Patient Itinerary Brief Card */}
+      <div className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-extrabold text-foreground">{patient.name}</span>
-              <span className="text-xs text-muted-foreground font-mono">({patient.age}y, {patient.gender})</span>
-              <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                Session {patient.sessionNumber} of {patient.totalSessions}
-              </span>
+              <h2 className="text-lg font-extrabold text-foreground">{ACTIVE_VISIT.patientName}</h2>
+              <span className="text-xs text-muted-foreground font-mono">({ACTIVE_VISIT.age}y, {ACTIVE_VISIT.gender})</span>
             </div>
-            <p className="text-xs font-bold text-primary mt-0.5">{patient.condition}</p>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-              <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-              <span>{patient.address}</span>
+            <p className="text-xs font-bold text-primary mt-0.5">{ACTIVE_VISIT.condition}</p>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
+              <MapPin className="w-3.5 h-3.5 text-primary" />
+              <span>{ACTIVE_VISIT.address}</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            <a
-              href={`tel:${patient.phone}`}
-              className="px-3.5 py-2 rounded-xl bg-card border border-border hover:bg-muted text-xs font-bold flex items-center gap-1.5"
-            >
-              <Phone className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Call Patient</span>
-            </a>
+          <div className="text-left sm:text-right shrink-0">
+            <div className="text-xs font-mono font-bold text-muted-foreground">Session Fee</div>
+            <div className="text-xl font-extrabold font-mono text-foreground mt-0.5">
+              ₹{totalAmount.toLocaleString('en-IN')}
+            </div>
+            <div className="text-[10px] text-emerald-500 font-bold">Your Share (60%): ₹{therapistPayout}</div>
           </div>
         </div>
 
-        {/* STAGE 1: IDLE / READY TO START TRAVEL */}
-        {visitStage === 'IDLE' && (
-          <div className="space-y-6 text-center py-6">
-            <div className="w-16 h-16 rounded-3xl bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-inner">
-              <Navigation className="w-8 h-8" />
-            </div>
-            <div className="max-w-md mx-auto space-y-1">
-              <h2 className="text-xl font-extrabold text-foreground">Ready for Doorstep Home Visit</h2>
-              <p className="text-xs text-muted-foreground">
-                Clicking "Start Travel" will broadcast your live ETA ({etaMinutes} mins) to the patient via SMS/WhatsApp and initialize GPS route assistance.
-              </p>
-            </div>
-
-            <Button
-              type="button"
-              onClick={handleStartTravel}
-              className="h-12 px-8 rounded-2xl bg-primary hover:bg-primary/95 text-white font-extrabold text-sm shadow-xl shadow-primary/25"
-            >
-              <Navigation className="w-4 h-4 mr-2" />
-              <span>Start Travel to Patient Home</span>
-            </Button>
+        <div className="pt-3 border-t border-border/60 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-1.5 text-muted-foreground font-mono">
+            <Clock className="w-3.5 h-3.5" />
+            <span>Time: {ACTIVE_VISIT.expectedStartTime}</span>
           </div>
-        )}
-
-        {/* STAGE 2: TRAVELING */}
-        {visitStage === 'TRAVELING' && (
-          <div className="space-y-6 text-center py-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 border border-accent/30 text-accent font-bold text-xs animate-pulse">
-              <Activity className="w-4 h-4" />
-              <span>En Route — Patient Notified of ETA</span>
-            </div>
-
-            <div className="max-w-md mx-auto space-y-2">
-              <h2 className="text-xl font-extrabold text-foreground">Traveling to {patient.name}'s Residence</h2>
-              <p className="text-xs text-muted-foreground">
-                Live navigation active. When you arrive at the doorstep, click "Confirm Doorstep Arrival".
-              </p>
-            </div>
-
-            <div className="p-4 bg-muted/40 rounded-2xl border border-border/60 max-w-sm mx-auto text-xs text-left space-y-1">
-              <div className="text-muted-foreground">Estimated Arrival Time: <strong className="text-foreground font-mono">18 minutes</strong></div>
-              <div className="text-muted-foreground">Doorstep Location: <strong className="text-foreground">Malad West</strong></div>
-            </div>
-
-            <Button
-              type="button"
-              onClick={handleConfirmArrival}
-              className="h-12 px-8 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-xl"
-            >
-              <CheckCircle2 className="w-4 h-4 mr-2" />
-              <span>I Have Arrived at Patient Doorstep</span>
-            </Button>
-          </div>
-        )}
-
-        {/* STAGE 3: ARRIVED / OTP VERIFICATION */}
-        {visitStage === 'ARRIVED' && (
-          <div className="max-w-md mx-auto space-y-5 py-4">
-            <div className="text-center space-y-1">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-2">
-                <KeyRound className="w-6 h-6" />
-              </div>
-              <h2 className="text-xl font-extrabold text-foreground">Enter Patient Check-In OTP</h2>
-              <p className="text-xs text-muted-foreground">
-                Ask the patient or caregiver for the 4-digit session check-in OTP sent to their mobile.
-              </p>
-            </div>
-
-            {otpError && (
-              <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{otpError}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div>
-                <Label className="text-xs font-bold">4-Digit Security OTP</Label>
-                <Input
-                  type="text"
-                  maxLength={4}
-                  placeholder="8492"
-                  value={patientOtp}
-                  onChange={(e) => setPatientOtp(e.target.value.replace(/\D/g, ''))}
-                  className="text-center text-2xl tracking-[0.4em] font-mono font-bold h-14 rounded-xl mt-1.5"
-                  autoFocus
-                  required
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full h-12 rounded-xl bg-primary hover:bg-primary/95 text-white font-extrabold text-sm shadow-lg shadow-primary/20"
-              >
-                <span>Verify OTP & Unlock Clinical Session</span>
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </form>
-
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => setPatientOtp(patient.otpCode)}
-                className="text-xs text-muted-foreground hover:text-foreground underline font-medium"
-              >
-                Autofill Verified Demo OTP ({patient.otpCode})
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* STAGE 4: IN_SESSION / DIGITAL SOAP NOTES */}
-        {visitStage === 'IN_SESSION' && (
-          <div className="space-y-6">
-            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2 text-emerald-500 font-bold">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Session Live & Authenticated • Timer: {formatTimer(sessionSeconds)}</span>
-              </div>
-              <span className="font-mono text-muted-foreground font-bold">L4-L5 Lumbar Rehab</span>
-            </div>
-
-            <div className="border-t border-border/60 pt-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-extrabold text-foreground flex items-center gap-1.5">
-                  <Stethoscope className="w-4 h-4 text-primary" />
-                  <span>Digital SOAP Clinical Assessment Note</span>
-                </h3>
-                <span className="text-[10px] text-muted-foreground uppercase font-bold">Session 4 of 10</span>
-              </div>
-
-              {/* Pain Scale Slider */}
-              <div className="p-4 bg-muted/30 rounded-2xl border border-border/60">
-                <div className="flex items-center justify-between mb-2">
-                  <Label className="text-xs font-bold">Patient Reported Pain Scale (VAS: 0 - 10)</Label>
-                  <span className="text-sm font-mono font-extrabold text-primary bg-primary/10 px-3 py-0.5 rounded-full">
-                    {painScale} / 10
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="10"
-                  value={painScale}
-                  onChange={(e) => setPainScale(Number(e.target.value))}
-                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
-                />
-                <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-                  <span>0 - No Pain</span>
-                  <span>5 - Moderate</span>
-                  <span>10 - Severe Intolerable</span>
-                </div>
-              </div>
-
-              {/* Subjective */}
-              <div>
-                <Label className="text-xs font-bold text-foreground">S - Subjective Symptoms</Label>
-                <textarea
-                  rows={2}
-                  value={subjectiveNote}
-                  onChange={(e) => setSubjectiveNote(e.target.value)}
-                  className="w-full p-3 mt-1 bg-background border border-input rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              {/* Objective */}
-              <div>
-                <Label className="text-xs font-bold text-foreground">O - Objective Examination & Range of Motion</Label>
-                <textarea
-                  rows={2}
-                  value={objectiveNote}
-                  onChange={(e) => setObjectiveNote(e.target.value)}
-                  className="w-full p-3 mt-1 bg-background border border-input rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              {/* Assessment */}
-              <div>
-                <Label className="text-xs font-bold text-foreground">A - Clinical Assessment & Progress</Label>
-                <textarea
-                  rows={2}
-                  value={assessmentNote}
-                  onChange={(e) => setAssessmentNote(e.target.value)}
-                  className="w-full p-3 mt-1 bg-background border border-input rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              {/* Plan */}
-              <div>
-                <Label className="text-xs font-bold text-foreground">P - Plan & Prescribed Home Exercises</Label>
-                <textarea
-                  rows={2}
-                  value={planNote}
-                  onChange={(e) => setPlanNote(e.target.value)}
-                  className="w-full p-3 mt-1 bg-background border border-input rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-            </div>
-
-            {/* Complete Visit Button */}
-            <div className="pt-4 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-xs text-muted-foreground">
-                Total Session Fee: <strong>₹{patient.sessionFee}</strong> • Net Therapist Payout: <strong className="text-emerald-500 font-mono">₹{patient.payoutAmount}</strong>
-              </div>
-
-              <Button
-                type="button"
-                onClick={handleCompleteSession}
-                className="w-full sm:w-auto h-12 px-8 rounded-2xl bg-primary hover:bg-primary/95 text-white font-extrabold text-xs shadow-xl shadow-primary/25 flex items-center justify-center gap-2"
-              >
-                <Check className="w-4 h-4" />
-                <span>Submit SOAP & Complete Visit</span>
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* STAGE 5: COMPLETED */}
-        {visitStage === 'COMPLETED' && (
-          <div className="text-center py-8 space-y-6">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
-              <CheckCircle2 className="w-10 h-10" />
-            </div>
-
-            <div className="space-y-1">
-              <h2 className="text-2xl font-extrabold text-foreground">Visit Completed Successfully!</h2>
-              <p className="text-xs text-muted-foreground">
-                Digital tax invoice & exercises sent to {patient.name}. ₹{patient.payoutAmount} has been credited to your wallet.
-              </p>
-            </div>
-
-            <div className="p-4 bg-muted/40 rounded-2xl border border-border/60 max-w-sm mx-auto text-xs space-y-2">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Session Payout:</span>
-                <span className="font-bold text-emerald-500 font-mono">+₹{patient.payoutAmount} (60%)</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">SOAP Note ID:</span>
-                <span className="font-mono font-bold">SOAP-2026-9812</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Updated Wallet Balance:</span>
-                <span className="font-bold font-mono">₹{((user?.walletBalance || 14850) + patient.payoutAmount).toLocaleString('en-IN')}</span>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <Link href="/app/wallet" prefetch={false}>
-                <Button variant="outline" className="h-11 px-5 rounded-xl text-xs font-bold">
-                  View in Wallet
-                </Button>
-              </Link>
-              <Button
-                type="button"
-                onClick={handleResetForNext}
-                className="h-11 px-6 rounded-xl bg-primary hover:bg-primary/95 text-white font-extrabold text-xs shadow-md"
-              >
-                Back to Appointments
-              </Button>
-            </div>
-          </div>
-        )}
+          <a href={`tel:${ACTIVE_VISIT.phone}`} className="flex items-center gap-1.5 text-primary font-bold hover:underline">
+            <Phone className="w-3.5 h-3.5" />
+            <span>Call Patient</span>
+          </a>
+        </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* STAGE 1: SCHEDULED → START TRAVEL */}
+      {/* ========================================================================= */}
+      {stage === 'SCHEDULED' && (
+        <div className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm text-center space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary mx-auto flex items-center justify-center">
+            <Navigation className="w-7 h-7" />
+          </div>
+          <div>
+            <h3 className="text-base font-extrabold text-foreground">Ready to Start Journey?</h3>
+            <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+              Tapping Start Travel broadcasts live ETA to {ACTIVE_VISIT.patientName} and logs your GPS travel route.
+            </p>
+          </div>
+          <Button
+            onClick={() => setStage('TRAVEL_STARTED')}
+            className="h-12 px-8 rounded-2xl bg-primary hover:bg-primary/95 text-white font-extrabold text-xs shadow-lg shadow-primary/20"
+          >
+            <Navigation className="w-4 h-4 mr-2" />
+            <span>Start Travel (Broadcast ETA)</span>
+          </Button>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* STAGE 2: TRAVEL STARTED → ARRIVED */}
+      {/* ========================================================================= */}
+      {stage === 'TRAVEL_STARTED' && (
+        <div className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm text-center space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-500 mx-auto flex items-center justify-center animate-pulse">
+            <Clock className="w-7 h-7" />
+          </div>
+          <div>
+            <span className="text-[10px] font-extrabold text-amber-500 uppercase tracking-wider">
+              En Route • ETA 18 mins
+            </span>
+            <h3 className="text-base font-extrabold text-foreground mt-1">Traveling to Patient Doorstep</h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              Patient notified via WhatsApp. Tap "I Have Arrived" upon reaching the building entrance.
+            </p>
+          </div>
+          <Button
+            onClick={() => setStage('ARRIVED')}
+            className="h-12 px-8 rounded-2xl bg-primary hover:bg-primary/95 text-white font-extrabold text-xs shadow-lg shadow-primary/20"
+          >
+            <MapPin className="w-4 h-4 mr-2" />
+            <span>I Have Arrived at Doorstep</span>
+          </Button>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* STAGE 3: ARRIVED → OTP CHECK-IN */}
+      {/* ========================================================================= */}
+      {(stage === 'ARRIVED' || stage === 'OTP_CHECKIN') && (
+        <div className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm text-center space-y-5 max-w-md mx-auto">
+          <div className="w-14 h-14 rounded-2xl bg-sky-500/10 text-sky-500 mx-auto flex items-center justify-center">
+            <ShieldCheck className="w-7 h-7" />
+          </div>
+          <div>
+            <h3 className="text-base font-extrabold text-foreground">Patient Check-in OTP</h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              Ask the patient for their 4-digit start OTP to unlock this session.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Input
+              type="text"
+              maxLength={4}
+              value={enteredOtp}
+              onChange={(e) => setEnteredOtp(e.target.value)}
+              placeholder="Enter 4-digit OTP"
+              className="text-center font-mono text-2xl font-extrabold tracking-widest h-14 rounded-2xl"
+            />
+            {otpError && (
+              <p className="text-xs text-destructive font-bold">
+                Invalid OTP. (Demo test code: <strong>{ACTIVE_VISIT.checkInOtp}</strong> or 1234)
+              </p>
+            )}
+          </div>
+
+          <div className="p-3 bg-muted/40 rounded-xl text-[11px] text-muted-foreground font-mono">
+            Demo Test OTP: <strong>{ACTIVE_VISIT.checkInOtp}</strong>
+          </div>
+
+          <Button
+            onClick={handleVerifyOtp}
+            className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/95 text-white font-extrabold text-xs shadow-lg shadow-primary/20"
+          >
+            <CheckCircle2 className="w-4 h-4 mr-2" />
+            <span>Verify OTP & Begin Clinical Session</span>
+          </Button>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* STAGE 4: IN_SESSION → CLINICAL SOAP NOTE & ADD-ONS */}
+      {/* ========================================================================= */}
+      {stage === 'IN_SESSION' && (
+        <div className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="flex items-center justify-between pb-3 border-b border-border/60">
+            <div className="flex items-center gap-2">
+              <Stethoscope className="w-5 h-5 text-primary" />
+              <h3 className="text-base font-extrabold text-foreground">Clinical SOAP Assessment & Care Plan</h3>
+            </div>
+            <span className="text-xs font-mono font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full">
+              Live Session Active
+            </span>
+          </div>
+
+          <div className="space-y-4 text-xs">
+            {/* Subjective */}
+            <div>
+              <Label className="font-bold">Subjective Symptoms & Chief Complaint</Label>
+              <textarea
+                rows={2}
+                value={chiefComplaint}
+                onChange={(e) => setChiefComplaint(e.target.value)}
+                className="w-full p-3 mt-1 bg-background border border-input rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            {/* VAS Pain Score */}
+            <div className="p-4 bg-muted/20 rounded-2xl space-y-2">
+              <div className="flex justify-between items-center">
+                <Label className="font-bold">VAS Pain Intensity Score: {vasPainScore} / 10</Label>
+                <span
+                  className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                    vasPainScore <= 3
+                      ? 'bg-emerald-500/10 text-emerald-500'
+                      : vasPainScore <= 6
+                      ? 'bg-amber-500/10 text-amber-500'
+                      : 'bg-destructive/10 text-destructive'
+                  }`}
+                >
+                  {vasPainScore <= 3 ? 'Mild' : vasPainScore <= 6 ? 'Moderate Pain' : 'Severe Pain'}
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={10}
+                value={vasPainScore}
+                onChange={(e) => setVasPainScore(Number(e.target.value))}
+                className="w-full accent-primary"
+              />
+            </div>
+
+            {/* Objective Exam */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label className="font-bold">Range of Motion (ROM)</Label>
+                <Input
+                  value={rangeOfMotion}
+                  onChange={(e) => setRangeOfMotion(e.target.value)}
+                  className="h-10 mt-1 rounded-xl text-xs"
+                />
+              </div>
+              <div>
+                <Label className="font-bold">Muscle Strength (MMT)</Label>
+                <Input
+                  value={muscleStrengthMMT}
+                  onChange={(e) => setMuscleStrengthMMT(e.target.value)}
+                  className="h-10 mt-1 rounded-xl text-xs"
+                />
+              </div>
+            </div>
+
+            {/* Advanced Add-On Treatments */}
+            <div className="p-4 bg-primary/5 border border-primary/20 rounded-2xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-extrabold text-foreground">Specialized Add-On Treatments</div>
+                  <div className="text-muted-foreground text-[11px]">Select extra modalities performed during visit.</div>
+                </div>
+                <span className="text-xs font-mono font-bold text-primary">+₹{addOnsTotal}</span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                {Object.entries(ADDON_PRICING).map(([addon, price]) => {
+                  const isSelected = selectedAddOns.includes(addon);
+                  return (
+                    <button
+                      key={addon}
+                      type="button"
+                      onClick={() => toggleAddOn(addon)}
+                      className={`p-2.5 rounded-xl text-xs font-bold border text-left transition-all flex flex-col justify-between ${
+                        isSelected
+                          ? 'border-primary bg-primary text-white shadow-md'
+                          : 'border-border/60 bg-card hover:border-primary/40'
+                      }`}
+                    >
+                      <span>{addon}</span>
+                      <span className="font-mono text-[11px] mt-1">+₹{price}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Home Exercise Plan */}
+            <div>
+              <Label className="font-bold">Home Exercise Prescription (Hep) & Ergonomic Advice</Label>
+              <textarea
+                rows={3}
+                value={homeExercisePrescription}
+                onChange={(e) => setHomeExercisePrescription(e.target.value)}
+                className="w-full p-3 mt-1 bg-background border border-input rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary font-mono"
+              />
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-border/60 flex justify-end">
+            <Button
+              onClick={() => setStage('FINALIZE_PAYMENT')}
+              className="h-12 px-7 rounded-2xl bg-primary hover:bg-primary/95 text-white font-extrabold text-xs shadow-lg shadow-primary/20"
+            >
+              <span>Save SOAP & Proceed to Payment (₹{totalAmount})</span>
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* STAGE 5: FINALIZE PAYMENT & CHECKOUT */}
+      {/* ========================================================================= */}
+      {stage === 'FINALIZE_PAYMENT' && (
+        <div className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="flex items-center justify-between pb-3 border-b border-border/60">
+            <div className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-primary" />
+              <h3 className="text-base font-extrabold text-foreground">Collect Payment & Settle Payout</h3>
+            </div>
+            <div className="text-right">
+              <span className="text-xs text-muted-foreground font-mono">Total Billable:</span>
+              <strong className="text-base font-mono text-foreground ml-2">₹{totalAmount}</strong>
+            </div>
+          </div>
+
+          {/* Payment Method Selector */}
+          <div className="space-y-3">
+            <Label className="font-bold text-xs">Select Collection Method</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[
+                {
+                  id: 'upi_qr' as const,
+                  title: 'Instant UPI QR Code',
+                  desc: 'Generate dynamic QR on screen for patient GPay / PhonePe scan.',
+                  icon: QrCode,
+                },
+                {
+                  id: 'cash' as const,
+                  title: 'Cash Payment',
+                  desc: 'Collect physical cash directly at doorstep.',
+                  icon: Banknote,
+                },
+                {
+                  id: 'online' as const,
+                  title: 'SMS / WhatsApp Link',
+                  desc: 'Dispatch instant payment checkout link to patient mobile.',
+                  icon: Send,
+                },
+              ].map((m) => {
+                const Icon = m.icon;
+                const isSelected = paymentMethod === m.id;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setPaymentMethod(m.id)}
+                    className={`p-4 rounded-2xl border text-left transition-all space-y-2 ${
+                      isSelected
+                        ? 'border-primary bg-primary/10 shadow-md ring-2 ring-primary/20'
+                        : 'border-border/60 bg-muted/20 hover:border-primary/40'
+                    }`}
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-card border border-border flex items-center justify-center text-primary">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-extrabold text-foreground">{m.title}</div>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{m.desc}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* UPI QR Display Preview */}
+          {paymentMethod === 'upi_qr' && (
+            <div className="p-6 bg-muted/30 border border-border/60 rounded-2xl text-center space-y-3 max-w-xs mx-auto">
+              <div className="w-40 h-40 bg-white p-2 rounded-2xl mx-auto flex items-center justify-center border shadow-sm">
+                <QrCode className="w-36 h-36 text-slate-900" />
+              </div>
+              <div className="text-xs font-extrabold font-mono text-foreground">UPI: aries.pay@hdfcbank</div>
+              <div className="text-[11px] text-muted-foreground">Scan with any UPI app to pay ₹{totalAmount}</div>
+            </div>
+          )}
+
+          {/* Commission Settlement Summary */}
+          <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl space-y-2 text-xs">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-foreground">Therapist Payout Credit (60%):</span>
+              <strong className="text-emerald-500 font-mono text-sm">+₹{therapistPayout}</strong>
+            </div>
+            <div className="text-[11px] text-muted-foreground">
+              Amount will be instantly credited to your Aries Wallet upon clicking Complete.
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-border/60 flex items-center justify-between">
+            <Button variant="outline" onClick={() => setStage('IN_SESSION')} className="h-11 px-5 rounded-xl font-bold text-xs">
+              Back to SOAP
+            </Button>
+
+            <Button
+              onClick={handleFinalizeVisit}
+              disabled={isProcessing}
+              className="h-12 px-8 rounded-2xl bg-primary hover:bg-primary/95 text-white font-extrabold text-xs shadow-lg shadow-primary/20"
+            >
+              {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Payment & Complete Visit'}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* STAGE 6: COMPLETED */}
+      {/* ========================================================================= */}
+      {stage === 'COMPLETED' && (
+        <div className="bg-card border-2 border-emerald-500/30 rounded-3xl p-8 shadow-lg text-center space-y-5">
+          <div className="w-16 h-16 rounded-3xl bg-emerald-500 text-white mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <CheckCircle2 className="w-10 h-10" />
+          </div>
+          <div>
+            <span className="text-xs font-extrabold text-emerald-500 uppercase tracking-widest">
+              Visit Successfully Finalized
+            </span>
+            <h2 className="text-2xl font-extrabold text-foreground mt-1">₹{therapistPayout} Credited to Your Wallet</h2>
+            <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+              Clinical SOAP records encrypted and saved to MongoDB. Patient invoice and care prescription sent via WhatsApp.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-3 pt-2">
+            <Button
+              onClick={() => {
+                setStage('SCHEDULED');
+                setEnteredOtp('');
+              }}
+              className="h-11 px-6 rounded-xl bg-primary text-white font-bold text-xs"
+            >
+              View Next Appointment
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -26,7 +26,7 @@ function VerifyContent() {
   const phoneParam = searchParams.get('phone') || '';
   const { user, updateUserData } = useProviderAuth();
 
-  const [mobileNumber, setMobileNumber] = useState(phoneParam || user?.mobileNumber || '9876543210');
+  const [mobileNumber, setMobileNumber] = useState(phoneParam || user?.phone || user?.mobileNo || '9876543210');
   const [otp, setOtp] = useState('');
   const [timer, setTimer] = useState(30);
   const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +68,7 @@ function VerifyContent() {
 
     try {
       await verifyProviderOtp(mobileNumber, otp);
-      updateUserData({ isVerified: true });
+      updateUserData({ isMobileNumberVerified: true, isVerified: true });
       setSuccessMessage('Mobile number verified successfully! Redirecting to KYC onboarding...');
       setTimeout(() => {
         router.push('/onboarding');

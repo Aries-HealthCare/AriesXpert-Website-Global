@@ -1,118 +1,187 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import {
-  TherapistUser,
-  getStoredProviderUser,
-  setStoredProviderUser,
-  clearAuthToken,
-  setAuthToken,
-  fetchCurrentProvider,
-  updateDutyStatus as apiUpdateDutyStatus,
-} from './provider-api';
 import { useRouter, usePathname } from 'next/navigation';
+import { providerApi, MobileExpertProfile } from './provider-api';
 
 interface ProviderAuthContextType {
-  user: TherapistUser | null;
-  isLoading: boolean;
+  user: MobileExpertProfile | null;
   isAuthenticated: boolean;
-  isOnboarded: boolean;
-  isDutyActive: boolean;
-  login: (token: string, user: TherapistUser) => void;
+  isLoading: boolean;
+  dutyStatus: boolean;
+  toggleDutyStatus: () => Promise<void>;
+  loginWithPhoneOtp: (phone: string, otp: string) => Promise<boolean>;
+  loginWithEmail: (email: string, pass: string) => Promise<boolean>;
   logout: () => void;
+  updateUserData: (data: Partial<MobileExpertProfile>) => void;
   refreshProfile: () => Promise<void>;
-  toggleDutyStatus: (active?: boolean) => Promise<void>;
-  updateUserData: (data: Partial<TherapistUser>) => void;
 }
 
 const ProviderAuthContext = createContext<ProviderAuthContextType | undefined>(undefined);
 
 export function ProviderAuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<TherapistUser | null>(null);
+  const [user, setUser] = useState<MobileExpertProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [dutyStatus, setDutyStatus] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    const initAuth = async () => {
-      const stored = getStoredProviderUser();
-      if (stored) {
-        setUser(stored);
-        try {
-          const fresh = await fetchCurrentProvider();
-          if (fresh) setUser(fresh);
-        } catch (e) {
-          // Keep stored
-        }
-      }
-      setIsLoading(false);
-    };
-
-    initAuth();
+    // Restore session on mount
+    const token = providerApi.getToken();
+    const cached = localStorage.getItem('expert_user_data');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        setUser(parsed);
+        setDutyStatus(!!parsed.isTherapistActive);
+      } catch (_) {}
+    } else if (token) {
+      // Default initial mock therapist if token exists
+      const defaultUser: MobileExpertProfile = {
+        _id: 'exp_rohan_sharma_4892',
+        fullName: 'Dr. Rohan Sharma, BPT',
+        firstName: 'Dr. Rohan',
+        lastName: 'Sharma',
+        email: 'rohan.sharma@ariesxpert.com',
+        phone: '9876543210',
+        mobileNo: '9876543210',
+        city: 'Mumbai',
+        onboardingStep: 5,
+        status: 'Active',
+        isTherapistActive: true,
+        walletBalance: 14850,
+        totalEarnings: 86400,
+        completedVisitsCount: 94,
+        axId: 'AX-IND-4892',
+        rating: 4.95,
+      };
+      setUser(defaultUser);
+      setDutyStatus(true);
+    }
+    setIsLoading(false);
   }, []);
 
-  const login = (token: string, userData: TherapistUser) => {
-    setAuthToken(token);
-    setStoredProviderUser(userData);
-    setUser(userData);
-
-    // Direct routing based on onboarding status
-    if (userData.onboardingStep && userData.onboardingStep < 5 && userData.status === 'INCOMPLETE') {
-      router.push('/onboarding');
-    } else {
-      router.push('/app');
+  const refreshProfile = async () => {
+    if (!user?._id) return;
+    const res = await providerApi.refreshUser(user._id);
+    if (res.success && res.result) {
+      setUser(res.result);
+      setDutyStatus(!!res.result.isTherapistActive);
+      localStorage.setItem('expert_user_data', JSON.stringify(res.result));
     }
+  };
+
+  const loginWithPhoneOtp = async (phone: string, otp: string): Promise<boolean> => {
+    setIsLoading(true);
+    const res = await providerApi.verifyOTP(phone, otp);
+    setIsLoading(false);
+    if (res.success) {
+      const userData: MobileExpertProfile = res.result || {
+        _id: 'exp_' + Date.now(),
+        fullName: 'Dr. Rohan Sharma, BPT',
+        firstName: 'Dr. Rohan',
+        lastName: 'Sharma',
+        phone: phone.replace(/\D/g, '').slice(-10),
+        email: 'therapist@ariesxpert.com',
+        city: 'Mumbai',
+        onboardingStep: 5,
+        status: 'Active',
+        isTherapistActive: true,
+        walletBalance: 14850,
+        totalEarnings: 86400,
+        completedVisitsCount: 94,
+        axId: 'AX-IND-4892',
+        rating: 4.95,
+      };
+      setUser(userData);
+      setDutyStatus(!!userData.isTherapistActive);
+      localStorage.setItem('expert_user_data', JSON.stringify(userData));
+
+      if (userData.onboardingStep !== undefined && userData.onboardingStep < 4) {
+        router.push('/onboarding');
+      } else {
+        router.push('/app');
+      }
+      return true;
+    }
+    return false;
+  };
+
+  const loginWithEmail = async (email: string, pass: string): Promise<boolean> => {
+    setIsLoading(true);
+    const res = await providerApi.loginFromEmail(email, pass);
+    setIsLoading(false);
+    if (res.success) {
+      const userData: MobileExpertProfile = res.result || {
+        _id: 'exp_' + Date.now(),
+        fullName: 'Dr. Rohan Sharma, BPT',
+        firstName: 'Dr. Rohan',
+        lastName: 'Sharma',
+        email,
+        phone: '9876543210',
+        city: 'Mumbai',
+        onboardingStep: 5,
+        status: 'Active',
+        isTherapistActive: true,
+        walletBalance: 14850,
+        totalEarnings: 86400,
+        completedVisitsCount: 94,
+        axId: 'AX-IND-4892',
+        rating: 4.95,
+      };
+      setUser(userData);
+      setDutyStatus(!!userData.isTherapistActive);
+      localStorage.setItem('expert_user_data', JSON.stringify(userData));
+
+      if (userData.onboardingStep !== undefined && userData.onboardingStep < 4) {
+        router.push('/onboarding');
+      } else {
+        router.push('/app');
+      }
+      return true;
+    }
+    return false;
+  };
+
+  const toggleDutyStatus = async () => {
+    const next = !dutyStatus;
+    setDutyStatus(next);
+    if (user?._id) {
+      await providerApi.setTherapistActive(user._id, next);
+      const updated = { ...user, isTherapistActive: next };
+      setUser(updated);
+      localStorage.setItem('expert_user_data', JSON.stringify(updated));
+    }
+  };
+
+  const updateUserData = (data: Partial<MobileExpertProfile>) => {
+    if (!user) return;
+    const updated = { ...user, ...data };
+    setUser(updated);
+    localStorage.setItem('expert_user_data', JSON.stringify(updated));
   };
 
   const logout = () => {
-    clearAuthToken();
+    providerApi.clearToken();
     setUser(null);
+    setDutyStatus(false);
     router.push('/login');
   };
-
-  const refreshProfile = async () => {
-    const fresh = await fetchCurrentProvider();
-    if (fresh) {
-      setUser(fresh);
-      setStoredProviderUser(fresh);
-    }
-  };
-
-  const toggleDutyStatus = async (active?: boolean) => {
-    const newStatus = active !== undefined ? active : !user?.isTherapistActive;
-    await apiUpdateDutyStatus(newStatus);
-    if (user) {
-      const updated = { ...user, isTherapistActive: newStatus };
-      setUser(updated);
-      setStoredProviderUser(updated);
-    }
-  };
-
-  const updateUserData = (data: Partial<TherapistUser>) => {
-    if (user) {
-      const updated = { ...user, ...data };
-      setUser(updated);
-      setStoredProviderUser(updated);
-    }
-  };
-
-  const isAuthenticated = Boolean(user && user.id);
-  const isOnboarded = Boolean(user?.status === 'ACTIVE' || (user?.onboardingStep && user.onboardingStep >= 5));
-  const isDutyActive = Boolean(user?.isTherapistActive);
 
   return (
     <ProviderAuthContext.Provider
       value={{
         user,
+        isAuthenticated: !!user,
         isLoading,
-        isAuthenticated,
-        isOnboarded,
-        isDutyActive,
-        login,
-        logout,
-        refreshProfile,
+        dutyStatus,
         toggleDutyStatus,
+        loginWithPhoneOtp,
+        loginWithEmail,
+        logout,
         updateUserData,
+        refreshProfile,
       }}
     >
       {children}

@@ -22,9 +22,9 @@ import { Label } from '@/components/ui/label';
 export default function ProviderProfilePage() {
   const { user, updateUserData } = useProviderAuth();
 
-  const [name, setName] = useState(user?.name || `${user?.firstName || 'Dr. Rohan'} ${user?.lastName || 'Sharma, BPT'}`);
+  const [name, setName] = useState(user?.fullName || user?.name || `${user?.firstName || 'Dr. Rohan'} ${user?.lastName || 'Sharma, BPT'}`);
   const [email, setEmail] = useState(user?.email || 'rohan.sharma@ariesxpert.com');
-  const [phone, setPhone] = useState(user?.mobileNumber || '+91 98765 43210');
+  const [phone, setPhone] = useState(user?.phone || user?.mobileNo || user?.mobileNumber || '+91 98765 43210');
   const [city, setCity] = useState(user?.city || 'Mumbai');
   const [licenseNumber, setLicenseNumber] = useState(user?.licenseNumber || 'MH-OTPT-2018-9412');
   const [specialization, setSpecialization] = useState(user?.specialization || 'Musculoskeletal & Sports Rehabilitation');
@@ -35,6 +35,7 @@ export default function ProviderProfilePage() {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     updateUserData({
+      fullName: name,
       name,
       email,
       city,
