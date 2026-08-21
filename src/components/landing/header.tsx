@@ -55,17 +55,17 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-xl border-b border-border/10 shadow-sm transition-all duration-300">
-      <div className="w-full max-w-[1920px] mx-auto flex h-24 md:h-32 items-center px-4 sm:px-6 lg:px-8 relative justify-between xl:justify-start">
+      <div className="w-full max-w-7xl 2xl:max-w-[1720px] mx-auto flex h-20 md:h-24 items-center px-4 sm:px-6 lg:px-8 relative justify-between">
         
         {/* Mobile Left Corner: Theme Toggle */}
         <div className="xl:hidden flex items-center">
           <ThemeToggle />
         </div>
 
-        {/* Logo Section: Centered on Mobile, Left-aligned on Desktop */}
+        {/* Logo Section */}
         <div className="absolute left-1/2 -translate-x-1/2 xl:relative xl:left-0 xl:translate-x-0 flex items-center shrink-0">
-          <Link href="/" className="flex items-center group py-2" prefetch={false}>
-            <div className="relative h-14 w-44 sm:w-52 md:h-20 md:w-64 lg:h-22 lg:w-72 xl:h-24 xl:w-80 2xl:w-96 transition-all duration-300 group-hover:opacity-95">
+          <Link href="/" className="flex items-center group py-1" prefetch={false}>
+            <div className="relative h-12 w-40 sm:w-48 md:h-14 md:w-56 xl:h-16 xl:w-60 2xl:w-72 transition-all duration-300 group-hover:opacity-95">
               <Image
                 src="/logo-light.png"
                 alt="Aries PhysioCare"
@@ -85,29 +85,29 @@ export default function Header() {
         </div>
 
         {/* Navigation Menu (Desktop Only) */}
-        <nav className="hidden xl:flex flex-1 justify-center items-center gap-x-2 2xl:gap-x-4">
-          <Link href="/" className="text-[13px] 2xl:text-[15px] font-bold hover:text-primary transition-colors whitespace-nowrap px-1" prefetch={false}>Home</Link>
-          <Link href="/about" className="text-[13px] 2xl:text-[15px] font-bold hover:text-primary transition-colors whitespace-nowrap px-1" prefetch={false}>About</Link>
+        <nav className="hidden xl:flex items-center gap-x-2 min-[1350px]:gap-x-3 min-[1500px]:gap-x-5 px-2">
+          <Link href="/" className="text-[13px] 2xl:text-[14px] font-bold hover:text-primary transition-colors whitespace-nowrap px-1" prefetch={false}>Home</Link>
+          <Link href="/about" className="text-[13px] 2xl:text-[14px] font-bold hover:text-primary transition-colors whitespace-nowrap px-1" prefetch={false}>About</Link>
           <ServicesDropdown />
-          <Link href="/therapist" className="text-[13px] 2xl:text-[15px] font-bold hover:text-primary transition-colors flex items-center gap-1 whitespace-nowrap px-1" prefetch={false}>
+          <Link href="/therapist" className="text-[13px] 2xl:text-[14px] font-bold hover:text-primary transition-colors flex items-center gap-1 whitespace-nowrap px-1" prefetch={false}>
             <Users className="h-3.5 w-3.5" /> Therapists
           </Link>
-          <Link href="/clinic" className="text-[13px] 2xl:text-[15px] font-bold hover:text-primary transition-colors flex items-center gap-1 whitespace-nowrap px-1" prefetch={false}>
+          <Link href="/clinic" className="text-[13px] 2xl:text-[14px] font-bold hover:text-primary transition-colors flex items-center gap-1 whitespace-nowrap px-1" prefetch={false}>
             <Building2 className="h-3.5 w-3.5" /> Clinic
           </Link>
-          <Link href="/blogs" className="hidden 2xl:flex text-[15px] font-bold hover:text-primary transition-colors whitespace-nowrap px-1" prefetch={false}>Blog</Link>
+          <Link href="/blogs" className="hidden 2xl:flex text-[14px] font-bold hover:text-primary transition-colors whitespace-nowrap px-1" prefetch={false}>Blog</Link>
           <div className="hidden 2xl:block"><WorkWithUsDropdown /></div>
 
-          <div className="hidden min-[1700px]:flex items-center gap-2 border-l ml-2 pl-4 border-border/50">
-            <Link href="/free-tele-consultation" className="text-sm 2xl:text-[15px] font-black hover:text-primary transition-colors flex items-center gap-1.5 text-accent whitespace-nowrap" prefetch={false}>
+          <div className="hidden min-[1600px]:flex items-center gap-2 border-l ml-1 pl-3 border-border/50">
+            <Link href="/free-tele-consultation" className="text-[13px] 2xl:text-[14px] font-black hover:text-primary transition-colors flex items-center gap-1.5 text-accent whitespace-nowrap" prefetch={false}>
               <Video className="h-4 w-4 animate-pulse" /> Free Consultation
             </Link>
           </div>
         </nav>
 
         {/* Actions Section */}
-        <div className="flex items-center gap-2 xl:gap-3 shrink-0 ml-auto xl:ml-0">
-          <div className="hidden sm:block">
+        <div className="flex items-center gap-2 sm:gap-2.5 2xl:gap-3 shrink-0">
+          <div className="hidden md:block">
             <LocationSelector current={currentLocationName} />
           </div>
           <div className="hidden xl:block">
@@ -115,14 +115,14 @@ export default function Header() {
           </div>
           <Link
             href="/login"
-            className="hidden lg:inline-flex items-center gap-1.5 px-3.5 py-2 2xl:px-4 2xl:py-2.5 rounded-full border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary text-[12px] 2xl:text-[13px] font-bold transition-all hover:scale-105"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 2xl:px-4 2xl:py-2.5 rounded-full border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary text-xs 2xl:text-[13px] font-bold transition-all hover:scale-105 whitespace-nowrap shrink-0"
             prefetch={false}
           >
             <Stethoscope className="w-3.5 h-3.5" />
-            <span>Provider Portal</span>
+            <span>Login</span>
           </Link>
-          <div className="hidden xl:inline-flex">
-            <BookAppointmentButton className="neon-primary-border bg-primary text-white hover:bg-primary/95 shadow-xl transition-all rounded-full px-4 py-2.5 2xl:px-8 2xl:py-4 text-[13px] 2xl:text-[15px] font-black tracking-wide hover:-translate-y-0.5 whitespace-nowrap">
+          <div className="hidden sm:inline-flex shrink-0">
+            <BookAppointmentButton className="neon-primary-border bg-primary text-white hover:bg-primary/95 shadow-xl transition-all rounded-full px-4 py-2 2xl:px-6 2xl:py-2.5 text-xs 2xl:text-sm font-black tracking-wide hover:-translate-y-0.5 whitespace-nowrap shrink-0">
               Book Home Visit
             </BookAppointmentButton>
           </div>
