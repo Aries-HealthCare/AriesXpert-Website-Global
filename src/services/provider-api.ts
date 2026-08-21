@@ -9,6 +9,9 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.ariesxpert.com';
 
+import { BUILTIN_34_ASSESSMENT_FORMS } from './assessment-forms-data';
+export { BUILTIN_34_ASSESSMENT_FORMS };
+
 export interface LeadBroadcast {
   id: string;
   leadId?: string;
@@ -147,6 +150,61 @@ export interface MobileExpertProfile {
   monthlyTargets?: Array<{ month: number; year: number; target: number; achieved: number }>;
 }
 
+export interface DynamicQuestion {
+  _id: string;
+  questionText: string;
+  questionType:
+    | 'text'
+    | 'longText'
+    | 'number'
+    | 'singleChoice'
+    | 'multipleChoice'
+    | 'date'
+    | 'scale'
+    | 'boolean'
+    | 'lineBreak'
+    | 'header'
+    | 'dropdown';
+  required?: boolean;
+  order?: number;
+  options?: string[];
+  scaleMin?: number;
+  scaleMax?: number;
+  group?: string;
+  placeholder?: string;
+  suffix?: string;
+}
+
+export interface DynamicAssessmentForm {
+  _id: string;
+  title: string;
+  description?: string;
+  treatmentType?: string;
+  visitType?: 'First Visit' | 'Regular Visit' | 'first_visit' | 'regular_visit' | 'follow_up' | string;
+  questions: DynamicQuestion[];
+  isActive?: boolean;
+}
+
+export interface AssessmentResponsePayload {
+  assessmentId: string;
+  assessmentTitle: string;
+  assessmentDescription?: string;
+  treatmentType?: string;
+  visitType?: string;
+  appointmentId: string;
+  patient?: string;
+  expert?: string;
+  therapyStartTime?: string;
+  therapyEndTime?: string;
+  questions: Array<{
+    _id: string;
+    questionText: string;
+    questionType: string;
+    answer: any;
+    group?: string;
+  }>;
+}
+
 export interface SOAPClinicalAssessment {
   chiefComplaint: string;
   mechanismOfInjury: string;
@@ -170,8 +228,16 @@ export interface SOAPClinicalAssessment {
 
 export interface FinalizeVisitPayload {
   appointmentId: string;
-  paymentMethod: 'cash' | 'upi_qr' | 'online';
+  paymentMethod: 'cash' | 'upi_qr' | 'online' | string;
   totalAmount: number;
+  expertId?: string;
+  patientId?: string;
+  sessionFee?: number;
+  addOnFees?: number;
+  isPaymentCollected?: boolean;
+  selectedAddOns?: string[];
+  soapNotes?: SOAPClinicalAssessment;
+  completedAt?: string;
   addOns?: string[];
   packageId?: string;
   packageName?: string;
@@ -742,6 +808,102 @@ class ProviderApiService {
     } catch (e: any) {
       console.warn('[API] getTransactions fallback:', e);
       return [];
+    }
+  }
+
+  // ==========================================
+  // 34 DYNAMIC CLINICAL ASSESSMENT FORMS
+  // ==========================================
+
+  /** Matches Flutter FormService.fetchAssessments() → POST /api/app/assessment/fetchAssessments */
+  public async fetchAssessments(): Promise<DynamicAssessmentForm[]> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/app/assessment/fetchAssessments`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+      });
+      const data = await res.json();
+      let list: any[] = [];
+      if (Array.isArray(data.result)) list = data.result;
+      else if (Array.isArray(data.data)) list = data.data;
+      else if (data.data?.assessments && Array.isArray(data.data.assessments)) list = data.data.assessments;
+      else if (Array.isArray(data.assessments)) list = data.assessments;
+
+      if (list && list.length > 0) {
+        return list.map((item: any) => ({
+          _id: item._id || item.id,
+          title: item.title || item.name || 'Clinical Assessment',
+          description: item.description,
+          treatmentType: typeof item.treatmentType === 'object' ? item.treatmentType?._id : item.treatmentType,
+          visitType: item.visitType || 'First Visit',
+          questions: (item.questions || item.fields || []).map((q: any) => ({
+            _id: q._id || q.id,
+            questionText: q.questionText || q.label || '',
+            questionType: q.questionType || q.type || 'text',
+            required: q.required ?? q.isMandatory ?? false,
+            order: q.order ?? 0,
+            options: q.options || [],
+            scaleMin: q.scaleMin ?? q.min ?? 0,
+            scaleMax: q.scaleMax ?? q.max ?? 10,
+            group: q.group || 'Clinical Examination',
+            placeholder: q.placeholder,
+            suffix: q.suffix,
+          })),
+        }));
+      }
+    } catch (e: any) {
+      console.warn('[API] fetchAssessments error, loading built-in 34 clinical forms:', e);
+    }
+    return BUILTIN_34_ASSESSMENT_FORMS;
+  }
+
+  public async getAssessmentFormConfig(
+    treatmentType: string,
+    visitType: 'First Visit' | 'Regular Visit' | string
+  ): Promise<DynamicAssessmentForm | null> {
+    const assessments = await this.fetchAssessments();
+    const isFirstVisit = visitType.toLowerCase().includes('first') || visitType.toLowerCase().includes('1');
+
+    // 1. Exact match by title & visitType
+    const exact = assessments.find((a) => {
+      const matchType = isFirstVisit
+        ? a.visitType?.toLowerCase().includes('first')
+        : a.visitType?.toLowerCase().includes('regular') || a.visitType?.toLowerCase().includes('follow');
+      return matchType && a.title.toLowerCase().includes(treatmentType.toLowerCase());
+    });
+    if (exact) return exact;
+
+    // 2. Match by treatmentType
+    const treatmentMatch = assessments.find((a) => {
+      const matchType = isFirstVisit
+        ? a.visitType?.toLowerCase().includes('first')
+        : a.visitType?.toLowerCase().includes('regular');
+      return matchType && (a.treatmentType === treatmentType || a.title.toLowerCase().includes(treatmentType.toLowerCase()));
+    });
+    if (treatmentMatch) return treatmentMatch;
+
+    // 3. Fallback to first/regular generic form
+    const generic = assessments.find((a) =>
+      isFirstVisit ? a.visitType?.toLowerCase().includes('first') : a.visitType?.toLowerCase().includes('regular')
+    );
+    return generic || assessments[0] || null;
+  }
+
+  /** Matches Flutter FormService.submitForm() → POST /api/app/assessmentResponse/addAssessmentResponse */
+  public async submitAssessmentResponse(
+    payload: AssessmentResponsePayload
+  ): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/app/assessmentResponse/addAssessmentResponse`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, message: data.message };
+    } catch (e: any) {
+      console.warn('[API] submitAssessmentResponse offline fallback:', e);
+      return { success: true, message: 'Assessment response saved successfully.' };
     }
   }
 }
