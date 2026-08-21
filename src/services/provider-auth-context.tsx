@@ -29,35 +29,23 @@ export function ProviderAuthProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     // Restore session on mount
     const token = providerApi.getToken();
-    const cached = localStorage.getItem('expert_user_data');
+    const cached = typeof window !== 'undefined' ? localStorage.getItem('expert_user_data') : null;
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
         setUser(parsed);
         setDutyStatus(!!parsed.isTherapistActive);
+        // Silently refresh from server in background
+        if (token && parsed._id) {
+          providerApi.refreshUser(parsed._id).then((res) => {
+            if (res.success && res.result) {
+              setUser(res.result);
+              setDutyStatus(!!res.result.isTherapistActive);
+              localStorage.setItem('expert_user_data', JSON.stringify(res.result));
+            }
+          }).catch(() => {});
+        }
       } catch (_) {}
-    } else if (token) {
-      // Default initial mock therapist if token exists
-      const defaultUser: MobileExpertProfile = {
-        _id: 'exp_rohan_sharma_4892',
-        fullName: 'Dr. Rohan Sharma, BPT',
-        firstName: 'Dr. Rohan',
-        lastName: 'Sharma',
-        email: 'rohan.sharma@ariesxpert.com',
-        phone: '9876543210',
-        mobileNo: '9876543210',
-        city: 'Mumbai',
-        onboardingStep: 5,
-        status: 'Active',
-        isTherapistActive: true,
-        walletBalance: 14850,
-        totalEarnings: 86400,
-        completedVisitsCount: 94,
-        axId: 'AX-IND-4892',
-        rating: 4.95,
-      };
-      setUser(defaultUser);
-      setDutyStatus(true);
     }
     setIsLoading(false);
   }, []);
@@ -79,20 +67,12 @@ export function ProviderAuthProvider({ children }: { children: React.ReactNode }
     if (res.success) {
       const userData: MobileExpertProfile = res.result || {
         _id: 'exp_' + Date.now(),
-        fullName: 'Dr. Rohan Sharma, BPT',
-        firstName: 'Dr. Rohan',
-        lastName: 'Sharma',
+        fullName: 'Provider',
         phone: phone.replace(/\D/g, '').slice(-10),
-        email: 'therapist@ariesxpert.com',
-        city: 'Mumbai',
+        city: '',
         onboardingStep: 5,
         status: 'Active',
         isTherapistActive: true,
-        walletBalance: 14850,
-        totalEarnings: 86400,
-        completedVisitsCount: 94,
-        axId: 'AX-IND-4892',
-        rating: 4.95,
       };
       setUser(userData);
       setDutyStatus(!!userData.isTherapistActive);
@@ -115,20 +95,12 @@ export function ProviderAuthProvider({ children }: { children: React.ReactNode }
     if (res.success) {
       const userData: MobileExpertProfile = res.result || {
         _id: 'exp_' + Date.now(),
-        fullName: 'Dr. Rohan Sharma, BPT',
-        firstName: 'Dr. Rohan',
-        lastName: 'Sharma',
         email,
-        phone: '9876543210',
-        city: 'Mumbai',
+        fullName: 'Provider',
+        city: '',
         onboardingStep: 5,
         status: 'Active',
         isTherapistActive: true,
-        walletBalance: 14850,
-        totalEarnings: 86400,
-        completedVisitsCount: 94,
-        axId: 'AX-IND-4892',
-        rating: 4.95,
       };
       setUser(userData);
       setDutyStatus(!!userData.isTherapistActive);

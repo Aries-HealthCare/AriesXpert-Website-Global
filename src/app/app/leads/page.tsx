@@ -1,271 +1,413 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { fetchIncomingLeads, LeadBroadcast, respondToLeadBroadcast } from '@/services/provider-api';
+import { providerApi } from '@/services/provider-api';
 import {
   Radio,
   MapPin,
   Clock,
   CheckCircle2,
   XCircle,
-  AlertCircle,
   TrendingUp,
   User,
   Phone,
   Calendar,
-  Filter,
   RefreshCw,
   Zap,
-  Info,
-  Navigation
+  Loader2,
+  UserCheck,
+  MessageSquare,
+  FileText,
+  Navigation,
+  AlertTriangle,
+  Heart,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+const PASS_REASONS = ['Busy', 'Not Interested', 'Location Too Far', 'Price Issue', 'Other'];
+
+function getExpiryText(lead: any): string {
+  const createdAt = lead.createdAt ? new Date(lead.createdAt) : null;
+  const expiresIn = lead.expiresIn?.toString() || '72 hours';
+  if (!createdAt) return lead.expiresIn ? String(lead.expiresIn) : 'Expires soon';
+
+  let durationMs = 72 * 3600 * 1000;
+  const match = expiresIn.match(/(\d+)\s*(hour|day|h|d)/i);
+  if (match) {
+    const val = parseInt(match[1]);
+    durationMs = match[2].startsWith('d') ? val * 86400000 : val * 3600000;
+  }
+  const expiry = new Date(createdAt.getTime() + durationMs);
+  const remaining = expiry.getTime() - Date.now();
+  if (remaining <= 0) return 'Expired';
+  const hrs = Math.floor(remaining / 3600000);
+  const mins = Math.floor((remaining % 3600000) / 60000);
+  if (hrs > 24) return `Expires in ${Math.floor(hrs / 24)}d ${hrs % 24}h`;
+  if (hrs > 0) return `Expires in ${hrs}h ${mins}m`;
+  return `Expires in ${mins}m`;
+}
+
+function getUrgencyBadge(urgency?: string) {
+  switch ((urgency || '').toUpperCase()) {
+    case 'HIGH':
+    case 'URGENT':
+      return <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-red-500/10 text-red-500 border border-red-500/20">🔴 Urgent</span>;
+    case 'HIGH_DEMAND':
+      return <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/20">🟠 High Demand</span>;
+    case 'MEDIUM':
+      return <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">🟡 Medium</span>;
+    default:
+      return <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20">🗓 Scheduled</span>;
+  }
+}
+
 export default function ProviderLeadsPage() {
-  const [leads, setLeads] = useState<LeadBroadcast[]>([]);
-  const [acceptedLeads, setAcceptedLeads] = useState<LeadBroadcast[]>([]);
-  const [filterType, setFilterType] = useState<'ALL' | 'HOME' | 'CLINIC'>('ALL');
+  const [activeTab, setActiveTab] = useState<'new' | 'acquired'>('new');
+  const [newLeads, setNewLeads] = useState<any[]>([]);
+  const [acquiredLeads, setAcquiredLeads] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [feedback, setFeedback] = useState<{ id: string; type: 'success' | 'info'; text: string } | null>(null);
+  const [passDialogLead, setPassDialogLead] = useState<any | null>(null);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
-  const loadLeads = async () => {
-    setIsRefreshing(true);
-    const data = await fetchIncomingLeads();
-    setLeads(data);
-    setIsRefreshing(false);
-  };
-
-  useEffect(() => {
-    loadLeads();
+  const loadLeads = useCallback(async (showRefresh = false) => {
+    if (showRefresh) setIsRefreshing(true);
+    else setIsLoading(true);
+    try {
+      const data = await providerApi.getLeads();
+      setNewLeads(data.newLeads || []);
+      setAcquiredLeads(data.acquiredLeads || []);
+    } catch (e) {
+      console.warn('Leads load error', e);
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
   }, []);
 
-  const handleAction = async (lead: LeadBroadcast, action: 'ACCEPT' | 'DECLINE') => {
-    await respondToLeadBroadcast(lead.id, action);
-    if (action === 'ACCEPT') {
-      setAcceptedLeads([lead, ...acceptedLeads]);
-      setFeedback({
-        id: lead.id,
-        type: 'success',
-        text: `Lead for ${lead.patientName} successfully accepted! Added to Active Visits.`,
-      });
-    } else {
-      setFeedback({
-        id: lead.id,
-        type: 'info',
-        text: `Lead declined. It has been recirculated to nearby therapists.`,
-      });
-    }
-    setLeads(leads.filter((l) => l.id !== lead.id));
+  useEffect(() => { loadLeads(); }, [loadLeads]);
+
+  const showFeedback = (type: 'success' | 'error' | 'info', text: string) => {
+    setFeedback({ type, text });
+    setTimeout(() => setFeedback(null), 5000);
   };
 
-  const filteredLeads = leads.filter((l) => {
-    if (filterType === 'HOME') return l.serviceType === 'Home Visit';
-    if (filterType === 'CLINIC') return l.serviceType === 'Clinic Visit';
-    return true;
-  });
+  const handleInterest = async (lead: any) => {
+    const id = lead._id || lead.id;
+    try {
+      const res = await providerApi.expressInterest(id);
+      if (res.success) {
+        setNewLeads((prev) => prev.filter((l) => (l._id || l.id) !== id));
+        showFeedback('success', 'Interest registered. Waiting for admin approval.');
+      } else {
+        showFeedback('error', res.message || 'Failed to register interest.');
+      }
+    } catch {
+      showFeedback('error', 'Unable to register interest. Please try again.');
+    }
+  };
+
+  const handlePass = async (lead: any, reason: string) => {
+    const id = lead._id || lead.id;
+    setPassDialogLead(null);
+    try {
+      await providerApi.passLead(id, reason);
+      setNewLeads((prev) => prev.filter((l) => (l._id || l.id) !== id));
+      showFeedback('info', 'Lead passed. It has been recirculated to nearby therapists.');
+    } catch {
+      showFeedback('error', 'Failed to pass lead. Please try again.');
+    }
+  };
+
+  const handleReview = async (lead: any) => {
+    const id = lead._id || lead.id;
+    showFeedback('info', 'Sending review invitation via WhatsApp...');
+    try {
+      const res = await providerApi.requestPatientReview(id);
+      if (res.success) {
+        showFeedback('success', `Review link sent to ${res.data?.phoneNumber || 'patient'} via WhatsApp!`);
+      } else {
+        showFeedback('error', res.message || 'Failed to send review invitation.');
+      }
+    } catch {
+      showFeedback('error', 'Unable to send review invitation via WhatsApp.');
+    }
+  };
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      {/* Header */}
+      {/* Header — matches 'Clients & Leads' heading in clients_leads.dart */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
-              <Radio className="w-4 h-4 animate-pulse" />
-            </div>
-            <h1 className="text-2xl font-extrabold tracking-tight">Live Lead Broadcast Stream</h1>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Real-time patient match alerts within your registered service pincodes.
-          </p>
+          <h1 className="text-2xl font-extrabold tracking-tight">Clients & Leads</h1>
+          <p className="text-xs text-muted-foreground mt-1">Manage your patient pipeline</p>
         </div>
-
-        <div className="flex items-center gap-2">
-          {/* Refresh button */}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={loadLeads}
-            disabled={isRefreshing}
-            className="rounded-xl text-xs font-bold"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span>Refresh Stream</span>
-          </Button>
-        </div>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-border/80 pb-3">
         <button
-          type="button"
-          onClick={() => setFilterType('ALL')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-            filterType === 'ALL'
-              ? 'bg-primary text-white shadow-sm'
-              : 'bg-muted/50 text-muted-foreground hover:text-foreground'
-          }`}
+          onClick={() => loadLeads(true)}
+          disabled={isRefreshing}
+          className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-xl border border-border/80 hover:bg-muted/50 transition-colors self-start sm:self-auto"
         >
-          All Matches ({leads.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => setFilterType('HOME')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-            filterType === 'HOME'
-              ? 'bg-primary text-white shadow-sm'
-              : 'bg-muted/50 text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          Home Visits
-        </button>
-        <button
-          type="button"
-          onClick={() => setFilterType('CLINIC')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-            filterType === 'CLINIC'
-              ? 'bg-primary text-white shadow-sm'
-              : 'bg-muted/50 text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          Clinic Consults
+          {isRefreshing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+          Refresh
         </button>
       </div>
 
-      {/* Feedback message */}
+      {/* Feedback banner */}
       {feedback && (
-        <div
-          className={`p-4 rounded-2xl text-xs font-bold flex items-center justify-between animate-in fade-in ${
-            feedback.type === 'success'
-              ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-500'
-              : 'bg-muted border border-border text-muted-foreground'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            {feedback.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <Info className="w-4 h-4" />}
-            <span>{feedback.text}</span>
-          </div>
-          {feedback.type === 'success' && (
-            <Link href="/app/visits" className="underline font-bold">
-              Go to Visits →
-            </Link>
-          )}
+        <div className={`p-4 rounded-2xl text-xs font-bold flex items-center gap-2 animate-in fade-in ${
+          feedback.type === 'success' ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/30' :
+          feedback.type === 'error' ? 'bg-red-500/10 text-red-600 border border-red-500/30' :
+          'bg-blue-500/10 text-blue-600 border border-blue-500/30'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> :
+           feedback.type === 'error' ? <XCircle className="w-4 h-4 shrink-0" /> :
+           <Radio className="w-4 h-4 shrink-0" />}
+          {feedback.text}
         </div>
       )}
 
-      {/* Active Broadcasts Stream */}
-      <div className="space-y-4">
-        {filteredLeads.length === 0 ? (
-          <div className="text-center py-16 bg-card border border-border/80 rounded-3xl p-8">
-            <Radio className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-foreground">No Pending Broadcasts</h3>
-            <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
-              You are on duty! New patient matching broadcasts in your pincodes will ring here automatically.
-            </p>
-          </div>
-        ) : (
-          filteredLeads.map((lead) => (
-            <div
-              key={lead.id}
-              className="bg-card border-2 border-border/80 hover:border-primary/40 rounded-3xl p-5 sm:p-6 shadow-sm transition-all relative overflow-hidden"
-            >
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-                <div className="space-y-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                      {lead.leadId}
-                    </span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
-                      {lead.serviceType}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground font-mono">
-                      Broadcast Active
-                    </span>
-                  </div>
-
-                  <h3 className="text-lg font-extrabold text-foreground">
-                    {lead.condition}
-                  </h3>
-
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5 text-foreground" />
-                      <span>
-                        <strong className="text-foreground">{lead.patientName}</strong> ({lead.patientAge}y, {lead.patientGender})
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-primary" />
-                      <span>{lead.locality} ({lead.distanceKm} km)</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-primary" />
-                      <span>{lead.scheduledDate} @ {lead.scheduledTime}</span>
-                    </div>
-                  </div>
-
-                  <div className="p-3 bg-muted/40 rounded-xl border border-border/60 text-xs text-muted-foreground flex items-center justify-between">
-                    <div>
-                      Patient Address: <strong className="text-foreground">{lead.address}</strong>
-                    </div>
-                    <div className="text-right font-mono">
-                      Session Fee: ₹{lead.sessionFee}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Pricing & CTA Controls */}
-                <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end justify-between gap-3 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-border/60">
-                  <div className="text-left lg:text-right">
-                    <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Therapist Net Payout</div>
-                    <div className="text-2xl font-extrabold font-mono text-emerald-500">
-                      ₹{lead.payoutAmount} <span className="text-xs text-muted-foreground font-normal">(60%)</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => handleAction(lead, 'DECLINE')}
-                      className="flex-1 sm:flex-none h-11 px-4 rounded-xl text-xs font-bold hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
-                    >
-                      Decline
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={() => handleAction(lead, 'ACCEPT')}
-                      className="flex-1 sm:flex-none h-11 px-6 rounded-xl text-xs font-extrabold bg-primary hover:bg-primary/95 text-white shadow-lg shadow-primary/20"
-                    >
-                      Accept & Book Slot
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))
-        )}
+      {/* Tab Toggle — matches _buildTabToggle in clients_leads.dart */}
+      <div className="h-13 p-1 bg-muted/30 border border-border/60 rounded-[26px] flex relative">
+        <div
+          className="absolute top-1 bottom-1 w-1/2 bg-primary rounded-[22px] shadow-md transition-all duration-280"
+          style={{ left: activeTab === 'new' ? '4px' : 'calc(50% - 4px)' }}
+        />
+        <button
+          onClick={() => setActiveTab('new')}
+          className={`flex-1 relative z-10 text-xs font-bold rounded-[22px] transition-colors py-2.5 ${
+            activeTab === 'new' ? 'text-white' : 'text-muted-foreground'
+          }`}
+        >
+          New Leads {newLeads.length > 0 && <span className="ml-1 bg-white/20 px-1.5 py-0.5 rounded-full text-[10px]">{newLeads.length}</span>}
+        </button>
+        <button
+          onClick={() => setActiveTab('acquired')}
+          className={`flex-1 relative z-10 text-xs font-bold rounded-[22px] transition-colors py-2.5 ${
+            activeTab === 'acquired' ? 'text-white' : 'text-muted-foreground'
+          }`}
+        >
+          My Patients {acquiredLeads.length > 0 && <span className="ml-1 bg-white/20 px-1.5 py-0.5 rounded-full text-[10px]">{acquiredLeads.length}</span>}
+        </button>
       </div>
 
-      {/* Accepted Leads History */}
-      {acceptedLeads.length > 0 && (
-        <div className="pt-6 border-t border-border space-y-3">
-          <h3 className="text-sm font-extrabold text-foreground">Recently Accepted Leads (Ready for Travel)</h3>
-          <div className="space-y-2">
-            {acceptedLeads.map((item) => (
-              <div key={item.id} className="p-3.5 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span className="font-bold text-foreground">{item.patientName}</span>
-                  <span className="text-muted-foreground">• {item.condition}</span>
+      {/* AI notice for new leads tab */}
+      {activeTab === 'new' && (
+        <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20 flex items-start gap-3">
+          <Zap className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+          <div>
+            <p className="text-xs font-bold text-foreground">Aries AI Lead Matching Active</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              Leads are matched based on your registered service pincodes, specialization, and availability.
+              Express interest quickly — leads expire within 4–72 hours.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Content */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : activeTab === 'new' ? (
+        newLeads.length === 0 ? (
+          <div className="p-12 rounded-3xl border border-dashed border-border/80 text-center text-muted-foreground">
+            <Radio className="w-10 h-10 mx-auto mb-3 opacity-40 animate-pulse" />
+            <p className="text-sm font-medium">No new leads available</p>
+            <p className="text-xs mt-1">Check back soon — new leads broadcast every few minutes</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {newLeads.map((lead: any) => {
+              const patientName = lead.patientName || lead.patient?.name || lead.patient?.fullName || 'Patient';
+              const age = lead.patientAge || lead.age || lead.patient?.age;
+              const gender = lead.patientGender || lead.gender || lead.patient?.gender;
+              const condition = lead.condition || '—';
+              const pkg = lead.packageType || lead.packageName || '—';
+              const locality = lead.locality || lead.location || lead.city || '—';
+              const distance = lead.distanceKm;
+              const payout = lead.payoutAmount || lead.sessionFee;
+              const urgency = lead.urgency;
+              const expiryText = getExpiryText(lead);
+              const id = lead._id || lead.id;
+              return (
+                <div key={id} className="bg-card border border-border/80 rounded-3xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                  {/* Patient info row */}
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-sm font-bold text-foreground">{patientName}</h3>
+                        {age && <span className="text-[10px] text-muted-foreground">({age}y{gender ? ` ${gender[0]}` : ''})</span>}
+                        {urgency && getUrgencyBadge(urgency)}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{condition}</p>
+                    </div>
+                  </div>
+
+                  {/* Details */}
+                  <div className="space-y-1.5 mb-4">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <FileText className="w-3.5 h-3.5 shrink-0 text-primary" />
+                      <span>{pkg}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <MapPin className="w-3.5 h-3.5 shrink-0 text-primary" />
+                      <span className="font-medium text-foreground">{locality}</span>
+                      {distance && <span>({distance} km away)</span>}
+                    </div>
+                    {(lead.scheduledDate || lead.scheduledTime) && (
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <Calendar className="w-3.5 h-3.5 shrink-0 text-primary" />
+                        <span>{lead.scheduledDate || lead.scheduledTime}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-emerald-500 font-bold">₹{(payout || 0).toLocaleString('en-IN')} Therapist Payout</span>
+                      <span className="text-muted-foreground flex items-center gap-1">
+                        <Clock className="w-3 h-3" /> {expiryText}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Action buttons — matches Express Interest & Pass buttons */}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 h-10 rounded-2xl text-xs font-bold border-destructive/30 text-destructive hover:bg-destructive/5"
+                      onClick={() => setPassDialogLead(lead)}
+                    >
+                      <XCircle className="w-3.5 h-3.5 mr-1.5" /> Pass
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="flex-1 h-10 rounded-2xl bg-primary hover:bg-primary/95 text-white font-bold text-xs shadow-md shadow-primary/20"
+                      onClick={() => handleInterest(lead)}
+                    >
+                      <Zap className="w-3.5 h-3.5 mr-1.5" /> Express Interest
+                    </Button>
+                  </div>
                 </div>
-                <Link href="/app/visits" className="font-bold text-primary hover:underline">
-                  Execute Visit →
-                </Link>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+        )
+      ) : (
+        /* Acquired Leads / My Patients Tab */
+        acquiredLeads.length === 0 ? (
+          <div className="p-12 rounded-3xl border border-dashed border-border/80 text-center text-muted-foreground">
+            <UserCheck className="w-10 h-10 mx-auto mb-3 opacity-40" />
+            <p className="text-sm font-medium">You have no active patients</p>
+            <p className="text-xs mt-1">Accept leads to build your patient roster</p>
+            <Button variant="outline" className="mt-3 rounded-xl text-xs font-bold" onClick={() => setActiveTab('new')}>
+              Browse New Leads
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {acquiredLeads.map((lead: any) => {
+              const patientName = lead.patientName || lead.patient?.name || lead.patient?.fullName || 'Patient';
+              const age = lead.patientAge || lead.age || lead.patient?.age;
+              const gender = lead.patientGender || lead.gender || lead.patient?.gender;
+              const condition = lead.condition || lead.diagnosis || '—';
+              const pkg = lead.packageType || lead.packageName || '—';
+              const phone = lead.phone || lead.patient?.phone || lead.patient?.mobileNo || '';
+              const completed = lead.completedSessions || 0;
+              const total = lead.totalSessions || lead.sessionsCount || 0;
+              const progress = total > 0 ? completed / total : 0;
+              const id = lead._id || lead.id;
+              return (
+                <div key={id} className="bg-card border border-border/80 rounded-3xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                  {/* Patient info */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0 font-bold text-sm">
+                      {patientName[0]?.toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-sm font-bold text-foreground truncate">{patientName}</h3>
+                        {age && <span className="text-[10px] text-muted-foreground">({age}y{gender ? ` ${gender[0]}` : ''})</span>}
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{condition}</p>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shrink-0">Active</span>
+                  </div>
+
+                  {/* Package & sessions */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <FileText className="w-3.5 h-3.5 shrink-0 text-primary" />
+                      <span>{pkg}</span>
+                    </div>
+                    {total > 0 && (
+                      <div>
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <span className="text-muted-foreground">Sessions completed</span>
+                          <span className="font-bold text-foreground">{completed}/{total}</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-muted/50 rounded-full overflow-hidden">
+                          <div className="h-full bg-primary rounded-full" style={{ width: `${progress * 100}%` }} />
+                        </div>
+                      </div>
+                    )}
+                    {lead.address && (
+                      <div className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                        <MapPin className="w-3.5 h-3.5 shrink-0 text-primary mt-0.5" />
+                        <span className="line-clamp-1">{lead.address}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action buttons — Call, WhatsApp Review, Schedule */}
+                  <div className="flex flex-wrap gap-2">
+                    {phone && (
+                      <a href={`tel:${phone}`} className="flex-1">
+                        <Button variant="outline" size="sm" className="w-full h-9 rounded-xl text-xs font-bold">
+                          <Phone className="w-3.5 h-3.5 mr-1" /> Call
+                        </Button>
+                      </a>
+                    )}
+                    <Button variant="outline" size="sm" className="flex-1 h-9 rounded-xl text-xs font-bold border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/5" onClick={() => handleReview(lead)}>
+                      <MessageSquare className="w-3.5 h-3.5 mr-1" /> Review
+                    </Button>
+                    <Link href="/app/appointments" prefetch={false} className="flex-1">
+                      <Button size="sm" className="w-full h-9 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary font-bold text-xs border border-primary/20">
+                        <Calendar className="w-3.5 h-3.5 mr-1" /> Schedule
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )
+      )}
+
+      {/* Pass Lead Dialog — matches _showPassDialog in clients_leads.dart */}
+      {passDialogLead && (
+        <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-50 p-4" onClick={() => setPassDialogLead(null)}>
+          <div className="bg-card border border-border rounded-3xl w-full max-w-sm shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="p-5 border-b border-border">
+              <h3 className="text-base font-bold">Reason for Passing</h3>
+              <p className="text-xs text-muted-foreground mt-1">Please select a reason to pass this lead</p>
+            </div>
+            <div className="divide-y divide-border">
+              {PASS_REASONS.map((reason) => (
+                <button
+                  key={reason}
+                  className="w-full px-5 py-4 text-sm text-left hover:bg-muted/50 transition-colors font-medium"
+                  onClick={() => handlePass(passDialogLead, reason)}
+                >
+                  {reason}
+                </button>
+              ))}
+            </div>
+            <div className="p-4">
+              <Button variant="outline" className="w-full rounded-xl font-bold text-xs" onClick={() => setPassDialogLead(null)}>
+                CANCEL
+              </Button>
+            </div>
           </div>
         </div>
       )}

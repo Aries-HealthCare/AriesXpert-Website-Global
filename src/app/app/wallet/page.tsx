@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useProviderAuth } from '@/services/provider-auth-context';
-import { WalletLedgerEntry } from '@/services/provider-api';
+import { providerApi } from '@/services/provider-api';
 import {
   Wallet,
   TrendingUp,
@@ -14,274 +14,332 @@ import {
   AlertCircle,
   Clock,
   Download,
-  Filter,
   ShieldCheck,
-  Sparkles,
-  Loader2
+  Loader2,
+  RefreshCw,
+  Calendar,
+  BarChart3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-const INITIAL_TRANSACTIONS: WalletLedgerEntry[] = [
-  {
-    id: 'tx_01',
-    transactionId: 'TXN-2026-94821',
-    type: 'CREDIT',
-    category: 'VISIT_PAYOUT',
-    amount: 720,
-    balanceAfter: 14850,
-    description: 'Home Visit Payout (60%) - Dr. Arvind Kulkarni (Session 4)',
-    date: 'Today, 05:45 PM',
-    status: 'SUCCESS',
-  },
-  {
-    id: 'tx_02',
-    transactionId: 'TXN-2026-94719',
-    type: 'CREDIT',
-    category: 'VISIT_PAYOUT',
-    amount: 900,
-    balanceAfter: 14130,
-    description: 'Home Visit Payout (60%) - Mr. Anil Kapoor (Session 6)',
-    date: 'Today, 12:30 PM',
-    status: 'SUCCESS',
-  },
-  {
-    id: 'tx_03',
-    transactionId: 'TXN-2026-94602',
-    type: 'CREDIT',
-    category: 'VISIT_PAYOUT',
-    amount: 720,
-    balanceAfter: 13230,
-    description: 'Home Visit Payout (60%) - Mrs. Meenakshi Rao (Session 3)',
-    date: 'Today, 10:25 AM',
-    status: 'SUCCESS',
-  },
-  {
-    id: 'tx_04',
-    transactionId: 'TXN-2026-93810',
-    type: 'CREDIT',
-    category: 'REFERRAL_BONUS',
-    amount: 1000,
-    balanceAfter: 12510,
-    description: 'Physiotherapist Referral Bonus - Dr. Pooja Nair joined',
-    date: 'Yesterday, 04:15 PM',
-    status: 'SUCCESS',
-  },
-  {
-    id: 'tx_05',
-    transactionId: 'TXN-2026-92140',
-    type: 'DEBIT',
-    category: 'WITHDRAWAL',
-    amount: 10000,
-    balanceAfter: 11510,
-    description: 'Instant Bank Payout to HDFC Bank A/c **7291 (IMPS)',
-    date: '20 Aug 2026, 09:30 AM',
-    status: 'SUCCESS',
-  },
-];
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function getNextPayoutDate(): string {
+  const now = new Date();
+  const targetMonth = now.getDate() >= 5
+    ? (now.getMonth() + 1) % 12
+    : now.getMonth();
+  const year = now.getDate() >= 5 && now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear();
+  return `5 ${MONTH_NAMES[targetMonth]} ${year}`;
+}
 
 export default function ProviderWalletPage() {
-  const { user, updateUserData } = useProviderAuth();
-  const [transactions, setTransactions] = useState<WalletLedgerEntry[]>(INITIAL_TRANSACTIONS);
-  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
-  const [withdrawAmount, setWithdrawAmount] = useState('5000');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [withdrawSuccess, setWithdrawSuccess] = useState('');
+  const { user } = useProviderAuth();
+  const [walletData, setWalletData] = useState({
+    availableBalance: 0,
+    pendingBalance: 0,
+    walletStatus: 'Active',
+    isEligibleForPayout: false,
+  });
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [withdrawFeedback, setWithdrawFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [filterType, setFilterType] = useState<'ALL' | 'CREDIT' | 'DEBIT'>('ALL');
 
-  const balance = user?.walletBalance || 14850;
-  const totalEarned = user?.totalEarnings || 86400;
+  const expertId = user?.therapistId || user?.uid || user?._id || '';
 
-  const handleWithdrawal = () => {
-    const num = Number(withdrawAmount);
-    if (!num || num <= 0 || num > balance) {
-      alert('Please enter a valid amount within your available balance.');
+  // Compute KPIs from transaction history (matches wallet.dart logic)
+  let totalEarned = 0;
+  let totalPaidOut = 0;
+  let pendingFromTx = 0;
+  for (const tx of transactions) {
+    if (tx.type === 'CREDIT') {
+      const s = (tx.status || '').toLowerCase();
+      if (s === 'completed' || s === 'success') totalEarned += tx.amount;
+      else if (s === 'pending') pendingFromTx += tx.amount;
+    } else if (tx.type === 'DEBIT' && (tx.category || '').toUpperCase().includes('WITHDRAWAL')) {
+      const s = (tx.status || '').toLowerCase();
+      if (s === 'completed' || s === 'success') totalPaidOut += tx.amount;
+    }
+  }
+  const available = walletData.availableBalance > 0 ? walletData.availableBalance
+    : (user?.walletAmount ?? user?.walletBalance ?? 0);
+  const pending = pendingFromTx > 0 ? pendingFromTx : walletData.pendingBalance;
+  const totalEarnedFinal = totalEarned > 0 ? (totalEarned + pending) : (available + pending + totalPaidOut);
+
+  // 6-month earnings chart data (matches wallet.dart monthlyEarnings)
+  const monthlyEarnings: Record<string, number> = {};
+  const chartMonths: string[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const key = MONTH_NAMES[d.getMonth()];
+    if (!chartMonths.includes(key)) chartMonths.push(key);
+    monthlyEarnings[key] = 0;
+  }
+  for (const tx of transactions) {
+    if (tx.type === 'CREDIT' && ['completed', 'success'].includes((tx.status || '').toLowerCase())) {
+      const d = new Date(tx.createdAt || tx.date || '');
+      if (!isNaN(d.getTime())) {
+        const key = MONTH_NAMES[d.getMonth()];
+        if (key in monthlyEarnings) monthlyEarnings[key] += tx.amount;
+      }
+    }
+  }
+  const maxEarning = Math.max(...Object.values(monthlyEarnings), 1);
+
+  const loadWalletData = useCallback(async (showRefresh = false) => {
+    if (showRefresh) setRefreshing(true);
+    else setIsLoading(true);
+    try {
+      const [balanceData, txData] = await Promise.all([
+        providerApi.getWalletBalance(),
+        expertId ? providerApi.getTransactions(expertId) : Promise.resolve([]),
+      ]);
+      setWalletData(balanceData);
+      setTransactions(txData);
+    } catch (e) {
+      console.warn('Wallet load error', e);
+    } finally {
+      setIsLoading(false);
+      setRefreshing(false);
+    }
+  }, [expertId]);
+
+  useEffect(() => { loadWalletData(); }, [loadWalletData]);
+
+  const handleWithdrawal = async () => {
+    const amount = parseFloat(withdrawAmount);
+    if (!amount || amount <= 0 || amount > available) {
+      setWithdrawFeedback({ type: 'error', text: `Enter a valid amount (max ₹${available.toLocaleString('en-IN')})` });
       return;
     }
-    setIsProcessing(true);
-    setTimeout(() => {
-      const newBal = balance - num;
-      const newTx: WalletLedgerEntry = {
-        id: 'tx_' + Date.now(),
-        transactionId: 'TXN-2026-' + Math.floor(10000 + Math.random() * 90000),
-        type: 'DEBIT',
-        category: 'WITHDRAWAL',
-        amount: num,
-        balanceAfter: newBal,
-        description: `Instant Payout to HDFC Bank A/c **7291 (IMPS Ref: ${Math.floor(100000 + Math.random() * 900000)})`,
-        date: 'Just Now',
-        status: 'SUCCESS',
-      };
-      setTransactions([newTx, ...transactions]);
-      updateUserData({ walletBalance: newBal });
-      setIsProcessing(false);
-      setWithdrawSuccess(`₹${num.toLocaleString('en-IN')} successfully transferred to your registered bank account!`);
-      setTimeout(() => {
-        setIsWithdrawModalOpen(false);
-        setWithdrawSuccess('');
-      }, 1500);
-    }, 1000);
+    setIsWithdrawing(true);
+    try {
+      const res = await providerApi.requestWithdrawal(amount);
+      if (res.success) {
+        setWithdrawFeedback({ type: 'success', text: `Withdrawal request of ₹${amount.toLocaleString('en-IN')} submitted. Funds credited by ${getNextPayoutDate()}.` });
+        setWithdrawAmount('');
+        loadWalletData(true);
+      } else {
+        setWithdrawFeedback({ type: 'error', text: res.message || 'Withdrawal request failed.' });
+      }
+    } catch {
+      setWithdrawFeedback({ type: 'error', text: 'Unable to process withdrawal. Please try again.' });
+    } finally {
+      setIsWithdrawing(false);
+      setTimeout(() => setWithdrawFeedback(null), 8000);
+    }
   };
 
+  const filteredTx = transactions.filter((tx) => {
+    if (filterType === 'CREDIT') return tx.type === 'CREDIT';
+    if (filterType === 'DEBIT') return tx.type === 'DEBIT';
+    return true;
+  });
+
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center">
-              <Wallet className="w-4 h-4" />
-            </div>
-            <h1 className="text-2xl font-extrabold tracking-tight">Clinical Wallet & Payouts</h1>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Real-time balance, instant IMPS withdrawals, and double-entry transaction ledger.
-          </p>
+          <h1 className="text-2xl font-extrabold tracking-tight">My Wallet</h1>
+          <p className="text-xs text-muted-foreground mt-1">Balance, earnings history & payout requests</p>
         </div>
-
-        <Button
-          onClick={() => setIsWithdrawModalOpen(true)}
-          className="h-11 px-6 rounded-xl bg-primary hover:bg-primary/95 text-white font-extrabold text-xs shadow-lg shadow-primary/20 flex items-center gap-2"
+        <button
+          onClick={() => loadWalletData(true)}
+          disabled={refreshing}
+          className="w-10 h-10 rounded-2xl border border-border/80 bg-card flex items-center justify-center hover:bg-muted transition-colors"
         >
-          <ArrowDownRight className="w-4 h-4" />
-          <span>Withdraw to Bank Account</span>
-        </Button>
+          {refreshing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+        </button>
       </div>
 
-      {/* Balance Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-card border-2 border-primary/30 p-6 rounded-3xl shadow-sm relative overflow-hidden bg-gradient-to-br from-card to-primary/5">
-          <span className="text-xs font-bold text-muted-foreground">Available for Withdrawal</span>
-          <div className="text-3xl sm:text-4xl font-extrabold font-mono text-foreground mt-2">
-            ₹{balance.toLocaleString('en-IN')}
-          </div>
-          <div className="text-[11px] text-emerald-500 font-bold mt-2 flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Instant IMPS Settlement Enabled</span>
-          </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
-
-        <div className="bg-card border border-border/80 p-6 rounded-3xl shadow-sm">
-          <span className="text-xs font-bold text-muted-foreground">Total Lifetime Earnings</span>
-          <div className="text-3xl sm:text-4xl font-extrabold font-mono text-foreground mt-2">
-            ₹{totalEarned.toLocaleString('en-IN')}
-          </div>
-          <div className="text-[11px] text-muted-foreground mt-2">
-            Across 94 completed clinical visits
-          </div>
-        </div>
-
-        <div className="bg-card border border-border/80 p-6 rounded-3xl shadow-sm">
-          <span className="text-xs font-bold text-muted-foreground">Registered Payout Account</span>
-          <div className="text-sm font-extrabold text-foreground mt-2 flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-primary" />
-            <span>HDFC Bank • A/c **7291</span>
-          </div>
-          <div className="text-[11px] text-muted-foreground mt-2 font-mono">
-            IFSC: HDFC0000240 • UPI: rohan@okhdfc
-          </div>
-        </div>
-      </div>
-
-      {/* Transactions Passbook Ledger */}
-      <div className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-border/60 pb-4">
-          <h3 className="text-base font-extrabold text-foreground">Passbook Transaction Ledger</h3>
-          <span className="text-xs text-muted-foreground font-mono">{transactions.length} Transactions</span>
-        </div>
-
-        <div className="space-y-3">
-          {transactions.map((tx) => {
-            const isCredit = tx.type === 'CREDIT';
-            return (
-              <div
-                key={tx.id}
-                className="p-4 rounded-2xl border border-border/60 bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-              >
-                <div className="flex items-start gap-3">
-                  <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                      isCredit ? 'bg-emerald-500/10 text-emerald-500' : 'bg-primary/10 text-primary'
-                    }`}
-                  >
-                    {isCredit ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownRight className="w-5 h-5" />}
+      ) : (
+        <>
+          {/* Main Wallet Balance Card — matches wallet.dart hero card */}
+          <div className="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-primary/20 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent pointer-events-none" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <p className="text-xs font-bold opacity-70 uppercase tracking-widest">Available Balance</p>
+                  <div className="text-4xl sm:text-5xl font-black tracking-tight mt-1">
+                    ₹{available.toLocaleString('en-IN')}
                   </div>
-                  <div>
-                    <div className="text-xs font-bold text-foreground">{tx.description}</div>
-                    <div className="flex items-center gap-3 text-[11px] text-muted-foreground font-mono mt-1">
-                      <span>{tx.transactionId}</span>
-                      <span>•</span>
-                      <span>{tx.date}</span>
-                    </div>
-                  </div>
+                  <p className="text-xs opacity-70 mt-1">
+                    Status: <span className="font-bold opacity-100">{walletData.walletStatus}</span>
+                    {' · '}Next payout: <span className="font-bold opacity-100">{getNextPayoutDate()}</span>
+                  </p>
                 </div>
-
-                <div className="text-left sm:text-right shrink-0">
-                  <div
-                    className={`text-base font-mono font-extrabold ${
-                      isCredit ? 'text-emerald-500' : 'text-foreground'
-                    }`}
-                  >
-                    {isCredit ? '+' : '-'}₹{tx.amount.toLocaleString('en-IN')}
-                  </div>
-                  <div className="text-[10px] text-muted-foreground font-mono">
-                    Bal: ₹{tx.balanceAfter.toLocaleString('en-IN')}
-                  </div>
+                <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center">
+                  <Wallet className="w-7 h-7" />
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Withdrawal Modal */}
-      {isWithdrawModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-          <div className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-border/60">
-              <div className="flex items-center gap-2">
-                <Wallet className="w-5 h-5 text-primary" />
-                <h3 className="text-base font-extrabold text-foreground">Instant Bank Withdrawal</h3>
+              <div className="flex gap-3">
+                <div className="flex-1 bg-white/10 rounded-2xl px-4 py-3">
+                  <p className="text-[10px] opacity-70 uppercase tracking-wider">Pending</p>
+                  <p className="text-lg font-bold mt-0.5">₹{pending.toLocaleString('en-IN')}</p>
+                </div>
+                <div className="flex-1 bg-white/10 rounded-2xl px-4 py-3">
+                  <p className="text-[10px] opacity-70 uppercase tracking-wider">Total Earned</p>
+                  <p className="text-lg font-bold mt-0.5">₹{totalEarnedFinal.toLocaleString('en-IN')}</p>
+                </div>
+                <div className="flex-1 bg-white/10 rounded-2xl px-4 py-3">
+                  <p className="text-[10px] opacity-70 uppercase tracking-wider">Total Paid Out</p>
+                  <p className="text-lg font-bold mt-0.5">₹{totalPaidOut.toLocaleString('en-IN')}</p>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsWithdrawModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground font-bold"
-              >
-                ✕
-              </button>
             </div>
+          </div>
 
-            {withdrawSuccess && (
-              <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-bold rounded-xl flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>{withdrawSuccess}</span>
+          {/* Withdrawal Request */}
+          <div className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm">
+            <h2 className="text-sm font-bold mb-1">Request Withdrawal</h2>
+            <p className="text-xs text-muted-foreground mb-4">
+              Funds are transferred to your registered bank account by the 5th of each month.
+            </p>
+            {withdrawFeedback && (
+              <div className={`mb-4 p-3 rounded-2xl text-xs font-bold flex items-center gap-2 ${
+                withdrawFeedback.type === 'success' ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/30' : 'bg-red-500/10 text-red-600 border border-red-500/30'
+              }`}>
+                {withdrawFeedback.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                {withdrawFeedback.text}
               </div>
             )}
-
-            <div className="p-4 bg-muted/40 rounded-2xl space-y-1 text-xs">
-              <div className="text-muted-foreground">Available Balance: <strong className="text-foreground font-mono">₹{balance.toLocaleString('en-IN')}</strong></div>
-              <div className="text-muted-foreground">Disbursing To: <strong className="text-foreground">HDFC Bank (A/c **7291)</strong></div>
+            <div className="flex gap-3">
+              <div className="relative flex-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-bold text-sm">₹</span>
+                <Input
+                  type="number"
+                  placeholder={`Max ₹${available.toLocaleString('en-IN')}`}
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  className="pl-7 h-11 rounded-xl text-sm"
+                  min={100}
+                  max={available}
+                />
+              </div>
+              <Button
+                onClick={handleWithdrawal}
+                disabled={isWithdrawing || available <= 0}
+                className="h-11 px-6 rounded-xl bg-primary hover:bg-primary/95 text-white font-bold text-sm"
+              >
+                {isWithdrawing ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Withdraw'}
+              </Button>
             </div>
-
-            <div>
-              <label className="text-xs font-bold">Withdrawal Amount (₹)</label>
-              <Input
-                type="number"
-                value={withdrawAmount}
-                onChange={(e) => setWithdrawAmount(e.target.value)}
-                className="text-xl font-mono font-bold h-12 mt-1 rounded-xl"
-              />
+            <div className="mt-3 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+              Secured by Aries Finance Gateway. IMPS / UPI transfer within 24 hours of 5th.
             </div>
-
-            <Button
-              onClick={handleWithdrawal}
-              disabled={isProcessing}
-              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/95 text-white font-extrabold text-xs shadow-lg shadow-primary/20"
-            >
-              {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Confirm & Disburse Instant IMPS'}
-            </Button>
           </div>
-        </div>
+
+          {/* 6-Month Earnings Chart — matches wallet.dart line chart */}
+          <div className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-primary" />
+                <h2 className="text-sm font-bold">6-Month Earnings Trend</h2>
+              </div>
+            </div>
+            <div className="flex items-end gap-2 h-24">
+              {chartMonths.map((month) => {
+                const val = monthlyEarnings[month] || 0;
+                const heightPct = (val / maxEarning) * 100;
+                return (
+                  <div key={month} className="flex-1 flex flex-col items-center gap-1">
+                    <div className="text-[9px] font-bold text-muted-foreground">
+                      {val > 0 ? `₹${(val / 1000).toFixed(1)}K` : ''}
+                    </div>
+                    <div
+                      className="w-full bg-primary/20 rounded-t-lg relative overflow-hidden"
+                      style={{ height: `${Math.max(heightPct, 4)}%`, minHeight: '4px' }}
+                    >
+                      <div className="absolute inset-0 bg-primary rounded-t-lg" style={{ height: `${heightPct}%`, bottom: 0, top: 'auto' }} />
+                    </div>
+                    <div className="text-[9px] text-muted-foreground">{month}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Transaction History */}
+          <div className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-bold">Transaction History</h2>
+              <div className="flex rounded-xl overflow-hidden border border-border/60">
+                {(['ALL', 'CREDIT', 'DEBIT'] as const).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFilterType(f)}
+                    className={`px-3 py-1.5 text-[10px] font-bold transition-colors ${
+                      filterType === f ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted/50'
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {filteredTx.length === 0 ? (
+              <div className="text-center py-10 text-muted-foreground">
+                <Clock className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                <p className="text-sm">No transactions found</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {filteredTx.map((tx: any, i: number) => {
+                  const isCredit = tx.type === 'CREDIT';
+                  const txStatus = (tx.status || '').toLowerCase();
+                  const isPending = txStatus === 'pending';
+                  const isFailed = txStatus === 'failed';
+                  const date = formatDate(tx.createdAt || tx.date);
+                  const txId = tx._id || tx.id || tx.transactionId || `tx_${i}`;
+                  return (
+                    <div key={txId} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-muted/30 transition-colors">
+                      <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
+                        isCredit ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'
+                      }`}>
+                        {isCredit ? <ArrowDownRight className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-foreground truncate">{tx.description || tx.category || (isCredit ? 'Credit' : 'Debit')}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{date}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className={`text-sm font-bold ${isCredit ? 'text-emerald-500' : 'text-red-500'}`}>
+                          {isCredit ? '+' : '-'}₹{(tx.amount || 0).toLocaleString('en-IN')}
+                        </p>
+                        <p className={`text-[10px] font-bold mt-0.5 ${
+                          isPending ? 'text-amber-500' : isFailed ? 'text-red-500' : 'text-muted-foreground'
+                        }`}>
+                          {isPending ? '● Pending' : isFailed ? '✕ Failed' : '✓ Done'}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

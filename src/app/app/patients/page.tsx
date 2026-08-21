@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { providerApi } from '@/services/provider-api';
 import {
   Users,
   Search,
@@ -11,259 +12,222 @@ import {
   FileText,
   Activity,
   ChevronRight,
-  Plus,
   HeartPulse,
-  UserCheck
+  UserCheck,
+  Loader2,
+  RefreshCw,
+  MessageSquare,
+  TrendingUp,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
-interface PatientRecord {
-  id: string;
-  name: string;
-  age: number;
-  gender: string;
-  phone: string;
-  diagnosis: string;
-  activePackage: string;
-  completedSessions: number;
-  totalSessions: number;
-  lastVisit: string;
-  city: string;
-  pincode: string;
-  recoveryStatus: 'Excellent Progress' | 'Stable' | 'Initial Stage';
+function getRecoveryBadge(p: any) {
+  const completed = p.completedSessions || p.sessionsDone || 0;
+  const total = p.totalSessions || p.sessionsCount || 0;
+  const pct = total > 0 ? completed / total : 0;
+  if (pct >= 0.7) return { label: 'Excellent Progress', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' };
+  if (pct >= 0.3) return { label: 'Stable', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20' };
+  return { label: 'Initial Stage', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' };
 }
 
-const PATIENTS: PatientRecord[] = [
-  {
-    id: 'pat_01',
-    name: 'Mrs. Meenakshi Rao',
-    age: 68,
-    gender: 'Female',
-    phone: '+91 98201 44219',
-    diagnosis: 'Post-TKR Left Knee Joint Replacement Rehab',
-    activePackage: '10-Session Post-Surgical Package',
-    completedSessions: 3,
-    totalSessions: 10,
-    lastVisit: 'Today',
-    city: 'Borivali West, Mumbai',
-    pincode: '400103',
-    recoveryStatus: 'Excellent Progress',
-  },
-  {
-    id: 'pat_02',
-    name: 'Mr. Anil Kapoor',
-    age: 54,
-    gender: 'Male',
-    phone: '+91 98190 88214',
-    diagnosis: 'Right Hemiplegic Stroke Gait & Balance Protocol',
-    activePackage: '15-Session Neuro Recovery Package',
-    completedSessions: 6,
-    totalSessions: 15,
-    lastVisit: 'Today',
-    city: 'Kandivali East, Mumbai',
-    pincode: '400101',
-    recoveryStatus: 'Stable',
-  },
-  {
-    id: 'pat_03',
-    name: 'Dr. Arvind Kulkarni',
-    age: 71,
-    gender: 'Male',
-    phone: '+91 98204 11982',
-    diagnosis: 'Lumbar Canal Stenosis & Sciatica Relief',
-    activePackage: '10-Session Spine Rehab Package',
-    completedSessions: 4,
-    totalSessions: 10,
-    lastVisit: '2 days ago',
-    city: 'Malad West, Mumbai',
-    pincode: '400064',
-    recoveryStatus: 'Stable',
-  },
-  {
-    id: 'pat_04',
-    name: 'Ms. Sneha Varma',
-    age: 32,
-    gender: 'Female',
-    phone: '+91 97690 12345',
-    diagnosis: 'Cervical Radiculopathy & Tech Neck Syndrome',
-    activePackage: '5-Session Postural Care Package',
-    completedSessions: 1,
-    totalSessions: 5,
-    lastVisit: 'Yesterday',
-    city: 'Goregaon East, Mumbai',
-    pincode: '400063',
-    recoveryStatus: 'Initial Stage',
-  },
-  {
-    id: 'pat_05',
-    name: 'Mr. Vikram Singhania',
-    age: 48,
-    gender: 'Male',
-    phone: '+91 98200 77112',
-    diagnosis: 'Rotator Cuff Supraspinatus Tendinitis Rehab',
-    activePackage: '10-Session Sports Rehab Package',
-    completedSessions: 10,
-    totalSessions: 10,
-    lastVisit: '3 days ago',
-    city: 'Andheri West, Mumbai',
-    pincode: '400053',
-    recoveryStatus: 'Excellent Progress',
-  },
-];
-
 export default function ProviderPatientsPage() {
+  const [patients, setPatients] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPatient, setSelectedPatient] = useState<PatientRecord | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
+  const [feedbackPatient, setFeedbackPatient] = useState<string | null>(null);
 
-  const filtered = PATIENTS.filter(
-    (p) =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.diagnosis.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.phone.includes(searchQuery)
-  );
+  const loadPatients = useCallback(async (showRefresh = false) => {
+    if (showRefresh) setRefreshing(true);
+    else setIsLoading(true);
+    try {
+      const data = await providerApi.getPatients();
+      setPatients(data);
+    } catch (e) {
+      console.warn('Patients load error', e);
+    } finally {
+      setIsLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => { loadPatients(); }, [loadPatients]);
+
+  const handleReview = async (p: any) => {
+    const id = p._id || p.id;
+    setFeedbackPatient(null);
+    try {
+      const res = await providerApi.requestPatientReview(id);
+      if (res.success) {
+        setFeedbackPatient(`Review link sent to ${res.data?.phoneNumber || 'patient'} via WhatsApp ✓`);
+      } else {
+        setFeedbackPatient(res.message || 'Failed to send review link.');
+      }
+    } catch {
+      setFeedbackPatient('Unable to send review invitation. Please try again.');
+    }
+    setTimeout(() => setFeedbackPatient(null), 5000);
+  };
+
+  const filtered = patients.filter((p) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    const name = (p.patient?.name || p.patient?.fullName || p.patientDetails?.name || p.name || '').toLowerCase();
+    const diagnosis = (p.condition || p.diagnosis || p.packageName || '').toLowerCase();
+    return name.includes(q) || diagnosis.includes(q);
+  });
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-              <Users className="w-4 h-4" />
-            </div>
-            <h1 className="text-2xl font-extrabold tracking-tight">Patient Directory & Care Plans</h1>
-          </div>
+          <h1 className="text-2xl font-extrabold tracking-tight">My Patients</h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Access past treatment records, package session counters, and clinical notes.
+            {isLoading ? 'Loading...' : `${patients.length} patients in your active roster`}
           </p>
         </div>
+        <button
+          onClick={() => loadPatients(true)}
+          disabled={refreshing}
+          className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-xl border border-border/80 hover:bg-muted/50 transition-colors self-start sm:self-auto"
+        >
+          {refreshing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+          Refresh
+        </button>
+      </div>
 
-        <div className="w-full sm:w-72 relative">
-          <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-          <Input
-            type="text"
-            placeholder="Search patient name or condition..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-10 text-xs rounded-xl"
-          />
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder="Search patients by name or diagnosis..."
+          className="pl-9 h-11 rounded-2xl border-border/60"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {feedbackPatient && (
+        <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 text-xs font-bold border border-emerald-500/30">
+          {feedbackPatient}
         </div>
-      </div>
+      )}
 
-      {/* Patient Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filtered.map((pat) => (
-          <div
-            key={pat.id}
-            className="bg-card border border-border/80 rounded-3xl p-5 shadow-sm space-y-4 hover:border-primary/40 transition-all"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-base font-extrabold text-foreground">{pat.name}</h3>
-                  <span className="text-xs text-muted-foreground font-mono">({pat.age}y, {pat.gender})</span>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="p-12 rounded-3xl border border-dashed border-border/80 text-center text-muted-foreground">
+          <Users className="w-10 h-10 mx-auto mb-3 opacity-40" />
+          <p className="text-sm font-medium">{patients.length === 0 ? 'No patients in your roster' : 'No patients match your search'}</p>
+          <p className="text-xs mt-1">
+            {patients.length === 0 ? 'Accept leads to start building your patient roster' : 'Try a different search term'}
+          </p>
+          {patients.length === 0 && (
+            <Link href="/app/leads" prefetch={false}>
+              <Button variant="outline" className="mt-3 rounded-xl text-xs font-bold">Browse Leads</Button>
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {filtered.map((p: any) => {
+            const name = p.patient?.name || p.patient?.fullName || p.patientDetails?.name || p.name || 'Patient';
+            const age = p.patient?.age || p.patientDetails?.age || p.age;
+            const gender = p.patient?.gender || p.patientDetails?.gender || p.gender || '';
+            const phone = p.patient?.phone || p.patient?.mobileNo || p.patientDetails?.phone || p.phone || '';
+            const diagnosis = p.condition || p.diagnosis || '—';
+            const pkg = p.packageName || p.packageType || '—';
+            const completed = p.completedSessions || p.sessionsDone || 0;
+            const total = p.totalSessions || p.sessionsCount || 0;
+            const city = p.patient?.address || p.patientDetails?.address || p.city || '';
+            const lastVisit = p.lastVisitDate ? new Date(p.lastVisitDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+            const badge = getRecoveryBadge(p);
+            const id = p._id || p.id;
+            const progress = total > 0 ? completed / total : 0;
+            return (
+              <div key={id} className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                {/* Patient header */}
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold text-base shrink-0">
+                      {name[0]?.toUpperCase()}
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold">{name}</h3>
+                      <p className="text-xs text-muted-foreground">
+                        {[age ? `${age}y` : null, gender].filter(Boolean).join(' · ')}
+                      </p>
+                    </div>
+                  </div>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${badge.color}`}>
+                    {badge.label}
+                  </span>
                 </div>
-                <p className="text-xs font-bold text-primary mt-0.5">{pat.diagnosis}</p>
-              </div>
-              <span
-                className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
-                  pat.recoveryStatus === 'Excellent Progress'
-                    ? 'bg-emerald-500/10 text-emerald-500'
-                    : 'bg-primary/10 text-primary'
-                }`}
-              >
-                {pat.recoveryStatus}
-              </span>
-            </div>
 
-            {/* Session Progress Bar */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-[11px]">
-                <span className="text-muted-foreground font-medium">{pat.activePackage}</span>
-                <span className="font-mono font-bold text-foreground">
-                  {pat.completedSessions} / {pat.totalSessions} Sessions
-                </span>
-              </div>
-              <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary rounded-full transition-all"
-                  style={{ width: `${(pat.completedSessions / pat.totalSessions) * 100}%` }}
-                />
-              </div>
-            </div>
+                {/* Diagnosis & Package */}
+                <div className="space-y-1.5 mb-4 text-xs">
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <HeartPulse className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                    <span className="font-medium text-foreground">{diagnosis}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>{pkg}</span>
+                  </div>
+                  {city && (
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+                      <span>{city}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <Calendar className="w-3.5 h-3.5 shrink-0" />
+                    <span>Last visit: <strong className="text-foreground">{lastVisit}</strong></span>
+                  </div>
+                </div>
 
-            <div className="flex flex-wrap items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border/60">
-              <div className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-primary" />
-                <span>{pat.city}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5" />
-                <span>Last visit: {pat.lastVisit}</span>
-              </div>
-            </div>
+                {/* Session progress */}
+                {total > 0 && (
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <span className="text-muted-foreground">Session Progress</span>
+                      <span className="font-bold text-foreground">{completed} / {total}</span>
+                    </div>
+                    <div className="h-2 w-full bg-muted/50 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${progress >= 0.7 ? 'bg-emerald-500' : progress >= 0.3 ? 'bg-primary' : 'bg-amber-500'}`}
+                        style={{ width: `${progress * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
 
-            <div className="flex items-center gap-2 pt-2">
-              <a
-                href={`tel:${pat.phone}`}
-                className="flex-1 py-2 px-3 rounded-xl bg-muted hover:bg-muted/80 text-xs font-bold flex items-center justify-center gap-1.5"
-              >
-                <Phone className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Call Patient</span>
-              </a>
-              <Button
-                variant="outline"
-                onClick={() => setSelectedPatient(pat)}
-                className="flex-1 h-9 rounded-xl text-xs font-bold"
-              >
-                <FileText className="w-3.5 h-3.5 mr-1.5" />
-                <span>View SOAP Notes</span>
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Patient Detail Modal */}
-      {selectedPatient && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-          <div className="bg-card border border-border/80 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-border/60">
-              <div>
-                <h3 className="text-base font-extrabold text-foreground">{selectedPatient.name}</h3>
-                <p className="text-xs text-primary font-bold">{selectedPatient.diagnosis}</p>
+                {/* Actions */}
+                <div className="flex gap-2">
+                  {phone && (
+                    <a href={`tel:${phone}`} className="flex-1">
+                      <Button variant="outline" size="sm" className="w-full h-9 rounded-xl text-xs font-bold">
+                        <Phone className="w-3.5 h-3.5 mr-1" /> Call
+                      </Button>
+                    </a>
+                  )}
+                  <Button variant="outline" size="sm" className="flex-1 h-9 rounded-xl text-xs font-bold border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/5" onClick={() => handleReview(p)}>
+                    <MessageSquare className="w-3.5 h-3.5 mr-1" /> Review
+                  </Button>
+                  <Link href="/app/appointments" prefetch={false} className="flex-1">
+                    <Button size="sm" className="w-full h-9 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary font-bold text-xs border border-primary/20">
+                      <Calendar className="w-3.5 h-3.5 mr-1" /> Schedule
+                    </Button>
+                  </Link>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setSelectedPatient(null)}
-                className="text-muted-foreground hover:text-foreground font-bold text-lg"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div className="p-3 bg-muted/40 rounded-xl space-y-1">
-                <div className="font-bold text-foreground">Latest Clinical Assessment (SOAP)</div>
-                <p className="text-muted-foreground leading-relaxed">
-                  Patient shows 70% functional mobility restoration. Quadriceps strength upgraded to Grade 4/5. Recommended progressive resistance bands for next 4 sessions.
-                </p>
-              </div>
-
-              <div className="flex justify-between p-3 bg-muted/20 rounded-xl font-mono">
-                <span>Total Sessions Done:</span>
-                <strong className="text-foreground">{selectedPatient.completedSessions} of {selectedPatient.totalSessions}</strong>
-              </div>
-            </div>
-
-            <Button
-              onClick={() => setSelectedPatient(null)}
-              className="w-full h-11 rounded-xl bg-primary text-white font-bold text-xs"
-            >
-              Close Record
-            </Button>
-          </div>
+            );
+          })}
         </div>
       )}
     </div>

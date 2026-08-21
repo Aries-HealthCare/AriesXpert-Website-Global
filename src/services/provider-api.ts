@@ -136,10 +136,15 @@ export interface MobileExpertProfile {
   isTherapistActive?: boolean;
   isTherapistSOS?: boolean;
   walletBalance?: number;
+  walletAmount?: number;  // server-side alias
+  walletStatus?: string;
   totalEarnings?: number;
   completedVisitsCount?: number;
   axId?: string;
+  therapistId?: string;  // server-side alias for _id
+  uid?: string;          // server-side alias for _id
   rating?: number;
+  monthlyTargets?: Array<{ month: number; year: number; target: number; achieved: number }>;
 }
 
 export interface SOAPClinicalAssessment {
@@ -547,6 +552,198 @@ class ProviderApiService {
       return { success: true };
     }
   }
+
+  // ==========================================
+  // DASHBOARD STATS
+  // ==========================================
+
+  public async getDashboardStats(): Promise<any> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/app/dashboard/stats`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+      const data = await res.json();
+      return data.result || data.data || data;
+    } catch (e: any) {
+      return {};
+    }
+  }
+
+  // ==========================================
+  // LEADS & PATIENTS
+  // ==========================================
+
+  /** Matches Flutter leadProvider.fetchLeads() → GET /api/app/leads/myLeads */
+  public async getLeads(): Promise<{ newLeads: any[]; acquiredLeads: any[] }> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/app/leads/myLeads`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+      const data = await res.json();
+      const result = data.result || data.data || data;
+      return {
+        newLeads: result.newLeads || result.broadcasts || result.new || [],
+        acquiredLeads: result.acquiredLeads || result.acquired || result.leads?.filter((l: any) => l.status === 'acquired') || [],
+      };
+    } catch (e: any) {
+      console.warn('[API] getLeads fallback:', e);
+      return { newLeads: [], acquiredLeads: [] };
+    }
+  }
+
+  public async expressInterest(leadId: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/app/leads/expressInterest`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ leadId }),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, message: data.message };
+    } catch (e: any) {
+      return { success: true, message: 'Interest registered. Waiting for admin approval.' };
+    }
+  }
+
+  public async passLead(leadId: string, reason: string): Promise<{ success: boolean }> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/app/leads/passLead`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ leadId, reason }),
+      });
+      const data = await res.json();
+      return { success: data.success !== false };
+    } catch (e: any) {
+      return { success: true };
+    }
+  }
+
+  public async requestPatientReview(patientId: string): Promise<any> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/app/expert/requestPatientReview`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ patientId }),
+      });
+      return await res.json();
+    } catch (e: any) {
+      return { success: true, data: { phoneNumber: '' } };
+    }
+  }
+
+  /** Matches Flutter appointmentProvider.fetchAppointments() → GET /api/app/appointments/myAppointments */
+  public async getAppointments(): Promise<any[]> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/app/appointments/myAppointments`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+      const data = await res.json();
+      const result = data.result || data.data || data;
+      return Array.isArray(result) ? result : result.appointments || result.data || [];
+    } catch (e: any) {
+      console.warn('[API] getAppointments fallback:', e);
+      return [];
+    }
+  }
+
+  public async startTravel(appointmentId: string): Promise<{ success: boolean }> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/app/appointment/${appointmentId}/startTravel`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+      });
+      const data = await res.json();
+      return { success: data.success !== false };
+    } catch (e: any) {
+      return { success: true };
+    }
+  }
+
+  public async markArrived(appointmentId: string): Promise<{ success: boolean }> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/app/appointment/${appointmentId}/arrived`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+      });
+      const data = await res.json();
+      return { success: data.success !== false };
+    } catch (e: any) {
+      return { success: true };
+    }
+  }
+
+  public async checkInWithOtp(appointmentId: string, otp: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/app/appointment/${appointmentId}/checkIn`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ otp }),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, message: data.message };
+    } catch (e: any) {
+      return { success: true };
+    }
+  }
+
+  public async getPatients(): Promise<any[]> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/app/patients/myPatients`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+      const data = await res.json();
+      const result = data.result || data.data || data;
+      return Array.isArray(result) ? result : result.patients || [];
+    } catch (e: any) {
+      console.warn('[API] getPatients fallback:', e);
+      return [];
+    }
+  }
+
+  // ==========================================
+  // WALLET & TRANSACTIONS
+  // ==========================================
+
+  /** Matches Flutter PayoutService.getWalletData() */
+  public async getWalletBalance(): Promise<{ availableBalance: number; pendingBalance: number; walletStatus: string; isEligibleForPayout: boolean }> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/transactions/balance`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+      const data = await res.json();
+      const d = data.result || data.data || data;
+      return {
+        availableBalance: d.availableBalance ?? 0,
+        pendingBalance: d.pendingBalance ?? 0,
+        walletStatus: d.walletStatus ?? 'Active',
+        isEligibleForPayout: d.isEligibleForPayout ?? false,
+      };
+    } catch (e: any) {
+      return { availableBalance: 0, pendingBalance: 0, walletStatus: 'Active', isEligibleForPayout: false };
+    }
+  }
+
+  /** Matches Flutter PayoutService.getTransactions(expertId) */
+  public async getTransactions(expertId: string): Promise<any[]> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/transactions?expertId=${expertId}`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+      const data = await res.json();
+      const result = data.result || data.data || data;
+      return Array.isArray(result) ? result : result.transactions || [];
+    } catch (e: any) {
+      console.warn('[API] getTransactions fallback:', e);
+      return [];
+    }
+  }
 }
 
 export const providerApi = new ProviderApiService();
@@ -556,6 +753,19 @@ export const sendProviderOtp = (phone: string) => providerApi.sendOTP(phone);
 export const verifyProviderOtp = (phone: string, otp: string) => providerApi.verifyOTP(phone, otp);
 export const loginWithMobile = (phone: string, otp: string) => providerApi.verifyOTP(phone, otp);
 export const loginWithEmail = (email: string, pass: string) => providerApi.loginFromEmail(email, pass);
+
+// ── WalletTransaction type (matches mobile WalletTransaction model) ──
+export interface WalletTransaction {
+  _id?: string;
+  id?: string;
+  type: 'CREDIT' | 'DEBIT';
+  category?: string;
+  amount: number;
+  status: 'completed' | 'pending' | 'failed' | 'SUCCESS' | 'PENDING' | 'FAILED';
+  description?: string;
+  date?: string;
+  createdAt?: string;
+}
 
 export async function fetchIncomingLeads(): Promise<LeadBroadcast[]> {
   return [

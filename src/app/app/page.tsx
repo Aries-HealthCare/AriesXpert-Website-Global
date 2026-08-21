@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useProviderAuth } from '@/services/provider-auth-context';
-import { fetchIncomingLeads, LeadBroadcast, respondToLeadBroadcast } from '@/services/provider-api';
+import { providerApi } from '@/services/provider-api';
 import {
   TrendingUp,
   CalendarCheck,
@@ -12,353 +12,409 @@ import {
   Star,
   MapPin,
   Clock,
-  ArrowRight,
-  ShieldCheck,
-  Play,
-  CheckCircle2,
-  AlertCircle,
-  Sparkles,
-  Bot,
   ChevronRight,
   Navigation,
-  Phone,
-  UserCheck,
+  CheckCircle2,
+  Bot,
   Stethoscope,
-  Activity
+  Activity,
+  Users,
+  Target,
+  Zap,
+  RefreshCw,
+  AlertTriangle,
+  Phone,
+  Loader2,
+  ArrowRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+interface DashboardStats {
+  totalEarnings?: number;
+  todayVisits?: number;
+  totalVisits?: number;
+  uniquePatients?: number;
+  leadsTaken?: number;
+  missedLeads?: number;
+  monthlyTarget?: number;
+  monthlyAchieved?: number;
+  leadConversionRate?: string;
+  detailedVisits?: {
+    today: { total: number; completed: number; pending: number };
+    week?: { total: number };
+    month?: { total: number };
+  };
+}
+
+function formatCurrency(val?: number) {
+  if (!val) return '₹0';
+  if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
+  if (val >= 1000) return `₹${(val / 1000).toFixed(1)}K`;
+  return `₹${val.toLocaleString('en-IN')}`;
+}
+
 export default function ProviderDashboardPage() {
-  const { user, dutyStatus, toggleDutyStatus } = useProviderAuth();
-  const isDutyActive = dutyStatus;
-  const [leads, setLeads] = useState<LeadBroadcast[]>([]);
-  const [activeLeadIndex, setActiveLeadIndex] = useState(0);
-  const [acceptedLeadMessage, setAcceptedLeadMessage] = useState('');
+  const { user, dutyStatus, toggleDutyStatus, refreshProfile } = useProviderAuth();
+  const [stats, setStats] = useState<DashboardStats>({});
+  const [newLeadCount, setNewLeadCount] = useState(0);
+  const [todayAppointments, setTodayAppointments] = useState<any[]>([]);
+  const [nextAppointment, setNextAppointment] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const therapistName = user?.fullName || user?.name || (user?.firstName ? `${user.firstName} ${user.lastName || ''}` : 'Dr. Rohan Sharma, BPT');
-  const axId = user?.axId || 'AX-IND-4892';
-  const rating = user?.rating || 4.95;
-  const walletBalance = user?.walletBalance || 14850;
+  const therapistName = user?.fullName || user?.name
+    || (user?.firstName ? `${user.firstName} ${user?.lastName || ''}`.trim() : 'Provider');
+  const axId = user?.axId || user?.therapistId || user?.uid || '—';
+  const rating = user?.rating ?? 4.9;
+  const walletBalance = user?.walletAmount ?? user?.walletBalance ?? 0;
 
-  useEffect(() => {
-    const loadLeads = async () => {
-      const data = await fetchIncomingLeads();
-      setLeads(data);
-    };
-    loadLeads();
+  // Monthly target tracker
+  const now = new Date();
+  const currentMonthEntry = user?.monthlyTargets?.find(
+    (t) => t.month === now.getMonth() + 1 && t.year === now.getFullYear()
+  );
+  const monthlyTarget = currentMonthEntry?.target ?? stats.monthlyTarget ?? 10000;
+  const monthlyAchieved = currentMonthEntry?.achieved ?? stats.monthlyAchieved ?? (stats.totalEarnings ?? 0);
+  const progress = monthlyTarget > 0 ? Math.min(monthlyAchieved / monthlyTarget, 1) : 0;
+
+  const loadDashboard = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [statsData, leadsData, aptsData] = await Promise.all([
+        providerApi.getDashboardStats(),
+        providerApi.getLeads(),
+        providerApi.getAppointments(),
+      ]);
+      setStats(statsData);
+      setNewLeadCount(leadsData.newLeads?.length ?? 0);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayApts = (aptsData || []).filter((a: any) => {
+        const d = new Date(a.appointmentDate || a.scheduledTime || '');
+        d.setHours(0, 0, 0, 0);
+        return d.getTime() === today.getTime();
+      });
+      setTodayAppointments(todayApts);
+
+      const upcoming = todayApts.find((a: any) =>
+        !['Completed', 'Cancelled', 'completed', 'cancelled'].includes(a.status || '')
+      );
+      setNextAppointment(upcoming || null);
+    } catch (e) {
+      console.warn('Dashboard load error', e);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const handleAcceptLead = async (leadId: string) => {
-    await respondToLeadBroadcast(leadId, 'ACCEPT');
-    setAcceptedLeadMessage('Lead accepted! Added to your Active Visits schedule.');
-    setLeads(leads.filter((l) => l.id !== leadId));
+  useEffect(() => {
+    loadDashboard();
+  }, [loadDashboard]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([loadDashboard(), refreshProfile()]);
+    setRefreshing(false);
   };
 
-  const topLead = leads.length > 0 ? leads[0] : null;
+  const kpiCards = [
+    {
+      label: 'Total Earnings',
+      value: formatCurrency(stats.totalEarnings),
+      sub: 'Live earnings',
+      icon: <TrendingUp className="w-4 h-4" />,
+      color: 'text-emerald-500 bg-emerald-500/10',
+    },
+    {
+      label: "Today's Visits",
+      value: String(stats.detailedVisits?.today?.total ?? stats.todayVisits ?? todayAppointments.length),
+      sub: `${stats.detailedVisits?.today?.completed ?? 0} completed`,
+      icon: <CalendarCheck className="w-4 h-4" />,
+      color: 'text-primary bg-primary/10',
+    },
+    {
+      label: 'Patients Attended',
+      value: String(stats.uniquePatients ?? '—'),
+      sub: 'Unique patients',
+      icon: <Users className="w-4 h-4" />,
+      color: 'text-purple-500 bg-purple-500/10',
+    },
+    {
+      label: 'Lead Broadcasts',
+      value: String(newLeadCount),
+      sub: stats.leadConversionRate ? `${stats.leadConversionRate} conversion` : 'Nearby matches',
+      icon: <Radio className="w-4 h-4 animate-pulse" />,
+      color: 'text-cyan-500 bg-cyan-500/10',
+    },
+    {
+      label: 'Missed Leads',
+      value: String(stats.missedLeads ?? 0),
+      sub: 'Last 7 days',
+      icon: <AlertTriangle className="w-4 h-4" />,
+      color: 'text-red-500 bg-red-500/10',
+    },
+    {
+      label: 'Wallet Balance',
+      value: formatCurrency(walletBalance),
+      sub: 'Available now',
+      icon: <Wallet className="w-4 h-4" />,
+      color: 'text-sky-500 bg-sky-500/10',
+      href: '/app/wallet',
+    },
+    {
+      label: 'Leads Taken',
+      value: String(stats.leadsTaken ?? '—'),
+      sub: 'Total acquired',
+      icon: <Zap className="w-4 h-4" />,
+      color: 'text-amber-500 bg-amber-500/10',
+    },
+    {
+      label: 'Monthly Target',
+      value: `${Math.round(progress * 100)}%`,
+      sub: `₹${monthlyAchieved.toLocaleString('en-IN')} / ₹${monthlyTarget.toLocaleString('en-IN')}`,
+      icon: <Target className="w-4 h-4" />,
+      color: 'text-indigo-500 bg-indigo-500/10',
+    },
+  ];
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      {/* Top Welcome Banner */}
+      {/* Profile Header Card — matches ProfileCard in dashboard_screen.dart */}
       <div className="bg-gradient-to-r from-card via-card to-primary/5 border border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex flex-wrap items-center gap-2 mb-1.5">
               <span className="text-xs font-mono font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">
                 {axId}
               </span>
               <div className="flex items-center gap-1 text-amber-500 text-xs font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
                 <Star className="w-3.5 h-3.5 fill-amber-500" />
-                <span>{rating} Clinical Rating</span>
+                <span>{rating} Rating</span>
               </div>
               <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                 ✓ Verified Physiotherapist
               </span>
+              {/* Duty toggle */}
+              <button
+                onClick={toggleDutyStatus}
+                className={`text-xs font-bold px-3 py-0.5 rounded-full border transition-all ${
+                  dutyStatus
+                    ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30'
+                    : 'bg-muted text-muted-foreground border-border'
+                }`}
+              >
+                {dutyStatus ? '🟢 On Duty' : '⚪ Off Duty'}
+              </button>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Welcome back, {therapistName}
+              Welcome, {therapistName}
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Clinical territory: <strong className="text-foreground">{user?.city || 'Mumbai (Borivali - Kandivali)'}</strong> • 4 scheduled visits today
+              Clinical territory: <strong className="text-foreground">{user?.city || '—'}</strong>
+              {todayAppointments.length > 0 && ` • ${todayAppointments.length} visits today`}
             </p>
           </div>
-
           <div className="flex items-center gap-3">
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="w-10 h-10 rounded-2xl border border-border/80 bg-card flex items-center justify-center hover:bg-muted transition-colors"
+            >
+              {refreshing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            </button>
             <Link href="/app/visits" prefetch={false}>
               <Button className="h-11 px-5 rounded-2xl bg-primary hover:bg-primary/95 text-white font-extrabold shadow-lg shadow-primary/20 flex items-center gap-2">
-                <Play className="w-4 h-4 fill-white" />
-                <span>Active Visits (1 Pending)</span>
+                <Navigation className="w-4 h-4" />
+                <span>Start Visit</span>
               </Button>
             </Link>
           </div>
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        {/* Card 1: Today's Earnings */}
-        <div className="bg-card border border-border/80 p-5 rounded-3xl shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-muted-foreground">Today's Earnings</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4" />
-            </div>
+      {/* Monthly Target Progress — matches _buildTargetTracker in dashboard_screen.dart */}
+      <div className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Monthly Target Progress</p>
+            <p className="text-xl font-extrabold mt-0.5">
+              ₹{monthlyAchieved.toLocaleString('en-IN')} / ₹{monthlyTarget.toLocaleString('en-IN')}
+            </p>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold font-mono mt-2 text-foreground">
-            ₹2,400
-          </div>
-          <div className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-            <span className="text-emerald-500 font-bold">+₹720</span> from completed morning sessions
-          </div>
+          <span className="text-sm font-black text-primary bg-primary/10 px-3 py-1 rounded-xl border border-primary/20">
+            {Math.round(progress * 100)}%
+          </span>
         </div>
-
-        {/* Card 2: Completed Sessions */}
-        <div className="bg-card border border-border/80 p-5 rounded-3xl shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-muted-foreground">Visits Completed</span>
-            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-              <CalendarCheck className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl sm:text-3xl font-extrabold font-mono mt-2 text-foreground">
-            3 <span className="text-base text-muted-foreground font-normal">/ 4</span>
-          </div>
-          <div className="text-[11px] text-muted-foreground mt-1">
-            1 remaining home session today
-          </div>
+        <div className="h-2.5 w-full bg-muted/50 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-1000"
+            style={{ width: `${progress * 100}%` }}
+          />
         </div>
+        <p className="text-[11px] text-muted-foreground mt-2.5 flex items-center gap-1.5 italic">
+          <span>💡</span>
+          Increase daily appointments by 15% to reach goal early
+        </p>
+      </div>
 
-        {/* Card 3: Live Broadcasts */}
-        <div className="bg-card border border-border/80 p-5 rounded-3xl shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-muted-foreground">Nearby Lead Matches</span>
-            <div className="w-8 h-8 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
-              <Radio className="w-4 h-4 animate-pulse" />
-            </div>
-          </div>
-          <div className="text-2xl sm:text-3xl font-extrabold font-mono mt-2 text-foreground">
-            {leads.length} <span className="text-xs font-bold text-accent">Active</span>
-          </div>
-          <div className="text-[11px] text-muted-foreground mt-1">
-            Within 5 km of your territory
-          </div>
+      {/* KPI Grid — matches _buildKPIGrid in dashboard_screen.dart (8 KPI cards) */}
+      <div>
+        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3 px-1">
+          📊 Performance Metrics
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+          {kpiCards.map((kpi) => {
+            const card = (
+              <div
+                key={kpi.label}
+                className="bg-card border border-border/80 p-4 sm:p-5 rounded-3xl shadow-sm relative overflow-hidden hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-muted-foreground">{kpi.label}</span>
+                  <div className={`w-8 h-8 rounded-xl ${kpi.color} flex items-center justify-center`}>
+                    {kpi.icon}
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl font-extrabold font-mono">
+                  {isLoading ? <span className="text-muted-foreground text-base">—</span> : kpi.value}
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-1">{kpi.sub}</div>
+              </div>
+            );
+            return kpi.href ? <Link key={kpi.label} href={kpi.href} prefetch={false}>{card}</Link> : card;
+          })}
         </div>
+      </div>
 
-        {/* Card 4: Wallet Balance */}
-        <div className="bg-card border border-border/80 p-5 rounded-3xl shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-muted-foreground">Wallet Balance</span>
-            <div className="w-8 h-8 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center">
-              <Wallet className="w-4 h-4" />
-            </div>
+      {/* AI Insight — matches _buildAIInsight in dashboard_screen.dart */}
+      <div className="bg-card border border-border/80 rounded-3xl p-5 shadow-sm">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <Bot className="w-5 h-5" />
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold font-mono mt-2 text-foreground">
-            ₹{walletBalance.toLocaleString('en-IN')}
+          <div className="flex-1">
+            <h3 className="text-sm font-bold text-foreground">Aries AI Insight</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed mt-1">
+              Repeat patients generate 2× more trust and 3× more income. Follow up with patients nearing session completion.
+            </p>
           </div>
-          <Link
-            href="/app/wallet"
-            className="text-[11px] font-bold text-primary hover:underline mt-1 inline-block"
-            prefetch={false}
-          >
-            Request Instant Payout →
+          <Link href="/app/buddy" prefetch={false}>
+            <Button variant="outline" className="h-9 px-4 rounded-xl text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 shrink-0">
+              Open Copilot →
+            </Button>
           </Link>
         </div>
       </div>
 
-      {/* Success notification banner when lead accepted */}
-      {acceptedLeadMessage && (
-        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-between animate-in fade-in">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
-            <span>{acceptedLeadMessage}</span>
-          </div>
-          <Link href="/app/visits" className="underline">
-            View Schedule →
-          </Link>
-        </div>
-      )}
-
-      {/* Live Broadcast Urgent Lead Card */}
-      {topLead && (
-        <div className="bg-gradient-to-br from-primary/10 via-card to-card border-2 border-primary/40 rounded-3xl p-6 shadow-md relative overflow-hidden">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className="flex h-2.5 w-2.5 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
-                </span>
-                <span className="text-xs font-extrabold uppercase tracking-wider text-primary">
-                  Immediate Lead Broadcast Match
-                </span>
-                <span className="text-xs text-muted-foreground font-mono">
-                  • Expires in 8 mins
-                </span>
-              </div>
-              <h2 className="text-lg sm:text-xl font-extrabold text-foreground">
-                {topLead.condition}
-              </h2>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-primary" />
-                  <strong className="text-foreground">{topLead.locality}</strong> ({topLead.distanceKm} km away)
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-primary" />
-                  {topLead.scheduledDate}, {topLead.scheduledTime}
-                </span>
-                <span className="flex items-center gap-1 text-emerald-500 font-bold">
-                  ₹{topLead.payoutAmount} Therapist Payout (60%)
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2.5 shrink-0">
-              <Button
-                type="button"
-                onClick={() => setLeads(leads.filter((l) => l.id !== topLead.id))}
-                variant="outline"
-                className="h-11 px-4 rounded-xl text-xs font-bold"
-              >
-                Pass
-              </Button>
-              <Button
-                type="button"
-                onClick={() => handleAcceptLead(topLead.id)}
-                className="h-11 px-6 rounded-xl bg-primary hover:bg-primary/95 text-white font-extrabold shadow-lg shadow-primary/20"
-              >
-                Accept Lead Broadcast
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Main Grid: Today's Schedule + AI Buddy Quick Copilot */}
+      {/* Today's Schedule + Quick Shortcuts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Today's Clinical Schedule Timeline */}
+        {/* Left: Today's Appointments */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-extrabold tracking-tight">Today's Treatment Itinerary</h3>
-            <Link
-              href="/app/appointments"
-              className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
-              prefetch={false}
-            >
+            <Link href="/app/appointments" className="text-xs font-bold text-primary hover:underline flex items-center gap-1" prefetch={false}>
               <span>Full Schedule</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          <div className="space-y-3">
-            {/* Session 1: Completed */}
-            <div className="p-4 rounded-2xl border border-border/80 bg-card/60 flex items-start justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-foreground">Mrs. Meenakshi Rao (68y)</span>
-                    <span className="text-[10px] bg-emerald-500/10 text-emerald-500 font-bold px-2 py-0.5 rounded-full">
-                      Completed ✓
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Post-TKR Knee Joint Mobilization • IC Colony, Borivali West
-                  </p>
-                  <div className="text-[11px] font-mono text-muted-foreground mt-1">
-                    09:30 AM - 10:20 AM • SOAP Note Submitted • ₹720 Credited
-                  </div>
-                </div>
-              </div>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
             </div>
-
-            {/* Session 2: Completed */}
-            <div className="p-4 rounded-2xl border border-border/80 bg-card/60 flex items-start justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-foreground">Mr. Anil Kapoor (54y)</span>
-                    <span className="text-[10px] bg-emerald-500/10 text-emerald-500 font-bold px-2 py-0.5 rounded-full">
-                      Completed ✓
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Stroke Hemiplegia Gait Training • Thakur Village, Kandivali East
-                  </p>
-                  <div className="text-[11px] font-mono text-muted-foreground mt-1">
-                    11:30 AM - 12:25 PM • SOAP Note Submitted • ₹900 Credited
-                  </div>
-                </div>
-              </div>
+          ) : todayAppointments.length === 0 ? (
+            <div className="p-8 rounded-3xl border border-dashed border-border/80 text-center text-muted-foreground">
+              <CalendarCheck className="w-10 h-10 mx-auto mb-3 opacity-40" />
+              <p className="text-sm font-medium">No visits scheduled for today</p>
+              <Link href="/app/leads" prefetch={false}>
+                <Button variant="outline" className="mt-3 rounded-xl text-xs font-bold">Browse New Leads</Button>
+              </Link>
             </div>
-
-            {/* Session 3: UPCOMING / ACTION REQUIRED */}
-            <div className="p-5 rounded-2xl border-2 border-primary/30 bg-primary/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-primary text-white flex items-center justify-center shrink-0 shadow-md">
-                  <Navigation className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-extrabold text-foreground">Dr. Arvind Kulkarni (71y)</span>
-                    <span className="text-[10px] bg-primary text-white font-bold px-2 py-0.5 rounded-full">
-                      Next Up (05:00 PM)
-                    </span>
+          ) : (
+            <div className="space-y-3">
+              {todayAppointments.map((apt: any) => {
+                const isCompleted = ['Completed', 'completed'].includes(apt.status || '');
+                const patientName = apt.patient?.name || apt.patient?.fullName || apt.patientDetails?.name || 'Patient';
+                const age = apt.patient?.age || apt.patientDetails?.age;
+                const time = apt.startTime || apt.scheduledTime || '';
+                const session = apt.sessionNumber && apt.totalSessions
+                  ? `Session ${apt.sessionNumber} of ${apt.totalSessions}`
+                  : '';
+                const fee = apt.sessionFee || apt.totalAmount;
+                return (
+                  <div
+                    key={apt._id || apt.id}
+                    className={`p-4 rounded-2xl border flex items-start justify-between gap-3 ${
+                      isCompleted
+                        ? 'border-border/80 bg-card/60'
+                        : 'border-2 border-primary/30 bg-primary/5'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                        isCompleted ? 'bg-emerald-500/10 text-emerald-500' : 'bg-primary text-white shadow-md'
+                      }`}>
+                        {isCompleted ? <CheckCircle2 className="w-4 h-4" /> : <Navigation className="w-4 h-4" />}
+                      </div>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="text-xs font-bold text-foreground">
+                            {patientName}{age ? ` (${age}y)` : ''}
+                          </span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            isCompleted
+                              ? 'bg-emerald-500/10 text-emerald-500'
+                              : 'bg-primary text-white'
+                          }`}>
+                            {isCompleted ? 'Completed ✓' : time ? `Next Up (${time})` : apt.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {apt.condition || apt.packageName || '—'} • {apt.patient?.address || apt.patientDetails?.address || ''}
+                        </p>
+                        {session && (
+                          <p className="text-[11px] font-semibold text-primary mt-1">
+                            {session}{fee ? ` • ₹${fee.toLocaleString('en-IN')} fee` : ''}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    {!isCompleted && (
+                      <Link href="/app/visits" prefetch={false}>
+                        <Button className="h-9 px-4 rounded-xl bg-primary hover:bg-primary/95 text-white font-bold text-xs shadow-md shrink-0">
+                          Start →
+                        </Button>
+                      </Link>
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Lumbar Canal Stenosis & Balance Therapy • Evershine Nagar, Malad West
-                  </p>
-                  <div className="text-xs font-semibold text-primary mt-1.5 flex items-center gap-3">
-                    <span>Session 4 of 10</span>
-                    <span>•</span>
-                    <span>Patient Phone: +91 98204 11982</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <Link href="/app/visits" prefetch={false}>
-                  <Button className="h-10 px-5 rounded-xl bg-primary hover:bg-primary/95 text-white font-bold text-xs shadow-md">
-                    Start Travel →
-                  </Button>
-                </Link>
-              </div>
+                );
+              })}
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Right Column: AI Clinical Copilot & Shortcuts */}
+        {/* Right: AI Buddy + Quick Shortcuts */}
         <div className="space-y-4">
-          <div className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm space-y-4">
+          {/* AI Buddy Card */}
+          <div className="bg-card border border-border/80 rounded-3xl p-5 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
-                  <Bot className="w-5 h-5" />
+                <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                  <Bot className="w-4 h-4" />
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-foreground">Aries AI Clinical Buddy</h4>
                   <p className="text-[10px] text-muted-foreground">Doorstep Physio Copilot</p>
                 </div>
               </div>
-              <span className="text-[10px] bg-accent/10 text-accent font-bold px-2 py-0.5 rounded-full">
-                Active
-              </span>
+              <span className="text-[10px] bg-emerald-500/10 text-emerald-500 font-bold px-2 py-0.5 rounded-full">Active</span>
             </div>
-
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Ask about clinical differentials, exercise prescription progressions, or red flags before starting your next visit.
+              Ask about clinical differentials, exercise progressions, or red flags before starting your next visit.
             </p>
-
-            <div className="p-3 bg-muted/40 rounded-2xl border border-border/60 text-xs text-foreground italic">
-              "Patient Dr. Arvind has history of osteoporosis. Avoid aggressive spinal flexion manipulations."
-            </div>
-
             <Link href="/app/buddy" className="block" prefetch={false}>
-              <Button variant="outline" className="w-full h-10 rounded-xl text-xs font-bold border-accent/40 text-accent hover:bg-accent/10">
+              <Button variant="outline" className="w-full h-10 rounded-xl text-xs font-bold border-primary/40 text-primary hover:bg-primary/10">
                 Open AI Case Copilot →
               </Button>
             </Link>
@@ -366,46 +422,27 @@ export default function ProviderDashboardPage() {
 
           {/* Quick Shortcuts */}
           <div className="bg-card border border-border/80 rounded-3xl p-5 shadow-sm space-y-3">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">
-              Quick Shortcuts
-            </h4>
+            <h4 className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Quick Shortcuts</h4>
             <div className="grid grid-cols-2 gap-2">
-              <Link
-                href="/app/wallet"
-                className="p-3 rounded-2xl bg-muted/30 hover:bg-muted/60 border border-border/60 transition-all text-left"
-                prefetch={false}
-              >
-                <Wallet className="w-4 h-4 text-sky-500 mb-1" />
-                <div className="text-xs font-bold text-foreground">My Wallet</div>
-                <div className="text-[10px] text-muted-foreground">₹14,850 balance</div>
-              </Link>
-              <Link
-                href="/app/referrals"
-                className="p-3 rounded-2xl bg-muted/30 hover:bg-muted/60 border border-border/60 transition-all text-left"
-                prefetch={false}
-              >
-                <TrendingUp className="w-4 h-4 text-emerald-500 mb-1" />
-                <div className="text-xs font-bold text-foreground">Refer & Earn</div>
-                <div className="text-[10px] text-muted-foreground">₹1,000 / Colleague</div>
-              </Link>
-              <Link
-                href="/app/availability"
-                className="p-3 rounded-2xl bg-muted/30 hover:bg-muted/60 border border-border/60 transition-all text-left"
-                prefetch={false}
-              >
-                <Clock className="w-4 h-4 text-amber-500 mb-1" />
-                <div className="text-xs font-bold text-foreground">Time Slots</div>
-                <div className="text-[10px] text-muted-foreground">5 active pincodes</div>
-              </Link>
-              <Link
-                href="/app/training"
-                className="p-3 rounded-2xl bg-muted/30 hover:bg-muted/60 border border-border/60 transition-all text-left"
-                prefetch={false}
-              >
-                <Stethoscope className="w-4 h-4 text-primary mb-1" />
-                <div className="text-xs font-bold text-foreground">SOP Library</div>
-                <div className="text-[10px] text-muted-foreground">Clinical Protocols</div>
-              </Link>
+              {[
+                { href: '/app/wallet', icon: <Wallet className="w-4 h-4 text-sky-500" />, label: 'My Wallet', sub: formatCurrency(walletBalance) },
+                { href: '/app/referrals', icon: <TrendingUp className="w-4 h-4 text-emerald-500" />, label: 'Refer & Earn', sub: '₹1,000 / Colleague' },
+                { href: '/app/availability', icon: <Clock className="w-4 h-4 text-amber-500" />, label: 'Availability', sub: 'Manage slots' },
+                { href: '/app/training', icon: <Stethoscope className="w-4 h-4 text-primary" />, label: 'SOP Library', sub: 'Clinical Protocols' },
+                { href: '/app/patients', icon: <Users className="w-4 h-4 text-purple-500" />, label: 'My Patients', sub: `${stats.uniquePatients ?? 0} patients` },
+                { href: '/app/earnings', icon: <Activity className="w-4 h-4 text-rose-500" />, label: 'Earnings', sub: 'History & Analytics' },
+              ].map((s) => (
+                <Link
+                  key={s.href}
+                  href={s.href}
+                  className="p-3 rounded-2xl bg-muted/30 hover:bg-muted/60 border border-border/60 transition-all text-left"
+                  prefetch={false}
+                >
+                  <div className="mb-1">{s.icon}</div>
+                  <div className="text-xs font-bold text-foreground">{s.label}</div>
+                  <div className="text-[10px] text-muted-foreground">{s.sub}</div>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
