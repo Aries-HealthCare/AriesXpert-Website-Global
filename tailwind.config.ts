@@ -20,7 +20,9 @@ const config = {
     extend: {
       fontFamily: {
         body: ['var(--font-inter)', 'sans-serif'],
-        headline: ['var(--font-space-grotesk)', 'sans-serif'],
+        headline: ['var(--font-outfit)', 'var(--font-space-grotesk)', 'sans-serif'],
+        display: ['var(--font-outfit)', 'sans-serif'],
+        outfit: ['var(--font-outfit)', 'sans-serif'],
       },
       transitionTimingFunction: {
         'healthcare': 'cubic-bezier(0.16, 1, 0.3, 1)',

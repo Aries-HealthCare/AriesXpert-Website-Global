@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useProviderAuth } from '@/services/provider-auth-context';
+import { DynamicAppLogo } from '@/components/ui/dynamic-app-logo';
+import { PwaInstallPrompt } from '@/components/pwa/pwa-install-prompt';
 import {
   LayoutDashboard,
   Radio,
@@ -32,7 +34,10 @@ import {
   LogOut,
   AlertTriangle,
   Stethoscope,
-  ChevronDown
+  ChevronDown,
+  PhoneCall,
+  Volume2,
+  CheckCircle2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -53,13 +58,13 @@ const NAV_ITEMS = [
   { href: '/app/profile', label: 'My Profile', icon: User },
   { href: '/app/availability', label: 'Availability & Slots', icon: Clock },
   { href: '/app/documents', label: 'KYC Documents', icon: FileText },
-  { href: '/app/support', label: 'Support & SOS', icon: HelpCircle },
+  { href: '/app/support', label: 'Support & Tickets', icon: HelpCircle },
   { href: '/app/settings', label: 'App Settings', icon: Settings },
 ];
 
 const MOBILE_BOTTOM_TABS = [
   { href: '/app', label: 'Home', icon: LayoutDashboard },
-  { href: '/app/leads', label: 'Leads', icon: Radio, badge: '3' },
+  { href: '/app/leads', label: 'Leads', icon: Radio, badge: 'Live' },
   { href: '/app/visits', label: 'Visits', icon: Navigation },
   { href: '/app/wallet', label: 'Wallet', icon: Wallet },
   { href: '/app/buddy', label: 'AI Buddy', icon: Bot },
@@ -69,236 +74,173 @@ export default function ProviderAppLayout({ children }: { children: React.ReactN
   const pathname = usePathname();
   const router = useRouter();
   const { user, dutyStatus, toggleDutyStatus, logout, isAuthenticated } = useProviderAuth();
-  const isDutyActive = dutyStatus;
 
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-  const [isSOSActive, setIsSOSActive] = useState(false);
+  const [showSOSModal, setShowSOSModal] = useState(false);
+  const [sosCountdown, setSosCountdown] = useState<number | null>(null);
+  const [sosTransmitted, setSosTransmitted] = useState(false);
 
-  const therapistName = user?.fullName || user?.name || (user?.firstName ? `${user.firstName} ${user.lastName || ''}` : 'Dr. Rohan Sharma, BPT');
-  const axId = user?.axId || 'AX-IND-4892';
-  const isApproved = user?.status === 'Active' || user?.status === 'Approved' || user?.status === 'ACTIVE';
-  const isUnderReview = user?.status === 'Pending' || user?.status === 'UNDER_REVIEW' || user?.status === 'Incomplete';
+  const therapistName = user?.fullName || user?.name || (user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Provider');
+  const axId = user?.axId || user?.therapistId || user?.uid || 'AX-IND-4892';
 
-  const handleSOSTrigger = () => {
-    setIsSOSActive(true);
-    // In production broadcasts live GPS to clinical escalation center
-    setTimeout(() => {
-      alert('🚨 EMERGENCY SOS TRIGGERED: Dispatch team and Clinical Director notified. GPS Coordinates transmitted.');
-      setIsSOSActive(false);
-    }, 500);
+  // SOS Emergency Trigger with 3-second abort countdown
+  const triggerSOS = () => {
+    setShowSOSModal(true);
+    setSosTransmitted(false);
+    setSosCountdown(3);
+  };
+
+  useEffect(() => {
+    if (sosCountdown === null) return;
+    if (sosCountdown === 0) {
+      setSosTransmitted(true);
+      setSosCountdown(null);
+      return;
+    }
+    const timer = setTimeout(() => setSosCountdown(sosCountdown - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [sosCountdown]);
+
+  const abortSOS = () => {
+    setSosCountdown(null);
+    setShowSOSModal(false);
+    setSosTransmitted(false);
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col antialiased">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-body antialiased selection:bg-primary/20">
       {/* Top Application Bar */}
-      <header className="sticky top-0 z-40 h-16 border-b border-border/80 bg-card/95 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between shadow-sm">
+      <header className="sticky top-0 z-40 h-16 border-b border-border/80 bg-card/90 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between shadow-sm">
         {/* Brand & Mobile Hamburger */}
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => setIsMobileDrawerOpen(!isMobileDrawerOpen)}
-            className="lg:hidden p-2 rounded-xl bg-muted/60 hover:bg-muted text-foreground"
+            className="lg:hidden p-2 rounded-2xl bg-muted/60 hover:bg-muted text-foreground transition-colors"
           >
             {isMobileDrawerOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
-          <Link href="/app" className="flex items-center gap-2" prefetch={false}>
-            <div className="relative h-9 w-32 sm:w-40">
-              <Image
-                src="/logo-light.png"
-                alt="Aries PhysioCare"
-                fill
-                className="object-contain block dark:hidden object-left"
-                priority
-              />
-              <Image
-                src="/logo-dark.png"
-                alt="Aries PhysioCare"
-                fill
-                className="object-contain hidden dark:block object-left"
-                priority
-              />
-            </div>
-            <span className="hidden sm:inline-block text-[10px] uppercase tracking-widest font-extrabold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-              Xpert Provider
-            </span>
+          <Link href="/app" className="flex items-center gap-2.5" prefetch={false}>
+            <DynamicAppLogo size={38} showText={true} />
           </Link>
         </div>
 
-        {/* Center/Right Actions */}
-        <div className="flex items-center gap-2 sm:gap-4">
+        {/* Action Controls & Duty Switch */}
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* Duty Status Switch */}
           <button
             type="button"
-            onClick={() => toggleDutyStatus()}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all border shadow-sm ${
-              isDutyActive
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/20'
-                : 'bg-muted/80 border-border text-muted-foreground hover:bg-muted'
+            onClick={toggleDutyStatus}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-2xl border text-xs font-outfit font-extrabold transition-all ${
+              dutyStatus
+                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 shadow-sm shadow-emerald-500/10'
+                : 'bg-muted/40 text-muted-foreground border-border/80'
             }`}
           >
-            <span className={`w-2.5 h-2.5 rounded-full ${isDutyActive ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`} />
-            <span className="hidden sm:inline">{isDutyActive ? 'On Duty (Receiving Leads)' : 'Off Duty'}</span>
-            <span className="sm:hidden">{isDutyActive ? 'Online' : 'Offline'}</span>
+            <span
+              className={`w-2.5 h-2.5 rounded-full transition-all ${
+                dutyStatus ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground/50'
+              }`}
+            />
+            <span className="hidden sm:inline">{dutyStatus ? 'On Duty' : 'Off Duty'}</span>
           </button>
 
-          {/* SOS Emergency Button */}
+          {/* Quick SOS Trigger */}
           <button
             type="button"
-            onClick={handleSOSTrigger}
-            className="p-2 rounded-full bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive hover:text-white transition-all shadow-sm flex items-center gap-1 text-xs font-bold"
-            title="Trigger Emergency SOS"
+            onClick={triggerSOS}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-destructive/10 hover:bg-destructive/20 text-destructive border border-destructive/30 text-xs font-outfit font-extrabold transition-all"
           >
-            <ShieldAlert className="w-4 h-4 animate-bounce" />
-            <span className="hidden md:inline">SOS</span>
+            <ShieldAlert className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">SOS</span>
           </button>
+
+          {/* Notifications */}
+          <Link
+            href="/app/notifications"
+            className="relative p-2 rounded-2xl border border-border/80 bg-card hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            prefetch={false}
+          >
+            <Bell className="w-4 h-4" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary" />
+          </Link>
 
           {/* Theme Toggle */}
           <ThemeToggle />
 
-          {/* User Profile dropdown */}
-          <div className="flex items-center gap-2 pl-2 border-l border-border/80">
-            <Link href="/app/profile" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shadow-md">
-                {therapistName.charAt(0) || 'D'}
-              </div>
-              <div className="hidden xl:block text-left">
-                <div className="text-xs font-bold text-foreground leading-tight group-hover:text-primary transition-colors truncate max-w-[120px]">
-                  {therapistName.split(',')[0]}
-                </div>
-                <div className="text-[10px] text-muted-foreground font-mono leading-none">
-                  {axId}
-                </div>
-              </div>
-            </Link>
-
-            <button
-              type="button"
-              onClick={logout}
-              className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors"
-              title="Sign Out"
-            >
-              <Power className="w-4 h-4" />
-            </button>
-          </div>
+          {/* Therapist Avatar */}
+          <Link
+            href="/app/profile"
+            className="hidden sm:flex items-center gap-2 p-1.5 pl-2.5 rounded-2xl border border-border/80 bg-card hover:bg-muted transition-all"
+            prefetch={false}
+          >
+            <div className="flex flex-col text-right">
+              <span className="text-xs font-outfit font-extrabold text-foreground truncate max-w-[120px]">
+                {therapistName}
+              </span>
+              <span className="text-[10px] font-mono text-muted-foreground">{axId}</span>
+            </div>
+            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-outfit font-extrabold text-xs">
+              {therapistName[0]?.toUpperCase()}
+            </div>
+          </Link>
         </div>
       </header>
 
-      {/* Under Review Notification Banner */}
-      {isUnderReview && (
-        <div className="bg-amber-500/10 border-b border-amber-500/30 text-amber-600 dark:text-amber-400 px-4 py-2 text-xs flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 shrink-0" />
-            <span>
-              <strong>Application Under Verification:</strong> Your KYC documents and clinical credentials are being verified by our Clinical Director. You can explore all modules and test simulation leads.
-            </span>
-          </div>
-          <Link href="/app/documents" className="font-bold underline shrink-0 ml-2">
-            Check Status →
-          </Link>
-        </div>
-      )}
-
-      {/* Main Body with Sidebar + Content */}
-      <div className="flex-1 flex max-w-[1920px] w-full mx-auto">
+      {/* App Workspace Container */}
+      <div className="flex-1 flex overflow-hidden">
         {/* Desktop Sidebar Navigation */}
-        <aside className="hidden lg:flex flex-col w-64 border-r border-border/80 bg-card/50 p-4 shrink-0 overflow-y-auto max-h-[calc(100vh-4rem)] sticky top-16">
-          <div className="space-y-1">
-            <div className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground px-3 py-1 mb-1">
-              Clinical Operations
+        <aside className="hidden lg:flex w-64 xl:w-72 flex-col border-r border-border/80 bg-card/60 backdrop-blur-md p-4 space-y-4 overflow-y-auto">
+          {/* Quick Profile Summary Card */}
+          <div className="p-4 rounded-3xl bg-gradient-to-br from-primary/10 via-card to-card border border-primary/20 space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-primary text-white flex items-center justify-center font-outfit font-extrabold text-sm shadow-md shadow-primary/20">
+                {therapistName[0]?.toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-outfit font-extrabold text-foreground truncate">
+                  {therapistName}
+                </p>
+                <p className="text-[10px] font-mono text-primary font-bold">{axId}</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+                    Verified Specialist
+                  </span>
+                </div>
+              </div>
             </div>
-            {NAV_ITEMS.slice(0, 5).map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href || (item.href !== '/app' && pathname.startsWith(item.href));
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                    isActive
-                      ? 'bg-primary text-white shadow-md shadow-primary/20'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
-                  prefetch={false}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className="w-4 h-4 shrink-0" />
-                    <span>{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span
-                      className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
-                        isActive ? 'bg-white text-primary' : 'bg-primary/10 text-primary'
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
           </div>
 
-          <div className="space-y-1 mt-6">
-            <div className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground px-3 py-1 mb-1">
-              Finance & Growth
-            </div>
-            {NAV_ITEMS.slice(5, 10).map((item) => {
+          {/* Navigation Links */}
+          <nav className="space-y-1 flex-1">
+            {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href || pathname.startsWith(item.href);
+              const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                    isActive
-                      ? 'bg-primary text-white shadow-md shadow-primary/20'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
-                  prefetch={false}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className="w-4 h-4 shrink-0" />
-                    <span>{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-muted text-muted-foreground">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-
-          <div className="space-y-1 mt-6">
-            <div className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground px-3 py-1 mb-1">
-              AI & Administration
-            </div>
-            {NAV_ITEMS.slice(10).map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href || pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-outfit font-bold transition-all ${
                     isActive
                       ? 'bg-primary text-white shadow-md shadow-primary/20'
                       : item.highlight
-                      ? 'bg-accent/10 text-accent hover:bg-accent/20 font-extrabold'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      ? 'bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
                   }`}
                   prefetch={false}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className="w-4 h-4 shrink-0" />
+                    <Icon className="w-4 h-4" />
                     <span>{item.label}</span>
                   </div>
                   {item.badge && (
                     <span
-                      className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${
-                        isActive ? 'bg-white text-primary' : 'bg-primary/20 text-primary'
+                      className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                        isActive
+                          ? 'bg-white/20 text-white'
+                          : 'bg-primary/15 text-primary'
                       }`}
                     >
                       {item.badge}
@@ -307,118 +249,186 @@ export default function ProviderAppLayout({ children }: { children: React.ReactN
                 </Link>
               );
             })}
-          </div>
+          </nav>
 
-          {/* Quick Support Badge in Sidebar bottom */}
-          <div className="mt-auto pt-6">
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/10 via-accent/5 to-transparent border border-primary/20">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
-                <Sparkles className="w-4 h-4 text-accent" />
-                <span>24x7 Ops Helpline</span>
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-1">
-                Direct coordinator hotline for doorstep assistance.
-              </p>
-              <Link
-                href="/app/support"
-                className="mt-2 text-xs font-bold text-primary hover:underline block"
-              >
-                Contact Ops Desk →
-              </Link>
-            </div>
+          {/* Logout Button */}
+          <div className="pt-2 border-t border-border/80">
+            <button
+              onClick={logout}
+              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-outfit font-bold text-destructive hover:bg-destructive/10 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logout Session</span>
+            </button>
           </div>
         </aside>
 
-        {/* Mobile Fullscreen Navigation Drawer */}
-        {isMobileDrawerOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden flex">
-            <div
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm"
-              onClick={() => setIsMobileDrawerOpen(false)}
-            />
-            <div className="relative w-80 bg-card border-r border-border h-full flex flex-col p-4 shadow-2xl overflow-y-auto">
-              <div className="flex items-center justify-between pb-4 border-b border-border mb-4">
-                <span className="font-extrabold text-sm text-foreground">AriesXpert Menu</span>
-                <button
-                  type="button"
-                  onClick={() => setIsMobileDrawerOpen(false)}
-                  className="p-1 rounded-lg hover:bg-muted text-muted-foreground"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="space-y-1">
-                {NAV_ITEMS.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = pathname === item.href || (item.href !== '/app' && pathname.startsWith(item.href));
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setIsMobileDrawerOpen(false)}
-                      className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold ${
-                        isActive ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted'
-                      }`}
-                      prefetch={false}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <Icon className="w-4 h-4" />
-                        <span>{item.label}</span>
-                      </div>
-                      {item.badge && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold">
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                })}
-              </div>
-
-              <div className="mt-auto pt-6 border-t border-border">
-                <button
-                  type="button"
-                  onClick={logout}
-                  className="w-full py-2.5 px-3 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive/20 font-bold text-xs flex items-center justify-center gap-2"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Log Out of AriesXpert</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Main Workspace Content */}
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 overflow-y-auto">
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 pb-28 lg:pb-8">
           {children}
         </main>
       </div>
 
-      {/* Mobile Bottom Navigation Bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border/80 px-2 py-1.5 flex items-center justify-around shadow-lg">
-        {MOBILE_BOTTOM_TABS.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = pathname === tab.href || (tab.href !== '/app' && pathname.startsWith(tab.href));
-          return (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={`flex flex-col items-center py-1 px-3 rounded-xl transition-all relative ${
-                isActive ? 'text-primary font-extrabold scale-105' : 'text-muted-foreground hover:text-foreground'
-              }`}
-              prefetch={false}
+      {/* Mobile Sliding Drawer */}
+      {isMobileDrawerOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm lg:hidden animate-in fade-in"
+          onClick={() => setIsMobileDrawerOpen(false)}
+        >
+          <div
+            className="w-72 max-w-[85vw] h-full bg-card border-r border-border p-5 flex flex-col space-y-4 overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-border">
+              <DynamicAppLogo size={34} showText={true} />
+              <button
+                onClick={() => setIsMobileDrawerOpen(false)}
+                className="w-8 h-8 rounded-xl bg-muted/60 flex items-center justify-center text-muted-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Profile summary */}
+            <div className="p-3.5 rounded-2xl bg-muted/40 border border-border/60">
+              <p className="text-xs font-outfit font-bold text-foreground truncate">{therapistName}</p>
+              <p className="text-[10px] font-mono text-primary font-bold">{axId}</p>
+            </div>
+
+            {/* Nav list */}
+            <nav className="space-y-1 flex-1">
+              {NAV_ITEMS.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsMobileDrawerOpen(false)}
+                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-outfit font-bold transition-all ${
+                      isActive
+                        ? 'bg-primary text-white shadow-md'
+                        : 'text-muted-foreground hover:bg-muted/50'
+                    }`}
+                    prefetch={false}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </div>
+                    {item.badge && (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-bold">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <button
+              onClick={() => {
+                setIsMobileDrawerOpen(false);
+                logout();
+              }}
+              className="w-full flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-destructive hover:bg-destructive/10"
             >
-              <Icon className="w-5 h-5" />
-              <span className="text-[10px] mt-0.5">{tab.label}</span>
-              {tab.badge && (
-                <span className="absolute top-0 right-1 w-2 h-2 rounded-full bg-primary animate-ping" />
-              )}
-            </Link>
-          );
-        })}
-      </nav>
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Bottom Navigation Bar — 5 Core Tabs */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-2xl border-t border-border/80 px-2 py-2 shadow-2xl">
+        <div className="flex items-center justify-around max-w-lg mx-auto">
+          {MOBILE_BOTTOM_TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = pathname === tab.href;
+            return (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all relative ${
+                  isActive
+                    ? 'text-primary font-extrabold'
+                    : 'text-muted-foreground hover:text-foreground font-medium'
+                }`}
+                prefetch={false}
+              >
+                <div className="relative">
+                  <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                  {tab.badge && (
+                    <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  )}
+                </div>
+                <span className="text-[10px] font-outfit mt-1">{tab.label}</span>
+                {isActive && (
+                  <span className="w-4 h-1 rounded-full bg-primary mt-0.5 shadow-sm" />
+                )}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Interactive Emergency SOS Modal */}
+      {showSOSModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-card border-2 border-destructive rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
+            <div className="w-20 h-20 rounded-full bg-destructive/15 text-destructive flex items-center justify-center mx-auto animate-pulse">
+              <ShieldAlert className="w-10 h-10" />
+            </div>
+
+            <div>
+              <h2 className="text-xl font-outfit font-black text-destructive">
+                {sosTransmitted ? 'EMERGENCY SOS TRANSMITTED' : 'EMERGENCY SOS TRIGGERED'}
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                {sosTransmitted
+                  ? 'Clinical Escalation Command Center notified. Live GPS broadcasting active.'
+                  : 'Dispatching emergency response to your live clinical location.'}
+              </p>
+            </div>
+
+            {sosCountdown !== null && (
+              <div className="py-2">
+                <div className="text-4xl font-black font-mono text-destructive">
+                  {sosCountdown}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Transmitting in {sosCountdown} seconds...
+                </p>
+              </div>
+            )}
+
+            {sosTransmitted && (
+              <div className="p-3 bg-destructive/10 rounded-2xl border border-destructive/30 text-xs font-bold text-destructive space-y-1">
+                <div className="flex items-center justify-center gap-1">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>GPS Broadcasted: IC Colony, Borivali West</span>
+                </div>
+                <p className="text-[10px] font-normal text-muted-foreground">
+                  Clinical Director & Police escalation center alerted.
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-2 pt-2">
+              <Button
+                onClick={abortSOS}
+                className="w-full h-11 rounded-2xl bg-muted hover:bg-muted/80 text-foreground font-outfit font-extrabold text-xs"
+              >
+                {sosTransmitted ? 'Close Alert' : 'Abort SOS (Cancel)'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PWA Device Install Prompt */}
+      <PwaInstallPrompt />
     </div>
   );
 }

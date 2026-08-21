@@ -4,69 +4,75 @@
 
 @layer base {
   :root {
-    /* ─── Premium Professional Red Theme ─────────────── */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 12%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 12%;
+    /* ─── Flutter AriesXpert Mobile Light Palette ─────── */
+    --background: 250 33% 97%;       /* #F6F5FB soft lavender-white */
+    --foreground: 240 3% 12%;        /* #1D1D1F premium charcoal black */
+    --card: 0 0% 100%;               /* #FFFFFF pure white */
+    --card-foreground: 240 3% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 12%;
+    --popover-foreground: 240 3% 12%;
 
-    /* Primary: Deep, sophisticated Crimson Red */
-    --primary: 348 83% 47%;
+    /* Primary: Rich Violet / Electric Blue */
+    --primary: 263 70% 58%;          /* #7C3AED / #007AFF */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 348 83% 30%;
+    --secondary: 250 25% 94%;
+    --secondary-foreground: 263 70% 45%;
 
-    --muted: 0 0% 95%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 240 5% 94%;
+    --muted-foreground: 240 2% 44%;  /* #6E6E73 luxury muted grey */
 
-    /* Accent: Luxurious Gold */
-    --accent: 43 74% 49%;
-    --accent-foreground: 0 0% 12%;
+    /* Accent: Luxury Metallic Gold */
+    --accent: 45 66% 52%;            /* #D4AF37 */
+    --accent-foreground: 240 3% 12%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 4 100% 59%;       /* #FF3B30 */
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 348 83% 47%;
-    --radius: 1rem;
+    --success: 134 61% 49%;          /* #34C759 */
+    
+    --border: 240 6% 91%;            /* #E5E5EA */
+    --input: 240 6% 91%;
+    --ring: 263 70% 58%;
+    --radius: 1.25rem;
 
     /* Charts */
-    --chart-1: 348 83% 47%;
-    --chart-2: 43 74% 49%;
-    --chart-3: 210 80% 50%;
-    --chart-4: 142 70% 45%;
-    --chart-5: 280 70% 55%;
+    --chart-1: 263 70% 58%;
+    --chart-2: 45 66% 52%;
+    --chart-3: 211 100% 50%;
+    --chart-4: 134 61% 49%;
+    --chart-5: 4 100% 59%;
   }
 
   .dark {
-    /* Ultra Modern Dark Mode */
-    --background: 0 0% 6%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 9%;
-    --popover-foreground: 0 0% 98%;
+    /* ─── Flutter AriesXpert Mobile OLED Dark Mode ───── */
+    --background: 0 0% 0%;           /* #000000 True OLED Black */
+    --foreground: 0 0% 100%;         /* #FFFFFF True White */
+    --card: 0 0% 7%;                 /* #111111 Deep Graphite */
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 348 83% 55%;
+    /* Primary: Vibrant Neon Blue */
+    --primary: 208 100% 50%;         /* #0088FF */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 12%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 70%;
+    --muted-foreground: 240 2% 57%;  /* #8E8E93 */
 
-    --accent: 43 74% 50%;
-    --accent-foreground: 0 0% 10%;
+    /* Accent: Luxury Metallic Gold */
+    --accent: 45 66% 52%;            /* #D4AF37 */
+    --accent-foreground: 0 0% 0%;
 
-    --destructive: 0 70% 40%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14%;
-    --input: 0 0% 18%;
-    --ring: 348 83% 55%;
+    --destructive: 4 100% 61%;       /* #FF453A */
+    --destructive-foreground: 0 0% 100%;
+    --success: 135 64% 50%;          /* #30D158 */
+
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 208 100% 50%;
   }
 }
 
