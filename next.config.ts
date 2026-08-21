@@ -81,6 +81,19 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  async rewrites() {
+    return [
+      {
+        source: '/api/app/:path*',
+        destination: 'https://api.ariesxpert.com/api/app/:path*',
+      },
+      {
+        source: '/api/v1/:path*',
+        destination: 'https://api.ariesxpert.com/api/v1/:path*',
+      },
+    ];
+  },
+
   images: {
     unoptimized: true,
     formats: ['image/avif', 'image/webp'],
