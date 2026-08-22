@@ -45,7 +45,7 @@ export default function ProviderAIBuddyPage() {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendMessage = (textToSend?: string) => {
+  const handleSendMessage = async (textToSend?: string) => {
     const text = textToSend || inputValue;
     if (!text.trim()) return;
 
@@ -60,17 +60,17 @@ export default function ProviderAIBuddyPage() {
     if (!textToSend) setInputValue('');
     setIsLoading(true);
 
-    setTimeout(() => {
-      let replyText = '';
-      const lower = text.toLowerCase();
-
-      if (lower.includes('tkr') || lower.includes('knee')) {
-        replyText = `**Clinical Recommendation for Post-TKR (Day 10-14):**\n\n1. **Active-Assisted ROM:** Heel slides with strap assistance targeting 90° flexion.\n2. **Extensor Mechanism:** Isometric quad sets with biofeedback towel roll, Straight Leg Raise (SLR) with zero extensor lag.\n3. **Patellar Mobility:** Superior/inferior and medial/lateral patellar glides.\n4. **Weight-Bearing:** Bilateral closed-kinetic chain mini-squats (0-30°), step-ups on 2-inch block.\n5. **Cryotherapy & Elevation:** 15 mins post-session to minimize effusion.\n\n*Caution:* Verify surgical wound healing and absence of calf tenderness (DVT screening).`;
-      } else if (lower.includes('red flag') || lower.includes('lumbar') || lower.includes('cauda')) {
-        replyText = `**Emergency Red Flag Screening for Acute Lumbar Cases:**\n\n- **Cauda Equina Syndrome:** Saddle anesthesia (perineal numbness), sudden bowel/bladder incontinence, bilateral progressive lower limb motor deficit.\n- **Spinal Malignancy:** Unexplained weight loss, pain unremitting at night/rest, history of cancer.\n- **Infection/Discitis:** High fever, systemic chills, recent IV injection history.\n\n*Protocol:* If positive for saddle anesthesia or urinary retention, quarantine home session and immediately initiate Aries Clinical Director SOS Protocol.`;
-      } else {
-        replyText = `**Evidence-Based Clinical Protocol Analysis:**\n\nFor **${text}**, the primary clinical focus should be establishing baseline active/passive joint angles, assessing neural tension (SLR/Slump/ULTT), and deploying graded isometric loading prior to dynamic eccentrics.\n\nRecommended home prescription includes: 3 sets of 10 repetitions, twice daily, maintaining pain score < 3/10 on the VAS scale.`;
-      }
+    try {
+      const res = await fetch('/api/app/ai-copilot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: text,
+          therapistName,
+        }),
+      });
+      const data = await res.json();
+      const replyText = data.reply || `Hello ${therapistName}! How can I assist with your patient cases or doorstep exercise prescriptions today?`;
 
       const buddyMsg: ChatMessage = {
         id: 'msg_b_' + Date.now(),
@@ -80,8 +80,17 @@ export default function ProviderAIBuddyPage() {
       };
 
       setMessages((prev) => [...prev, buddyMsg]);
+    } catch {
+      const buddyMsg: ChatMessage = {
+        id: 'msg_b_' + Date.now(),
+        sender: 'buddy',
+        text: `Hello ${therapistName}! I'm ready to assist with your clinical cases. Could you please share the diagnosis or rehabilitation protocol you would like to discuss?`,
+        timestamp: 'Just Now',
+      };
+      setMessages((prev) => [...prev, buddyMsg]);
+    } finally {
       setIsLoading(false);
-    }, 900);
+    }
   };
 
   return (
