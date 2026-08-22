@@ -61,14 +61,37 @@ export default function ProviderRegisterPage() {
     setIsLoading(true);
 
     try {
-      // 1. Trigger MSG91 OTP
-      await providerApi.sendOTP(cleanPhone);
+      // 1. Immediately create/register Expert in MongoDB backend
+      let registeredId = '';
+      try {
+        const fd = new FormData();
+        fd.append('fullName', fullName);
+        fd.append('phone', cleanPhone.slice(-10));
+        fd.append('email', email.toLowerCase().trim());
+        fd.append('password', password);
+        fd.append('city', city);
+        fd.append('countryCode', '+91');
+        fd.append('countryName', 'India');
+        fd.append('licenseNumber', licenseNumber);
+        fd.append('specialization', qualification);
+        fd.append('isMobileNumberVerified', 'false');
 
-      // 2. Cache preliminary data to pass to onboarding
+        const regRes = await providerApi.addPersonalInfo(fd);
+        if (regRes.result?._id) {
+          registeredId = regRes.result._id;
+        }
+      } catch (backendErr) {
+        console.warn('[Register] Immediate backend registration error:', backendErr);
+      }
+
+      // 2. Trigger MSG91 OTP
+      await providerApi.sendOTP(cleanPhone.slice(-10));
+
+      // 3. Cache preliminary data to pass to onboarding
       const tempUser = {
-        _id: 'exp_' + Date.now(),
+        _id: registeredId || 'exp_' + Date.now(),
         fullName,
-        phone: cleanPhone,
+        phone: cleanPhone.slice(-10),
         email: email.toLowerCase().trim(),
         city,
         licenseNumber,
@@ -78,11 +101,11 @@ export default function ProviderRegisterPage() {
       };
 
       updateUserData(tempUser);
-      localStorage.setItem('temp_register_phone', cleanPhone);
+      localStorage.setItem('temp_register_phone', cleanPhone.slice(-10));
       localStorage.setItem('temp_register_data', JSON.stringify(tempUser));
 
-      // 3. Redirect to OTP verification
-      router.push(`/verify?phone=${cleanPhone}`);
+      // 4. Redirect to OTP verification
+      router.push(`/verify?phone=${cleanPhone.slice(-10)}`);
     } catch (e: any) {
       setErrorMsg(e.message || 'Registration request failed. Please try again.');
     } finally {
