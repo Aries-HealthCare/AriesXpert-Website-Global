@@ -486,19 +486,23 @@ export default function ProviderOnboardingPage() {
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/80">
           <div className="flex items-center gap-3">
-            <Link href="/" prefetch={false} className="relative h-10 w-36 sm:w-44 block">
+            <Link href="/" prefetch={false} className="h-10 w-36 sm:w-44 flex items-center" style={{ height: '40px', width: '160px', maxWidth: '100%', position: 'relative' }}>
               <Image
                 src="/logo-light.png"
                 alt="Aries PhysioCare"
-                fill
-                className="object-contain block dark:hidden object-left"
+                width={160}
+                height={40}
+                style={{ height: '40px', width: 'auto', maxHeight: '40px', objectFit: 'contain' }}
+                className="block dark:hidden"
                 priority
               />
               <Image
                 src="/logo-dark.png"
                 alt="Aries PhysioCare"
-                fill
-                className="object-contain hidden dark:block object-left"
+                width={160}
+                height={40}
+                style={{ height: '40px', width: 'auto', maxHeight: '40px', objectFit: 'contain' }}
+                className="hidden dark:block"
                 priority
               />
             </Link>

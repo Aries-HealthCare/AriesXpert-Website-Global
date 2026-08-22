@@ -140,19 +140,23 @@ export default function ProviderLoginPage() {
       {/* Top Bar with brand and back link */}
       <div className="max-w-7xl w-full mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group" prefetch={false}>
-          <div className="relative h-12 w-44 sm:w-52">
+          <div className="h-12 w-44 sm:w-52 flex items-center" style={{ height: '48px', width: '180px', maxWidth: '100%', position: 'relative' }}>
             <Image
               src="/logo-light.png"
               alt="Aries PhysioCare"
-              fill
-              className="object-contain block dark:hidden object-left"
+              width={180}
+              height={48}
+              style={{ height: '48px', width: 'auto', maxHeight: '48px', objectFit: 'contain' }}
+              className="block dark:hidden"
               priority
             />
             <Image
               src="/logo-dark.png"
               alt="Aries PhysioCare"
-              fill
-              className="object-contain hidden dark:block object-left"
+              width={180}
+              height={48}
+              style={{ height: '48px', width: 'auto', maxHeight: '48px', objectFit: 'contain' }}
+              className="hidden dark:block"
               priority
             />
           </div>
