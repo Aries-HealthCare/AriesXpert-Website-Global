@@ -37,7 +37,7 @@ export default function Header() {
   const pathname = usePathname();
 
   const currentLocationName = useMemo(() => {
-    const parts = pathname.split('/').filter(Boolean);
+    const parts = (pathname || '').split('/').filter(Boolean);
     if (parts[0] !== 'services' || parts.length < 3) return null;
 
     const ignoreKeywords = ['conditions', 'symptoms', 'therapies-offered', 'services-offered', 'services'];
@@ -140,7 +140,7 @@ function LocationSelector({ current }: { current: string | null }) {
   const router = useRouter();
   const { toast } = useToast();
   const [isDetecting, setIsDetecting] = useState(false);
-  const serviceSlug = pathname.split('/')[2] || 'physiotherapy';
+  const serviceSlug = (pathname || '').split('/')[2] || 'physiotherapy';
 
   const handleCitySelect = (cityName: string, url: string) => {
     localStorage.setItem("user_city", cityName);

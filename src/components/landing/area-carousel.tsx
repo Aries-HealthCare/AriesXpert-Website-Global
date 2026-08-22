@@ -25,7 +25,7 @@ export default function AreaCarousel() {
   }, []);
 
   const { cityData, stateSlug } = useMemo(() => {
-    const segments = pathname.split('/').filter(Boolean);
+    const segments = (pathname || '').split('/').filter(Boolean);
     let citySlug = "";
     let sSlug = "maharashtra";
 

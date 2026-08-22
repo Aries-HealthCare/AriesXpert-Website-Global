@@ -176,10 +176,27 @@ export function ProviderAuthProvider({ children }: { children: React.ReactNode }
   );
 }
 
-export function useProviderAuth() {
+export function useProviderAuth(): ProviderAuthContextType {
   const context = useContext(ProviderAuthContext);
   if (!context) {
-    throw new Error('useProviderAuth must be used within a ProviderAuthProvider');
+    return {
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      dutyStatus: false,
+      toggleDutyStatus: async () => {},
+      loginWithPhoneOtp: async (phone: string, otp: string) => {
+        const res = await providerApi.verifyOTP(phone, otp);
+        return res.success;
+      },
+      loginWithEmail: async (email: string, pass: string) => {
+        const res = await providerApi.loginFromEmail(email, pass);
+        return res.success;
+      },
+      logout: () => {},
+      updateUserData: () => {},
+      refreshProfile: async () => {},
+    };
   }
   return context;
 }

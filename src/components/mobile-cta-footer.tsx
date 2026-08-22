@@ -30,6 +30,7 @@ export default function MobileCtaFooter() {
 
   const isHidden = useMemo(() => {
     // Hide on booking page and consultation pages to avoid distraction
+    if (!pathname) return false;
     return pathname.startsWith('/book-appointment') || pathname.startsWith('/free-tele-consultation/session');
   }, [pathname]);
 
