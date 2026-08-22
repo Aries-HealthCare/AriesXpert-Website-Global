@@ -781,13 +781,17 @@ export default function ProviderOnboardingPage() {
                     onChange={(e) => setQualification(e.target.value)}
                     className="w-full h-11 px-3 rounded-2xl border border-border/80 bg-background text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/30"
                   >
-                    <option value="BPT (Bachelor of Physiotherapy)">BPT (Bachelor of Physiotherapy)</option>
-                    <option value="MPT (Master of Physiotherapy - Ortho)">MPT (Orthopedics & Musculoskeletal)</option>
-                    <option value="MPT (Master of Physiotherapy - Neuro)">MPT (Neurology & Psychosomatic)</option>
-                    <option value="MPT (Master of Physiotherapy - Sports)">MPT (Sports Medicine)</option>
-                    <option value="MPT (Master of Physiotherapy - Cardio)">MPT (Cardiopulmonary)</option>
-                    <option value="MPT (Master of Physiotherapy - Peds)">MPT (Pediatrics)</option>
-                    <option value="Ph.D in Physical Therapy">Ph.D in Physical Therapy</option>
+                    <option value="BPT / BPTh (Bachelor of Physiotherapy)">BPT / BPTh (Bachelor of Physiotherapy)</option>
+                    <option value="MPT / MPTh (Orthopedics & Musculoskeletal)">MPT / MPTh (Orthopedics & Musculoskeletal)</option>
+                    <option value="MPT / MPTh (Neurology & Psychosomatic)">MPT / MPTh (Neurology & Psychosomatic)</option>
+                    <option value="MPT / MPTh (Sports Medicine & Rehab)">MPT / MPTh (Sports Medicine & Rehab)</option>
+                    <option value="MPT / MPTh (Cardiopulmonary & ICU)">MPT / MPTh (Cardiopulmonary & ICU)</option>
+                    <option value="MPT / MPTh (Pediatrics & Developmental)">MPT / MPTh (Pediatrics & Developmental)</option>
+                    <option value="BOT / MOTh (Occupational Therapy)">BOT / MOTh (Occupational Therapy)</option>
+                    <option value="BASLP / MASLP (Speech Therapy)">BASLP / MASLP (Speech Therapy)</option>
+                    <option value="B.Sc / M.Sc Clinical Nutrition">B.Sc / M.Sc Clinical Nutrition</option>
+                    <option value="GNM / B.Sc Nursing">GNM / B.Sc Nursing</option>
+                    <option value="Ph.D / Fellowship in Physical Therapy">Ph.D / Fellowship in Physical Therapy</option>
                   </select>
                 </div>
 
