@@ -28,6 +28,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface DashboardStats {
   totalEarnings?: number;
@@ -178,6 +179,24 @@ export default function ProviderDashboardPage() {
     },
   ];
 
+  const [showTargetModal, setShowTargetModal] = useState(false);
+  const [customTargetInput, setCustomTargetInput] = useState('60000');
+  const [savedTargetFeedback, setSavedTargetFeedback] = useState(false);
+
+  // Calculate required visits pace
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const daysRemaining = Math.max(1, daysInMonth - now.getDate());
+  const remainingRevenue = Math.max(0, monthlyTarget - monthlyAchieved);
+  const dailyVisitsRequired = Math.ceil(remainingRevenue / (720 * daysRemaining));
+
+  const handleSaveTarget = () => {
+    const val = parseInt(customTargetInput) || 60000;
+    setStats((prev) => ({ ...prev, monthlyTarget: val }));
+    setShowTargetModal(false);
+    setSavedTargetFeedback(true);
+    setTimeout(() => setSavedTargetFeedback(false), 3000);
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Profile Header Card — matches ProfileCard in dashboard_screen.dart */}
@@ -211,7 +230,7 @@ export default function ProviderDashboardPage() {
               Welcome, {therapistName}
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Clinical territory: <strong className="text-foreground">{user?.city || '—'}</strong>
+              Clinical territory: <strong className="text-foreground">{user?.city || 'Mumbai'}</strong>
               {todayAppointments.length > 0 && ` • ${todayAppointments.length} visits today`}
             </p>
           </div>
@@ -233,18 +252,39 @@ export default function ProviderDashboardPage() {
         </div>
       </div>
 
-      {/* Monthly Target Progress — matches _buildTargetTracker in dashboard_screen.dart */}
-      <div className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
+      {savedTargetFeedback && (
+        <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 text-xs font-bold rounded-2xl flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4" />
+          <span>Monthly target goal updated successfully.</span>
+        </div>
+      )}
+
+      {/* Monthly Target Progress — matches target_setup.dart in mobile app */}
+      <div className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Monthly Target Progress</p>
+            <div className="flex items-center gap-2">
+              <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Monthly Target Goal</p>
+              <button
+                onClick={() => {
+                  setCustomTargetInput(String(monthlyTarget));
+                  setShowTargetModal(true);
+                }}
+                className="text-[10px] text-primary font-bold hover:underline"
+              >
+                (Edit Goal)
+              </button>
+            </div>
             <p className="text-xl font-extrabold mt-0.5">
               ₹{monthlyAchieved.toLocaleString('en-IN')} / ₹{monthlyTarget.toLocaleString('en-IN')}
             </p>
           </div>
-          <span className="text-sm font-black text-primary bg-primary/10 px-3 py-1 rounded-xl border border-primary/20">
-            {Math.round(progress * 100)}%
-          </span>
+          <div className="text-right">
+            <span className="text-sm font-black text-primary bg-primary/10 px-3 py-1 rounded-xl border border-primary/20">
+              {Math.round(progress * 100)}%
+            </span>
+            <p className="text-[10px] text-muted-foreground font-mono mt-1">{daysRemaining} days left in month</p>
+          </div>
         </div>
         <div className="h-2.5 w-full bg-muted/50 rounded-full overflow-hidden">
           <div
@@ -252,9 +292,20 @@ export default function ProviderDashboardPage() {
             style={{ width: `${progress * 100}%` }}
           />
         </div>
-        <p className="text-[11px] text-muted-foreground mt-2.5 flex items-center gap-1.5 italic">
-          <span>💡</span>
-          Increase daily appointments by 15% to reach goal early
+        <p className="text-[11px] text-muted-foreground pt-1 flex items-center justify-between">
+          <span className="flex items-center gap-1">
+            <span>💡</span>
+            <span>Target Pace: <strong>{dailyVisitsRequired} visits/day</strong> needed to achieve monthly goal</span>
+          </span>
+          <button
+            onClick={() => {
+              setCustomTargetInput(String(monthlyTarget));
+              setShowTargetModal(true);
+            }}
+            className="text-xs font-bold text-primary hover:underline"
+          >
+            Adjust Target ➔
+          </button>
         </p>
       </div>
 
@@ -394,7 +445,7 @@ export default function ProviderDashboardPage() {
           )}
         </div>
 
-        {/* Right: AI Buddy + Quick Shortcuts */}
+        {/* Right: AI Buddy + Comprehensive 12 Quick Shortcuts */}
         <div className="space-y-4">
           {/* AI Buddy Card */}
           <div className="bg-card border border-border/80 rounded-3xl p-5 shadow-sm space-y-4">
@@ -420,17 +471,23 @@ export default function ProviderDashboardPage() {
             </Link>
           </div>
 
-          {/* Quick Shortcuts */}
+          {/* Quick Shortcuts — 12 Complete Modules */}
           <div className="bg-card border border-border/80 rounded-3xl p-5 shadow-sm space-y-3">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Quick Shortcuts</h4>
+            <h4 className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Quick Action Hub</h4>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { href: '/app/wallet', icon: <Wallet className="w-4 h-4 text-sky-500" />, label: 'My Wallet', sub: formatCurrency(walletBalance) },
-                { href: '/app/referrals', icon: <TrendingUp className="w-4 h-4 text-emerald-500" />, label: 'Refer & Earn', sub: '₹1,000 / Colleague' },
-                { href: '/app/availability', icon: <Clock className="w-4 h-4 text-amber-500" />, label: 'Availability', sub: 'Manage slots' },
-                { href: '/app/training', icon: <Stethoscope className="w-4 h-4 text-primary" />, label: 'SOP Library', sub: 'Clinical Protocols' },
-                { href: '/app/patients', icon: <Users className="w-4 h-4 text-purple-500" />, label: 'My Patients', sub: `${stats.uniquePatients ?? 0} patients` },
-                { href: '/app/earnings', icon: <Activity className="w-4 h-4 text-rose-500" />, label: 'Earnings', sub: 'History & Analytics' },
+                { href: '/app/gaming', icon: '🎮', label: 'Gaming Arena', sub: 'Tournaments & Shop' },
+                { href: '/app/telehealth', icon: '📹', label: 'Telehealth Room', sub: 'Video Consults' },
+                { href: '/app/attendance', icon: '⏰', label: 'Daily Attendance', sub: 'GPS Clock-In' },
+                { href: '/app/invoices', icon: '🧾', label: 'Tax Invoices', sub: 'Dynamic UPI QR' },
+                { href: '/app/quality', icon: '⭐', label: 'Quality Score', sub: 'NPS & Audits' },
+                { href: '/app/sos', icon: '🚨', label: 'Emergency SOS', sub: 'Panic Alarm' },
+                { href: '/app/wallet', icon: '💼', label: 'My Wallet', sub: formatCurrency(walletBalance) },
+                { href: '/app/referrals', icon: '🎁', label: 'Refer & Earn', sub: '₹1,000 / Colleague' },
+                { href: '/app/availability', icon: '📍', label: 'Availability', sub: 'Manage Pincodes' },
+                { href: '/app/training', icon: '🎓', label: 'SOP Library', sub: 'Clinical Protocols' },
+                { href: '/app/patients', icon: '👥', label: 'My Patients', sub: `${stats.uniquePatients ?? 0} patients` },
+                { href: '/app/earnings', icon: '📈', label: 'Earnings', sub: 'Analytics & TDS' },
               ].map((s) => (
                 <Link
                   key={s.href}
@@ -438,15 +495,60 @@ export default function ProviderDashboardPage() {
                   className="p-3 rounded-2xl bg-muted/30 hover:bg-muted/60 border border-border/60 transition-all text-left"
                   prefetch={false}
                 >
-                  <div className="mb-1">{s.icon}</div>
-                  <div className="text-xs font-bold text-foreground">{s.label}</div>
-                  <div className="text-[10px] text-muted-foreground">{s.sub}</div>
+                  <div className="text-base mb-1">{s.icon}</div>
+                  <div className="text-xs font-bold text-foreground truncate">{s.label}</div>
+                  <div className="text-[10px] text-muted-foreground truncate">{s.sub}</div>
                 </Link>
               ))}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Target Setup Modal (target_setup.dart parity) */}
+      {showTargetModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowTargetModal(false)}>
+          <div className="bg-card border border-border rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between pb-2 border-b border-border">
+              <h3 className="text-base font-outfit font-extrabold text-foreground">Configure Monthly Goal</h3>
+              <button onClick={() => setShowTargetModal(false)} className="text-muted-foreground hover:text-foreground">✕</button>
+            </div>
+
+            <div className="space-y-1 text-xs">
+              <p className="text-muted-foreground">
+                Set your target monthly revenue goal. Aries will calculate your required daily doorstep visit pace.
+              </p>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-foreground">Monthly Earnings Target (₹)</label>
+              <Input
+                type="number"
+                value={customTargetInput}
+                onChange={(e) => setCustomTargetInput(e.target.value)}
+                className="text-lg font-mono font-black h-12 rounded-2xl border-2 border-primary/40 text-center"
+              />
+            </div>
+
+            <div className="p-3 bg-muted/30 rounded-2xl text-xs space-y-1">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Days Remaining:</span>
+                <span className="font-bold font-mono">{daysRemaining} days</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Required Daily Visits:</span>
+                <span className="font-bold text-primary font-mono">
+                  ~{Math.ceil(Math.max(0, parseInt(customTargetInput || '0') - monthlyAchieved) / (720 * daysRemaining))} visits/day
+                </span>
+              </div>
+            </div>
+
+            <Button onClick={handleSaveTarget} className="w-full h-11 rounded-2xl bg-primary text-white font-extrabold text-xs">
+              Save Monthly Goal
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

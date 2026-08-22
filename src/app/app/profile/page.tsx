@@ -20,6 +20,11 @@ import {
   Share2,
   Calendar,
   Sparkles,
+  Navigation,
+  Plus,
+  Trash2,
+  ShieldAlert,
+  Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,7 +32,7 @@ import { Label } from '@/components/ui/label';
 
 export default function ProviderProfilePage() {
   const { user, updateUserData } = useProviderAuth();
-  const [activeTab, setActiveTab] = useState<'profile' | 'idcard'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'serviceArea' | 'emergency' | 'idcard'>('profile');
 
   const [name, setName] = useState(user?.fullName || user?.name || 'Dr. Rohan Sharma, BPT');
   const [email, setEmail] = useState(user?.email || 'rohan.sharma@ariesxpert.com');
@@ -38,6 +43,16 @@ export default function ProviderProfilePage() {
   const [experience, setExperience] = useState(user?.experience ? String(user.experience) : '6');
   const [bio, setBio] = useState('Senior Physiotherapist with 6+ years of clinical excellence in post-operative orthopedic recovery, sports rehabilitation, and neurological gait restoration across Mumbai.');
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  // Service Area & Pincodes
+  const [operatingRadiusKm, setOperatingRadiusKm] = useState('8');
+  const [pincodes, setPincodes] = useState<string[]>(['400092', '400103', '400067', '400068']);
+  const [newPincode, setNewPincode] = useState('');
+
+  // Emergency Contacts
+  const [emergencyName, setEmergencyName] = useState('Dr. Priya Deshmukh (Clinical Buddy)');
+  const [emergencyPhone, setEmergencyPhone] = useState('+91 98201 44219');
+  const [emergencyRelation, setEmergencyRelation] = useState('Clinical Colleague / Territory Peer');
 
   const axId = user?.axId || user?.therapistId || 'AX-IND-4892';
 
@@ -56,6 +71,17 @@ export default function ProviderProfilePage() {
     setTimeout(() => setSavedSuccess(false), 2500);
   };
 
+  const handleAddPincode = () => {
+    if (newPincode.trim().length === 6 && !pincodes.includes(newPincode.trim())) {
+      setPincodes([...pincodes, newPincode.trim()]);
+      setNewPincode('');
+    }
+  };
+
+  const handleRemovePincode = (pin: string) => {
+    setPincodes(pincodes.filter((p) => p !== pin));
+  };
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header */}
@@ -68,32 +94,44 @@ export default function ProviderProfilePage() {
             <h1 className="text-2xl font-outfit font-extrabold tracking-tight">Therapist Profile & ID</h1>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            Manage your public bio, council credentials, and digital specialist identity card.
+            Manage your public credentials, clinical service territory, emergency SOS roster, and digital ID card.
           </p>
         </div>
 
-        {/* Tab Toggle: Edit Profile vs Digital ID Card */}
-        <div className="flex gap-1 p-1 bg-muted/40 border border-border/80 rounded-2xl w-fit">
+        {/* Tab Toggle */}
+        <div className="flex gap-1 p-1 bg-muted/40 border border-border/80 rounded-2xl overflow-x-auto">
           <button
             onClick={() => setActiveTab('profile')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-outfit font-bold transition-all ${
-              activeTab === 'profile'
-                ? 'bg-primary text-white shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+            className={`px-3 py-1.5 rounded-xl text-xs font-outfit font-bold transition-all shrink-0 ${
+              activeTab === 'profile' ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground'
             }`}
           >
             Profile Info
           </button>
           <button
+            onClick={() => setActiveTab('serviceArea')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-outfit font-bold transition-all shrink-0 ${
+              activeTab === 'serviceArea' ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground'
+            }`}
+          >
+            Service Area
+          </button>
+          <button
+            onClick={() => setActiveTab('emergency')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-outfit font-bold transition-all shrink-0 ${
+              activeTab === 'emergency' ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground'
+            }`}
+          >
+            Emergency SOS
+          </button>
+          <button
             onClick={() => setActiveTab('idcard')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-outfit font-bold transition-all ${
-              activeTab === 'idcard'
-                ? 'bg-primary text-white shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-outfit font-bold transition-all shrink-0 ${
+              activeTab === 'idcard' ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground'
             }`}
           >
             <QrCode className="w-3.5 h-3.5" />
-            <span>Digital ID Card</span>
+            <span>Digital ID</span>
           </button>
         </div>
       </div>
@@ -105,10 +143,9 @@ export default function ProviderProfilePage() {
         </div>
       )}
 
-      {activeTab === 'profile' ? (
-        /* Main Profile Form */
+      {/* ── TAB 1: MAIN PROFILE FORM ── */}
+      {activeTab === 'profile' && (
         <form onSubmit={handleSave} className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-          {/* Avatar & Header */}
           <div className="flex items-center gap-4 pb-6 border-b border-border/60">
             <div className="relative">
               <div className="w-20 h-20 rounded-3xl bg-primary text-white text-2xl font-outfit font-black flex items-center justify-center shadow-lg shadow-primary/20">
@@ -135,7 +172,6 @@ export default function ProviderProfilePage() {
             </div>
           </div>
 
-          {/* Form Fields Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-xs font-bold">Full Name & Honorifics</Label>
@@ -232,14 +268,136 @@ export default function ProviderProfilePage() {
             </Button>
           </div>
         </form>
-      ) : (
-        /* Digital ID Card — matches Flutter digital_id_card.dart */
+      )}
+
+      {/* ── TAB 2: SERVICE AREA & PINCODES ── */}
+      {activeTab === 'serviceArea' && (
+        <div className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="space-y-1">
+            <h3 className="text-base font-outfit font-extrabold text-foreground">Doorstep Operating Territory</h3>
+            <p className="text-xs text-muted-foreground">
+              Define your service radius and assigned pincodes to receive high-intent patient broadcasts in your locality.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs font-bold">Operating Travel Radius (km)</Label>
+            <div className="flex items-center gap-4">
+              <input
+                type="range"
+                min="2"
+                max="25"
+                value={operatingRadiusKm}
+                onChange={(e) => setOperatingRadiusKm(e.target.value)}
+                className="w-full accent-primary h-2 bg-muted rounded-lg cursor-pointer"
+              />
+              <span className="font-mono font-black text-primary text-base px-3 py-1 bg-primary/10 rounded-xl shrink-0">
+                {operatingRadiusKm} km
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-3 pt-2">
+            <Label className="text-xs font-bold">Assigned Active Pincodes</Label>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Enter 6-digit Pincode (e.g. 400092)..."
+                maxLength={6}
+                value={newPincode}
+                onChange={(e) => setNewPincode(e.target.value.replace(/\D/g, ''))}
+                className="h-10 rounded-xl text-xs font-mono"
+              />
+              <Button onClick={handleAddPincode} className="h-10 px-4 rounded-xl text-xs font-bold">
+                <Plus className="w-4 h-4 mr-1" /> Add
+              </Button>
+            </div>
+
+            <div className="flex flex-wrap gap-2 pt-2">
+              {pincodes.map((pin) => (
+                <div
+                  key={pin}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted/40 border border-border/60 text-xs font-mono font-bold text-foreground"
+                >
+                  <MapPin className="w-3.5 h-3.5 text-primary" />
+                  <span>{pin}</span>
+                  <button onClick={() => handleRemovePincode(pin)} className="text-muted-foreground hover:text-destructive">
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Button
+            onClick={() => {
+              setSavedSuccess(true);
+              setTimeout(() => setSavedSuccess(false), 2500);
+            }}
+            className="w-full h-11 rounded-2xl bg-primary text-white font-extrabold text-xs"
+          >
+            Save Territory Pincodes
+          </Button>
+        </div>
+      )}
+
+      {/* ── TAB 3: EMERGENCY SOS CONFIGURATION ── */}
+      {activeTab === 'emergency' && (
+        <div className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="space-y-1">
+            <h3 className="text-base font-outfit font-extrabold text-foreground">Emergency SOS Buddy & Contacts</h3>
+            <p className="text-xs text-muted-foreground">
+              These contacts will be alerted immediately with your live GPS location if you trigger an emergency SOS during a doorstep visit.
+            </p>
+          </div>
+
+          <div className="space-y-4 text-xs">
+            <div className="space-y-1.5">
+              <Label className="font-bold">Primary Emergency Contact Name</Label>
+              <Input
+                value={emergencyName}
+                onChange={(e) => setEmergencyName(e.target.value)}
+                className="h-10 rounded-xl text-xs"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="font-bold">Contact Mobile Phone</Label>
+              <Input
+                value={emergencyPhone}
+                onChange={(e) => setEmergencyPhone(e.target.value)}
+                className="h-10 rounded-xl text-xs font-mono"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="font-bold">Relationship / Designation</Label>
+              <Input
+                value={emergencyRelation}
+                onChange={(e) => setEmergencyRelation(e.target.value)}
+                className="h-10 rounded-xl text-xs"
+              />
+            </div>
+          </div>
+
+          <Button
+            onClick={() => {
+              setSavedSuccess(true);
+              setTimeout(() => setSavedSuccess(false), 2500);
+            }}
+            className="w-full h-11 rounded-2xl bg-destructive hover:bg-destructive/90 text-white font-extrabold text-xs shadow-md"
+          >
+            Save Emergency SOS Protocol
+          </Button>
+        </div>
+      )}
+
+      {/* ── TAB 4: DIGITAL ID CARD ── */}
+      {activeTab === 'idcard' && (
         <div className="space-y-6">
           <div className="max-w-md mx-auto bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-primary/40 relative overflow-hidden">
-            {/* Ambient metallic sheen */}
             <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
 
-            {/* Top row: Brand logo & Verified seal */}
+            {/* Top row */}
             <div className="flex items-center justify-between relative z-10 pb-4 border-b border-white/10">
               <DynamicAppLogo size={36} showText={true} />
               <div className="flex items-center gap-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2.5 py-1 rounded-full text-[10px] font-bold">
@@ -248,7 +406,7 @@ export default function ProviderProfilePage() {
               </div>
             </div>
 
-            {/* Middle row: Doctor headshot, name, council reg */}
+            {/* Middle row */}
             <div className="flex items-center gap-4 my-6 relative z-10">
               <div className="w-20 h-20 rounded-2xl bg-primary text-white text-2xl font-outfit font-black flex items-center justify-center shadow-lg border-2 border-white/20 shrink-0">
                 {name.charAt(0) || 'D'}
@@ -274,7 +432,7 @@ export default function ProviderProfilePage() {
               </div>
             </div>
 
-            {/* Bottom Row: QR Code & Signature Seal */}
+            {/* Bottom Row */}
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/10 relative z-10">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 bg-white rounded-xl">

@@ -90,6 +90,19 @@ export default function ProviderVisitsPage() {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [formMode, setFormMode] = useState<'dynamic' | 'soap'>('dynamic');
   const [selectedAssessmentForm, setSelectedAssessmentForm] = useState<DynamicAssessmentForm | null>(null);
+  const [treatmentSeconds, setTreatmentSeconds] = useState(1122); // 18m 42s default
+  const [isTimerRunning, setIsTimerRunning] = useState(true);
+
+  // Treatment stopwatch timer
+  useEffect(() => {
+    if (visitStage !== 'IN_SESSION' || !isTimerRunning) return;
+    const interval = setInterval(() => setTreatmentSeconds((prev) => prev + 1), 1000);
+    return () => clearInterval(interval);
+  }, [visitStage, isTimerRunning]);
+
+  const activeSessionTime = `${Math.floor(treatmentSeconds / 60)
+    .toString()
+    .padStart(2, '0')}:${(treatmentSeconds % 60).toString().padStart(2, '0')}`;
 
   // SOAP note state
   const [soap, setSoap] = useState<SOAPClinicalAssessment>({
@@ -487,6 +500,47 @@ export default function ProviderVisitsPage() {
           {/* ── STAGE 4: IN_SESSION — 34 DYNAMIC FORMS RENDERER ── */}
           {visitStage === 'IN_SESSION' && (
             <div className="space-y-6">
+              {/* Live Treatment Stopwatch HUD Banner */}
+              <div className="bg-gradient-to-r from-primary/15 via-accent/15 to-emerald-500/15 border-2 border-primary/40 rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-mono text-base font-black shadow-inner animate-pulse">
+                    <Clock className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                        <span>TREATMENT TIMER RUNNING</span>
+                      </span>
+                      <span className="text-xs text-muted-foreground font-medium">Standard 45-Min Doorstep Session</span>
+                    </div>
+                    <p className="text-sm font-outfit font-extrabold text-foreground mt-0.5">
+                      Elapsed Time: <span className="font-mono text-primary font-black text-base">{activeSessionTime || '18:42'}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl border-primary/30 text-primary text-xs font-bold"
+                    onClick={() => alert('Timer paused.')}
+                  >
+                    Pause Timer
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="rounded-xl bg-primary text-white text-xs font-bold"
+                    onClick={() => alert('+5 minutes added to clinical session.')}
+                  >
+                    +5 Min
+                  </Button>
+                </div>
+              </div>
+
               {/* Form Mode Selector: 34 Backend Forms vs Traditional SOAP */}
               <div className="flex items-center justify-between bg-card border border-border/80 p-4 rounded-3xl">
                 <div className="flex items-center gap-2">

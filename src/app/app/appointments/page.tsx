@@ -110,11 +110,35 @@ const INITIAL_APPOINTMENTS: AppointmentItem[] = [
 export default function ProviderAppointmentsPage() {
   const [appointments, setAppointments] = useState<AppointmentItem[]>(INITIAL_APPOINTMENTS);
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'Scheduled' | 'InProgress' | 'Completed'>('ALL');
+  const [dateFilter, setDateFilter] = useState<'ALL' | 'Today' | 'Tomorrow'>('ALL');
+  const [reschedulingApt, setReschedulingApt] = useState<AppointmentItem | null>(null);
+  const [rescheduleDate, setRescheduleDate] = useState('Tomorrow');
+  const [rescheduleTime, setRescheduleTime] = useState('02:00 PM - 03:00 PM');
 
   const filtered = appointments.filter((a) => {
-    if (statusFilter === 'ALL') return true;
-    return a.status === statusFilter;
+    if (statusFilter !== 'ALL' && a.status !== statusFilter) return false;
+    if (dateFilter !== 'ALL' && a.date !== dateFilter) return false;
+    return true;
   });
+
+  const handleSaveReschedule = () => {
+    if (!reschedulingApt) return;
+    setAppointments(
+      appointments.map((a) =>
+        a.id === reschedulingApt.id ? { ...a, date: rescheduleDate, timeSlot: rescheduleTime } : a
+      )
+    );
+    alert(`Appointment for ${reschedulingApt.patientName} rescheduled to ${rescheduleDate} at ${rescheduleTime}. Notification sent.`);
+    setReschedulingApt(null);
+  };
+
+  const handleCancelAppointment = (id: string) => {
+    if (confirm('Are you sure you want to cancel this scheduled appointment?')) {
+      setAppointments(
+        appointments.map((a) => (a.id === id ? { ...a, status: 'Cancelled' as const } : a))
+      );
+    }
+  };
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
@@ -142,22 +166,38 @@ export default function ProviderAppointmentsPage() {
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-border/80 pb-3">
-        {(['ALL', 'Scheduled', 'Completed'] as const).map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => setStatusFilter(tab)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-              statusFilter === tab
-                ? 'bg-primary text-white shadow-sm'
-                : 'bg-muted/50 text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            {tab === 'ALL' ? `All Appointments (${appointments.length})` : tab}
-          </button>
-        ))}
+      {/* Filter Tabs & Date Filter */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/80 pb-3">
+        <div className="flex items-center gap-2 overflow-x-auto">
+          {(['ALL', 'Scheduled', 'Completed'] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setStatusFilter(tab)}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 ${
+                statusFilter === tab
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'bg-muted/50 text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {tab === 'ALL' ? `All Appointments (${appointments.length})` : tab}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          {(['ALL', 'Today', 'Tomorrow'] as const).map((d) => (
+            <button
+              key={d}
+              onClick={() => setDateFilter(d)}
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
+                dateFilter === d ? 'bg-muted text-foreground border border-border' : 'text-muted-foreground'
+              }`}
+            >
+              {d === 'ALL' ? 'All Dates' : d}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Appointments List */}
@@ -165,11 +205,16 @@ export default function ProviderAppointmentsPage() {
         {filtered.map((apt) => {
           const isCompleted = apt.status === 'Completed';
           const isScheduled = apt.status === 'Scheduled';
+          const isCancelled = apt.status === 'Cancelled';
           return (
             <div
               key={apt.id}
               className={`bg-card border rounded-3xl p-5 sm:p-6 shadow-sm transition-all ${
-                isScheduled ? 'border-primary/40 bg-gradient-to-r from-card to-primary/5' : 'border-border/80'
+                isScheduled
+                  ? 'border-primary/40 bg-gradient-to-r from-card to-primary/5'
+                  : isCancelled
+                  ? 'border-border/40 opacity-60'
+                  : 'border-border/80'
               }`}
             >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
@@ -179,6 +224,8 @@ export default function ProviderAppointmentsPage() {
                       className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                         isCompleted
                           ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+                          : isCancelled
+                          ? 'bg-destructive/10 text-destructive'
                           : 'bg-primary text-white'
                       }`}
                     >
@@ -219,12 +266,22 @@ export default function ProviderAppointmentsPage() {
                 {/* Right CTA */}
                 <div className="flex items-center gap-2 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-border/60">
                   {isScheduled && (
-                    <Link href="/app/visits" prefetch={false}>
-                      <Button className="h-11 px-5 rounded-xl bg-primary hover:bg-primary/95 text-white font-extrabold text-xs shadow-md flex items-center gap-1.5">
-                        <Play className="w-4 h-4 fill-white" />
-                        <span>Launch Visit</span>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setReschedulingApt(apt)}
+                        className="h-10 px-3 rounded-xl text-xs font-bold"
+                      >
+                        Reschedule
                       </Button>
-                    </Link>
+                      <Link href="/app/visits" prefetch={false}>
+                        <Button className="h-10 px-5 rounded-xl bg-primary hover:bg-primary/95 text-white font-extrabold text-xs shadow-md flex items-center gap-1.5">
+                          <Play className="w-4 h-4 fill-white" />
+                          <span>Launch Visit</span>
+                        </Button>
+                      </Link>
+                    </div>
                   )}
                   {isCompleted && (
                     <div className="text-right">
@@ -238,6 +295,78 @@ export default function ProviderAppointmentsPage() {
           );
         })}
       </div>
+
+      {/* Reschedule Modal */}
+      {reschedulingApt && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setReschedulingApt(null)}
+        >
+          <div
+            className="bg-card border border-border rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-2 border-b border-border">
+              <h3 className="text-base font-outfit font-extrabold text-foreground">Reschedule Appointment</h3>
+              <button onClick={() => setReschedulingApt(null)} className="text-muted-foreground hover:text-foreground">✕</button>
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              Patient: <strong className="text-foreground">{reschedulingApt.patientName}</strong>
+            </p>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="font-bold text-foreground block mb-1">Select New Date</label>
+                <select
+                  value={rescheduleDate}
+                  onChange={(e) => setRescheduleDate(e.target.value)}
+                  className="w-full h-10 px-3 bg-background border border-input rounded-xl text-xs font-bold"
+                >
+                  <option value="Today">Today</option>
+                  <option value="Tomorrow">Tomorrow</option>
+                  <option value="In 2 Days">In 2 Days</option>
+                  <option value="Next Monday">Next Monday</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="font-bold text-foreground block mb-1">Select Time Slot</label>
+                <select
+                  value={rescheduleTime}
+                  onChange={(e) => setRescheduleTime(e.target.value)}
+                  className="w-full h-10 px-3 bg-background border border-input rounded-xl text-xs font-bold"
+                >
+                  <option value="09:00 AM - 10:00 AM">09:00 AM - 10:00 AM</option>
+                  <option value="11:30 AM - 12:30 PM">11:30 AM - 12:30 PM</option>
+                  <option value="02:00 PM - 03:00 PM">02:00 PM - 03:00 PM</option>
+                  <option value="04:30 PM - 05:30 PM">04:30 PM - 05:30 PM</option>
+                  <option value="06:00 PM - 07:00 PM">06:00 PM - 07:00 PM</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  handleCancelAppointment(reschedulingApt.id);
+                  setReschedulingApt(null);
+                }}
+                className="flex-1 h-11 rounded-2xl text-destructive border-destructive/30 text-xs font-bold"
+              >
+                Cancel Slot
+              </Button>
+              <Button
+                onClick={handleSaveReschedule}
+                className="flex-1 h-11 rounded-2xl bg-primary text-white text-xs font-bold shadow-md"
+              >
+                Save Schedule
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

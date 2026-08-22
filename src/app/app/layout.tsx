@@ -38,6 +38,11 @@ import {
   PhoneCall,
   Volume2,
   CheckCircle2,
+  Gamepad2,
+  Video,
+  Receipt,
+  Trophy,
+  Activity,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -48,16 +53,22 @@ const NAV_ITEMS = [
   { href: '/app/appointments', label: 'Appointments', icon: CalendarCheck },
   { href: '/app/visits', label: 'Active Visits', icon: Navigation, badge: 'Workflow' },
   { href: '/app/patients', label: 'Patients', icon: Users },
+  { href: '/app/gaming', label: 'Gaming Arena', icon: Gamepad2, badge: 'Tournament', highlight: true },
+  { href: '/app/telehealth', label: 'Telehealth Room', icon: Video, badge: 'Agora RTC' },
+  { href: '/app/attendance', label: 'Daily Attendance', icon: Clock },
   { href: '/app/wallet', label: 'Wallet & Payouts', icon: Wallet },
   { href: '/app/earnings', label: 'Earnings Analytics', icon: TrendingUp },
+  { href: '/app/invoices', label: 'Invoices & Receipts', icon: Receipt },
+  { href: '/app/quality', label: 'Quality Score & NPS', icon: Activity },
+  { href: '/app/sos', label: 'Emergency SOS Hub', icon: ShieldAlert },
+  { href: '/app/buddy', label: 'AI Clinical Buddy', icon: Bot, highlight: true },
+  { href: '/app/profile', label: 'My Profile & ID', icon: User },
   { href: '/app/referrals', label: 'Referral Program', icon: Share2 },
   { href: '/app/rewards', label: 'Rewards & Tiers', icon: Award },
   { href: '/app/training', label: 'Clinical Academy', icon: GraduationCap },
-  { href: '/app/notifications', label: 'Notifications', icon: Bell, badge: '3' },
-  { href: '/app/buddy', label: 'AI Clinical Buddy', icon: Bot, highlight: true },
-  { href: '/app/profile', label: 'My Profile', icon: User },
   { href: '/app/availability', label: 'Availability & Slots', icon: Clock },
   { href: '/app/documents', label: 'KYC Documents', icon: FileText },
+  { href: '/app/notifications', label: 'Notifications', icon: Bell, badge: '3' },
   { href: '/app/support', label: 'Support & Tickets', icon: HelpCircle },
   { href: '/app/settings', label: 'App Settings', icon: Settings },
 ];
@@ -66,8 +77,8 @@ const MOBILE_BOTTOM_TABS = [
   { href: '/app', label: 'Home', icon: LayoutDashboard },
   { href: '/app/leads', label: 'Leads', icon: Radio, badge: 'Live' },
   { href: '/app/visits', label: 'Visits', icon: Navigation },
+  { href: '/app/gaming', label: 'Arena', icon: Gamepad2 },
   { href: '/app/wallet', label: 'Wallet', icon: Wallet },
-  { href: '/app/buddy', label: 'AI Buddy', icon: Bot },
 ];
 
 export default function ProviderAppLayout({ children }: { children: React.ReactNode }) {
