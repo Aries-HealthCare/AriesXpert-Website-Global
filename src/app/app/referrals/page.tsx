@@ -17,6 +17,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
+import Link from 'next/link';
+
 export default function ProviderReferralsPage() {
   const { user } = useProviderAuth();
   const [copiedCode, setCopiedCode] = useState(false);
@@ -46,12 +48,19 @@ export default function ProviderReferralsPage() {
             <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
               <Share2 className="w-4 h-4" />
             </div>
-            <h1 className="text-2xl font-extrabold tracking-tight">Provider Referral Program</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight">Colleague Therapist Referrals</h1>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
             Invite fellow physiotherapists and earn ₹1,000 when they complete their first doorstep session.
           </p>
         </div>
+
+        <Link href="/app/refer-patient" prefetch={false}>
+          <Button className="h-10 px-4 rounded-2xl bg-primary text-white font-extrabold text-xs shadow-md flex items-center gap-1.5">
+            <UserPlus className="w-4 h-4" />
+            <span>Refer a Patient (10% Commission) ➔</span>
+          </Button>
+        </Link>
       </div>
 
       {/* Shareable Banner */}

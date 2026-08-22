@@ -43,6 +43,7 @@ import {
   Receipt,
   Trophy,
   Activity,
+  UserPlus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -53,6 +54,7 @@ const NAV_ITEMS = [
   { href: '/app/appointments', label: 'Appointments', icon: CalendarCheck },
   { href: '/app/visits', label: 'Active Visits', icon: Navigation, badge: 'Workflow' },
   { href: '/app/patients', label: 'Patients', icon: Users },
+  { href: '/app/refer-patient', label: 'Refer Patient', icon: UserPlus, badge: '10% Earn', highlight: true },
   { href: '/app/gaming', label: 'Gaming Arena', icon: Gamepad2, badge: 'Tournament', highlight: true },
   { href: '/app/telehealth', label: 'Telehealth Room', icon: Video, badge: 'Agora RTC' },
   { href: '/app/attendance', label: 'Daily Attendance', icon: Clock },
@@ -63,7 +65,7 @@ const NAV_ITEMS = [
   { href: '/app/sos', label: 'Emergency SOS Hub', icon: ShieldAlert },
   { href: '/app/buddy', label: 'AI Clinical Buddy', icon: Bot, highlight: true },
   { href: '/app/profile', label: 'My Profile & ID', icon: User },
-  { href: '/app/referrals', label: 'Referral Program', icon: Share2 },
+  { href: '/app/referrals', label: 'Refer Colleague', icon: Share2 },
   { href: '/app/rewards', label: 'Rewards & Tiers', icon: Award },
   { href: '/app/training', label: 'Clinical Academy', icon: GraduationCap },
   { href: '/app/availability', label: 'Availability & Slots', icon: Clock },
