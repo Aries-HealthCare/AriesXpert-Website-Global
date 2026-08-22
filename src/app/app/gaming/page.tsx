@@ -73,7 +73,7 @@ export default function ProviderGamingArenaPage() {
 
   const LEADERBOARD_DATA = [
     { rank: 1, name: 'Dr. Priya Deshmukh, MPT', city: 'Mumbai', score: 9420, coins: 4800, tier: 'Diamond Master' },
-    { rank: 2, name: `${userFullName} (You)`, city: `${userCity}`, score: 8750, coins: 3650, tier: 'Platinum Healer', isUser: true },
+    { rank: 2, name: `${userFullName} (You)`, city: `${userCity}`, score: 8750, coins: 500, tier: 'Platinum Healer', isUser: true },
     { rank: 3, name: 'Dr. Ananya Roy, MPT', city: 'Kolkata', score: 8120, coins: 3200, tier: 'Platinum Healer' },
     { rank: 4, name: 'Dr. Sameer Nair, BPT', city: 'Pune', score: 7640, coins: 2900, tier: 'Gold Specialist' },
     { rank: 5, name: 'Dr. Kavita Verma, MPT', city: 'Delhi NCR', score: 7210, coins: 2600, tier: 'Gold Specialist' },
@@ -81,7 +81,7 @@ export default function ProviderGamingArenaPage() {
   ];
 
   const [activeMode, setActiveMode] = useState<GameMode>('TOURNAMENT');
-  const [coins, setCoins] = useState(user?.coins || 3650);
+  const [coins, setCoins] = useState(user?.coins ?? 500);
   const [tasks, setTasks] = useState(DAILY_TASKS);
   const [tournamentData, setTournamentData] = useState<any>(null);
   const [currentQIndex, setCurrentQIndex] = useState(0);

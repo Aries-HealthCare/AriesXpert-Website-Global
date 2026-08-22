@@ -1356,7 +1356,7 @@ class ProviderApiService {
       });
       const data = await res.json();
       return data.result || data.data || {
-        coins: 1450,
+        coins: 500,
         rank: 12,
         weeklyScore: 3820,
         completedQuests: 14,
@@ -1365,7 +1365,7 @@ class ProviderApiService {
       };
     } catch {
       return {
-        coins: 1450,
+        coins: 500,
         rank: 12,
         weeklyScore: 3820,
         completedQuests: 14,
