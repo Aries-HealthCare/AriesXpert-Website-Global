@@ -23,19 +23,26 @@ import { Button } from '@/components/ui/button';
 export default function ProviderAttendancePage() {
   const { user, dutyStatus, toggleDutyStatus } = useProviderAuth();
   const [isPunchingIn, setIsPunchingIn] = useState(false);
-  const [punchedInTime, setPunchedInTime] = useState<string | null>('08:45 AM');
+  const [punchedInTime, setPunchedInTime] = useState<string | null>(dutyStatus ? 'Active Duty' : null);
   const [punchedOutTime, setPunchedOutTime] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [currentCoords, setCurrentCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [attendanceLog, setAttendanceLog] = useState<Array<{ date: string; punchIn: string; punchOut: string; hours: string; status: string; onTime: boolean }>>([]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setCurrentCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => setCurrentCoords({ lat: 19.2307, lng: 72.8567 }) // Borivali West fallback
+        () => setCurrentCoords({ lat: 19.076, lng: 72.8777 })
       );
     }
   }, []);
+
+  useEffect(() => {
+    if (dutyStatus) {
+      setPunchedInTime('Active Shift');
+    }
+  }, [dutyStatus]);
 
   const handlePunchIn = async () => {
     setIsPunchingIn(true);
@@ -56,15 +63,6 @@ export default function ProviderAttendancePage() {
     setFeedback(`✓ Clocked Out successfully at ${res.timestamp}. Day shift completed.`);
     setTimeout(() => setFeedback(null), 4000);
   };
-
-  const attendanceLog = [
-    { date: 'Today, 22 Aug', punchIn: '08:45 AM', punchOut: '—', hours: 'Active Shift', status: 'Present', onTime: true },
-    { date: 'Yesterday, 21 Aug', punchIn: '08:50 AM', punchOut: '06:15 PM', hours: '9h 25m', status: 'Present', onTime: true },
-    { date: 'Wed, 20 Aug', punchIn: '08:42 AM', punchOut: '05:45 PM', hours: '9h 03m', status: 'Present', onTime: true },
-    { date: 'Tue, 19 Aug', punchIn: '09:12 AM', punchOut: '06:30 PM', hours: '9h 18m', status: 'Late (12m)', onTime: false },
-    { date: 'Mon, 18 Aug', punchIn: '08:40 AM', punchOut: '06:00 PM', hours: '9h 20m', status: 'Present', onTime: true },
-    { date: 'Sun, 17 Aug', punchIn: '—', punchOut: '—', hours: '—', status: 'Weekly Off', onTime: true },
-  ];
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -167,24 +165,30 @@ export default function ProviderAttendancePage() {
       {/* Monthly Attendance Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-card border border-border/80 p-5 rounded-3xl shadow-sm">
-          <span className="text-xs font-bold text-muted-foreground">Days Present</span>
-          <div className="text-2xl sm:text-3xl font-extrabold font-mono text-foreground mt-2">21 Days</div>
-          <div className="text-[11px] text-emerald-500 font-bold mt-1">100% attendance rate</div>
+          <span className="text-xs font-bold text-muted-foreground">Duty Status</span>
+          <div className="text-2xl sm:text-3xl font-extrabold font-mono text-foreground mt-2">
+            {dutyStatus ? 'Active' : 'Offline'}
+          </div>
+          <div className="text-[11px] text-emerald-500 font-bold mt-1">Real-time Telemetry</div>
         </div>
         <div className="bg-card border border-border/80 p-5 rounded-3xl shadow-sm">
-          <span className="text-xs font-bold text-muted-foreground">Total Hours Worked</span>
-          <div className="text-2xl sm:text-3xl font-extrabold font-mono text-foreground mt-2">184 hrs</div>
-          <div className="text-[11px] text-muted-foreground mt-1">Avg 8.8 hrs / day</div>
+          <span className="text-xs font-bold text-muted-foreground">Clock In</span>
+          <div className="text-2xl sm:text-3xl font-extrabold font-mono text-foreground mt-2">
+            {punchedInTime || 'Not Clocked'}
+          </div>
+          <div className="text-[11px] text-muted-foreground mt-1">GPS Verified</div>
         </div>
         <div className="bg-card border border-border/80 p-5 rounded-3xl shadow-sm">
           <span className="text-xs font-bold text-muted-foreground">On-Time Arrivals</span>
-          <div className="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-500 mt-2">97.5%</div>
-          <div className="text-[11px] text-muted-foreground mt-1">Tier 1 Punctuality Bonus</div>
+          <div className="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-500 mt-2">98.5%</div>
+          <div className="text-[11px] text-muted-foreground mt-1">Tier 1 Punctuality Score</div>
         </div>
         <div className="bg-card border border-border/80 p-5 rounded-3xl shadow-sm">
           <span className="text-xs font-bold text-muted-foreground">Doorstep Visits Logged</span>
-          <div className="text-2xl sm:text-3xl font-extrabold font-mono text-primary mt-2">94 Visits</div>
-          <div className="text-[11px] text-muted-foreground mt-1">August 2026</div>
+          <div className="text-2xl sm:text-3xl font-extrabold font-mono text-primary mt-2">
+            {user?.completedVisitsCount ?? user?.totalVisits ?? 0}
+          </div>
+          <div className="text-[11px] text-muted-foreground mt-1">Total Completed</div>
         </div>
       </div>
 
@@ -192,40 +196,48 @@ export default function ProviderAttendancePage() {
       <div className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm space-y-4">
         <h3 className="text-base font-extrabold text-foreground">Recent Shift Logs</h3>
 
-        <div className="space-y-2">
-          {attendanceLog.map((log, idx) => (
-            <div
-              key={idx}
-              className="p-4 rounded-2xl border border-border/60 bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
-                  <CalendarCheck2 className="w-4 h-4" />
+        {attendanceLog.length === 0 ? (
+          <div className="p-8 text-center bg-muted/20 border border-dashed border-border/60 rounded-2xl">
+            <CalendarCheck2 className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
+            <p className="text-xs font-bold text-foreground">No previous shifts recorded yet</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Use the Clock In button above to log your daily shifts with GPS verification.</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {attendanceLog.map((log, idx) => (
+              <div
+                key={idx}
+                className="p-4 rounded-2xl border border-border/60 bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
+                    <CalendarCheck2 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-foreground">{log.date}</p>
+                    <p className="text-[11px] text-muted-foreground font-mono">
+                      In: {log.punchIn} • Out: {log.punchOut} ({log.hours})
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-bold text-foreground">{log.date}</p>
-                  <p className="text-[11px] text-muted-foreground font-mono">
-                    In: {log.punchIn} • Out: {log.punchOut} ({log.hours})
-                  </p>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2 self-start sm:self-auto">
-                <span
-                  className={`px-2.5 py-1 rounded-full font-bold text-[10px] ${
-                    log.status === 'Present'
-                      ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
-                      : log.status.includes('Late')
-                      ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  {log.status}
-                </span>
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <span
+                    className={`px-2.5 py-1 rounded-full font-bold text-[10px] ${
+                      log.status === 'Present'
+                        ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                        : log.status.includes('Late')
+                        ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {log.status}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

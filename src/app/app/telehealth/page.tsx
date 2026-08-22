@@ -33,16 +33,11 @@ export default function ProviderTelehealthPage() {
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [callDurationSeconds, setCallDurationSeconds] = useState(0);
   const [activeDrawer, setActiveDrawer] = useState<'RECORD' | 'PRESCRIPTION' | 'CHAT'>('RECORD');
-  const [chatMessages, setChatMessages] = useState<Array<{ sender: 'therapist' | 'patient'; text: string; time: string }>>([
-    { sender: 'patient', text: 'Hello Doctor, I can see and hear you clearly.', time: '10:02 AM' },
-  ]);
+  const [chatMessages, setChatMessages] = useState<Array<{ sender: 'therapist' | 'patient'; text: string; time: string }>>([]);
   const [chatInput, setChatInput] = useState('');
 
   // Prescription items
-  const [exercises, setExercises] = useState<Array<{ name: string; sets: string; reps: string; hold: string }>>([
-    { name: 'Isometric Quadriceps Sets with Towel Roll', sets: '3 Sets', reps: '10 Reps', hold: '5 sec hold' },
-    { name: 'Active-Assisted Heel Slides with Towel', sets: '3 Sets', reps: '10 Reps', hold: 'End-range 3s' },
-  ]);
+  const [exercises, setExercises] = useState<Array<{ name: string; sets: string; reps: string; hold: string }>>([]);
   const [newExName, setNewExName] = useState('');
 
   // Call timer

@@ -17,7 +17,33 @@ import { Button } from '@/components/ui/button';
 
 export default function ProviderRewardsPage() {
   const { user } = useProviderAuth();
-  const completed = user?.completedVisitsCount || 94;
+  const completed = user?.completedVisitsCount ?? user?.totalVisits ?? 0;
+  const rating = user?.rating ?? 4.95;
+
+  let tierName = 'Silver Practitioner Tier';
+  let nextTier = 'Gold Specialist';
+  let target = 25;
+  let prevTarget = 0;
+
+  if (completed >= 150) {
+    tierName = 'Diamond Master Tier';
+    nextTier = 'Apex Legend';
+    prevTarget = 150;
+    target = 300;
+  } else if (completed >= 75) {
+    tierName = 'Platinum Healer Tier';
+    nextTier = 'Diamond Master';
+    prevTarget = 75;
+    target = 150;
+  } else if (completed >= 25) {
+    tierName = 'Gold Specialist Tier';
+    nextTier = 'Platinum Healer';
+    prevTarget = 25;
+    target = 75;
+  }
+
+  const remaining = Math.max(0, target - completed);
+  const progressPercent = Math.min(100, Math.max(8, Math.round(((completed - prevTarget) / Math.max(1, target - prevTarget)) * 100)));
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -48,28 +74,28 @@ export default function ProviderRewardsPage() {
                 Current Level
               </span>
               <h2 className="text-xl sm:text-2xl font-extrabold text-foreground">
-                Gold Specialist Tier
+                {tierName}
               </h2>
               <div className="text-xs text-muted-foreground mt-0.5">
-                4.95 Rating • 94 Total Visits Completed
+                {rating} Rating • {completed} Total Visits Completed
               </div>
             </div>
           </div>
 
           <div className="text-left sm:text-right">
-            <div className="text-xs font-bold text-foreground">Next: Platinum Healer</div>
-            <div className="text-[11px] text-muted-foreground font-mono">6 more sessions needed</div>
+            <div className="text-xs font-bold text-foreground">Next: {nextTier}</div>
+            <div className="text-[11px] text-muted-foreground font-mono">{remaining} more sessions needed</div>
           </div>
         </div>
 
         {/* Progress Bar */}
         <div className="space-y-1 pt-2">
           <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
-            <div className="h-full bg-amber-500 rounded-full" style={{ width: '94%' }} />
+            <div className="h-full bg-amber-500 rounded-full transition-all duration-500" style={{ width: `${progressPercent}%` }} />
           </div>
           <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
-            <span>Gold (50 Sessions)</span>
-            <span>Platinum (100 Sessions)</span>
+            <span>{prevTarget} Sessions</span>
+            <span>{target} Sessions</span>
           </div>
         </div>
       </div>

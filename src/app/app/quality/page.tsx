@@ -134,8 +134,15 @@ export default function ProviderQualityDashboardPage() {
           <div className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm space-y-4">
             <h3 className="text-base font-extrabold text-foreground">Verified Patient Feedback & Reviews</h3>
 
-            <div className="space-y-4">
-              {metrics.reviews.map((rev: any) => (
+            {metrics.reviews.length === 0 ? (
+              <div className="p-8 text-center bg-muted/20 border border-dashed border-border/60 rounded-2xl">
+                <MessageSquare className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
+                <p className="text-xs font-bold text-foreground">No patient reviews yet</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Reviews submitted by patients following completed doorstep clinical sessions will appear here.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {metrics.reviews.map((rev: any) => (
                 <div key={rev.id} className="p-5 rounded-2xl border border-border/60 bg-muted/20 space-y-3 text-xs">
                   <div className="flex items-start justify-between gap-3">
                     <div>
@@ -204,6 +211,7 @@ export default function ProviderQualityDashboardPage() {
                 </div>
               ))}
             </div>
+            )}
           </div>
         </>
       )}

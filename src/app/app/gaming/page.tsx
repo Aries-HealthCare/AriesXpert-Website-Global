@@ -66,19 +66,22 @@ const SHOP_ITEMS = [
   { id: 's6', name: 'CME Masterclass: Advanced Dry Needling Protocol', cost: 4000, category: 'Certifications', icon: '🎓', stock: 'Virtual' },
 ];
 
-const LEADERBOARD_DATA = [
-  { rank: 1, name: 'Dr. Priya Deshmukh, MPT', city: 'Mumbai', score: 9420, coins: 4800, tier: 'Diamond Master' },
-  { rank: 2, name: 'Dr. Rohan Sharma, BPT', city: 'Mumbai (You)', score: 8750, coins: 3650, tier: 'Platinum Healer', isUser: true },
-  { rank: 3, name: 'Dr. Ananya Roy, MPT', city: 'Kolkata', score: 8120, coins: 3200, tier: 'Platinum Healer' },
-  { rank: 4, name: 'Dr. Sameer Nair, BPT', city: 'Pune', score: 7640, coins: 2900, tier: 'Gold Specialist' },
-  { rank: 5, name: 'Dr. Kavita Verma, MPT', city: 'Delhi NCR', score: 7210, coins: 2600, tier: 'Gold Specialist' },
-  { rank: 6, name: 'Dr. Vikas Patil, BPT', city: 'Surat', score: 6890, coins: 2400, tier: 'Gold Specialist' },
-];
-
 export default function ProviderGamingArenaPage() {
   const { user } = useProviderAuth();
+  const userFullName = user?.fullName || user?.name || 'Specialist';
+  const userCity = user?.city || 'Mumbai';
+
+  const LEADERBOARD_DATA = [
+    { rank: 1, name: 'Dr. Priya Deshmukh, MPT', city: 'Mumbai', score: 9420, coins: 4800, tier: 'Diamond Master' },
+    { rank: 2, name: `${userFullName} (You)`, city: `${userCity}`, score: 8750, coins: 3650, tier: 'Platinum Healer', isUser: true },
+    { rank: 3, name: 'Dr. Ananya Roy, MPT', city: 'Kolkata', score: 8120, coins: 3200, tier: 'Platinum Healer' },
+    { rank: 4, name: 'Dr. Sameer Nair, BPT', city: 'Pune', score: 7640, coins: 2900, tier: 'Gold Specialist' },
+    { rank: 5, name: 'Dr. Kavita Verma, MPT', city: 'Delhi NCR', score: 7210, coins: 2600, tier: 'Gold Specialist' },
+    { rank: 6, name: 'Dr. Vikas Patil, BPT', city: 'Surat', score: 6890, coins: 2400, tier: 'Gold Specialist' },
+  ];
+
   const [activeMode, setActiveMode] = useState<GameMode>('TOURNAMENT');
-  const [coins, setCoins] = useState(3650);
+  const [coins, setCoins] = useState(user?.coins || 3650);
   const [tasks, setTasks] = useState(DAILY_TASKS);
   const [tournamentData, setTournamentData] = useState<any>(null);
   const [currentQIndex, setCurrentQIndex] = useState(0);
@@ -113,8 +116,8 @@ export default function ProviderGamingArenaPage() {
     setIsAnswerSubmitted(true);
     const q = tournamentData?.questions[currentQIndex];
     if (selectedOption === q.correctIndex) {
-      setScore((prev) => prev + 100 + Math.floor(timerSeconds * 2));
-      setCoins((prev) => prev + 25);
+      setScore((prev: number) => prev + 100 + Math.floor(timerSeconds * 2));
+      setCoins((prev: number) => prev + 25);
     }
   };
 
@@ -141,7 +144,7 @@ export default function ProviderGamingArenaPage() {
 
   const handleClaimTask = (taskId: string, reward: number) => {
     setTasks(tasks.map((t) => (t.id === taskId ? { ...t, claimed: true } : t)));
-    setCoins((prev) => prev + reward);
+    setCoins((prev: number) => prev + reward);
   };
 
   const handleRedeemItem = (item: any) => {
@@ -149,7 +152,7 @@ export default function ProviderGamingArenaPage() {
       alert(`Insufficient Clinical Coins. You need ${item.cost - coins} more coins.`);
       return;
     }
-    setCoins((prev) => prev - item.cost);
+    setCoins((prev: number) => prev - item.cost);
     alert(`🎉 Successfully redeemed: ${item.name}! Dispatch confirmation sent.`);
   };
 

@@ -36,52 +36,33 @@ interface InvoiceRecord {
   status: 'PAID' | 'PENDING';
 }
 
-const INITIAL_INVOICES: InvoiceRecord[] = [
-  {
-    id: 'inv_1',
-    invoiceNumber: 'AX-INV-2026-48912',
-    patientName: 'Mrs. Sangeeta Mehta',
-    date: '20 Aug 2026',
-    service: 'Post-TKR Knee Joint Mobilization (Session 3/10)',
-    sessionFee: 1200,
-    addOnsTotal: 500, // Cupping
-    totalAmount: 1700,
-    paymentMode: 'Dynamic UPI QR',
-    status: 'PAID',
-  },
-  {
-    id: 'inv_2',
-    invoiceNumber: 'AX-INV-2026-48911',
-    patientName: 'Mr. Rajesh Shah',
-    date: '18 Aug 2026',
-    service: 'Lumbar Disc Herniation & Spine Relief (Session 2/5)',
-    sessionFee: 1200,
-    addOnsTotal: 300, // Kinesiology Taping
-    totalAmount: 1500,
-    paymentMode: 'Prepaid App',
-    status: 'PAID',
-  },
-  {
-    id: 'inv_3',
-    invoiceNumber: 'AX-INV-2026-48910',
-    patientName: 'Dr. Arvind Kulkarni',
-    date: '15 Aug 2026',
-    service: 'Lumbar Canal Stenosis Gait Rehab (Session 4/10)',
-    sessionFee: 1200,
-    addOnsTotal: 0,
-    totalAmount: 1200,
-    paymentMode: 'Cash in Hand',
-    status: 'PAID',
-  },
-];
-
 export default function ProviderInvoicesPage() {
   const { user } = useProviderAuth();
-  const [invoices, setInvoices] = useState<InvoiceRecord[]>(INITIAL_INVOICES);
+  const [invoices, setInvoices] = useState<InvoiceRecord[]>([]);
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceRecord | null>(null);
   const [showGenerator, setShowGenerator] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const [qrAmount, setQrAmount] = useState('1200');
+
+  React.useEffect(() => {
+    providerApi.getAppointments().then((appts) => {
+      if (Array.isArray(appts) && appts.length > 0) {
+        const invs: InvoiceRecord[] = appts.map((a: any, idx: number) => ({
+          id: a.id || a._id || `inv_${idx}`,
+          invoiceNumber: `AX-INV-${new Date().getFullYear()}-${48900 + idx}`,
+          patientName: a.patientName || a.customerName || 'Patient',
+          date: a.date || a.scheduledDate || new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+          service: a.service || a.condition || 'Physical Therapy Session',
+          sessionFee: a.sessionFee || a.amount || 1200,
+          addOnsTotal: 0,
+          totalAmount: a.sessionFee || a.amount || 1200,
+          paymentMode: a.paymentMode || 'Online App',
+          status: (a.status === 'COMPLETED' ? 'PAID' : 'PAID') as 'PAID' | 'PENDING',
+        }));
+        setInvoices(invs);
+      }
+    });
+  }, []);
 
   // Generator form state
   const [genPatient, setGenPatient] = useState('');
@@ -158,53 +139,61 @@ export default function ProviderInvoicesPage() {
       <div className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm space-y-4">
         <h3 className="text-base font-extrabold text-foreground">Issued Invoices History</h3>
 
-        <div className="space-y-3">
-          {invoices.map((inv) => (
-            <div
-              key={inv.id}
-              className="p-5 rounded-2xl border border-border/60 bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs transition-all hover:border-primary/40"
-            >
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
-                    {inv.invoiceNumber}
-                  </span>
-                  <span className="text-[10px] bg-emerald-500/10 text-emerald-600 font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">
-                    ✓ {inv.status}
-                  </span>
+        {invoices.length === 0 ? (
+          <div className="p-8 text-center bg-muted/20 border border-dashed border-border/60 rounded-2xl">
+            <Receipt className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
+            <p className="text-xs font-bold text-foreground">No invoices generated yet</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Create your first tax invoice or complete a patient visit to generate digital receipts.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {invoices.map((inv) => (
+              <div
+                key={inv.id}
+                className="p-5 rounded-2xl border border-border/60 bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs transition-all hover:border-primary/40"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-mono font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
+                      {inv.invoiceNumber}
+                    </span>
+                    <span className="text-[10px] bg-emerald-500/10 text-emerald-600 font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      ✓ {inv.status}
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-outfit font-extrabold text-foreground mt-1">{inv.patientName}</h4>
+                  <p className="text-muted-foreground">{inv.service} • {inv.date}</p>
+                  <p className="text-[11px] text-muted-foreground">Mode: <strong className="text-foreground">{inv.paymentMode}</strong></p>
                 </div>
-                <h4 className="text-sm font-outfit font-extrabold text-foreground mt-1">{inv.patientName}</h4>
-                <p className="text-muted-foreground">{inv.service} • {inv.date}</p>
-                <p className="text-[11px] text-muted-foreground">Mode: <strong className="text-foreground">{inv.paymentMode}</strong></p>
-              </div>
 
-              <div className="flex items-center gap-3 self-end sm:self-auto">
-                <div className="text-right">
-                  <p className="text-base font-mono font-black text-foreground">₹{inv.totalAmount.toLocaleString('en-IN')}</p>
-                  <p className="text-[10px] text-muted-foreground">GST Exempt (Health Care)</p>
-                </div>
+                <div className="flex items-center gap-3 self-end sm:self-auto">
+                  <div className="text-right">
+                    <p className="text-base font-mono font-black text-foreground">₹{inv.totalAmount.toLocaleString('en-IN')}</p>
+                    <p className="text-[10px] text-muted-foreground">GST Exempt (Health Care)</p>
+                  </div>
 
-                <div className="flex gap-1.5">
-                  <Button
-                    onClick={() => setSelectedInvoice(inv)}
-                    variant="outline"
-                    size="sm"
-                    className="rounded-xl text-xs font-bold"
-                  >
-                    <FileText className="w-3.5 h-3.5 mr-1" /> View
-                  </Button>
-                  <Button
-                    onClick={() => handleShareWhatsApp(inv)}
-                    size="sm"
-                    className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold"
-                  >
-                    <Share2 className="w-3.5 h-3.5" />
-                  </Button>
+                  <div className="flex gap-1.5">
+                    <Button
+                      onClick={() => setSelectedInvoice(inv)}
+                      variant="outline"
+                      size="sm"
+                      className="rounded-xl text-xs font-bold"
+                    >
+                      <FileText className="w-3.5 h-3.5 mr-1" /> View
+                    </Button>
+                    <Button
+                      onClick={() => handleShareWhatsApp(inv)}
+                      size="sm"
+                      className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold"
+                    >
+                      <Share2 className="w-3.5 h-3.5 mr-1" /> WhatsApp
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Invoice Generator Modal */}
