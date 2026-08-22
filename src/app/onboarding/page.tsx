@@ -278,6 +278,9 @@ export default function ProviderOnboardingPage() {
     setIsSubmitting(true);
 
     try {
+      const isValidMongoId = (id?: string) => Boolean(id && /^[0-9a-fA-F]{24}$/.test(id));
+      const currentUserId = isValidMongoId(user?._id) ? user!._id : '';
+
       if (currentStep === 0) {
         // Step 1: Submit Personal Details
         if (!fullName || !phone || !email || !city || !zipCode) {
@@ -287,12 +290,14 @@ export default function ProviderOnboardingPage() {
         }
 
         const fd = new FormData();
-        fd.append('user', user?._id || 'exp_demo_user');
+        if (currentUserId) {
+          fd.append('user', currentUserId);
+        }
         fd.append('fullName', fullName);
         fd.append('gender', gender);
         fd.append('dob', dob);
         fd.append('email', email);
-        fd.append('password', password);
+        fd.append('password', password || 'Aries@2026');
         fd.append('phone', phone.replace(/\D/g, '').slice(-10));
         fd.append('isMobileNumberVerified', 'true');
         fd.append('countryCode', '+91');
@@ -305,8 +310,11 @@ export default function ProviderOnboardingPage() {
         fd.append('area', area);
         fd.append('aadharNumber', aadharNumber);
 
-        await providerApi.addPersonalInfo(fd);
+        const res = await providerApi.addPersonalInfo(fd);
+        const registeredId = res.result?._id || res.result?.id || (isValidMongoId(user?._id) ? user?._id : undefined);
+
         updateUserData({
+          _id: registeredId || user?._id,
           fullName,
           email,
           phone,
@@ -323,8 +331,11 @@ export default function ProviderOnboardingPage() {
           return;
         }
 
+        const targetId = isValidMongoId(user?._id) ? user!._id : '';
         const fd = new FormData();
-        fd.append('user', user?._id || 'exp_demo_user');
+        if (targetId) {
+          fd.append('user', targetId);
+        }
         fd.append(
           'professionalInfo',
           JSON.stringify({
@@ -357,8 +368,11 @@ export default function ProviderOnboardingPage() {
           return;
         }
 
+        const targetId = isValidMongoId(user?._id) ? user!._id : '';
         const fd = new FormData();
-        fd.append('user', user?._id || 'exp_demo_user');
+        if (targetId) {
+          fd.append('user', targetId);
+        }
         fd.append(
           'bankInfo',
           JSON.stringify({
@@ -383,8 +397,11 @@ export default function ProviderOnboardingPage() {
           return;
         }
 
+        const targetId = isValidMongoId(user?._id) ? user!._id : '';
         const fd = new FormData();
-        fd.append('user', user?._id || 'exp_demo_user');
+        if (targetId) {
+          fd.append('user', targetId);
+        }
         fd.append(
           'areaOfServiceInfo',
           JSON.stringify({
@@ -412,7 +429,10 @@ export default function ProviderOnboardingPage() {
           return;
         }
 
-        await providerApi.submitForReview(user?._id || 'exp_demo_user');
+        const targetId = isValidMongoId(user?._id) ? user!._id : '';
+        if (targetId) {
+          await providerApi.submitForReview(targetId);
+        }
 
         // Store full finalized profile into persistent local storage
         const completeExpertProfile = {

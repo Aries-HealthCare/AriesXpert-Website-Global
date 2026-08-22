@@ -7,7 +7,8 @@
  * to the central MongoDB database.
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.ariesxpert.com';
+const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.ariesxpert.com';
+const API_BASE_URL = rawApiUrl.replace(/\/api(\/v1)?\/?$/, '').replace(/\/$/, '') || 'https://api.ariesxpert.com';
 
 import { BUILTIN_34_ASSESSMENT_FORMS } from './assessment-forms-data';
 export { BUILTIN_34_ASSESSMENT_FORMS };
