@@ -15,6 +15,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
+import { useProviderAuth } from '@/services/provider-auth-context';
+
 interface ChatMessage {
   id: string;
   sender: 'user' | 'buddy';
@@ -29,17 +31,17 @@ const SAMPLE_PROMPTS = [
   'Dry needling safety precautions for upper trapezius trigger points',
 ];
 
-const INITIAL_MESSAGES: ChatMessage[] = [
-  {
-    id: 'm_01',
-    sender: 'buddy',
-    text: 'Hello Dr. Rohan! I am your Aries AI Clinical Copilot. I can assist with differential diagnoses, evidence-based exercise progressions, red flag screenings, and SOAP note synthesis. What clinical case are we managing today?',
-    timestamp: 'Just Now',
-  },
-];
-
 export default function ProviderAIBuddyPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
+  const { user } = useProviderAuth();
+  const therapistName = user?.fullName || user?.name || 'Doctor';
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: 'm_01',
+      sender: 'buddy',
+      text: `Hello ${therapistName}! I am your Aries AI Clinical Copilot. I can assist with differential diagnoses, evidence-based exercise progressions, red flag screenings, and SOAP note synthesis. What clinical case are we managing today?`,
+      timestamp: 'Just Now',
+    },
+  ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 

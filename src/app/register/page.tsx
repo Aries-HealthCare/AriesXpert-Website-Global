@@ -126,7 +126,7 @@ export default function ProviderRegisterPage() {
                 <Input
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Dr. Rohan Sharma"
+                  placeholder="e.g. Dr. Priya Deshmukh, BPT"
                   className="pl-9 h-11 rounded-xl text-xs"
                   required
                 />

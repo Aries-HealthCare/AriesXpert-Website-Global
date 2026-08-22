@@ -569,48 +569,57 @@ export default function ProviderGamingArenaPage() {
           </div>
 
           <div className="space-y-2">
-            {LEADERBOARD_DATA.map((entry) => (
-              <div
-                key={entry.rank}
-                className={`p-4 rounded-2xl border flex items-center justify-between gap-3 text-xs transition-all ${
-                  entry.isUser
-                    ? 'border-2 border-primary bg-primary/10 shadow-md'
-                    : 'border-border/60 bg-muted/20'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center font-mono font-black text-sm ${
-                      entry.rank === 1
-                        ? 'bg-amber-500 text-slate-950 shadow-md'
-                        : entry.rank === 2
-                        ? 'bg-slate-300 text-slate-950'
-                        : entry.rank === 3
-                        ? 'bg-amber-700 text-white'
-                        : 'bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    #{entry.rank}
-                  </span>
-                  <div>
-                    <p className="font-outfit font-bold text-foreground text-sm flex items-center gap-1.5">
-                      <span>{entry.name}</span>
-                      {entry.isUser && (
-                        <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-full font-bold">
-                          YOU
-                        </span>
-                      )}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground">{entry.city} • {entry.tier}</p>
+            {LEADERBOARD_DATA.map((rawEntry) => {
+              const entry = rawEntry.isUser
+                ? {
+                    ...rawEntry,
+                    name: user?.fullName || user?.name || 'Dr. Specialist',
+                    city: `${user?.city || 'Mumbai'} (You)`,
+                  }
+                : rawEntry;
+              return (
+                <div
+                  key={entry.rank}
+                  className={`p-4 rounded-2xl border flex items-center justify-between gap-3 text-xs transition-all ${
+                    entry.isUser
+                      ? 'border-2 border-primary bg-primary/10 shadow-md'
+                      : 'border-border/60 bg-muted/20'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center font-mono font-black text-sm ${
+                        entry.rank === 1
+                          ? 'bg-amber-500 text-slate-950 shadow-md'
+                          : entry.rank === 2
+                          ? 'bg-slate-300 text-slate-950'
+                          : entry.rank === 3
+                          ? 'bg-amber-700 text-white'
+                          : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      #{entry.rank}
+                    </span>
+                    <div>
+                      <p className="font-outfit font-bold text-foreground text-sm flex items-center gap-1.5">
+                        <span>{entry.name}</span>
+                        {entry.isUser && (
+                          <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-full font-bold">
+                            YOU
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">{entry.city} • {entry.tier}</p>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="font-mono font-black text-foreground text-sm">{entry.score.toLocaleString()} Pts</p>
+                    <p className="text-[10px] font-mono text-amber-500 font-bold">{entry.coins.toLocaleString()} Coins</p>
                   </div>
                 </div>
-
-                <div className="text-right">
-                  <p className="font-mono font-black text-foreground text-sm">{entry.score.toLocaleString()} Pts</p>
-                  <p className="text-[10px] font-mono text-amber-500 font-bold">{entry.coins.toLocaleString()} Coins</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

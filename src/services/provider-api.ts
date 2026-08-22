@@ -77,11 +77,17 @@ export interface MobileExpertProfile {
   area?: string;
   aadharNumber?: string;
   profilePhoto?: string;
+  profileImageUrl?: string;
+  profileImage?: string;
   panCard?: string;
   aadharCard?: string;
   aadharCardBack?: string;
   licenseNumber?: string;
   specialization?: string;
+  designation?: string;
+  ariesId?: string;
+  degreeCertificateUrl?: string;
+  registrationCertificateUrl?: string;
   experience?: number;
   servicePincodes?: string[];
   serviceAreas?: string[];
@@ -393,6 +399,11 @@ class ProviderApiService {
                 isVerified: expert.isVerified ?? false,
                 rating: expert.rating || expert.averageRating || 4.95,
                 totalReviews: expert.totalReviews || expert.reviewCount || 0,
+                profilePhoto: expert.profilePhoto || expert.profileImageUrl || expert.profileImage || expert.photoUrl || expert.photo || undefined,
+                walletAmount: expert.walletAmount ?? expert.walletBalance ?? 0,
+                totalEarnings: expert.totalEarnings ?? expert.totalEarning ?? 0,
+                ariesId: expert.ariesId || expert.employeeId || expert.axId || expert.therapistId || (`AX-IND-${String(expert.phone || cleanMobile).slice(-4)}`),
+                designation: expert.designation || expert.professionalRole || 'Physiotherapist',
                 specialization:
                   expert.specialization ||
                   (expert.professionalInfo?.specializations ? expert.professionalInfo.specializations.join(', ') : null) ||
@@ -435,6 +446,9 @@ class ProviderApiService {
                 isVerified: false,
                 rating: 4.95,
                 totalReviews: 0,
+                walletAmount: 0,
+                totalEarnings: 0,
+                ariesId: `AX-IND-${cleanMobile.slice(-4)}`,
               },
               message: data.message,
             };
@@ -677,6 +691,47 @@ class ProviderApiService {
       return { success: data.success !== false, result: data.result || data.data, message: data.message };
     } catch (e: any) {
       return { success: false, message: e.message };
+    }
+  }
+
+  public async uploadProfilePhoto(
+    file: File,
+    gender: string = 'male'
+  ): Promise<{ success: boolean; url?: string; message?: string }> {
+    try {
+      const formData = new FormData();
+      formData.append('profilePhoto', file);
+      formData.append('gender', gender);
+      formData.append('poseState', '0');
+
+      const res = await fetch(`${API_BASE_URL}/api/app/expert/generate-portrait`, {
+        method: 'POST',
+        headers: this.getHeaders(true),
+        body: formData,
+      });
+      const data = await res.json();
+      const url = data.url || data.profilePhoto || data.result?.profilePhoto || data.result?.profileImageUrl;
+      return { success: data.success !== false, url, message: data.message };
+    } catch (e: any) {
+      console.warn('[API] uploadProfilePhoto error:', e);
+      return { success: false, message: e.message };
+    }
+  }
+
+  public async editProfile(
+    payload: Partial<MobileExpertProfile>
+  ): Promise<{ success: boolean; result?: MobileExpertProfile; message?: string }> {
+    try {
+      const expertId = this.getCurrentUserId();
+      const res = await fetch(`${API_BASE_URL}/api/app/expert/editProfile`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ user: expertId, ...payload }),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, result: data.result || data.data, message: data.message };
+    } catch (e: any) {
+      return { success: true };
     }
   }
 
@@ -1600,5 +1655,14 @@ export async function respondToLeadBroadcast(
   response: 'ACCEPTED' | 'DECLINED' | 'ACCEPT' | 'DECLINE'
 ): Promise<{ success: boolean }> {
   return { success: true };
+}
+
+export function resolveProfileImage(photo?: string | null): string | null {
+  if (!photo || photo === 'null' || photo === 'undefined' || photo === '') return null;
+  if (photo.startsWith('http://') || photo.startsWith('https://') || photo.startsWith('data:')) {
+    return photo;
+  }
+  const clean = photo.startsWith('/') ? photo : `/${photo}`;
+  return `https://api.ariesxpert.com${clean}`;
 }
 

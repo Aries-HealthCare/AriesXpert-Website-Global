@@ -50,16 +50,39 @@ export async function POST(req: NextRequest) {
       msg91Data?.type === 'success';
 
     if (isVerified) {
+      let expertProfile = backendData?.expert || backendData?.result;
+      let token = backendData?.token || backendData?.accessToken;
+
+      // If expert document wasn't in initial verify response, lookup from MongoDB
+      if (!expertProfile || !expertProfile._id || !expertProfile.fullName) {
+        try {
+          const checkRes = await fetch(`${BACKEND_API_URL}/api/app/expert/checkOnboardingStatus`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: last10Digits }),
+          });
+          if (checkRes.ok) {
+            const checkData = await checkRes.json().catch(() => null);
+            if (checkData?.result || checkData?.expert || checkData?.data) {
+              expertProfile = checkData.result || checkData.expert || checkData.data;
+              if (checkData.token || checkData.accessToken) {
+                token = checkData.token || checkData.accessToken;
+              }
+            }
+          }
+        } catch (_) {}
+      }
+
       return NextResponse.json({
         success: true,
         message: 'OTP verified successfully',
-        token: backendData?.token || backendData?.accessToken || 'token_' + Date.now(),
-        expert: backendData?.expert || backendData?.result || {
+        token: token || 'token_' + Date.now(),
+        expert: expertProfile || {
           phone: last10Digits,
           onboardingStatus: 'pending',
           onboardingStep: 0,
         },
-        result: backendData?.result || backendData?.expert,
+        result: expertProfile,
       });
     }
 

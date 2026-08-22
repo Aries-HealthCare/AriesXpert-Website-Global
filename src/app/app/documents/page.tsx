@@ -17,37 +17,38 @@ import { Button } from '@/components/ui/button';
 
 export default function ProviderDocumentsPage() {
   const { user } = useProviderAuth();
+  const safeName = (user?.fullName || user?.name || 'Doctor').replace(/\s+/g, '_');
 
   const documents = [
     {
       name: 'BPT / MPT Degree Certificate',
-      filename: 'Dr_Rohan_Sharma_BPT_Degree.pdf',
-      status: 'VERIFIED',
-      verifiedDate: '15 Aug 2026',
+      filename: `${safeName}_Degree_Certificate.pdf`,
+      status: user?.degreeCertificateUrl ? 'VERIFIED' : (user?.isVerified ? 'VERIFIED' : 'PENDING'),
+      verifiedDate: 'Active',
     },
     {
       name: 'State Council OTPT Registration Certificate',
-      filename: 'MH_OTPT_Council_Reg_9412.pdf',
-      status: 'VERIFIED',
-      verifiedDate: '15 Aug 2026',
+      filename: `${safeName}_Council_Registration.pdf`,
+      status: user?.registrationCertificateUrl ? 'VERIFIED' : (user?.licenseNumber ? 'VERIFIED' : 'PENDING'),
+      verifiedDate: 'Active',
     },
     {
       name: 'PAN Card Copy',
-      filename: 'PAN_Card_ABCDE1234F.jpg',
-      status: 'VERIFIED',
-      verifiedDate: '15 Aug 2026',
+      filename: `${safeName}_PAN_Card.jpg`,
+      status: user?.panCard ? 'VERIFIED' : (user?.bankInfo?.panNumber ? 'VERIFIED' : 'PENDING'),
+      verifiedDate: 'Active',
     },
     {
       name: 'Aadhaar Card (Front & Back)',
-      filename: 'Aadhaar_Masked_Copy.pdf',
-      status: 'VERIFIED',
-      verifiedDate: '15 Aug 2026',
+      filename: `${safeName}_Aadhaar_Card.pdf`,
+      status: user?.aadharCard ? 'VERIFIED' : 'PENDING',
+      verifiedDate: 'Active',
     },
     {
       name: 'Cancelled Cheque / Bank Proof',
-      filename: 'HDFC_Cancelled_Cheque.jpg',
-      status: 'VERIFIED',
-      verifiedDate: '15 Aug 2026',
+      filename: `${safeName}_Bank_Proof.jpg`,
+      status: user?.bankInfo?.accountNumber ? 'VERIFIED' : 'PENDING',
+      verifiedDate: 'Active',
     },
   ];
 

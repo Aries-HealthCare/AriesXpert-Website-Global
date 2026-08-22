@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useProviderAuth } from '@/services/provider-auth-context';
+import { providerApi, resolveProfileImage } from '@/services/provider-api';
 import { DynamicAppLogo } from '@/components/ui/dynamic-app-logo';
 import {
   User,
@@ -25,6 +26,7 @@ import {
   Trash2,
   ShieldAlert,
   Users,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,29 +34,63 @@ import { Label } from '@/components/ui/label';
 
 export default function ProviderProfilePage() {
   const { user, updateUserData } = useProviderAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<'profile' | 'serviceArea' | 'emergency' | 'idcard'>('profile');
 
-  const [name, setName] = useState(user?.fullName || user?.name || 'Dr. Rohan Sharma, BPT');
-  const [email, setEmail] = useState(user?.email || 'rohan.sharma@ariesxpert.com');
-  const [phone, setPhone] = useState(user?.phone || user?.mobileNo || '+91 98765 43210');
+  const [name, setName] = useState(user?.fullName || user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [phone, setPhone] = useState(user?.phone || user?.mobileNo || '');
   const [city, setCity] = useState(user?.city || 'Mumbai');
-  const [licenseNumber, setLicenseNumber] = useState(user?.licenseNumber || 'MH-OTPT-2018-9412');
-  const [specialization, setSpecialization] = useState(user?.specialization || 'Musculoskeletal & Sports Rehabilitation');
-  const [experience, setExperience] = useState(user?.experience ? String(user.experience) : '6');
-  const [bio, setBio] = useState('Senior Physiotherapist with 6+ years of clinical excellence in post-operative orthopedic recovery, sports rehabilitation, and neurological gait restoration across Mumbai.');
+  const [licenseNumber, setLicenseNumber] = useState(user?.licenseNumber || '');
+  const [specialization, setSpecialization] = useState(user?.specialization || 'Musculoskeletal & Orthopedic Rehabilitation');
+  const [experience, setExperience] = useState(user?.yearsOfExperience || (user?.experience ? String(user.experience) : '5'));
+  const [bio, setBio] = useState('Senior Physiotherapist specializing in evidence-based rehabilitation, post-operative care, and neurological restoration.');
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
   // Service Area & Pincodes
-  const [operatingRadiusKm, setOperatingRadiusKm] = useState('8');
-  const [pincodes, setPincodes] = useState<string[]>(['400092', '400103', '400067', '400068']);
+  const [operatingRadiusKm, setOperatingRadiusKm] = useState('10');
+  const [pincodes, setPincodes] = useState<string[]>(user?.targetPincodes || ['400092', '400103', '400067']);
   const [newPincode, setNewPincode] = useState('');
 
   // Emergency Contacts
-  const [emergencyName, setEmergencyName] = useState('Dr. Priya Deshmukh (Clinical Buddy)');
+  const [emergencyName, setEmergencyName] = useState('Emergency SOS Team');
   const [emergencyPhone, setEmergencyPhone] = useState('+91 98201 44219');
-  const [emergencyRelation, setEmergencyRelation] = useState('Clinical Colleague / Territory Peer');
+  const [emergencyRelation, setEmergencyRelation] = useState('Clinical Colleague / Territory Lead');
 
-  const axId = user?.axId || user?.therapistId || 'AX-IND-4892';
+  const axId = user?.axId || user?.therapistId || (user?.phone ? `AX-IND-${user.phone.slice(-4)}` : 'AX-IND-PROV');
+  const profilePhotoUrl = resolveProfileImage(user?.profilePhoto);
+
+  useEffect(() => {
+    if (user) {
+      if (user.fullName || user.name) setName(user.fullName || user.name || '');
+      if (user.email) setEmail(user.email);
+      if (user.phone || user.mobileNo) setPhone(user.phone || user.mobileNo || '');
+      if (user.city) setCity(user.city);
+      if (user.licenseNumber) setLicenseNumber(user.licenseNumber);
+      if (user.specialization) setSpecialization(user.specialization);
+      if (user.yearsOfExperience || user.experience) setExperience(String(user.yearsOfExperience || user.experience));
+      if (user.targetPincodes && user.targetPincodes.length > 0) setPincodes(user.targetPincodes);
+    }
+  }, [user]);
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingPhoto(true);
+    try {
+      const res = await providerApi.uploadProfilePhoto(file, user?.gender || 'male');
+      if (res.success && res.url) {
+        updateUserData({ profilePhoto: res.url });
+        setSavedSuccess(true);
+        setTimeout(() => setSavedSuccess(false), 2500);
+      }
+    } catch (err) {
+      console.warn('Photo upload failed:', err);
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +101,17 @@ export default function ProviderProfilePage() {
       city,
       licenseNumber,
       specialization,
-      experience: Number(experience),
+      yearsOfExperience: experience,
+      targetPincodes: pincodes,
+    });
+    providerApi.editProfile({
+      fullName: name,
+      email,
+      city,
+      licenseNumber,
+      specialization,
+      yearsOfExperience: experience,
+      targetPincodes: pincodes,
     });
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2500);
@@ -148,21 +194,38 @@ export default function ProviderProfilePage() {
         <form onSubmit={handleSave} className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
           <div className="flex items-center gap-4 pb-6 border-b border-border/60">
             <div className="relative">
-              <div className="w-20 h-20 rounded-3xl bg-primary text-white text-2xl font-outfit font-black flex items-center justify-center shadow-lg shadow-primary/20">
-                {name.charAt(0) || 'D'}
-              </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handlePhotoUpload}
+                accept="image/*"
+                className="hidden"
+              />
+              {profilePhotoUrl ? (
+                <img
+                  src={profilePhotoUrl}
+                  alt={name}
+                  className="w-20 h-20 rounded-3xl object-cover shadow-lg shadow-primary/20 border-2 border-primary/20"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-3xl bg-primary text-white text-2xl font-outfit font-black flex items-center justify-center shadow-lg shadow-primary/20">
+                  {name.charAt(0) || 'D'}
+                </div>
+              )}
               <button
                 type="button"
-                className="absolute -bottom-1 -right-1 p-1.5 rounded-xl bg-card border border-border text-foreground hover:text-primary shadow-sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingPhoto}
+                className="absolute -bottom-1 -right-1 p-1.5 rounded-xl bg-card border border-border text-foreground hover:text-primary shadow-sm transition-colors"
                 title="Upload new headshot"
               >
-                <Camera className="w-3.5 h-3.5" />
+                {isUploadingPhoto ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
               </button>
             </div>
 
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-lg font-outfit font-extrabold text-foreground">{name}</h2>
+                <h2 className="text-lg font-outfit font-extrabold text-foreground">{name || 'Doctor'}</h2>
                 <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">
                   Verified Doctor ✓
                 </span>
@@ -408,11 +471,19 @@ export default function ProviderProfilePage() {
 
             {/* Middle row */}
             <div className="flex items-center gap-4 my-6 relative z-10">
-              <div className="w-20 h-20 rounded-2xl bg-primary text-white text-2xl font-outfit font-black flex items-center justify-center shadow-lg border-2 border-white/20 shrink-0">
-                {name.charAt(0) || 'D'}
-              </div>
+              {profilePhotoUrl ? (
+                <img
+                  src={profilePhotoUrl}
+                  alt={name}
+                  className="w-20 h-20 rounded-2xl object-cover shadow-lg border-2 border-white/20 shrink-0"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-2xl bg-primary text-white text-2xl font-outfit font-black flex items-center justify-center shadow-lg border-2 border-white/20 shrink-0">
+                  {name.charAt(0) || 'D'}
+                </div>
+              )}
               <div className="min-w-0">
-                <h3 className="text-lg font-outfit font-extrabold tracking-tight truncate">{name}</h3>
+                <h3 className="text-lg font-outfit font-extrabold tracking-tight truncate">{name || 'Doctor'}</h3>
                 <p className="text-xs text-slate-300 font-medium truncate">{specialization}</p>
                 <div className="mt-1 flex items-center gap-2 text-[11px] font-mono text-primary font-bold">
                   <span>ID: {axId}</span>

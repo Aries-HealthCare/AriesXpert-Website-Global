@@ -75,55 +75,48 @@ export default function ProviderOnboardingPage() {
   const [successMsg, setSuccessMsg] = useState('');
 
   // ── Step 1: Personal Details ─────────────────────────
-  const [fullName, setFullName] = useState('Dr. Rohan Sharma');
-  const [gender, setGender] = useState('Male');
-  const [dob, setDob] = useState('1992-08-15');
-  const [email, setEmail] = useState('rohan.sharma@ariesxpert.com');
-  const [password, setPassword] = useState('AriesDoc@2026!');
-  const [phone, setPhone] = useState('9876543210');
-  const [streetAddress, setStreetAddress] = useState('A-402, Green Meadows');
-  const [addressLineTwo, setAddressLineTwo] = useState('Link Road, IC Colony');
-  const [zipCode, setZipCode] = useState('400103');
-  const [city, setCity] = useState('Mumbai');
-  const [stateVal, setStateVal] = useState('Maharashtra');
-  const [area, setArea] = useState('Borivali West');
-  const [aadharNumber, setAadharNumber] = useState('5489 1234 8901');
+  const [fullName, setFullName] = useState(user?.fullName || user?.name || '');
+  const [gender, setGender] = useState(user?.gender || 'Male');
+  const [dob, setDob] = useState(user?.dob || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState(user?.phone || user?.mobileNo || '');
+  const [streetAddress, setStreetAddress] = useState(user?.streetAddress || '');
+  const [addressLineTwo, setAddressLineTwo] = useState('');
+  const [zipCode, setZipCode] = useState(user?.zipCode || '');
+  const [city, setCity] = useState(user?.city || 'Mumbai');
+  const [stateVal, setStateVal] = useState(user?.state || 'Maharashtra');
+  const [area, setArea] = useState('');
+  const [aadharNumber, setAadharNumber] = useState('');
 
   // ── Step 2: Professional Qualifications ──────────────
-  const [professionalRole, setProfessionalRole] = useState('Physiotherapist');
-  const [qualification, setQualification] = useState('BPT (Bachelor of Physiotherapy)');
-  const [specializations, setSpecializations] = useState<string[]>([
-    'Musculoskeletal & Orthopedic',
-    'Neurological Rehabilitation',
-  ]);
-  const [yearOfExperience, setYearOfExperience] = useState('6');
-  const [councilRegistrationNumber, setCouncilRegistrationNumber] = useState('MSPT-84920-IN');
-  const [currentlyWorkingAt, setCurrentlyWorkingAt] = useState('Private Practice & Doorstep Consultations');
+  const [professionalRole, setProfessionalRole] = useState(user?.designation || 'Physiotherapist');
+  const [qualification, setQualification] = useState(user?.specialization || 'BPT (Bachelor of Physiotherapy)');
+  const [specializations, setSpecializations] = useState<string[]>(
+    user?.specialization ? [user.specialization] : ['Musculoskeletal & Orthopedic', 'Neurological Rehabilitation']
+  );
+  const [yearOfExperience, setYearOfExperience] = useState(user?.yearsOfExperience || '');
+  const [councilRegistrationNumber, setCouncilRegistrationNumber] = useState(user?.licenseNumber || '');
+  const [currentlyWorkingAt, setCurrentlyWorkingAt] = useState('');
   const [serviceTypes, setServiceTypes] = useState<string[]>(['Home Visit', 'Clinic Visit', 'Telehealth']);
   const [hasModalities, setHasModalities] = useState(true);
   const [hasOwnClinic, setHasOwnClinic] = useState(false);
   const [clinicName, setClinicName] = useState('');
-  const [clinicEstablishmentYear, setClinicEstablishmentYear] = useState('2020');
+  const [clinicEstablishmentYear, setClinicEstablishmentYear] = useState('');
 
   // ── Step 3: Banking & Payout ─────────────────────────
   const [accountType, setAccountType] = useState('Savings');
-  const [accountHolderName, setAccountHolderName] = useState('Dr. Rohan Sharma');
-  const [accountNumber, setAccountNumber] = useState('50100234567890');
-  const [bankName, setBankName] = useState('HDFC Bank');
-  const [ifscCode, setIfscCode] = useState('HDFC0000240');
-  const [upiId, setUpiId] = useState('rohan@okhdfc');
-  const [panNumber, setPanNumber] = useState('ABCDE1234F');
+  const [accountHolderName, setAccountHolderName] = useState(user?.fullName || user?.name || '');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [ifscCode, setIfscCode] = useState('');
+  const [upiId, setUpiId] = useState('');
+  const [panNumber, setPanNumber] = useState('');
 
   // ── Step 4: Service Area & Travel ─────────────────────
-  const [serviceCity, setServiceCity] = useState('Mumbai');
-  const [serviceAreas, setServiceAreas] = useState<string[]>(['Borivali West', 'Kandivali East', 'Malad West']);
-  const [targetPincodes, setTargetPincodes] = useState<string[]>([
-    '400103',
-    '400101',
-    '400064',
-    '400063',
-    '400053',
-  ]);
+  const [serviceCity, setServiceCity] = useState(user?.city || 'Mumbai');
+  const [serviceAreas, setServiceAreas] = useState<string[]>(user?.serviceAreas || []);
+  const [targetPincodes, setTargetPincodes] = useState<string[]>(user?.targetPincodes || []);
   const [newPincode, setNewPincode] = useState('');
   const [newArea, setNewArea] = useState('');
   const [serviceRadius, setServiceRadius] = useState(12);
@@ -607,7 +600,7 @@ export default function ProviderOnboardingPage() {
                   <Input
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Dr. Rohan Sharma"
+                    placeholder="e.g. Dr. Priya Deshmukh"
                     className="h-11 rounded-2xl text-xs font-bold"
                     required
                   />
@@ -867,7 +860,7 @@ export default function ProviderOnboardingPage() {
                   <Input
                     value={accountHolderName}
                     onChange={(e) => setAccountHolderName(e.target.value)}
-                    placeholder="Dr. Rohan Sharma"
+                    placeholder="e.g. Dr. Priya Deshmukh"
                     className="h-11 rounded-2xl text-xs font-bold"
                     required
                   />
@@ -890,7 +883,7 @@ export default function ProviderOnboardingPage() {
                     type="password"
                     value={accountNumber}
                     onChange={(e) => setAccountNumber(e.target.value)}
-                    placeholder="50100234567890"
+                    placeholder="Enter Account Number"
                     className="h-11 rounded-2xl text-xs font-mono font-bold"
                     required
                   />
@@ -901,7 +894,7 @@ export default function ProviderOnboardingPage() {
                   <Input
                     value={ifscCode}
                     onChange={(e) => setIfscCode(e.target.value.toUpperCase())}
-                    placeholder="HDFC0000240"
+                    placeholder="e.g. HDFC0000240"
                     className="h-11 rounded-2xl text-xs font-mono font-bold"
                     required
                   />
@@ -912,7 +905,7 @@ export default function ProviderOnboardingPage() {
                   <Input
                     value={panNumber}
                     onChange={(e) => setPanNumber(e.target.value.toUpperCase())}
-                    placeholder="ABCDE1234F"
+                    placeholder="e.g. ABCDE1234F"
                     className="h-11 rounded-2xl text-xs font-mono font-bold"
                     required
                   />
@@ -923,7 +916,7 @@ export default function ProviderOnboardingPage() {
                   <Input
                     value={upiId}
                     onChange={(e) => setUpiId(e.target.value)}
-                    placeholder="rohan@okhdfc"
+                    placeholder="e.g. doctor@okhdfc"
                     className="h-11 rounded-2xl text-xs font-mono"
                   />
                 </div>

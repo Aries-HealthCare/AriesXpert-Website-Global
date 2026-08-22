@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useProviderAuth } from '@/services/provider-auth-context';
+import { resolveProfileImage } from '@/services/provider-api';
 import { DynamicAppLogo } from '@/components/ui/dynamic-app-logo';
 import { PwaInstallPrompt } from '@/components/pwa/pwa-install-prompt';
 import {
@@ -194,9 +195,17 @@ export default function ProviderAppLayout({ children }: { children: React.ReactN
               </span>
               <span className="text-[10px] font-mono text-muted-foreground">{axId}</span>
             </div>
-            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-outfit font-extrabold text-xs">
-              {therapistName[0]?.toUpperCase()}
-            </div>
+            {resolveProfileImage(user?.profilePhoto) ? (
+              <img
+                src={resolveProfileImage(user?.profilePhoto)!}
+                alt={therapistName}
+                className="w-8 h-8 rounded-xl object-cover border border-primary/20"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-outfit font-extrabold text-xs">
+                {therapistName[0]?.toUpperCase()}
+              </div>
+            )}
           </Link>
         </div>
       </header>
@@ -208,9 +217,17 @@ export default function ProviderAppLayout({ children }: { children: React.ReactN
           {/* Quick Profile Summary Card */}
           <div className="p-4 rounded-3xl bg-gradient-to-br from-primary/10 via-card to-card border border-primary/20 space-y-2">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-primary text-white flex items-center justify-center font-outfit font-extrabold text-sm shadow-md shadow-primary/20">
-                {therapistName[0]?.toUpperCase()}
-              </div>
+              {resolveProfileImage(user?.profilePhoto) ? (
+                <img
+                  src={resolveProfileImage(user?.profilePhoto)!}
+                  alt={therapistName}
+                  className="w-11 h-11 rounded-2xl object-cover shadow-md shadow-primary/20 border-2 border-primary/20 shrink-0"
+                />
+              ) : (
+                <div className="w-11 h-11 rounded-2xl bg-primary text-white flex items-center justify-center font-outfit font-extrabold text-sm shadow-md shadow-primary/20 shrink-0">
+                  {therapistName[0]?.toUpperCase()}
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-outfit font-extrabold text-foreground truncate">
                   {therapistName}
