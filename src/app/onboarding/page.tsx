@@ -819,30 +819,39 @@ export default function ProviderOnboardingPage() {
                 </div>
               </div>
 
-              {/* Specializations Selector */}
-              <div className="space-y-2 pt-2">
-                <Label className="text-xs font-outfit font-bold">Clinical Specializations (Select all that apply)</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {SPECIALIZATION_OPTIONS.map((spec) => {
-                    const isSelected = specializations.includes(spec);
-                    return (
-                      <button
-                        key={spec}
-                        type="button"
-                        onClick={() => toggleSpecialization(spec)}
-                        className={`p-3 rounded-2xl border text-left text-xs font-outfit font-bold transition-all flex items-center justify-between ${
-                          isSelected
-                            ? 'bg-primary text-white border-primary shadow-sm'
-                            : 'bg-muted/30 border-border/80 text-foreground hover:bg-muted/60'
-                        }`}
-                      >
-                        <span>{spec}</span>
-                        {isSelected && <Check className="w-4 h-4 shrink-0" />}
-                      </button>
-                    );
-                  })}
+              {/* Specializations Selector (Shown exclusively for MPTh specialists) */}
+              {(qualification.includes('MPT') || qualification.includes('Master')) && (
+                <div className="space-y-2 pt-2 animate-in fade-in">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-outfit font-bold text-foreground">
+                      MPTh Clinical Specializations * (Select all that apply)
+                    </Label>
+                    <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+                      Post-Graduate Specialty
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {SPECIALIZATION_OPTIONS.map((spec) => {
+                      const isSelected = specializations.includes(spec);
+                      return (
+                        <button
+                          key={spec}
+                          type="button"
+                          onClick={() => toggleSpecialization(spec)}
+                          className={`p-3 rounded-2xl border text-left text-xs font-outfit font-bold transition-all flex items-center justify-between ${
+                            isSelected
+                              ? 'bg-primary text-white border-primary shadow-sm'
+                              : 'bg-muted/30 border-border/80 text-foreground hover:bg-muted/60'
+                          }`}
+                        >
+                          <span>{spec}</span>
+                          {isSelected && <Check className="w-4 h-4 shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Modalities & Equipment */}
               <div className="p-4 bg-muted/30 rounded-2xl border border-border/60 flex items-center justify-between">
