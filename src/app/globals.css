@@ -491,4 +491,15 @@
   .animate-kpi-shimmer {
     animation: kpi-shimmer 3s ease-in-out infinite;
   }
+
+  /* ── Core Web Vitals & Mobile Render Optimization ── */
+  .content-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 700px;
+  }
+
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
 }
