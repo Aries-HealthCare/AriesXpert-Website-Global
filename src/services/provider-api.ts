@@ -328,8 +328,7 @@ class ProviderApiService {
 
     return {
       success: true,
-      message: `Verification code generated for +91 ${cleanMobile}. (Use 786786 or 123456 if SMS is delayed)`,
-      code: '786786',
+      message: `Verification code sent to +91 ${cleanMobile} via SMS.`,
     };
   }
 

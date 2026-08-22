@@ -21,7 +21,6 @@ import {
   AlertCircle,
   Activity,
   ArrowLeft,
-  KeyRound,
   Check,
   RefreshCw,
 } from 'lucide-react';
@@ -38,7 +37,6 @@ export default function ProviderLoginPage() {
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
-  const [activeOtpCode, setActiveOtpCode] = useState('786786');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -83,15 +81,11 @@ export default function ProviderLoginPage() {
       const res = await sendProviderOtp(cleanMobile);
       setOtpSent(true);
       setOtpTimer(45);
-      if (res.code) {
-        setActiveOtpCode(res.code);
-      }
-      setSuccessMessage(res.message || `OTP dispatched to +91 ${cleanMobile}.`);
+      setSuccessMessage(res.message || `Verification code sent to +91 ${cleanMobile} via SMS.`);
     } catch (err: any) {
       setOtpSent(true);
       setOtpTimer(45);
-      setActiveOtpCode('786786');
-      setSuccessMessage(`Verification active for +91 ${cleanMobile}.`);
+      setSuccessMessage(`Verification code sent to +91 ${cleanMobile} via SMS.`);
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +97,7 @@ export default function ProviderLoginPage() {
       handleSendOtp(e);
       return;
     }
-    if (!otp || otp.length < 4) {
+    if (!otp || otp.length < 6) {
       setErrorMessage('Please enter the 6-digit verification code.');
       return;
     }
@@ -112,10 +106,10 @@ export default function ProviderLoginPage() {
     try {
       const ok = await loginWithPhoneOtp(mobileNumber, otp);
       if (!ok) {
-        setErrorMessage('Verification failed. Please use code 786786 or 123456.');
+        setErrorMessage('Invalid verification code. Please check your SMS and try again.');
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Verification failed. Please enter 786786 or 123456.');
+      setErrorMessage(err.message || 'Invalid verification code. Please check your SMS and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -312,36 +306,6 @@ export default function ProviderLoginPage() {
                       autoFocus
                       required
                     />
-                  </div>
-
-                  {/* Instant OTP Helper Box */}
-                  <div className="p-3 bg-muted/40 rounded-2xl border border-border/60 space-y-2">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-outfit font-bold text-muted-foreground">
-                        Instant Verification Bypass:
-                      </span>
-                      <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
-                        Universal Code
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setOtp('786786')}
-                        className="flex-1 py-1.5 px-3 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-xs font-mono font-black transition-all flex items-center justify-center gap-1.5"
-                      >
-                        <KeyRound className="w-3.5 h-3.5" />
-                        <span>786786</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setOtp('123456')}
-                        className="flex-1 py-1.5 px-3 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-xs font-mono font-black transition-all flex items-center justify-center gap-1.5"
-                      >
-                        <KeyRound className="w-3.5 h-3.5" />
-                        <span>123456</span>
-                      </button>
-                    </div>
                   </div>
                 </div>
               )}
