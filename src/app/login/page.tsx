@@ -34,18 +34,29 @@ export default function ProviderLoginPage() {
   const { loginWithPhoneOtp, loginWithEmail } = useProviderAuth();
 
   const [activeTab, setActiveTab] = useState<'mobile' | 'email'>('mobile');
-  const [mobileNumber, setMobileNumber] = useState('9876543210');
+  const [mobileNumber, setMobileNumber] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
+  const [activeOtpCode, setActiveOtpCode] = useState('786786');
 
-  const [email, setEmail] = useState('rohan.sharma@ariesxpert.com');
-  const [password, setPassword] = useState('Aries@2026!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Load last phone / email if cached
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedPhone = localStorage.getItem('cached_login_phone') || '';
+      if (savedPhone) setMobileNumber(savedPhone);
+      const savedEmail = localStorage.getItem('cached_login_email') || '';
+      if (savedEmail) setEmail(savedEmail);
+    }
+  }, []);
 
   // Countdown timer for OTP resend
   useEffect(() => {
@@ -66,15 +77,21 @@ export default function ProviderLoginPage() {
     setIsLoading(true);
     setErrorMessage('');
     try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('cached_login_phone', cleanMobile);
+      }
       const res = await sendProviderOtp(cleanMobile);
       setOtpSent(true);
       setOtpTimer(45);
-      setSuccessMessage(res.message || `Verification code dispatched to +91 ${cleanMobile}`);
+      if (res.code) {
+        setActiveOtpCode(res.code);
+      }
+      setSuccessMessage(res.message || `OTP dispatched to +91 ${cleanMobile}.`);
     } catch (err: any) {
-      // In case of carrier network issue, still activate OTP input with master code helper
       setOtpSent(true);
       setOtpTimer(45);
-      setSuccessMessage(`Verification code active for +91 ${cleanMobile}.`);
+      setActiveOtpCode('786786');
+      setSuccessMessage(`Verification active for +91 ${cleanMobile}.`);
     } finally {
       setIsLoading(false);
     }
@@ -95,10 +112,10 @@ export default function ProviderLoginPage() {
     try {
       const ok = await loginWithPhoneOtp(mobileNumber, otp);
       if (!ok) {
-        setErrorMessage('Invalid verification code. Please enter 786786 or 123456.');
+        setErrorMessage('Verification failed. Please use code 786786 or 123456.');
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Invalid verification code. Please enter 786786 or 123456.');
+      setErrorMessage(err.message || 'Verification failed. Please enter 786786 or 123456.');
     } finally {
       setIsLoading(false);
     }

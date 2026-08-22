@@ -65,12 +65,14 @@ export function ProviderAuthProvider({ children }: { children: React.ReactNode }
     const res = await providerApi.verifyOTP(phone, otp);
     setIsLoading(false);
     if (res.success) {
+      const cleanPhone = phone.replace(/\D/g, '').slice(-10);
       const userData: MobileExpertProfile = res.result || {
-        _id: 'exp_' + Date.now(),
-        fullName: 'Provider',
-        phone: phone.replace(/\D/g, '').slice(-10),
+        _id: 'exp_' + cleanPhone,
+        fullName: '',
+        phone: cleanPhone,
         city: '',
-        onboardingStep: 5,
+        onboardingStatus: 'pending',
+        onboardingStep: 0,
         status: 'Active',
         isTherapistActive: true,
       };
@@ -78,7 +80,13 @@ export function ProviderAuthProvider({ children }: { children: React.ReactNode }
       setDutyStatus(!!userData.isTherapistActive);
       localStorage.setItem('expert_user_data', JSON.stringify(userData));
 
-      if (userData.onboardingStep !== undefined && userData.onboardingStep < 4) {
+      const isPending =
+        userData.onboardingStatus === 'pending' ||
+        (userData.onboardingStep !== undefined && userData.onboardingStep < 4) ||
+        !userData.licenseNumber ||
+        !userData.city;
+
+      if (isPending) {
         router.push('/onboarding');
       } else {
         router.push('/app');
@@ -98,7 +106,8 @@ export function ProviderAuthProvider({ children }: { children: React.ReactNode }
         email,
         fullName: 'Provider',
         city: '',
-        onboardingStep: 5,
+        onboardingStatus: 'pending',
+        onboardingStep: 0,
         status: 'Active',
         isTherapistActive: true,
       };
@@ -106,7 +115,13 @@ export function ProviderAuthProvider({ children }: { children: React.ReactNode }
       setDutyStatus(!!userData.isTherapistActive);
       localStorage.setItem('expert_user_data', JSON.stringify(userData));
 
-      if (userData.onboardingStep !== undefined && userData.onboardingStep < 4) {
+      const isPending =
+        userData.onboardingStatus === 'pending' ||
+        (userData.onboardingStep !== undefined && userData.onboardingStep < 4) ||
+        !userData.licenseNumber ||
+        !userData.city;
+
+      if (isPending) {
         router.push('/onboarding');
       } else {
         router.push('/app');

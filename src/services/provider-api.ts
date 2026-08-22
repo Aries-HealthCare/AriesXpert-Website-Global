@@ -369,38 +369,42 @@ class ProviderApiService {
           if (data.success !== false) {
             // If real expert document returned from MongoDB, normalize and return
             if (expert) {
+              const hasCompleted =
+                expert.onboardingStatus === 'completed' ||
+                (expert.onboardingStep !== undefined && expert.onboardingStep >= 4 && expert.licenseNumber);
+
               const normalizedExpert: MobileExpertProfile = {
                 _id: expert._id || expert.id,
-                fullName: expert.fullName || `${expert.firstName || ''} ${expert.lastName || ''}`.trim() || 'Therapist',
+                fullName: expert.fullName || `${expert.firstName || ''} ${expert.lastName || ''}`.trim() || '',
                 firstName: expert.firstName,
                 lastName: expert.lastName,
                 phone: expert.phone || cleanMobile,
                 email: expert.email || `${cleanMobile}@ariesxpert.com`,
-                city: expert.city || expert.areaOfServiceInfo?.city || 'Mumbai',
+                city: expert.city || expert.areaOfServiceInfo?.city || '',
                 state: expert.state,
                 zipCode: expert.zipCode || expert.areaOfServiceInfo?.pincode,
                 streetAddress: expert.streetAddress,
                 gender: expert.gender,
                 dob: expert.dob,
                 status: expert.status || 'Active',
-                onboardingStatus: expert.onboardingStatus || 'completed',
-                onboardingStep: expert.onboardingStep ?? 5,
+                onboardingStatus: hasCompleted ? 'completed' : (expert.onboardingStatus || 'pending'),
+                onboardingStep: expert.onboardingStep ?? (hasCompleted ? 5 : 0),
                 isTherapistActive: expert.isProfileActive ?? expert.isTherapistActive ?? true,
                 isProfileActive: expert.isProfileActive ?? true,
-                isVerified: expert.isVerified ?? true,
+                isVerified: expert.isVerified ?? false,
                 rating: expert.rating || expert.averageRating || 4.95,
-                totalReviews: expert.totalReviews || expert.reviewCount || 28,
+                totalReviews: expert.totalReviews || expert.reviewCount || 0,
                 specialization:
                   expert.specialization ||
                   (expert.professionalInfo?.specializations ? expert.professionalInfo.specializations.join(', ') : null) ||
                   expert.professionalInfo?.qualification ||
-                  'Physiotherapist',
+                  '',
                 licenseNumber:
                   expert.licenseNumber ||
                   expert.professionalInfo?.councilRegistrationNumber ||
                   expert.professionalInfo?.registrationNumber ||
-                  'MSPT-84920-IN',
-                yearsOfExperience: expert.yearsOfExperience || expert.professionalInfo?.yearOfExperience || '5',
+                  '',
+                yearsOfExperience: expert.yearsOfExperience || expert.professionalInfo?.yearOfExperience || '',
                 serviceAreas: expert.areaOfServiceInfo?.serviceAreas || expert.serviceAreas || [],
                 targetPincodes: expert.areaOfServiceInfo?.targetPincodes || expert.targetPincodes || [],
                 bankInfo: expert.bankInfo,
@@ -420,17 +424,18 @@ class ProviderApiService {
               token,
               result: {
                 _id: 'exp_' + cleanMobile,
-                fullName: 'Dr. Therapist',
+                fullName: '',
                 phone: cleanMobile,
                 email: `${cleanMobile}@ariesxpert.com`,
-                city: 'Mumbai',
-                onboardingStep: 5,
+                city: '',
+                onboardingStatus: 'pending',
+                onboardingStep: 0,
                 status: 'Active',
                 isTherapistActive: true,
                 isProfileActive: true,
-                isVerified: true,
+                isVerified: false,
                 rating: 4.95,
-                totalReviews: 24,
+                totalReviews: 0,
               },
               message: data.message,
             };

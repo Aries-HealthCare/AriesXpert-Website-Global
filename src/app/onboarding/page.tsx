@@ -137,24 +137,48 @@ export default function ProviderOnboardingPage() {
   const [declarationTrue, setDeclarationTrue] = useState(true);
 
   // Initialize from user / localStorage draft
+  // Initialize from user / localStorage draft
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Load registered user info
-    if (user?.fullName) setFullName(user.fullName);
-    if (user?.email) setEmail(user.email);
-    if (user?.phone) setPhone(user.phone);
-    if (user?.city) setCity(user.city);
+    // Load registered user info if logged in
+    if (user) {
+      if (user.fullName) setFullName(user.fullName);
+      if (user.email) setEmail(user.email);
+      if (user.phone) setPhone(user.phone);
+      if (user.city) setCity(user.city);
+      if (user.state) setStateVal(user.state);
+      if (user.zipCode) setZipCode(user.zipCode);
+      if (user.streetAddress) setStreetAddress(user.streetAddress);
+      if (user.gender) setGender(user.gender);
+      if (user.dob) setDob(user.dob);
+      if (user.licenseNumber) setCouncilRegistrationNumber(user.licenseNumber);
+      if (user.specialization) setQualification(user.specialization);
+      if (user.yearsOfExperience) setYearOfExperience(user.yearsOfExperience);
+      if (user.targetPincodes && user.targetPincodes.length > 0) setTargetPincodes(user.targetPincodes);
+      if (user.serviceAreas && user.serviceAreas.length > 0) setServiceAreas(user.serviceAreas);
+      if (user.bankInfo) {
+        if (user.bankInfo.accountHolderName) setAccountHolderName(user.bankInfo.accountHolderName);
+        if (user.bankInfo.accountNumber) setAccountNumber(user.bankInfo.accountNumber);
+        if (user.bankInfo.bankName) setBankName(user.bankInfo.bankName);
+        if (user.bankInfo.ifscCode) setIfscCode(user.bankInfo.ifscCode);
+        if (user.bankInfo.upiId) setUpiId(user.bankInfo.upiId);
+        if (user.bankInfo.panNumber) setPanNumber(user.bankInfo.panNumber);
+      }
+      if (user.onboardingStep !== undefined && user.onboardingStep >= 0 && user.onboardingStep <= 4) {
+        setCurrentStep(user.onboardingStep);
+      }
+    }
 
     // Load cached draft
     const cached = localStorage.getItem('onboarding_full_draft');
     if (cached) {
       try {
         const d = JSON.parse(cached);
-        if (d.fullName) setFullName(d.fullName);
-        if (d.phone) setPhone(d.phone);
-        if (d.email) setEmail(d.email);
-        if (d.city) setCity(d.city);
+        if (d.fullName && !user?.fullName) setFullName(d.fullName);
+        if (d.phone && !user?.phone) setPhone(d.phone);
+        if (d.email && !user?.email) setEmail(d.email);
+        if (d.city && !user?.city) setCity(d.city);
         if (d.qualification) setQualification(d.qualification);
         if (d.councilRegistrationNumber) setCouncilRegistrationNumber(d.councilRegistrationNumber);
         if (d.accountHolderName) setAccountHolderName(d.accountHolderName);
@@ -162,7 +186,6 @@ export default function ProviderOnboardingPage() {
         if (d.ifscCode) setIfscCode(d.ifscCode);
         if (d.upiId) setUpiId(d.upiId);
         if (d.targetPincodes) setTargetPincodes(d.targetPincodes);
-        if (d.currentStep !== undefined) setCurrentStep(d.currentStep);
       } catch (_) {}
     }
   }, [user]);
@@ -490,6 +513,21 @@ export default function ProviderOnboardingPage() {
             <span className="font-bold text-foreground">{STEPS[currentStep].title}</span>
           </div>
         </div>
+
+        {/* Pending Registration Welcome Banner */}
+        {user?.phone && (
+          <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex items-start gap-3 text-xs">
+            <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <div>
+              <p className="font-outfit font-extrabold text-foreground text-sm">
+                Complete Your Provider Registration
+              </p>
+              <p className="text-muted-foreground mt-0.5">
+                Welcome! Your registered mobile <span className="font-mono font-bold text-foreground">+91 {user.phone}</span> is verified. Complete your clinical registration and operating territory below to activate your practice.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* 5-Step Stepper Progress Bar */}
         <div className="grid grid-cols-5 gap-2 sm:gap-3">
