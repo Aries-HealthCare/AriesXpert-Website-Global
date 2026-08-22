@@ -311,26 +311,41 @@ export default function ProviderDashboardPage() {
 
       {/* KPI Grid — matches _buildKPIGrid in dashboard_screen.dart (8 KPI cards) */}
       <div>
-        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3 px-1">
-          📊 Performance Metrics
-        </h2>
+        <div className="flex items-center justify-between mb-3 px-1">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+            <span>📊 Performance & Clinical Telemetry</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          </h2>
+          <span className="text-[11px] text-muted-foreground font-mono">Live Sync • 2026 Governance</span>
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           {kpiCards.map((kpi) => {
             const card = (
               <div
                 key={kpi.label}
-                className="bg-card border border-border/80 p-4 sm:p-5 rounded-3xl shadow-sm relative overflow-hidden hover:shadow-md transition-shadow"
+                className="group relative bg-card border border-border/80 p-4 sm:p-5 rounded-3xl shadow-sm overflow-hidden hover:-translate-y-1.5 hover:shadow-xl hover:border-primary/40 transition-all duration-300 cursor-pointer"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-muted-foreground">{kpi.label}</span>
-                  <div className={`w-8 h-8 rounded-xl ${kpi.color} flex items-center justify-center`}>
+                {/* Ambient glow accent */}
+                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/10 to-transparent rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+                {/* Shimmer sweep bar on hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+
+                <div className="flex items-center justify-between mb-2 relative z-10">
+                  <span className="text-xs font-bold text-muted-foreground group-hover:text-foreground transition-colors">
+                    {kpi.label}
+                  </span>
+                  <div className={`w-8 h-8 rounded-xl ${kpi.color} flex items-center justify-center shadow-xs group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
                     {kpi.icon}
                   </div>
                 </div>
-                <div className="text-2xl sm:text-3xl font-extrabold font-mono">
+                <div className="text-2xl sm:text-3xl font-extrabold font-mono tracking-tight relative z-10 group-hover:text-primary transition-colors">
                   {isLoading ? <span className="text-muted-foreground text-base">—</span> : kpi.value}
                 </div>
-                <div className="text-[11px] text-muted-foreground mt-1">{kpi.sub}</div>
+                <div className="text-[11px] text-muted-foreground mt-1 flex items-center justify-between relative z-10">
+                  <span>{kpi.sub}</span>
+                  <ChevronRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-primary" />
+                </div>
               </div>
             );
             return kpi.href ? <Link key={kpi.label} href={kpi.href} prefetch={false}>{card}</Link> : card;

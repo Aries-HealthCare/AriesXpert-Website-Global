@@ -58,6 +58,24 @@ export default function ProviderProfilePage() {
   const [emergencyPhone, setEmergencyPhone] = useState('+91 98201 44219');
   const [emergencyRelation, setEmergencyRelation] = useState('Clinical Colleague / Territory Lead');
 
+  // Digital ID 3D Animation State
+  const [isIdCardFlipped, setIsIdCardFlipped] = useState(false);
+  const [cardTilt, setCardTilt] = useState({ x: 0, y: 0 });
+
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    setCardTilt({
+      x: -(y / (rect.height / 2)) * 10,
+      y: (x / (rect.width / 2)) * 10,
+    });
+  };
+
+  const handleCardMouseLeave = () => {
+    setCardTilt({ x: 0, y: 0 });
+  };
+
   const axId = user?.axId || user?.therapistId || (user?.phone ? `AX-IND-${user.phone.slice(-4)}` : 'AX-IND-PROV');
   const profilePhotoUrl = resolveProfileImage(user?.profilePhoto);
 
@@ -457,83 +475,168 @@ export default function ProviderProfilePage() {
       {/* ── TAB 4: DIGITAL ID CARD ── */}
       {activeTab === 'idcard' && (
         <div className="space-y-6">
-          <div className="max-w-md mx-auto bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-primary/40 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
-
-            {/* Top row */}
-            <div className="flex items-center justify-between relative z-10 pb-4 border-b border-white/10">
-              <DynamicAppLogo size={36} showText={true} />
-              <div className="flex items-center gap-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2.5 py-1 rounded-full text-[10px] font-bold">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>OFFICIAL VERIFIED SPECIALIST</span>
-              </div>
+          <div className="text-center space-y-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 border border-accent/30 text-accent text-xs font-bold">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Interactive 3D Holographic Identity Pass</span>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Click or tap the card to flip between Clinical Credentials and Live Verification QR Scanner.
+            </p>
+          </div>
 
-            {/* Middle row */}
-            <div className="flex items-center gap-4 my-6 relative z-10">
-              {profilePhotoUrl ? (
-                <img
-                  src={profilePhotoUrl}
-                  alt={name}
-                  className="w-20 h-20 rounded-2xl object-cover shadow-lg border-2 border-white/20 shrink-0"
-                />
-              ) : (
-                <div className="w-20 h-20 rounded-2xl bg-primary text-white text-2xl font-outfit font-black flex items-center justify-center shadow-lg border-2 border-white/20 shrink-0">
-                  {name.charAt(0) || 'D'}
-                </div>
-              )}
-              <div className="min-w-0">
-                <h3 className="text-lg font-outfit font-extrabold tracking-tight truncate">{name || 'Doctor'}</h3>
-                <p className="text-xs text-slate-300 font-medium truncate">{specialization}</p>
-                <div className="mt-1 flex items-center gap-2 text-[11px] font-mono text-primary font-bold">
-                  <span>ID: {axId}</span>
-                </div>
-              </div>
-            </div>
+          {/* 3D Perspective Card Container */}
+          <div
+            className="relative w-full max-w-md mx-auto h-[480px] perspective-1000 cursor-pointer select-none group"
+            onMouseMove={handleCardMouseMove}
+            onMouseLeave={handleCardMouseLeave}
+            onClick={() => setIsIdCardFlipped(!isIdCardFlipped)}
+          >
+            <div
+              className={`w-full h-full transition-transform duration-700 transform-style-3d relative ${
+                isIdCardFlipped ? 'rotate-y-180' : ''
+              }`}
+              style={{
+                transform: isIdCardFlipped
+                  ? 'rotateY(180deg)'
+                  : `rotateX(${cardTilt.x}deg) rotateY(${cardTilt.y}deg)`,
+              }}
+            >
+              {/* ── FRONT SIDE ── */}
+              <div className="absolute inset-0 w-full h-full backface-hidden rounded-3xl p-6 sm:p-7 shadow-2xl border-2 border-accent/40 bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950 text-white flex flex-col justify-between overflow-hidden">
+                {/* Holographic metallic reflection sweep */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-accent/10 via-transparent to-primary/15 pointer-events-none animate-holographic" />
+                <div className="absolute top-0 right-0 w-40 h-40 bg-accent/10 rounded-full blur-2xl pointer-events-none" />
 
-            {/* Council & Location Grid */}
-            <div className="grid grid-cols-2 gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs relative z-10">
-              <div>
-                <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Council Reg No</p>
-                <p className="font-mono font-bold text-white mt-0.5">{licenseNumber}</p>
-              </div>
-              <div>
-                <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Territory</p>
-                <p className="font-bold text-white mt-0.5">{city}, India</p>
-              </div>
-            </div>
+                {/* Card Top Header */}
+                <div className="flex items-center justify-between relative z-10 pb-3.5 border-b border-white/10">
+                  <DynamicAppLogo size={36} showText={true} />
+                  <div className="flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2.5 py-1 rounded-full text-[9px] font-extrabold tracking-wide">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>VERIFIED SPECIALIST</span>
+                  </div>
+                </div>
 
-            {/* Bottom Row */}
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/10 relative z-10">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-white rounded-xl">
-                  <QrCode className="w-8 h-8 text-black" />
+                {/* Doctor Bio & Verified Portrait */}
+                <div className="flex items-center gap-4 my-auto relative z-10">
+                  <div className="relative shrink-0">
+                    {profilePhotoUrl ? (
+                      <img
+                        src={profilePhotoUrl}
+                        alt={name}
+                        className="w-20 h-20 rounded-2xl object-cover shadow-xl border-2 border-accent/50 group-hover:scale-105 transition-transform"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-primary to-accent text-white text-2xl font-outfit font-black flex items-center justify-center shadow-xl border-2 border-accent/50 group-hover:scale-105 transition-transform">
+                        {name.charAt(0) || 'D'}
+                      </div>
+                    )}
+                    {/* Live RFID / Security chip stamp */}
+                    <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-accent text-slate-950 font-black text-[9px] flex items-center justify-center shadow-md border border-white">
+                      ✓
+                    </span>
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-lg font-outfit font-extrabold tracking-tight text-white truncate">
+                      {name || 'Doctor'}
+                    </h3>
+                    <p className="text-xs text-accent font-semibold truncate mt-0.5">{specialization}</p>
+                    <div className="mt-1.5 flex items-center gap-2 text-[11px] font-mono text-slate-300">
+                      <span className="bg-white/10 px-2 py-0.5 rounded-md font-bold text-white">ID: {axId}</span>
+                      <span className="text-[10px] text-emerald-400 font-bold">● Active 2026</span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[10px] font-bold text-slate-300">Scan to Verify Doctor</p>
-                  <p className="text-[9px] text-slate-400 font-mono">api.ariesxpert.com/verify/{axId}</p>
+
+                {/* Council & Location Grid */}
+                <div className="grid grid-cols-2 gap-2.5 p-3 rounded-2xl bg-white/5 border border-white/10 text-xs relative z-10 backdrop-blur-xs">
+                  <div>
+                    <p className="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Council Reg No</p>
+                    <p className="font-mono font-bold text-white mt-0.5 truncate">{licenseNumber || 'MH-PT-4892'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Territory / State</p>
+                    <p className="font-bold text-white mt-0.5 truncate">{city}, India</p>
+                  </div>
+                </div>
+
+                {/* Card Bottom Footer */}
+                <div className="flex items-center justify-between pt-3 border-t border-white/10 relative z-10 text-[10px]">
+                  <div className="flex items-center gap-2 text-slate-300 font-medium">
+                    <div className="p-1 bg-white rounded-lg">
+                      <QrCode className="w-5 h-5 text-black" />
+                    </div>
+                    <span>Tap card to view Laser QR</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Clinical Council</p>
+                    <p className="text-xs font-outfit font-extrabold text-accent">Authorized Specialist</p>
+                  </div>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-[9px] text-slate-400 uppercase tracking-wider">Clinical Council</p>
-                <p className="text-xs font-outfit font-extrabold text-accent">Authorized Specialist</p>
+
+              {/* ── BACK SIDE (3D FLIPPED) ── */}
+              <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-3xl p-6 sm:p-7 shadow-2xl border-2 border-emerald-500/40 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white flex flex-col justify-between overflow-hidden">
+                {/* Holographic aura */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/10 via-transparent to-primary/10 pointer-events-none" />
+
+                {/* Back Top Header */}
+                <div className="flex items-center justify-between relative z-10 pb-3 border-b border-white/10">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 font-mono">
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>SECURE DIGITAL IDENTITY</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-slate-400">EXP: 12/2028</span>
+                </div>
+
+                {/* High-Resolution QR with Animated Laser Scanner */}
+                <div className="my-auto text-center space-y-2 relative z-10">
+                  <div className="relative w-40 h-40 mx-auto bg-white p-2.5 rounded-2xl shadow-2xl flex items-center justify-center overflow-hidden border-2 border-emerald-400/40">
+                    <QrCode className="w-full h-full text-slate-950" />
+                    {/* Animated Laser Scanning Line */}
+                    <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent shadow-[0_0_12px_#10b981] animate-laser-sweep pointer-events-none" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-white">Scan with Camera to Verify Authenticity</p>
+                    <p className="text-[10px] font-mono text-slate-400 mt-0.5">
+                      https://ariesphysiocare.com/verify/{axId}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Back Footer Governance Notice */}
+                <div className="space-y-1.5 pt-3 border-t border-white/10 relative z-10 text-center">
+                  <p className="text-[9px] text-slate-400 leading-tight">
+                    Issued under the authority of Aries HealthCare Clinical Governance Board. Certified Doorstep Physiotherapy Provider.
+                  </p>
+                  <p className="text-[10px] font-bold text-accent">Tap to Flip to Front</p>
+                </div>
               </div>
             </div>
           </div>
 
+          {/* Action Buttons */}
           <div className="flex justify-center gap-3">
             <Button
               variant="outline"
               className="rounded-2xl text-xs font-bold"
-              onClick={() => alert(`Digital ID Card link copied: https://ariesphysiocare.com/verify/${axId}`)}
+              onClick={() => setIsIdCardFlipped(!isIdCardFlipped)}
             >
-              <Share2 className="w-3.5 h-3.5 mr-1.5" /> Share Digital ID
+              <Sparkles className="w-3.5 h-3.5 mr-1.5 text-primary" /> Flip 3D Card
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-2xl text-xs font-bold"
+              onClick={() => alert(`Digital ID link copied: https://ariesphysiocare.com/verify/${axId}`)}
+            >
+              <Share2 className="w-3.5 h-3.5 mr-1.5" /> Share Digital Pass
             </Button>
             <Button
               className="rounded-2xl bg-primary hover:bg-primary/95 text-white font-bold text-xs"
               onClick={() => window.print()}
             >
-              <Download className="w-3.5 h-3.5 mr-1.5" /> Print / Save ID Card
+              <Download className="w-3.5 h-3.5 mr-1.5" /> Print / Save ID
             </Button>
           </div>
         </div>
