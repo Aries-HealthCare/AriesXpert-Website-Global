@@ -70,6 +70,7 @@ export default function Header() {
                 src="/logo-light.png"
                 alt="Aries PhysioCare"
                 fill
+                sizes="(max-width: 640px) 160px, (max-width: 1024px) 224px, 288px"
                 className="object-contain block dark:hidden object-center xl:object-left"
                 priority
               />
@@ -77,6 +78,7 @@ export default function Header() {
                 src="/logo-dark.png"
                 alt="Aries PhysioCare"
                 fill
+                sizes="(max-width: 640px) 160px, (max-width: 1024px) 224px, 288px"
                 className="object-contain hidden dark:block object-center xl:object-left"
                 priority
               />

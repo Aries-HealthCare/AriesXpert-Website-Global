@@ -25,7 +25,11 @@ function formatCount(n: number): string {
 
 export default function Hero() {
   const { openModal } = useRequestCallback();
-  const [stats, setStats] = useState<WebsiteStats | null>(null);
+  const [stats, setStats] = useState<WebsiteStats>({
+    therapistCount: 450,
+    patientCount: 15000,
+    cityCount: 12,
+  });
 
   useEffect(() => {
     fetch('/api/stats')
@@ -50,7 +54,8 @@ export default function Hero() {
                   alt={image.description}
                   fill
                   sizes="100vw"
-                  className="object-cover object-center transition-transform duration-[3000ms] scale-110 animate-pulse-slow"
+                  quality={75}
+                  className="object-cover object-center transition-transform duration-[3000ms] scale-110"
                   priority={index === 0}
                   loading={index === 0 ? "eager" : "lazy"}
                 />

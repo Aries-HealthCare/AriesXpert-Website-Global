@@ -20,6 +20,7 @@ export default function Footer() {
                   src="/logo-light.png"
                   alt="Aries PhysioCare"
                   fill
+                  sizes="(max-width: 640px) 256px, 400px"
                   className="object-contain block dark:hidden object-center md:object-left"
                 />
                 {/* Dark Mode Logo */}
@@ -27,6 +28,7 @@ export default function Footer() {
                   src="/logo-dark.png"
                   alt="Aries PhysioCare"
                   fill
+                  sizes="(max-width: 640px) 256px, 400px"
                   className="object-contain hidden dark:block object-center md:object-left"
                 />
               </div>
