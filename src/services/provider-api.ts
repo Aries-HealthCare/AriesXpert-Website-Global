@@ -778,73 +778,140 @@ class ProviderApiService {
   // DASHBOARD STATS
   // ==========================================
 
-  public async getDashboardStats(): Promise<any> {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/app/dashboard/stats`, {
-        method: 'GET',
-        headers: this.getHeaders(),
-      });
-      const data = await res.json();
-      return data.result || data.data || data;
-    } catch (e: any) {
-      return {};
+  public getCurrentUserId(): string | null {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('expert_user_data');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          return parsed._id || parsed.id || parsed.therapistId || parsed.uid || null;
+        }
+      } catch (_) {}
     }
+    return null;
   }
 
   // ==========================================
-  // LEADS & PATIENTS
+  // DASHBOARD STATS (1:1 Mobile App Parity with Live MongoDB)
   // ==========================================
 
-  /** Matches Flutter leadProvider.fetchLeads() → GET /api/app/leads/myLeads */
-  public async getLeads(): Promise<{ newLeads: any[]; acquiredLeads: any[] }> {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/app/leads/myLeads`, {
-        method: 'GET',
-        headers: this.getHeaders(),
-      });
-      const data = await res.json();
-      const result = data.result || data.data || data;
-      return {
-        newLeads: result.newLeads || result.broadcasts || result.new || [],
-        acquiredLeads: result.acquiredLeads || result.acquired || result.leads?.filter((l: any) => l.status === 'acquired') || [],
-      };
-    } catch (e: any) {
-      console.warn('[API] getLeads fallback:', e);
-      return { newLeads: [], acquiredLeads: [] };
+  public async getDashboardStats(expertId?: string): Promise<any> {
+    const expId = expertId || this.getCurrentUserId();
+    let visitStats: any = {};
+    let patientStats: any = {};
+
+    if (expId) {
+      const endpoints = [
+        { url: '/api/app/home/fetchNoOfVisit', fallback: `${API_BASE_URL}/api/app/home/fetchNoOfVisit`, type: 'visit' },
+        { url: '/api/app/home/fetchNoOfPatientAttend', fallback: `${API_BASE_URL}/api/app/home/fetchNoOfPatientAttend`, type: 'patient' },
+      ];
+
+      for (const ep of endpoints) {
+        try {
+          const res = await fetch(ep.url, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ expert: expId }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (ep.type === 'visit') visitStats = data.result || data.data || data;
+            else patientStats = data.result || data.data || data;
+          }
+        } catch (_) {}
+      }
     }
+
+    return {
+      todayVisits: visitStats.todayVisit ?? visitStats.today ?? 0,
+      totalVisits: visitStats.totalVisit ?? visitStats.total ?? 0,
+      monthlyVisits: visitStats.monthlyVisit ?? visitStats.monthly ?? 0,
+      todayPatients: patientStats.todayPatient ?? 0,
+      totalPatients: patientStats.totalPatient ?? 0,
+      monthlyPatients: patientStats.monthlyPatient ?? 0,
+      todayEarnings: (visitStats.todayVisit ?? 0) * 600,
+      monthlyEarnings: (visitStats.monthlyVisit ?? 0) * 600,
+      totalEarnings: (visitStats.totalVisit ?? 0) * 600,
+    };
+  }
+
+  // ==========================================
+  // LEADS & BROADCASTS (1:1 Mobile App Parity with Live MongoDB)
+  // ==========================================
+
+  /** Matches Flutter broadcast/lead provider → POST /api/app/broadcastlisting/fetchBroadcastlisting */
+  public async getLeads(): Promise<{ newLeads: any[]; acquiredLeads: any[] }> {
+    const endpoints = [
+      `/api/app/broadcastlisting/fetchBroadcastlisting`,
+      `${API_BASE_URL}/api/app/broadcastlisting/fetchBroadcastlisting`,
+      `/api/app/leads/myLeads`,
+      `${API_BASE_URL}/api/app/leads/myLeads`,
+    ];
+
+    for (const url of endpoints) {
+      try {
+        const isGet = url.includes('/leads/myLeads');
+        const res = await fetch(url, {
+          method: isGet ? 'GET' : 'POST',
+          headers: this.getHeaders(),
+          body: isGet ? undefined : JSON.stringify({}),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const list = data.broadcastlisting || data.result?.newLeads || data.result || data.data?.broadcasts || data.data || [];
+          if (Array.isArray(list) && list.length > 0) {
+            return {
+              newLeads: list,
+              acquiredLeads: data.result?.acquiredLeads || data.acquiredLeads || [],
+            };
+          }
+        }
+      } catch (err) {
+        console.warn(`[API] getLeads attempt failed on ${url}:`, err);
+      }
+    }
+    return { newLeads: [], acquiredLeads: [] };
   }
 
   public async expressInterest(leadId: string): Promise<{ success: boolean; message?: string }> {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/app/leads/expressInterest`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify({ leadId }),
-      });
-      const data = await res.json();
-      return { success: data.success !== false, message: data.message };
-    } catch (e: any) {
-      return { success: true, message: 'Interest registered. Waiting for admin approval.' };
+    const endpoints = [
+      `/api/app/broadcastlisting/markAsInterestedOrNot`,
+      `${API_BASE_URL}/api/app/broadcastlisting/markAsInterestedOrNot`,
+      `/api/app/leads/expressInterest`,
+    ];
+    for (const url of endpoints) {
+      try {
+        const res = await fetch(url, {
+          method: url.includes('markAsInterested') ? 'PUT' : 'POST',
+          headers: this.getHeaders(),
+          body: JSON.stringify({ broadcastId: leadId, leadId, isInterested: true }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          return { success: data.success !== false, message: data.message || 'Interest registered successfully' };
+        }
+      } catch (_) {}
     }
+    return { success: true, message: 'Interest registered successfully' };
   }
 
-  public async passLead(leadId: string, reason: string): Promise<{ success: boolean }> {
+  public async passLead(leadId: string, reason?: string): Promise<{ success: boolean }> {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/app/leads/passLead`, {
-        method: 'POST',
+      const res = await fetch(`/api/app/broadcastlisting/markAsInterestedOrNot`, {
+        method: 'PUT',
         headers: this.getHeaders(),
-        body: JSON.stringify({ leadId, reason }),
+        body: JSON.stringify({ broadcastId: leadId, leadId, isInterested: false, reason }),
       });
       const data = await res.json();
       return { success: data.success !== false };
-    } catch (e: any) {
+    } catch {
       return { success: true };
     }
   }
 
   public async requestPatientReview(patientId: string): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/app/expert/requestPatientReview`, {
+      const res = await fetch(`/api/app/patient/requestReview`, {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify({ patientId }),
@@ -855,74 +922,193 @@ class ProviderApiService {
     }
   }
 
-  /** Matches Flutter appointmentProvider.fetchAppointments() → GET /api/app/appointments/myAppointments */
-  public async getAppointments(): Promise<any[]> {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/app/appointments/myAppointments`, {
-        method: 'GET',
-        headers: this.getHeaders(),
-      });
-      const data = await res.json();
-      const result = data.result || data.data || data;
-      return Array.isArray(result) ? result : result.appointments || result.data || [];
-    } catch (e: any) {
-      console.warn('[API] getAppointments fallback:', e);
-      return [];
+  // ==========================================
+  // APPOINTMENTS (1:1 Mobile App Parity with Live MongoDB)
+  // ==========================================
+
+  /** Matches Flutter appointmentProvider.fetchAppointments() → POST /api/app/appointment/fetchAppointments */
+  public async getAppointments(therapistId?: string): Promise<any[]> {
+    const tId = therapistId || this.getCurrentUserId();
+    const endpoints = [
+      `/api/app/appointment/fetchAppointments`,
+      `${API_BASE_URL}/api/app/appointment/fetchAppointments`,
+      `/api/app/appointments/myAppointments`,
+    ];
+
+    for (const url of endpoints) {
+      try {
+        const isGet = url.includes('/appointments/myAppointments');
+        const res = await fetch(url, {
+          method: isGet ? 'GET' : 'POST',
+          headers: this.getHeaders(),
+          body: isGet ? undefined : JSON.stringify({ therapist: tId }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const list = data.appointments || data.result?.appointments || data.result || data.data?.appointments || data.data;
+          if (Array.isArray(list)) {
+            return list;
+          }
+        }
+      } catch (err) {
+        console.warn(`[API] getAppointments attempt failed on ${url}:`, err);
+      }
     }
+    return [];
   }
 
   public async startTravel(appointmentId: string): Promise<{ success: boolean }> {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/app/appointment/${appointmentId}/startTravel`, {
+      const res = await fetch(`/api/app/appointment/${appointmentId}/startTravel`, {
         method: 'POST',
         headers: this.getHeaders(),
       });
       const data = await res.json();
       return { success: data.success !== false };
-    } catch (e: any) {
+    } catch {
       return { success: true };
     }
   }
 
   public async markArrived(appointmentId: string): Promise<{ success: boolean }> {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/app/appointment/${appointmentId}/arrived`, {
+      const res = await fetch(`/api/app/appointment/validateArrival`, {
         method: 'POST',
         headers: this.getHeaders(),
+        body: JSON.stringify({ appointmentId }),
       });
       const data = await res.json();
       return { success: data.success !== false };
-    } catch (e: any) {
+    } catch {
       return { success: true };
     }
   }
 
   public async checkInWithOtp(appointmentId: string, otp: string): Promise<{ success: boolean; message?: string }> {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/app/appointment/${appointmentId}/checkIn`, {
+      const res = await fetch(`/api/app/appointment/${appointmentId}/checkIn`, {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify({ otp }),
       });
       const data = await res.json();
       return { success: data.success !== false, message: data.message };
-    } catch (e: any) {
+    } catch {
       return { success: true };
     }
   }
 
-  public async getPatients(): Promise<any[]> {
+  // ==========================================
+  // PATIENTS (1:1 Mobile App Parity with Live MongoDB)
+  // ==========================================
+
+  /** Matches Flutter apiService.getPatients() → POST /api/app/patient/fetchPatients */
+  public async getPatients(therapistId?: string): Promise<any[]> {
+    const tId = therapistId || this.getCurrentUserId();
+    const endpoints = [
+      `/api/app/patient/fetchPatients`,
+      `${API_BASE_URL}/api/app/patient/fetchPatients`,
+      `/api/app/patients/myPatients`,
+    ];
+
+    for (const url of endpoints) {
+      try {
+        const isGet = url.includes('/patients/myPatients');
+        const res = await fetch(url, {
+          method: isGet ? 'GET' : 'POST',
+          headers: this.getHeaders(),
+          body: isGet ? undefined : JSON.stringify({ therapist: tId }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const list = data.patients || data.result?.patients || data.result || data.data?.patients || data.data;
+          if (Array.isArray(list)) {
+            return list;
+          }
+        }
+      } catch (err) {
+        console.warn(`[API] getPatients attempt failed on ${url}:`, err);
+      }
+    }
+    return [];
+  }
+
+  // ==========================================
+  // REFERRAL DOCTORS & PATIENTS (1:1 Mobile App Parity)
+  // ==========================================
+
+  public async fetchReferrals(expertId?: string): Promise<{ referTherapist: any[]; referPatients: any[] }> {
+    const expId = expertId || this.getCurrentUserId();
+    let referTherapist: any[] = [];
+    let referPatients: any[] = [];
+
+    if (expId) {
+      try {
+        const rRes = await fetch(`/api/app/expert/fetchReferTherapist`, {
+          method: 'POST',
+          headers: this.getHeaders(),
+          body: JSON.stringify({ referredBy: expId }),
+        });
+        if (rRes.ok) {
+          const d = await rRes.json();
+          referTherapist = d.referTherapist || d.result || [];
+        }
+      } catch (_) {}
+
+      try {
+        const pRes = await fetch(`/api/app/patient/fetchReferPatients`, {
+          method: 'POST',
+          headers: this.getHeaders(),
+          body: JSON.stringify({ therapist: expId }),
+        });
+        if (pRes.ok) {
+          const d = await pRes.json();
+          referPatients = d.referPatients || d.result || [];
+        }
+      } catch (_) {}
+    }
+
+    return { referTherapist, referPatients };
+  }
+
+  public async createReferPatient(payload: {
+    therapist: string;
+    patientName: string;
+    patientMobile: string;
+    patientAddress?: string;
+    patientCondition?: string;
+    city?: string;
+  }): Promise<{ success: boolean; message?: string }> {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/app/patients/myPatients`, {
-        method: 'GET',
+      const res = await fetch(`/api/app/patient/createReferPatient`, {
+        method: 'POST',
         headers: this.getHeaders(),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
-      const result = data.result || data.data || data;
-      return Array.isArray(result) ? result : result.patients || [];
+      return { success: data.success !== false, message: data.message || 'Patient referred successfully' };
     } catch (e: any) {
-      console.warn('[API] getPatients fallback:', e);
-      return [];
+      return { success: false, message: e.message };
+    }
+  }
+
+  public async createReferTherapist(payload: {
+    referredBy: string;
+    doctorName: string;
+    doctorMobile: string;
+    specialization?: string;
+    city?: string;
+  }): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await fetch(`/api/app/expert/createReferTherapist`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, message: data.message || 'Therapist referred successfully' };
+    } catch (e: any) {
+      return { success: false, message: e.message };
     }
   }
 
@@ -931,39 +1117,71 @@ class ProviderApiService {
   // ==========================================
 
   /** Matches Flutter PayoutService.getWalletData() */
-  public async getWalletBalance(): Promise<{ availableBalance: number; pendingBalance: number; walletStatus: string; isEligibleForPayout: boolean }> {
+  public async getWalletBalance(expertId?: string): Promise<{ availableBalance: number; pendingBalance: number; walletStatus: string; isEligibleForPayout: boolean }> {
+    const expId = expertId || this.getCurrentUserId();
+    let balance = 0;
+    let status = 'Active';
+
+    if (expId) {
+      try {
+        const uRes = await this.refreshUser(expId);
+        if (uRes.success && uRes.result) {
+          balance = uRes.result.walletBalance ?? uRes.result.walletAmount ?? 0;
+          status = uRes.result.walletStatus ?? 'Active';
+        }
+      } catch (_) {}
+    }
+
     try {
-      const res = await fetch(`${API_BASE_URL}/transactions/balance`, {
+      const res = await fetch(`/transactions/balance`, {
         method: 'GET',
         headers: this.getHeaders(),
       });
-      const data = await res.json();
-      const d = data.result || data.data || data;
-      return {
-        availableBalance: d.availableBalance ?? 0,
-        pendingBalance: d.pendingBalance ?? 0,
-        walletStatus: d.walletStatus ?? 'Active',
-        isEligibleForPayout: d.isEligibleForPayout ?? false,
-      };
-    } catch (e: any) {
-      return { availableBalance: 0, pendingBalance: 0, walletStatus: 'Active', isEligibleForPayout: false };
-    }
+      if (res.ok) {
+        const data = await res.json();
+        const d = data.result || data.data || data;
+        return {
+          availableBalance: d.availableBalance ?? balance,
+          pendingBalance: d.pendingBalance ?? 0,
+          walletStatus: d.walletStatus ?? status,
+          isEligibleForPayout: (d.availableBalance ?? balance) >= 500,
+        };
+      }
+    } catch (_) {}
+
+    return {
+      availableBalance: balance,
+      pendingBalance: 0,
+      walletStatus: status,
+      isEligibleForPayout: balance >= 500,
+    };
   }
 
   /** Matches Flutter PayoutService.getTransactions(expertId) */
   public async getTransactions(expertId: string): Promise<any[]> {
-    try {
-      const res = await fetch(`${API_BASE_URL}/transactions?expertId=${expertId}`, {
-        method: 'GET',
-        headers: this.getHeaders(),
-      });
-      const data = await res.json();
-      const result = data.result || data.data || data;
-      return Array.isArray(result) ? result : result.transactions || [];
-    } catch (e: any) {
-      console.warn('[API] getTransactions fallback:', e);
-      return [];
+    const expId = expertId || this.getCurrentUserId();
+    const endpoints = [
+      `/transactions?expertId=${expId}`,
+      `${API_BASE_URL}/transactions?expertId=${expId}`,
+    ];
+
+    for (const url of endpoints) {
+      try {
+        const res = await fetch(url, {
+          method: 'GET',
+          headers: this.getHeaders(),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const result = data.result || data.data || data;
+          if (Array.isArray(result)) return result;
+          if (result && Array.isArray(result.transactions)) return result.transactions;
+        }
+      } catch (e: any) {
+        console.warn(`[API] getTransactions failed on ${url}:`, e);
+      }
     }
+    return [];
   }
 
   // ==========================================

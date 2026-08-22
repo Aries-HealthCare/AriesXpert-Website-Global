@@ -87,7 +87,8 @@ const INITIAL_REFERRED_PATIENTS: ReferredPatientItem[] = [
 
 export default function ProviderReferPatientPage() {
   const { user } = useProviderAuth();
-  const [referredList, setReferredList] = useState<ReferredPatientItem[]>(INITIAL_REFERRED_PATIENTS);
+  const [referredList, setReferredList] = useState<ReferredPatientItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showReferForm, setShowReferForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successFeedback, setSuccessFeedback] = useState<string | null>(null);
@@ -109,12 +110,46 @@ export default function ProviderReferPatientPage() {
   const [preferredTime, setPreferredTime] = useState('10:00 AM - 11:00 AM');
   const [patientConfirmed, setPatientConfirmed] = useState(true);
 
+  // Load real referred patients from backend
+  const loadReferrals = async () => {
+    setIsLoading(true);
+    try {
+      const data = await providerApi.fetchReferrals(user?._id);
+      if (data.referPatients && data.referPatients.length > 0) {
+        const mapped: ReferredPatientItem[] = data.referPatients.map((p: any, idx: number) => ({
+          id: p._id || p.id || 'ref_' + idx,
+          patientName: p.patientName || p.name || 'Patient',
+          patientPhone: p.patientMobile || p.phone || '',
+          condition: p.patientCondition || p.condition || 'General Physiotherapy',
+          city: p.city || user?.city || 'Mumbai',
+          area: p.patientAddress || p.area || '',
+          dateReferred: p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent',
+          visitsDone: p.visitsDone || 0,
+          totalVisits: p.totalVisits || 10,
+          status: p.status === 'Completed' ? 'Treatment Completed' : p.status === 'In Progress' ? 'In Treatment' : 'Lead Assigned',
+          earningsGenerated: (p.visitsDone || 0) * 78,
+        }));
+        setReferredList(mapped);
+      } else {
+        setReferredList([]);
+      }
+    } catch (_) {
+      setReferredList([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadReferrals();
+  }, [user?._id]);
+
   // Live Earning calculations
   const totalReferred = referredList.length;
   const completedTreatments = referredList.filter((p) => p.status === 'Treatment Completed').length;
   const totalEarned = referredList.reduce((acc, curr) => acc + curr.earningsGenerated, 0);
 
-  const handleSubmitReferral = (e: React.FormEvent) => {
+  const handleSubmitReferral = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!firstName.trim() || !phone.trim()) {
       alert('Please fill patient name and mobile number.');
@@ -126,26 +161,22 @@ export default function ProviderReferPatientPage() {
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      const newRef: ReferredPatientItem = {
-        id: 'ref_p_' + Date.now(),
-        patientName: `${firstName.trim()} ${lastName.trim()}`.trim(),
-        patientPhone: phone.trim(),
-        condition,
-        city,
-        area: `${area || 'Locality'} (${pincode})`,
-        dateReferred: 'Today',
-        visitsDone: 0,
-        totalVisits: 10,
-        status: 'Lead Assigned',
-        earningsGenerated: 0,
-      };
+    const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+    const payload = {
+      therapist: user?._id || user?.id || 'therapist_' + Date.now(),
+      patientName: fullName,
+      patientMobile: phone.trim(),
+      patientAddress: `${address} ${landmark} ${area} ${pincode}`.trim(),
+      patientCondition: condition,
+      city: city || user?.city || 'Mumbai',
+    };
 
-      setReferredList([newRef, ...referredList]);
-      setIsSubmitting(false);
+    const res = await providerApi.createReferPatient(payload);
+    setIsSubmitting(false);
+
+    if (res.success !== false) {
       setShowReferForm(false);
-      setSuccessFeedback(`🎉 Patient ${newRef.patientName} referred successfully! You will earn 10% commission on every session completed.`);
-
+      setSuccessFeedback(`🎉 Patient ${fullName} referred successfully! You will earn 10% commission on every session completed.`);
       // Reset form
       setFirstName('');
       setLastName('');
@@ -153,7 +184,10 @@ export default function ProviderReferPatientPage() {
       setAge('');
       setAddress('');
       setLandmark('');
-    }, 800);
+      loadReferrals();
+    } else {
+      alert(res.message || 'Failed to submit patient referral. Please try again.');
+    }
   };
 
   const handleShareWhatsApp = () => {
