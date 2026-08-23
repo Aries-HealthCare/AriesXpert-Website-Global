@@ -193,6 +193,7 @@ export default function CityLandingPageTemplate({ city }: CityLandingPageTemplat
 
                 <VettedExperts
                     locationName={city.cityName}
+                    state={city.stateName}
                     city={city.cityName}
                     className="py-16 md:py-20"
                 />

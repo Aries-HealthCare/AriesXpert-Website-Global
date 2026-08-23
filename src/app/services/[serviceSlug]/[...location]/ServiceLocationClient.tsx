@@ -299,7 +299,14 @@ export default function ServiceLocationClient({ serviceSlug, location }: Service
             </section>
 
             {/* VETTED EXPERTS FOR AREA */}
-            <VettedExperts locationName={capitalizedArea} city={capitalizedCity} area={capitalizedArea} specialization={spec} className="py-16 md:py-20" />
+            <VettedExperts 
+                locationName={capitalizedArea} 
+                state={geoPath.state?.name}
+                city={capitalizedCity} 
+                area={capitalizedArea} 
+                specialization={spec} 
+                className="py-16 md:py-20" 
+            />
 
             {/* MASTER TREATMENT BLOCK */}
             <WhatWeTreat />

@@ -22,6 +22,7 @@ interface TherapistCarouselProps {
     title?: string;
     description?: string;
     specialization?: string;
+    state?: string;
     city?: string;
     area?: string;
     limit?: number;
@@ -32,6 +33,7 @@ export default function TherapistCarousel({
     title,
     description,
     specialization,
+    state,
     city,
     area,
     limit = 10,
@@ -39,6 +41,7 @@ export default function TherapistCarousel({
 }: TherapistCarouselProps) {
     const { therapists, isLoading } = useTherapists({
         specialization,
+        state,
         city,
         area,
         limit,

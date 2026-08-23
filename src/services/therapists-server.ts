@@ -43,12 +43,22 @@ export async function fetchTherapistsServer(params: {
   }
 
   // Fallback to verified catalog
-  const filtered = VERIFIED_THERAPISTS_CATALOG.filter((t) => {
+  let filtered = VERIFIED_THERAPISTS_CATALOG.filter((t) => {
     if (params.slug && t.slug !== params.slug && t.id !== params.slug) return false;
-    if (params.city && !t.city.toLowerCase().includes(params.city.toLowerCase()) && !params.city.toLowerCase().includes(t.city.toLowerCase())) return false;
-    if (params.state && !t.state.toLowerCase().includes(params.state.toLowerCase())) return false;
+    if (params.state) {
+      const qState = params.state.trim().toLowerCase();
+      const tState = (t.state || '').toLowerCase();
+      if (!tState.includes(qState) && !qState.includes(tState)) return false;
+    }
+    if (params.city) {
+      const qCity = params.city.trim().toLowerCase();
+      const tCity = (t.city || '').toLowerCase();
+      const inAreas = t.areas.some((a) => a.toLowerCase().includes(qCity) || qCity.includes(a.toLowerCase()));
+      const matchCity = tCity.includes(qCity) || qCity.includes(tCity) || inAreas;
+      if (!matchCity) return false;
+    }
     if (params.area) {
-      const qArea = params.area.toLowerCase();
+      const qArea = params.area.trim().toLowerCase();
       const inArea = t.areas.some(a => a.toLowerCase().includes(qArea) || qArea.includes(a.toLowerCase())) ||
         (t.city && (t.city.toLowerCase().includes(qArea) || qArea.includes(t.city.toLowerCase())));
       if (!inArea) return false;
@@ -57,7 +67,30 @@ export async function fetchTherapistsServer(params: {
     return true;
   });
 
-  return filtered.length > 0 ? filtered : VERIFIED_THERAPISTS_CATALOG;
+  if (filtered.length === 0 && (params.city || params.state || params.area)) {
+    const qCity = (params.city || '').trim().toLowerCase();
+    const qState = (params.state || '').trim().toLowerCase();
+
+    filtered = VERIFIED_THERAPISTS_CATALOG.filter((t) => {
+      const tState = (t.state || '').toLowerCase();
+      const tCity = (t.city || '').toLowerCase();
+
+      if (qState && !tState.includes(qState) && !qState.includes(tState)) return false;
+      if (qCity) {
+        if (qCity.includes('thane') || qCity.includes('mumbai') || qCity.includes('navi')) {
+          return tCity.includes('thane') || tCity.includes('mumbai') || tCity.includes('navi');
+        }
+        return tCity.includes(qCity) || qCity.includes(tCity);
+      }
+      return true;
+    });
+  }
+
+  const result = filtered.length > 0
+    ? filtered
+    : (params.city || params.state || params.area ? [] : VERIFIED_THERAPISTS_CATALOG);
+
+  return params.limit ? result.slice(0, params.limit) : result;
 }
 
 function normalise(therapist: any): TherapistCard {

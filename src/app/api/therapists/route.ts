@@ -11,19 +11,21 @@ function filterCatalog(
   catalog: TherapistCard[],
   query: { city?: string | null; state?: string | null; area?: string | null; specialization?: string | null; slug?: string | null; limit?: number }
 ): TherapistCard[] {
-  return catalog.filter((t) => {
+  let filtered = catalog.filter((t) => {
     if (query.slug) {
       if (t.slug !== query.slug && t.id !== query.slug) return false;
-    }
-    if (query.city) {
-      const qCity = query.city.trim().toLowerCase();
-      const tCity = (t.city || '').toLowerCase();
-      if (!tCity.includes(qCity) && !qCity.includes(tCity)) return false;
     }
     if (query.state) {
       const qState = query.state.trim().toLowerCase();
       const tState = (t.state || '').toLowerCase();
       if (!tState.includes(qState) && !qState.includes(tState)) return false;
+    }
+    if (query.city) {
+      const qCity = query.city.trim().toLowerCase();
+      const tCity = (t.city || '').toLowerCase();
+      const inAreas = t.areas.some((a) => a.toLowerCase().includes(qCity) || qCity.includes(a.toLowerCase()));
+      const matchCity = tCity.includes(qCity) || qCity.includes(tCity) || inAreas;
+      if (!matchCity) return false;
     }
     if (query.area) {
       const qArea = query.area.trim().toLowerCase();
@@ -39,7 +41,29 @@ function filterCatalog(
       if (!inSpec) return false;
     }
     return true;
-  }).slice(0, query.limit || 100);
+  });
+
+  // If no exact match for sub-area, fallback to same city or same state / MMR cluster
+  if (filtered.length === 0 && (query.city || query.state || query.area)) {
+    const qCity = (query.city || '').trim().toLowerCase();
+    const qState = (query.state || '').trim().toLowerCase();
+
+    filtered = catalog.filter((t) => {
+      const tState = (t.state || '').toLowerCase();
+      const tCity = (t.city || '').toLowerCase();
+
+      if (qState && !tState.includes(qState) && !qState.includes(tState)) return false;
+      if (qCity) {
+        if (qCity.includes('thane') || qCity.includes('mumbai') || qCity.includes('navi')) {
+          return tCity.includes('thane') || tCity.includes('mumbai') || tCity.includes('navi');
+        }
+        return tCity.includes(qCity) || qCity.includes(tCity);
+      }
+      return true;
+    });
+  }
+
+  return filtered.slice(0, query.limit || 100);
 }
 
 export async function GET(req: NextRequest) {
@@ -89,7 +113,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // Fallback to Verified Specialists Catalog so the directory is never blank
+  // Fallback to Verified Specialists Catalog filtered strictly by location
   const filteredFallback = filterCatalog(VERIFIED_THERAPISTS_CATALOG, {
     city,
     state,
@@ -99,9 +123,13 @@ export async function GET(req: NextRequest) {
     limit,
   });
 
+  const finalList = filteredFallback.length > 0 
+    ? filteredFallback 
+    : (city || state || area ? [] : VERIFIED_THERAPISTS_CATALOG.slice(0, limit));
+
   return NextResponse.json({
-    therapists: filteredFallback.length > 0 ? filteredFallback : VERIFIED_THERAPISTS_CATALOG.slice(0, limit),
-    total: filteredFallback.length > 0 ? filteredFallback.length : VERIFIED_THERAPISTS_CATALOG.length,
+    therapists: finalList,
+    total: finalList.length,
     source: 'verified-catalog',
   });
 }

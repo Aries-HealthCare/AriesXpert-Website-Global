@@ -290,6 +290,7 @@ export default function AreaLandingPageTemplate({ location }: AreaLandingPageTem
 
                 <VettedExperts
                     locationName={location.locationName}
+                    state={location.stateName}
                     area={location.locationName}
                     city={location.cityName}
                     className="py-16 md:py-20 bg-secondary/10"

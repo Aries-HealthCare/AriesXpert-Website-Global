@@ -20,6 +20,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface VettedExpertsProps {
   locationName?: string;
   className?: string;
+  country?: string;
+  state?: string;
   city?: string;
   area?: string;
   specialization?: string;
@@ -115,8 +117,8 @@ function TherapistCard({ therapist, index }: { therapist: any, index: number }) 
   );
 }
 
-export default function VettedExperts({ locationName, className, city, area, specialization }: VettedExpertsProps) {
-  const { therapists, isLoading } = useTherapists({ city, area, specialization, limit: 12 });
+export default function VettedExperts({ locationName, className, country, state, city, area, specialization }: VettedExpertsProps) {
+  const { therapists, isLoading } = useTherapists({ state, city, area, specialization, limit: 12 });
 
   if (isLoading) {
     return (
