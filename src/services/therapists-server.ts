@@ -21,7 +21,7 @@ export async function fetchTherapistsServer(params: {
     const response = await fetch(getWebsiteTherapistsUrl(query), {
       headers: { Accept: 'application/json' },
       next: { revalidate: 60 },
-      signal: AbortSignal.timeout(4000),
+      signal: AbortSignal.timeout(8000),
     });
 
     if (response.ok) {
@@ -45,8 +45,14 @@ export async function fetchTherapistsServer(params: {
   // Fallback to verified catalog
   const filtered = VERIFIED_THERAPISTS_CATALOG.filter((t) => {
     if (params.slug && t.slug !== params.slug && t.id !== params.slug) return false;
-    if (params.city && !t.city.toLowerCase().includes(params.city.toLowerCase())) return false;
+    if (params.city && !t.city.toLowerCase().includes(params.city.toLowerCase()) && !params.city.toLowerCase().includes(t.city.toLowerCase())) return false;
     if (params.state && !t.state.toLowerCase().includes(params.state.toLowerCase())) return false;
+    if (params.area) {
+      const qArea = params.area.toLowerCase();
+      const inArea = t.areas.some(a => a.toLowerCase().includes(qArea) || qArea.includes(a.toLowerCase())) ||
+        (t.city && (t.city.toLowerCase().includes(qArea) || qArea.includes(t.city.toLowerCase())));
+      if (!inArea) return false;
+    }
     if (params.specialization && !t.specialization.toLowerCase().includes(params.specialization.toLowerCase())) return false;
     return true;
   });
@@ -55,37 +61,60 @@ export async function fetchTherapistsServer(params: {
 }
 
 function normalise(therapist: any): TherapistCard {
-  const name = typeof therapist.name === 'string' ? therapist.name.trim() : '';
+  const name = typeof therapist.name === 'string' && therapist.name.trim() 
+    ? therapist.name.trim() 
+    : (typeof therapist.fullName === 'string' ? therapist.fullName.trim() : '');
+    
   const specializations = Array.isArray(therapist.specializations)
     ? therapist.specializations.filter((value: unknown): value is string => typeof value === 'string' && Boolean(value.trim()))
-    : [];
-  const rawExperience = therapist.experience;
-  const experience = typeof rawExperience === 'number'
-    ? `${rawExperience} Year${rawExperience === 1 ? '' : 's'}`
-    : typeof rawExperience === 'string' ? rawExperience : '8+ Years';
+    : (Array.isArray(therapist.professionalInfo?.specializations) ? therapist.professionalInfo.specializations : []);
+    
+  const experienceValue = therapist.experience ?? therapist.professionalInfo?.yearOfExperience;
+  const experience =
+    typeof experienceValue === 'number'
+      ? `${experienceValue} Year${experienceValue === 1 ? '' : 's'}`
+      : typeof experienceValue === 'string'
+        ? experienceValue
+        : '8+ Years';
 
   const defaultAvatar = '/images/aries-emblem.png';
-  let imageUrl = typeof therapist.imageUrl === 'string' && therapist.imageUrl.trim() ? therapist.imageUrl.trim() : defaultAvatar;
-  if (imageUrl.includes('unsplash.com') || imageUrl.includes('placehold.co')) {
+  let imageUrl = typeof therapist.imageUrl === 'string' && therapist.imageUrl.trim() 
+    ? therapist.imageUrl.trim() 
+    : (typeof therapist.profilePhoto === 'string' && therapist.profilePhoto.trim() ? therapist.profilePhoto.trim() : defaultAvatar);
+  if (imageUrl.includes('unsplash.com') || imageUrl.includes('placehold.co') || !imageUrl) {
     imageUrl = defaultAvatar;
   }
 
+  const rawAreas = [
+    ...(Array.isArray(therapist.serviceAreas) ? therapist.serviceAreas : []),
+    ...(Array.isArray(therapist.areas) ? therapist.areas : []),
+    ...(Array.isArray(therapist.areaOfServiceInfo?.serviceAreas) ? therapist.areaOfServiceInfo.serviceAreas : []),
+    ...(therapist.area ? [therapist.area] : []),
+  ].filter((a): a is string => typeof a === 'string' && Boolean(a.trim()));
+
+  const uniqueAreas = Array.from(new Set(rawAreas));
+  const finalAreas = uniqueAreas.length > 0 ? uniqueAreas : ['City Wide'];
+
   return {
-    id: typeof therapist.id === 'string' ? therapist.id : `th-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+    id: typeof therapist.id === 'string' ? therapist.id : String(therapist._id || `th-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`),
     slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
     name,
-    qualification: typeof therapist.qualification === 'string' && therapist.qualification ? therapist.qualification : 'BPT, MPT',
+    qualification: typeof therapist.qualification === 'string' && therapist.qualification 
+      ? therapist.qualification 
+      : (therapist.professionalInfo?.qualification || 'BPT, MPT'),
     specialization: therapist.primarySpecialization || specializations[0] || 'Physiotherapy',
     experience,
     city: typeof therapist.city === 'string' ? therapist.city : 'Mumbai',
     state: typeof therapist.state === 'string' ? therapist.state : 'Maharashtra',
-    areas: Array.isArray(therapist.serviceAreas) && therapist.serviceAreas.length > 0 ? therapist.serviceAreas : ['City Wide'],
+    areas: finalAreas,
     rating: Number.isFinite(therapist.rating) && therapist.rating > 0 ? Number(therapist.rating) : 4.9,
     reviewCount: typeof therapist.reviewCount === 'number' ? therapist.reviewCount : 90,
     imageUrl,
     isAvailable: therapist.acceptingTelehealthRequests !== false,
     languages: Array.isArray(therapist.languages) && therapist.languages.length > 0 ? therapist.languages : ['English', 'Hindi'],
-    services: Array.isArray(therapist.serviceTypes) && therapist.serviceTypes.length > 0 ? therapist.serviceTypes : ['Home Visit Physiotherapy'],
+    services: Array.isArray(therapist.serviceTypes) && therapist.serviceTypes.length > 0 
+      ? therapist.serviceTypes 
+      : (Array.isArray(therapist.professionalInfo?.serviceTypes) ? therapist.professionalInfo.serviceTypes : ['Home Visit Physiotherapy']),
     bio: typeof therapist.bio === 'string' ? therapist.bio : '',
     isVerified: true,
     education: therapist.qualification ? [therapist.qualification] : ['Bachelor of Physiotherapy (BPT)'],

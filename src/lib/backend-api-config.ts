@@ -21,13 +21,8 @@ export function getBackendApiBaseUrl(): string {
     return configured;
   }
 
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error(
-      'BACKEND_API_BASE_URL must be set in production (or NEXT_PUBLIC_API_URL / NEXT_PUBLIC_API_BASE_URL / API_BASE_URL)',
-    );
-  }
-
-  return DEV_DEFAULT_BASE_URL;
+  // Canonical live production backend endpoint
+  return 'https://api.ariesxpert.com/api/v1';
 }
 
 export function getWebsiteTherapistsUrl(params: URLSearchParams): string {
