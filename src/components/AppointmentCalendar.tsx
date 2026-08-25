@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import { format, isBefore, startOfToday } from 'date-fns';
+import { Calendar as CalendarIcon } from 'lucide-react';
 import 'react-day-picker/dist/style.css';
 
 type Props = {
@@ -21,15 +22,20 @@ export default function AppointmentCalendar({ onDateSelect, selectedDate }: Prop
     onDateSelect(date);
   };
   
-  const formattedDate = selected ? format(selected, 'EEE, MMM d') : 'Select a date';
+  const formattedDate = selected ? format(selected, 'EEE, MMM d, yyyy') : 'Select a date';
 
   return (
-    <div className="rounded-lg border bg-card text-card-foreground shadow-sm w-full">
-      <div className="bg-primary text-primary-foreground p-6 rounded-t-lg">
-        <p className="text-sm font-medium uppercase tracking-wider text-primary-foreground/80">Select Date</p>
-        <p className="text-3xl font-bold font-headline mt-1">{formattedDate}</p>
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] text-card-foreground shadow-lg overflow-hidden w-full max-w-sm mx-auto backdrop-blur-md">
+      <div className="bg-primary/10 border-b border-primary/20 p-4 flex items-center justify-between">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-widest text-primary">Selected Date</p>
+          <p className="text-base font-bold font-headline mt-0.5 text-foreground">{formattedDate}</p>
+        </div>
+        <div className="w-9 h-9 rounded-xl bg-primary/20 text-primary flex items-center justify-center">
+          <CalendarIcon className="w-4 h-4" />
+        </div>
       </div>
-      <div className="p-4">
+      <div className="p-3 flex justify-center">
         <DayPicker
           mode="single"
           selected={selected}
@@ -39,23 +45,23 @@ export default function AppointmentCalendar({ onDateSelect, selectedDate }: Prop
           className="w-full"
           classNames={{
             months: 'flex justify-center',
-            month: 'w-full space-y-4',
-            caption: 'flex justify-center pt-1 relative items-center',
-            caption_label: 'text-lg font-medium font-headline',
+            month: 'w-full space-y-3',
+            caption: 'flex justify-center pt-1 pb-2 relative items-center',
+            caption_label: 'text-sm font-bold font-headline text-foreground',
             nav: 'space-x-1 flex items-center',
-            nav_button: 'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
+            nav_button: 'h-7 w-7 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center opacity-70 hover:opacity-100 hover:bg-primary/20 transition-all',
             nav_button_previous: 'absolute left-1',
             nav_button_next: 'absolute right-1',
             table: 'w-full border-collapse space-y-1',
-            head_row: 'flex',
-            head_cell: 'text-muted-foreground rounded-md w-9 font-medium text-[0.8rem]',
-            row: 'flex w-full mt-2',
-            cell: 'h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
-            day: 'h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-full hover:bg-accent transition-colors',
-            day_selected: 'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
-            day_today: 'bg-accent text-accent-foreground rounded-full',
-            day_disabled: 'text-muted-foreground opacity-50 cursor-not-allowed',
-            day_outside: 'day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30',
+            head_row: 'flex justify-between',
+            head_cell: 'text-muted-foreground w-8 font-semibold text-[0.75rem] text-center',
+            row: 'flex w-full justify-between mt-1.5',
+            cell: 'h-8 w-8 text-center text-xs p-0 relative focus-within:relative focus-within:z-20',
+            day: 'h-8 w-8 p-0 font-medium text-foreground rounded-lg hover:bg-primary/20 transition-all flex items-center justify-center',
+            day_selected: 'bg-primary text-primary-foreground font-bold shadow-md shadow-primary/30 hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
+            day_today: 'border border-primary/50 text-primary font-bold',
+            day_disabled: 'text-muted-foreground/30 opacity-30 cursor-not-allowed hover:bg-transparent',
+            day_outside: 'text-muted-foreground/30 opacity-20',
             day_hidden: 'invisible',
           }}
         />

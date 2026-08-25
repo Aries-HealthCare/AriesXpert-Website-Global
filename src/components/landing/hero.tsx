@@ -17,7 +17,8 @@ import type { WebsiteStats } from "@/app/api/stats/route";
 
 const heroImages = PlaceHolderImages.filter(p => p.id.startsWith('hero-'));
 
-function formatCount(n: number): string {
+function formatCount(n: number | undefined | null, fallback = '450+'): string {
+  if (n == null || isNaN(n)) return fallback;
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M+`;
   if (n >= 1_000) return `${Math.floor(n / 1_000)}k+`;
   return `${n}+`;
