@@ -41,7 +41,7 @@ export default function CareTakerClient() {
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15)_0%,transparent_60%)]" />
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
                     <Image
-                        src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=2000"
+                        src="https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=85&w=2400"
                         alt="Care Taker Hero"
                         fill
                         className="object-cover opacity-20 scale-110 animate-slow-zoom"
@@ -96,7 +96,7 @@ export default function CareTakerClient() {
                         <div className="relative">
                             <div className="aspect-square rounded-[3.5rem] overflow-hidden soft-shadow border-8 border-primary/5 shadow-2xl relative group">
                                 <Image
-                                    src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=1200"
+                                    src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=85&w=1600"
                                     alt="Compassionate Care"
                                     fill
                                     className="object-cover group-hover:scale-105 transition-transform duration-1000"

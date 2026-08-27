@@ -267,18 +267,18 @@ export default function AreaProfessionTemplate({
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-4 mt-8">
                                 <div className="aspect-square relative rounded-3xl overflow-hidden shadow-xl border">
-                                    <Image src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=400" alt="Specialized Care" fill className="object-cover" />
+                                    <Image src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=85&w=800" alt="Specialized Care" fill className="object-cover" />
                                 </div>
                                 <div className="aspect-[3/4] relative rounded-3xl overflow-hidden shadow-xl border">
-                                    <Image src="https://images.unsplash.com/photo-1581056771107-24ca5f033842?auto=format&fit=crop&q=80&w=400" alt="Home Visit" fill className="object-cover" />
+                                    <Image src="https://images.unsplash.com/photo-1581056771107-24ca5f033842?auto=format&fit=crop&q=85&w=800" alt="Home Visit" fill className="object-cover" />
                                 </div>
                             </div>
                             <div className="space-y-4">
                                 <div className="aspect-[3/4] relative rounded-3xl overflow-hidden shadow-xl border">
-                                    <Image src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=400" alt="Expert Consultation" fill className="object-cover" />
+                                    <Image src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=85&w=800" alt="Expert Consultation" fill className="object-cover" />
                                 </div>
                                 <div className="aspect-square relative rounded-3xl overflow-hidden shadow-xl border">
-                                    <Image src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&q=80&w=400" alt="Advanced Equipment" fill className="object-cover" />
+                                    <Image src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&q=85&w=800" alt="Advanced Equipment" fill className="object-cover" />
                                 </div>
                             </div>
                         </div>

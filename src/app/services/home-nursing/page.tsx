@@ -21,7 +21,7 @@ export const metadata: Metadata = {
         title: 'Hospital-Grade Nursing Care at Your Doorstep',
         description: 'Breathtakingly professional clinical care for your loved ones. Our certified nurses bridge the gap between hospital and home.',
         url: 'https://www.ariesphysiocare.com/services/home-nursing',
-        images: [{ url: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=1200', width: 1200, height: 630, alt: 'Home Nursing Care' }],
+        images: [{ url: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=85&w=1200', width: 1200, height: 630, alt: 'Home Nursing Care' }],
     },
     alternates: {
         canonical: 'https://www.ariesphysiocare.com/services/home-nursing',

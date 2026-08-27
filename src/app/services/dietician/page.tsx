@@ -21,7 +21,7 @@ export const metadata: Metadata = {
         title: 'Professional Medical Nutrition Therapy at Your Doorstep',
         description: 'Master your metabolic health with our expert clinical dieticians. Personalized, science-backed nutrition plans delivered in your home.',
         url: 'https://www.ariesphysiocare.com/services/dietician',
-        images: [{ url: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=1200', width: 1200, height: 630, alt: 'Clinical Dietician' }],
+        images: [{ url: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=85&w=1200', width: 1200, height: 630, alt: 'Clinical Dietician' }],
     },
     alternates: {
         canonical: 'https://www.ariesphysiocare.com/services/dietician',

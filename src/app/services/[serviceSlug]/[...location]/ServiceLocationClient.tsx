@@ -176,7 +176,7 @@ export default function ServiceLocationClient({ serviceSlug, location }: Service
             {/* HERO SECTION */}
             <section className="relative min-h-[80vh] flex items-center pt-24 pb-16 overflow-hidden bg-background">
                 <div className="absolute inset-0 z-0 opacity-5">
-                    <Image src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=2070" alt={`Home ${serviceName} in ${capitalizedArea}`} fill className="object-cover" priority />
+                    <Image src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=2400" alt={`Home ${serviceName} in ${capitalizedArea}`} fill className="object-cover" priority />
                 </div>
                 <div className="container mx-auto px-4 md:px-6 relative z-10">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">

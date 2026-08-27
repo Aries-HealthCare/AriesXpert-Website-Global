@@ -21,7 +21,7 @@ export const metadata: Metadata = {
         title: 'Dignified & Professional In-Home Care Taker Services',
         description: 'Master the activities of daily living with our trained care takers. Compassionate assistance delivered in your own home.',
         url: 'https://www.ariesphysiocare.com/services/care-taker',
-        images: [{ url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1200', width: 1200, height: 630, alt: 'Care Taker Services' }],
+        images: [{ url: 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=85&w=1200', width: 1200, height: 630, alt: 'Care Taker Services' }],
     },
     alternates: {
         canonical: 'https://www.ariesphysiocare.com/services/care-taker',

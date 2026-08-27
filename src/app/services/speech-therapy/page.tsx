@@ -21,7 +21,7 @@ export const metadata: Metadata = {
         title: 'Professional Speech & Language Therapy at Your Doorstep',
         description: 'Restoring the human voice and connection. Evidence-based clinical care for speech and swallowing disorders at your home.',
         url: 'https://www.ariesphysiocare.com/services/speech-therapy',
-        images: [{ url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1200', width: 1200, height: 630, alt: 'Speech Therapy Care' }],
+        images: [{ url: 'https://images.unsplash.com/photo-1543881062-8e1f5798aee8?auto=format&fit=crop&q=85&w=1200', width: 1200, height: 630, alt: 'Speech Therapy Care' }],
     },
     alternates: {
         canonical: 'https://www.ariesphysiocare.com/services/speech-therapy',

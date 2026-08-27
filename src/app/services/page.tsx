@@ -44,7 +44,7 @@ export default function AllServicesPage() {
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.1)_0%,transparent_70%)]" />
           <Image 
-            src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=2000" 
+            src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=2400" 
             alt="Clinical Excellence"
             fill
             className="object-cover opacity-10"

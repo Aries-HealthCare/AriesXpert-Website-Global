@@ -15,6 +15,38 @@ export const metadata = {
     keywords: "Healthcare Blog, Physiotherapy Tips, Home Care, Wellness, Aries PhysioCare, Recovery Advice"
 };
 
+function getBlogCover(topic?: string, territory?: string, title?: string) {
+  const query = `${topic || ''} ${territory || ''} ${title || ''}`.toLowerCase();
+  if (query.includes('back') || query.includes('spine') || query.includes('sciatica') || query.includes('lumbar')) {
+    return 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=85&w=1600';
+  }
+  if (query.includes('knee') || query.includes('joint') || query.includes('arthritis') || query.includes('ligament')) {
+    return 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600';
+  }
+  if (query.includes('sport') || query.includes('runner') || query.includes('athlet') || query.includes('fitness')) {
+    return 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=85&w=1600';
+  }
+  if (query.includes('neck') || query.includes('postur') || query.includes('desk') || query.includes('ergo')) {
+    return 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&q=85&w=1600';
+  }
+  if (query.includes('neuro') || query.includes('stroke') || query.includes('brain') || query.includes('paralysis')) {
+    return 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=85&w=1600';
+  }
+  if (query.includes('diet') || query.includes('nutrit') || query.includes('food') || query.includes('diabetes')) {
+    return 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=85&w=1600';
+  }
+  if (query.includes('senior') || query.includes('elder') || query.includes('geriatric') || query.includes('fall')) {
+    return 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=85&w=1600';
+  }
+  if (query.includes('child') || query.includes('pediatric') || query.includes('sensory') || query.includes('baby')) {
+    return 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=85&w=1600';
+  }
+  if (query.includes('nurse') || query.includes('wound') || query.includes('surg') || query.includes('icu')) {
+    return 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=85&w=1600';
+  }
+  return 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=85&w=1600';
+}
+
 export default async function BlogsPage() {
   const growthPosts = await fetchGrowthBlogPosts();
   // Only real, backend-sourced posts from the Growth Engine CMS feed are
@@ -24,14 +56,14 @@ export default async function BlogsPage() {
     slug: p.slug,
     title: p.title,
     summary: p.summary,
-    serviceTag: p.territory || p.topic || 'AI Insights',
+    serviceTag: p.territory || p.topic || 'Clinical Insights',
     readTime: `${Math.max(3, Math.ceil((p.content?.length || 400) / 900))} min read`,
     date: p.publishedAt
       ? new Date(p.publishedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })
       : 'Recently',
-    author: 'Aries Growth Engine',
-    imageUrl: '/images/blog-default.jpg',
-    imageHint: 'healthcare blog',
+    author: 'Aries Clinical Board',
+    imageUrl: p.imageUrl || getBlogCover(p.topic, p.territory, p.title),
+    imageHint: `${p.topic || 'medical'} healthcare blog cover`,
     isGrowth: true,
   }));
 
@@ -108,7 +140,6 @@ export default async function BlogsPage() {
               <Card key={post.id} className="group border-none bg-transparent shadow-none flex flex-col">
                 <CardHeader className="p-0 mb-6">
                   <Link href={`/blogs/${post.slug}`} className="block relative aspect-[16/10] w-full rounded-2xl overflow-hidden shadow-md">
-                    {!('isGrowth' in post && post.isGrowth) ? (
                     <Image
                       src={post.imageUrl}
                       alt={post.title}
@@ -117,11 +148,7 @@ export default async function BlogsPage() {
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                       data-ai-hint={post.imageHint}
                     />
-                    ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                      <span className="text-xs font-bold uppercase tracking-widest text-primary">Growth Engine</span>
-                    </div>
-                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
                     <div className="absolute top-4 left-4">
                       <Badge className="bg-white/90 dark:bg-black/80 text-foreground dark:text-white backdrop-blur-sm border-none shadow-sm font-bold text-[10px] uppercase tracking-wider px-3">
                         {post.serviceTag}

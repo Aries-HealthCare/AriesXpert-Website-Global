@@ -40,7 +40,7 @@ export default function DieticianClient() {
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15)_0%,transparent_60%)]" />
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
                     <Image
-                        src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=2000"
+                        src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=85&w=2400"
                         alt="Dietician Hero"
                         fill
                         className="object-cover opacity-20 scale-110 animate-slow-zoom"
@@ -95,7 +95,7 @@ export default function DieticianClient() {
                         <div className="relative">
                             <div className="aspect-square rounded-[3.5rem] overflow-hidden soft-shadow border-8 border-primary/5 shadow-2xl relative group">
                                 <Image
-                                    src="https://images.unsplash.com/photo-1505576399279-565b52d4ac71?auto=format&fit=crop&q=80&w=1200"
+                                    src="https://images.unsplash.com/photo-1505576399279-565b52d4ac71?auto=format&fit=crop&q=85&w=1600"
                                     alt="Clinical Nutrition"
                                     fill
                                     className="object-cover group-hover:scale-105 transition-transform duration-1000"

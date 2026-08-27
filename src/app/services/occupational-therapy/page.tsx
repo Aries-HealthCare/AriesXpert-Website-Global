@@ -21,7 +21,7 @@ export const metadata: Metadata = {
         title: 'Professional Occupational Therapy at Your Doorstep',
         description: 'Master the activities of daily living with our expert clinical specialists. Reclaim your independence in the comfort of your own home.',
         url: 'https://www.ariesphysiocare.com/services/occupational-therapy',
-        images: [{ url: 'https://images.unsplash.com/photo-1543881062-8e1f5798aee8?auto=format&fit=crop&q=80&w=1200', width: 1200, height: 630, alt: 'Occupational Therapy' }],
+        images: [{ url: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=85&w=1200', width: 1200, height: 630, alt: 'Occupational Therapy' }],
     },
     alternates: {
         canonical: 'https://www.ariesphysiocare.com/services/occupational-therapy',

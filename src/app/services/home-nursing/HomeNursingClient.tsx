@@ -41,7 +41,7 @@ export default function HomeNursingClient() {
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15)_0%,transparent_60%)]" />
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
                     <Image
-                        src="https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=2000"
+                        src="https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=85&w=2400"
                         alt="Home Nursing Hero"
                         fill
                         className="object-cover opacity-20 scale-110 animate-slow-zoom"
@@ -96,7 +96,7 @@ export default function HomeNursingClient() {
                         <div className="relative">
                             <div className="aspect-square rounded-[3.5rem] overflow-hidden soft-shadow border-8 border-primary/5 shadow-2xl relative group">
                                 <Image
-                                    src="https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=80&w=1200"
+                                    src="https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&q=85&w=1600"
                                     alt="Professional Nursing"
                                     fill
                                     className="object-cover group-hover:scale-105 transition-transform duration-1000"
