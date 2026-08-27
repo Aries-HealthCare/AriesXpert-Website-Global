@@ -52,7 +52,7 @@ export default function TherapistProfileTemplate({ therapist }: TherapistProfile
                     <div className="grid lg:grid-cols-12 gap-10 items-end">
                         <div className="lg:col-span-8 flex flex-col md:flex-row gap-8 items-center md:items-end text-center md:text-left">
                             {(() => {
-                                const isLogo = !therapist.imageUrl || therapist.imageUrl.includes('aries-emblem') || therapist.imageUrl.includes('default-avatar') || therapist.imageUrl.includes('unsplash') || therapist.imageUrl.includes('placehold');
+                                const isLogo = !therapist.imageUrl || therapist.imageUrl.includes('aries-emblem') || therapist.imageUrl.includes('BrandLogo') || therapist.imageUrl.includes('default-avatar') || therapist.imageUrl.includes('unsplash') || therapist.imageUrl.includes('placehold');
                                 const displayImg = isLogo ? '/images/aries-emblem.png' : therapist.imageUrl;
                                 return (
                                     <div className="relative group">

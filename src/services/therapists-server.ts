@@ -114,7 +114,15 @@ function normalise(therapist: any): TherapistCard {
   let imageUrl = typeof therapist.imageUrl === 'string' && therapist.imageUrl.trim() 
     ? therapist.imageUrl.trim() 
     : (typeof therapist.profilePhoto === 'string' && therapist.profilePhoto.trim() ? therapist.profilePhoto.trim() : defaultAvatar);
-  if (imageUrl.includes('unsplash.com') || imageUrl.includes('placehold.co') || !imageUrl) {
+  if (
+    imageUrl.includes('unsplash.com') ||
+    imageUrl.includes('placehold.co') ||
+    imageUrl.includes('_healed_') ||
+    imageUrl.includes('therapist_ai_pose') ||
+    imageUrl.includes('therapist_portrait_') ||
+    imageUrl.includes('BrandLogo') ||
+    !imageUrl
+  ) {
     imageUrl = defaultAvatar;
   }
 

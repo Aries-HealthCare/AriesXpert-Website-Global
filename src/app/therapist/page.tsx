@@ -205,7 +205,7 @@ export default function TherapistsPage() {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {filtered.map(t => {
-                                    const isLogo = !t.imageUrl || t.imageUrl.includes('aries-emblem') || t.imageUrl.includes('default-avatar') || t.imageUrl.includes('unsplash') || t.imageUrl.includes('placehold');
+                                    const isLogo = !t.imageUrl || t.imageUrl.includes('aries-emblem') || t.imageUrl.includes('BrandLogo') || t.imageUrl.includes('default-avatar') || t.imageUrl.includes('unsplash') || t.imageUrl.includes('placehold');
                                     const displayImg = isLogo ? '/images/aries-emblem.png' : t.imageUrl;
                                     return (
                                         <Card key={t.id || t.slug} className="group glassmorphic overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-1">
