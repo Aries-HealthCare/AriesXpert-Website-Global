@@ -9,29 +9,76 @@ const findImage = (id: string, name?: string) => {
     return { imageUrl: img.imageUrl, imageHint: img.imageHint };
   }
 
-  // Intelligent medical fallback based on name or id
+  // Comprehensive Medical Category Image Resolver with UHD Curated Photography
   const term = (name || id).toLowerCase();
-  let url = 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000'; // Generic medical
 
-  if (term.includes('back') || term.includes('spine') || term.includes('lumbar') || term.includes('scolio') || term.includes('spondy') || term.includes('disc')) {
-    url = 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=1000'; // Spine/Back
-  } else if (term.includes('knee') || term.includes('patell') || term.includes('acl') || term.includes('mcl') || term.includes('menisc')) {
-    url = 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1000'; // Knee
-  } else if (term.includes('shoulder') || term.includes('cuff') || term.includes('frozen')) {
-    url = 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1000'; // Therapy/Shoulder
-  } else if (term.includes('neck') || term.includes('cervic') || term.includes('whiplash')) {
-    url = 'https://images.unsplash.com/photo-1584820927500-47b2d5edb151?auto=format&fit=crop&w=1000'; // Neck pain
-  } else if (term.includes('neuro') || term.includes('stroke') || term.includes('palsy') || term.includes('brain') || term.includes('parkinson')) {
-    url = 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=1000'; // Neuro
-  } else if (term.includes('sport') || term.includes('athle') || term.includes('strain') || term.includes('sprain') || term.includes('tendon')) {
-    url = 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1000'; // Sports
-  } else if (term.includes('pediatric') || term.includes('kid') || term.includes('child')) {
-    url = 'https://images.unsplash.com/photo-1519238263530-990ffce6e4b8?auto=format&fit=crop&w=1000'; // Pediatric
-  } else if (term.includes('geriatric') || term.includes('elderly') || term.includes('age')) {
-    url = 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&w=1000'; // Elderly
+  // Spine, Back & Neck
+  if (term.includes('back') || term.includes('spine') || term.includes('lumbar') || term.includes('scolio') || term.includes('spondy') || term.includes('disc') || term.includes('sciatica') || term.includes('stenosis') || term.includes('sacral') || term.includes('retrolisthesis') || term.includes('fusion') || term.includes('discectomy') || term.includes('laminectomy')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&q=85&w=1600', imageHint: 'lumbar spine and back pain therapy' };
+  }
+  if (term.includes('neck') || term.includes('cervic') || term.includes('whiplash') || term.includes('torticollis') || term.includes('headache')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1584820927500-47b2d5edb151?auto=format&fit=crop&q=85&w=1600', imageHint: 'cervical neck pain and mobilization' };
   }
 
-  return { imageUrl: url, imageHint: term };
+  // Knee & Lower Extremity
+  if (term.includes('knee') || term.includes('patell') || term.includes('acl') || term.includes('mcl') || term.includes('pcl') || term.includes('lcl') || term.includes('menisc') || term.includes('tkr') || term.includes('genu') || term.includes('baker') || term.includes('osgood')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=85&w=1600', imageHint: 'knee joint rehabilitation and assessment' };
+  }
+  if (term.includes('ankle') || term.includes('foot') || term.includes('plantar') || term.includes('achilles') || term.includes('heel') || term.includes('tarsal') || term.includes('ctev') || term.includes('clubfoot') || term.includes('metatarsalgia') || term.includes('bunion') || term.includes('cuboid') || term.includes('hammer toe') || term.includes('gastrocnemius')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&q=85&w=1600', imageHint: 'ankle and foot orthopedic therapy' };
+  }
+  if (term.includes('hip') || term.includes('thr') || term.includes('trochanter') || term.includes('labral') || term.includes('pelvic') || term.includes('coccydynia') || term.includes('piriformis')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=85&w=1600', imageHint: 'hip joint and pelvic physical therapy' };
+  }
+
+  // Shoulder & Upper Extremity
+  if (term.includes('shoulder') || term.includes('cuff') || term.includes('frozen') || term.includes('impingement') || term.includes('dislocation') || term.includes('sprengel') || term.includes('hill-sachs') || term.includes('supraspinatus')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=85&w=1600', imageHint: 'shoulder mobilization and rotator cuff rehabilitation' };
+  }
+  if (term.includes('elbow') || term.includes('tennis') || term.includes('golfer') || term.includes('cubital') || term.includes('biceps')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=85&w=1600', imageHint: 'elbow tendon and joint therapy' };
+  }
+  if (term.includes('wrist') || term.includes('hand') || term.includes('carpal') || term.includes('quervain') || term.includes('trigger finger') || term.includes('ganglion') || term.includes('mallet') || term.includes('boutonniere') || term.includes('swan neck')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&q=85&w=1600', imageHint: 'hand dexterity and wrist physical rehabilitation' };
+  }
+
+  // Neurological Rehabilitation
+  if (term.includes('neuro') || term.includes('stroke') || term.includes('palsy') || term.includes('paralysis') || term.includes('hemiplegia') || term.includes('quadriplegia') || term.includes('parkinson') || term.includes('sclerosis') || term.includes('mnd') || term.includes('guillain') || term.includes('myasthenia') || term.includes('dementia') || term.includes('nerve') || term.includes('myelopathy') || term.includes('ataxia')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=85&w=1600', imageHint: 'neurological neuro-motor re-education' };
+  }
+
+  // Pediatric Rehabilitation
+  if (term.includes('pediatric') || term.includes('child') || term.includes('infant') || term.includes('kid') || term.includes('autism') || term.includes('down syndrome') || term.includes('cerebral palsy') || term.includes('spina bifida') || term.includes('dyslexia')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1519238263530-990ffce6e4b8?auto=format&fit=crop&q=85&w=1600', imageHint: 'pediatric physiotherapy and developmental therapy' };
+  }
+
+  // Geriatric & Senior Care
+  if (term.includes('geriatric') || term.includes('elderly') || term.includes('senior') || term.includes('age') || term.includes('fall') || term.includes('osteoporosis') || term.includes('frail')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=85&w=1600', imageHint: 'geriatric mobility and senior independence' };
+  }
+
+  // Sports & Musculoskeletal Conditioning
+  if (term.includes('sport') || term.includes('athle') || term.includes('strain') || term.includes('sprain') || term.includes('tendon') || term.includes('runner') || term.includes('hamstring') || term.includes('quadriceps') || term.includes('ligament')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=85&w=1600', imageHint: 'sports physical therapy and active conditioning' };
+  }
+
+  // Post-Surgical & Wound Care
+  if (term.includes('surgery') || term.includes('post-op') || term.includes('fracture') || term.includes('replacement') || term.includes('wound') || term.includes('burn')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=85&w=1600', imageHint: 'post-surgical orthopedic rehabilitation' };
+  }
+
+  // Cardiopulmonary & Respiratory
+  if (term.includes('cardio') || term.includes('pulmonary') || term.includes('chest') || term.includes('asthma') || term.includes('breath') || term.includes('lung') || term.includes('heart')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600', imageHint: 'cardiopulmonary chest physiotherapy' };
+  }
+
+  // Posture, Ergonomics & Lifestyle
+  if (term.includes('ergo') || term.includes('postur') || term.includes('work') || term.includes('desk') || term.includes('fatigue')) {
+    return { imageUrl: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&q=85&w=1600', imageHint: 'workplace ergonomic posture correction' };
+  }
+
+  // Default Clinical Excellence
+  return { imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600', imageHint: 'hospital-grade clinical healthcare' };
 };
 
 
@@ -98,8 +145,8 @@ export const locations: Location[] = [
     address: 'Borivali West / All Mumbai Hubs, Maharashtra',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1529253355930-ddbe423a2ac7?auto=format&fit=crop&q=80&w=1000',
-    mapImageHint: 'mumbai skyline'
+    mapImageUrl: 'https://images.unsplash.com/photo-1529253355930-ddbe423a2ac7?auto=format&fit=crop&q=85&w=1600',
+    mapImageHint: 'mumbai healthcare hub'
   },
   {
     id: 'loc-2',
@@ -107,8 +154,8 @@ export const locations: Location[] = [
     address: 'Koregaon Park / Baner Hub, Maharashtra',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1562778612-e1e0cda9915c?auto=format&fit=crop&q=80&w=1000',
-    mapImageHint: 'pune skyline'
+    mapImageUrl: 'https://images.unsplash.com/photo-1562778612-e1e0cda9915c?auto=format&fit=crop&q=85&w=1600',
+    mapImageHint: 'pune healthcare hub'
   },
   {
     id: 'loc-3',
@@ -116,8 +163,8 @@ export const locations: Location[] = [
     address: 'Indiranagar / Whitefield Hub, Karnataka',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&q=80&w=1000',
-    mapImageHint: 'bengaluru cityscape'
+    mapImageUrl: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&q=85&w=1600',
+    mapImageHint: 'bengaluru healthcare hub'
   },
   {
     id: 'loc-4',
@@ -125,8 +172,8 @@ export const locations: Location[] = [
     address: 'Anna Nagar / Adyar Hub, Tamil Nadu',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1582510003544-2d095665039b?auto=format&fit=crop&q=80&w=1000',
-    mapImageHint: 'chennai cityscape'
+    mapImageUrl: 'https://images.unsplash.com/photo-1582510003544-2d095665039b?auto=format&fit=crop&q=85&w=1600',
+    mapImageHint: 'chennai healthcare hub'
   },
   {
     id: 'loc-5',
@@ -134,8 +181,8 @@ export const locations: Location[] = [
     address: 'Jubilee Hills / HITEC City Hub, Telangana',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&q=80&w=1000',
-    mapImageHint: 'hyderabad cityscape'
+    mapImageUrl: 'https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&q=85&w=1600',
+    mapImageHint: 'hyderabad healthcare hub'
   },
   {
     id: 'loc-6',
@@ -143,8 +190,8 @@ export const locations: Location[] = [
     address: 'South Delhi / Gurugram Hub, Delhi NCR',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&q=80&w=1000',
-    mapImageHint: 'delhi cityscape'
+    mapImageUrl: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&q=85&w=1600',
+    mapImageHint: 'delhi ncr healthcare hub'
   },
   {
     id: 'loc-7',
@@ -152,8 +199,8 @@ export const locations: Location[] = [
     address: 'Salt Lake / Alipore Hub, West Bengal',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1558431382-27e39cb14bc8?auto=format&fit=crop&q=80&w=1000',
-    mapImageHint: 'kolkata cityscape'
+    mapImageUrl: 'https://images.unsplash.com/photo-1558431382-27e39cb14bc8?auto=format&fit=crop&q=85&w=1600',
+    mapImageHint: 'kolkata healthcare hub'
   },
 ];
 
@@ -346,6 +393,50 @@ const getConditionClinicalInfo = (name: string) => {
   };
 };
 
+const getSymptomImage = (name: string) => {
+  const ln = name.toLowerCase();
+  if (ln.includes('stiff') || ln.includes('spasm')) {
+    return { url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=85&w=1600', hint: 'muscle stiffness manual release' };
+  }
+  if (ln.includes('crepitus') || ln.includes('crack')) {
+    return { url: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=85&w=1600', hint: 'joint crepitus examination' };
+  }
+  if (ln.includes('numb') || ln.includes('tingl') || ln.includes('tremor')) {
+    return { url: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=85&w=1600', hint: 'neurological nerve conduction test' };
+  }
+  if (ln.includes('neck')) {
+    return { url: 'https://images.unsplash.com/photo-1584820927500-47b2d5edb151?auto=format&fit=crop&q=85&w=1600', hint: 'cervical neck palpation' };
+  }
+  if (ln.includes('foot') || ln.includes('ankle')) {
+    return { url: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&q=85&w=1600', hint: 'foot biomechanics therapy' };
+  }
+  if (ln.includes('back')) {
+    return { url: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&q=85&w=1600', hint: 'lumbar spine assessment' };
+  }
+  if (ln.includes('knee')) {
+    return { url: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=85&w=1600', hint: 'knee pain clinical assessment' };
+  }
+  if (ln.includes('shoulder')) {
+    return { url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=85&w=1600', hint: 'shoulder mobility testing' };
+  }
+  if (ln.includes('balance')) {
+    return { url: 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=85&w=1600', hint: 'balance and stability training' };
+  }
+  if (ln.includes('inflam') || ln.includes('swelling')) {
+    return { url: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=85&w=1600', hint: 'inflammation management' };
+  }
+  if (ln.includes('headache')) {
+    return { url: 'https://images.unsplash.com/photo-1584820927500-47b2d5edb151?auto=format&fit=crop&q=85&w=1600', hint: 'cervicogenic headache relief' };
+  }
+  if (ln.includes('breath') || ln.includes('shortness')) {
+    return { url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600', hint: 'chest physiotherapy' };
+  }
+  if (ln.includes('sprain') || ln.includes('strain')) {
+    return { url: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=85&w=1600', hint: 'sports sprain rehabilitation' };
+  }
+  return { url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600', hint: 'clinical assessment' };
+};
+
 const getSymptomClinicalInfo = (name: string): SymptomDetail => {
   const lowerName = name.toLowerCase();
   const dynamicFaqs = [
@@ -354,12 +445,13 @@ const getSymptomClinicalInfo = (name: string): SymptomDetail => {
     { id: 'sq3', question: `Can this be treated entirely at home?`, answer: `Yes, we bring hospital-grade portable equipment directly to your home to ensure elite-level treatment for ${name} without compromising on quality.` }
   ];
 
+  const symptomImg = getSymptomImage(name);
   const info: any = {
     name,
     slug: toSlug(name),
     faqs: dynamicFaqs,
-    imageUrl: 'https://images.unsplash.com/photo-1638604813811-6f3c53deff9c?auto=format&fit=crop&q=80&w=1000',
-    imageHint: 'clinical assessment'
+    imageUrl: symptomImg.url,
+    imageHint: symptomImg.hint
   };
 
   if (lowerName.includes('stiffness') || lowerName.includes('spasm')) {
@@ -405,18 +497,47 @@ const getTherapyClinicalInfo = (name: string): TherapyDetail => {
 
   const getTherapyImage = (name: string) => {
     const ln = name.toLowerCase();
-    if (ln.includes('cupping')) return { url: '/hero/cupping.jpg', hint: 'cupping therapy' };
-    if (ln.includes('tens') || ln.includes('transcutaneous')) return { url: '/hero/tens.jpg', hint: 'TENS therapy' };
-    if (ln.includes('needling')) return { url: '/hero/dry-needling.jpg', hint: 'dry needling' };
-    if (ln.includes('massage') || ln.includes('mobilization') || ln.includes('release')) return { url: '/hero/massage-gun.jpg', hint: 'massage therapy' };
-    if (ln.includes('taping') || ln.includes('kinesio')) return { url: '/hero/foam-roller.jpg', hint: 'rehabilitation' };
-    if (ln.includes('chiropractic') || ln.includes('decompression') || ln.includes('traction')) return { url: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=1000', hint: 'spine adjustment' };
-    if (ln.includes('laser') || ln.includes('ultrasound') || ln.includes('shockwave') || ln.includes('tecar') || ln.includes('swd') || ln.includes('diathermy')) return { url: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1000', hint: 'clinical modality' };
-    if (ln.includes('pelvic')) return { url: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&w=1000', hint: 'pelvic health' };
-    if (ln.includes('chest') || ln.includes('cryotherapy')) return { url: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&q=80&w=1000', hint: 'clinical care' };
-    if (ln.includes('harness')) return { url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1000', hint: 'gait training' };
+    if (ln.includes('cupping')) {
+      return { url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=85&w=1600', hint: 'cupping therapy and myofascial decompression' };
+    }
+    if (ln.includes('tens') || ln.includes('transcutaneous') || ln.includes('ift') || ln.includes('interferential')) {
+      return { url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=85&w=1600', hint: 'electrotherapy and TENS pain relief' };
+    }
+    if (ln.includes('needling')) {
+      return { url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=85&w=1600', hint: 'dry needling and trigger point therapy' };
+    }
+    if (ln.includes('massage') || ln.includes('mfr') || ln.includes('myofascial') || ln.includes('release') || ln.includes('tissue')) {
+      return { url: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&q=85&w=1600', hint: 'manual deep tissue release therapy' };
+    }
+    if (ln.includes('taping') || ln.includes('kinesio')) {
+      return { url: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=85&w=1600', hint: 'kinesio dynamic neuromuscular taping' };
+    }
+    if (ln.includes('chiropractic') || ln.includes('decompression') || ln.includes('traction') || ln.includes('robotic')) {
+      return { url: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&q=85&w=1600', hint: 'spinal adjustment and decompression therapy' };
+    }
+    if (ln.includes('laser') || ln.includes('ultrasound') || ln.includes('shockwave') || ln.includes('tecar') || ln.includes('swd') || ln.includes('diathermy')) {
+      return { url: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=85&w=1600', hint: 'advanced photobiomodulation and ultrasound modality' };
+    }
+    if (ln.includes('wax')) {
+      return { url: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&q=85&w=1600', hint: 'paraffin wax therapy for arthritic joints' };
+    }
+    if (ln.includes('pelvic')) {
+      return { url: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=85&w=1600', hint: 'pelvic floor core strengthening therapy' };
+    }
+    if (ln.includes('chest') || ln.includes('pulmonary')) {
+      return { url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600', hint: 'chest physiotherapy and respiratory hygiene' };
+    }
+    if (ln.includes('cryo') || ln.includes('cold') || ln.includes('compression')) {
+      return { url: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=85&w=1600', hint: 'cryotherapy and cold compression recovery' };
+    }
+    if (ln.includes('harness') || ln.includes('gait')) {
+      return { url: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=85&w=1600', hint: 'gait training and functional ambulation' };
+    }
+    if (ln.includes('manual') || ln.includes('mobilization')) {
+      return { url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=85&w=1600', hint: 'expert manual joint mobilization' };
+    }
 
-    return { url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1000', hint: 'physiotherapy' };
+    return { url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600', hint: 'evidence-based clinical physiotherapy' };
   };
 
   const therapyImg = getTherapyImage(name);
@@ -706,12 +827,12 @@ export const physiotherapyConditions: Condition[] = conditionList.map((name, ind
 const generateMockConditions = (servicePrefix: string, count: number): Condition[] => {
   const getImg = (prefix: string) => {
     switch (prefix) {
-      case 'ot': return 'https://images.unsplash.com/photo-1543881062-8e1f5798aee8?auto=format&fit=crop&w=1000';
-      case 'diet': return 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1000';
-      case 'nursing': return 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&w=1000';
-      case 'caretaker': return 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&w=1000';
-      case 'speech': return 'https://images.unsplash.com/photo-1520188740392-6abdfbe2ed2a?auto=format&fit=crop&w=1000';
-      default: return 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000';
+      case 'ot': return 'https://images.unsplash.com/photo-1519238263530-990ffce6e4b8?auto=format&fit=crop&q=85&w=1600';
+      case 'diet': return 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=85&w=1600';
+      case 'nursing': return 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=85&w=1600';
+      case 'caretaker': return 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=85&w=1600';
+      case 'speech': return 'https://images.unsplash.com/photo-1543881062-8e1f5798aee8?auto=format&fit=crop&q=85&w=1600';
+      default: return 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600';
     }
   };
 
@@ -753,8 +874,8 @@ export const services: Service[] = [
         name: 'Sensory Processing Disorder',
         slug: 'sensory-processing-disorder',
         description: 'Specialized sensory integration therapy to help children and adults process and respond to environmental stimuli effectively.',
-        imageUrl: 'https://images.unsplash.com/photo-1543881062-8e1f5798aee8?auto=format&fit=crop&w=1000',
-        imageHint: 'child in sensory play',
+        imageUrl: 'https://images.unsplash.com/photo-1519238263530-990ffce6e4b8?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'sensory integration and pediatric developmental therapy',
         symptoms: ['Over-sensitivity to light/sound', 'Poor coordination', 'Difficulty with transitions', 'Behavioral challenges'],
         treatmentDetails: 'Our OT experts utilize sensory-rich environments and structured play to regulate neural responses and improve focus.',
         benefits: ['Improved emotional regulation', 'Better focus in school/work', 'Enhanced motor coordination'],
@@ -766,8 +887,8 @@ export const services: Service[] = [
         name: 'Stroke & Neuro Rehabilitation',
         slug: 'neuro-occupational-therapy',
         description: 'Functional recovery programs to help stroke survivors regain the ability to perform daily tasks like dressing, eating, and grooming.',
-        imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&w=1000',
-        imageHint: 'elderly hand exercise',
+        imageUrl: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'neurological rehabilitation and fine motor dexterity',
         symptoms: ['Hemiplegia/Paralysis', 'Cognitive deficits', 'Loss of fine motor control', 'Difficulty with ADLs'],
         treatmentDetails: 'We use task-oriented training, constraint-induced movement therapy (CIMT), and cognitive retraining to restore autonomy.',
         benefits: ['Restored independence in self-care', 'Improved fine motor dexterity', 'Enhanced cognitive function'],
@@ -779,8 +900,8 @@ export const services: Service[] = [
         name: 'Pediatric Developmental Delay',
         slug: 'pediatric-occupational-therapy',
         description: 'Helping children achieve crucial developmental milestones through playful clinical intervention and motor skill training.',
-        imageUrl: 'https://images.unsplash.com/photo-1519238263530-990ffce6e4b8?auto=format&fit=crop&w=1000',
-        imageHint: 'child writing with OT',
+        imageUrl: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'pediatric developmental motor milestones therapy',
         symptoms: ['Delayed fine motor skills', 'Poor handwriting', 'Difficulty with buttons/zips', 'Low muscle tone'],
         treatmentDetails: 'Includes handwriting training, gross motor coordination games, and upper limb strengthening protocols.',
         benefits: ['School readiness', 'Improved self-esteem', 'Mastery of self-care tasks'],
@@ -792,8 +913,8 @@ export const services: Service[] = [
         name: 'Geriatric Home Safety & ADLs',
         slug: 'geriatric-occupational-therapy',
         description: 'Environmental modifications and functional training to help senior citizens live safely and independently at home.',
-        imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000',
-        imageHint: 'senior citizen at home',
+        imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'senior citizen daily living and fall prevention',
         symptoms: ['Frequent falls', 'Reduced mobility', 'Difficulty with home tasks', 'Cognitive decline'],
         treatmentDetails: 'Comprehensive home safety audits, balance training, and adaptive equipment recommendations (grab bars, reachers).',
         benefits: ['Reduced fall risk', 'Prolonged independent living', 'Improved quality of life for seniors'],
@@ -805,8 +926,8 @@ export const services: Service[] = [
         name: 'Hand & Wrist Rehabilitation',
         slug: 'hand-therapy',
         description: 'Specialized therapy for hand injuries, tendon repairs, and carpal tunnel syndrome to restore grip and dexterity.',
-        imageUrl: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=1000',
-        imageHint: 'hands being treated',
+        imageUrl: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'hand dexterity, tendon and wrist rehabilitation',
         symptoms: ['Wrist pain', 'Reduced grip strength', 'Numbness in fingers', 'Post-surgical stiffness'],
         treatmentDetails: 'Custom splinting, scar management, tendon gliding exercises, and progressive strengthening.',
         benefits: ['Restored hand function', 'Reduced pain and swelling', 'Improved dexterity for work/hobbies'],
@@ -818,8 +939,8 @@ export const services: Service[] = [
         name: 'Ergonomics & Workstation Adaptation',
         slug: 'occupational-ergonomics',
         description: 'Clinical assessment of your workspace to prevent repetitive strain injuries and optimize postural health.',
-        imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1000',
-        imageHint: 'office chair ergonomics',
+        imageUrl: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'workplace ergonomic posture correction',
         symptoms: ['Chronic neck/back pain', 'Wrist fatigue', 'Eye strain', 'Postural headaches'],
         treatmentDetails: 'Workstation setup analysis, postural corrective exercises, and micro-break scheduling protocols.',
         benefits: ['Reduced workplace injuries', 'Increased productivity', 'Long-term spinal health'],
@@ -841,8 +962,8 @@ export const services: Service[] = [
         name: 'Diabetes Management',
         slug: 'diabetes-nutrition',
         description: 'Scientific blood sugar control through specialized glycemic index management and personalized carbohydrate counting.',
-        imageUrl: 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?auto=format&fit=crop&w=1000',
-        imageHint: 'healthy vegetables and stethoscope',
+        imageUrl: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'clinical diabetes nutrition planning',
         symptoms: ['High blood sugar levels', 'Insulin resistance', 'Frequent fatigue', 'Fluctuating energy'],
         treatmentDetails: 'Personalized meal mapping to stabilize HbA1c levels, continuous glucose monitoring integration, and lifestyle coaching.',
         benefits: ['Stable energy levels', 'Reduced dependency on medication', 'Prevention of diabetic complications'],
@@ -854,8 +975,8 @@ export const services: Service[] = [
         name: 'Weight Management',
         slug: 'medical-weight-loss',
         description: 'Sustainable, medically-supervised weight loss or gain programs focused on body composition and metabolic health.',
-        imageUrl: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1000',
-        imageHint: 'balanced meal plate',
+        imageUrl: 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'balanced nutritional medical meal planning',
         symptoms: ['High BMI', 'Metabolic syndrome', 'Low muscle mass', 'PCOS-related weight gain'],
         treatmentDetails: 'Caloric deficit/surplus planning based on BMR, macronutrient optimization, and behavioral nutrition coaching.',
         benefits: ['Improved joint health', 'Enhanced metabolic rate', 'Sustainable fat loss'],
@@ -867,8 +988,8 @@ export const services: Service[] = [
         name: 'Cardiac Nutrition',
         slug: 'heart-healthy-diet',
         description: 'Heart-healthy dietary protocols to manage cholesterol, hypertension, and overall cardiovascular recovery.',
-        imageUrl: 'https://images.unsplash.com/photo-1505751172676-d7405903823d?auto=format&fit=crop&w=1000',
-        imageHint: 'avocado and heart healthy food',
+        imageUrl: 'https://images.unsplash.com/photo-1505751172676-d7405903823d?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'cardiac heart-healthy clinical nutrition',
         symptoms: ['High cholesterol (LDL)', 'Hypertension', 'Post-heart surgery', 'Arterial plaque'],
         treatmentDetails: 'Low-sodium, heart-healthy fat (MUFA/PUFA) integration and DASH diet based clinical protocols.',
         benefits: ['Lowered blood pressure', 'Improved lipid profile', 'Reduced risk of cardiac events'],
@@ -880,8 +1001,8 @@ export const services: Service[] = [
         name: 'Gastrointestinal Health',
         slug: 'gut-health-nutrition',
         description: 'Dietary interventions for IBS, Celiac disease, and general gut microbiome optimization.',
-        imageUrl: 'https://images.unsplash.com/photo-1616671285410-998846e96901?auto=format&fit=crop&w=1000',
-        imageHint: 'yogurt and berries',
+        imageUrl: 'https://images.unsplash.com/photo-1616671285410-998846e96901?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'gastrointestinal digestive health nutrition',
         symptoms: ['Bloating', 'Acid reflux', 'Food intolerances', 'Irregular bowel movements'],
         treatmentDetails: 'Elimination diets (Low FODMAP), probiotic integration, and gut-barrier repair protocols.',
         benefits: ['Elimination of digestive discomfort', 'Improved nutrient absorption', 'Enhanced immunity'],
@@ -903,8 +1024,8 @@ export const services: Service[] = [
         name: 'Post-Surgical Care',
         slug: 'post-operative-nursing',
         description: 'Comprehensive management of surgical wounds, drain care, and medication protocols for a safe infection-free recovery.',
-        imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1000',
-        imageHint: 'nurse checking surgical site',
+        imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'post-operative surgical nursing and wound care',
         symptoms: ['Surgical incisions', 'Suture/Staple removal', 'Post-op pain', 'Drain tubes'],
         treatmentDetails: 'Sterile dressing changes, administration of IV/Oral medications, monitoring for signs of infection, and progress reporting to surgeons.',
         benefits: ['Reduced risk of hospital readmission', 'Zero-infection recovery', 'Faster wound healing'],
@@ -916,8 +1037,8 @@ export const services: Service[] = [
         name: 'Chronic Disease Management',
         slug: 'chronic-illness-nursing',
         description: 'Professional monitoring and medication management for patients with chronic conditions like diabetes and hypertension.',
-        imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&w=1000',
-        imageHint: 'nurse taking blood pressure',
+        imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'chronic illness monitoring and vitals tracking',
         symptoms: ['Uncontrolled blood sugar', 'Hypertension', 'COPD/Respiratory issues', 'Chronic heart failure'],
         treatmentDetails: 'Regular vitals tracking, insulin administration, nebulization therapy, and oxygen management.',
         benefits: ['Stabilized health metrics', 'Early detection of complications', 'Effective medication adherence'],
@@ -929,8 +1050,8 @@ export const services: Service[] = [
         name: 'Critical Care at Home',
         slug: 'home-icu-nursing',
         description: 'Hospital-grade care for patients requiring specialized equipment like Tracheostomy, Ryle’s Tube, and Catheters.',
-        imageUrl: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1000',
-        imageHint: 'medical equipment at home',
+        imageUrl: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'critical care and specialized medical equipment',
         symptoms: ['Difficulty breathing', 'Feeding via tube', 'Urinary retention', 'Neurological instability'],
         treatmentDetails: 'Tracheostomy suctioning, Ryle’s Tube feeding, Foley catheterization, and ICU-trained nurse monitoring.',
         benefits: ['Cost-effective alternative to hospital ICU', 'Greater patient comfort', 'Specialized clinical intervention'],
@@ -942,8 +1063,8 @@ export const services: Service[] = [
         name: 'Wound & Bedsore Care',
         slug: 'wound-management-nursing',
         description: 'Expert treatment for chronic wounds, diabetic ulcers, and pressure sores (bedsores) using sterile techniques.',
-        imageUrl: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&w=1000',
-        imageHint: 'nurse dressing a wound',
+        imageUrl: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'sterile wound care and pressure sore management',
         symptoms: ['Persistent skin ulcers', 'Stage I-IV bedsores', 'Diabetic foot complications', 'Non-healing wounds'],
         treatmentDetails: 'Debridement consultation, advanced sterile dressing, pressure point management, and nutrition-assisted healing.',
         benefits: ['Prevention of gangrene', 'Rapid skin regeneration', 'Significant pain reduction'],
@@ -955,8 +1076,8 @@ export const services: Service[] = [
         name: 'Palliative & Geriatric Care',
         slug: 'geriatric-palliative-nursing',
         description: 'Compassionate clinical support focused on the comfort, dignity, and quality of life for seniors and those with life-limiting illnesses.',
-        imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000',
-        imageHint: 'nurse holding elderly hand',
+        imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'palliative geriatric nursing and comfort care',
         symptoms: ['Age-related frailty', 'Pain management needs', 'Emotional distress', 'End-of-life support'],
         treatmentDetails: 'Pain relief protocols, basic hygiene support, emotional counseling, and family caregiver training.',
         benefits: ['Enhanced quality of life', 'Dignified care at home', 'Reduced caregiver burnout'],
@@ -978,8 +1099,8 @@ export const services: Service[] = [
         name: 'Elderly Personal Hygiene',
         slug: 'elderly-hygiene-care',
         description: 'Assisting senior citizens with daily tasks like bathing, dressing, grooming, and maintaining personal dignity.',
-        imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1000',
-        imageHint: 'care taker helping elderly',
+        imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'elderly personal hygiene assistance',
         symptoms: ['Difficulty bathing', 'Inability to dress self', 'Poor grooming', 'Need for assistance'],
         treatmentDetails: 'Help with sponge baths/showers, oral hygiene, hair care, dressing assistance, and diaper changes if required.',
         benefits: ['Improved self-esteem', 'Prevention of skin infections', 'Comfort and freshness'],
@@ -991,8 +1112,8 @@ export const services: Service[] = [
         name: 'Mobility & Fall Prevention',
         slug: 'mobility-support-care',
         description: 'Safe handling and transfer techniques to help patients move around their home without the risk of falling.',
-        imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000',
-        imageHint: 'care taker helping patient walk',
+        imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'elderly mobility assistance and transfer support',
         symptoms: ['Fear of falling', 'Unsteady gait', 'Need for walking aids', 'Bed-to-chair transfers'],
         treatmentDetails: 'Assisted walking, wheelchair transfers, passive limb movements as prescribed by physios, and fall-risk monitoring.',
         benefits: ['Reduced risk of fractures', 'Increased confidence to move', 'Safe transitions'],
@@ -1004,8 +1125,8 @@ export const services: Service[] = [
         name: 'Bedridden & Post-Op Support',
         slug: 'bedridden-patient-care',
         description: 'Dedicated support for patients confined to bed, focusing on comfort, nutrition, and skin integrity.',
-        imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&w=1000',
-        imageHint: 'care taker assisting bedridden patient',
+        imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'bedridden patient compassionate care',
         symptoms: ['Paralysis', 'Comatose state', 'Severe mobility loss', 'Post-major surgery'],
         treatmentDetails: 'Regular positioning to prevent sores, feeding assistance, diaper management, and basic exercise support.',
         benefits: ['Prevention of bedsores', 'Better nutritional intake', 'Enhanced physical comfort'],
@@ -1027,8 +1148,8 @@ export const services: Service[] = [
         name: 'Pediatric Language Delay',
         slug: 'pediatric-speech-delay',
         description: 'Helping children bridge the gap in their expressive and receptive language skills through playful, structured clinical intervention.',
-        imageUrl: 'https://images.unsplash.com/photo-1543881062-8e1f5798aee8?auto=format&fit=crop&w=1000',
-        imageHint: 'child learning with therapist',
+        imageUrl: 'https://images.unsplash.com/photo-1543881062-8e1f5798aee8?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'pediatric speech and language articulation therapy',
         symptoms: ['Delayed first words', 'Limited vocabulary', 'Difficulty following instructions', 'Unclear pronunciation'],
         treatmentDetails: 'Language-rich play, phonological awareness exercises, and parent coaching to integrate therapy into daily routines.',
         benefits: ['Improved school readiness', 'Enhanced social interaction', 'Reduced frustration for child and parent'],
@@ -1040,8 +1161,8 @@ export const services: Service[] = [
         name: 'Autism & Social Communication',
         slug: 'autism-speech-therapy',
         description: 'Specialized focus on pragmatic language, social cues, and alternative communication for individuals on the spectrum.',
-        imageUrl: 'https://images.unsplash.com/photo-1519238263530-990ffce6e4b8?auto=format&fit=crop&w=1000',
-        imageHint: 'interaction with child',
+        imageUrl: 'https://images.unsplash.com/photo-1519238263530-990ffce6e4b8?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'social communication and pragmatic speech therapy',
         symptoms: ['Poor eye contact', 'Difficulty with turn-taking', 'Literal interpretation of language', 'Social isolation'],
         treatmentDetails: 'Social stories, visual supports (PECS), functional communication training, and peer-interaction modeling.',
         benefits: ['Meaningful social connections', 'Enhanced emotional expression', 'Improved functional independence'],
@@ -1053,8 +1174,8 @@ export const services: Service[] = [
         name: 'Post-Stroke Aphasia Rehab',
         slug: 'aphasia-rehabilitation',
         description: 'Intensive therapy to regain speech and language comprehension following a stroke or traumatic brain injury.',
-        imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&w=1000',
-        imageHint: 'adult neuro rehab',
+        imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'aphasia recovery and adult speech rehabilitation',
         symptoms: ['Difficulty finding words', 'Slurred speech (Dysarthria)', 'Loss of reading/writing skills', 'Impaired comprehension'],
         treatmentDetails: 'Melodic Intonation Therapy, Constraint-Induced Language Therapy, and cognitive-linguistic retraining.',
         benefits: ['Restored ability to communicate needs', 'Improved quality of life', 'Enhanced cognitive function'],
@@ -1066,8 +1187,8 @@ export const services: Service[] = [
         name: 'Stuttering & Fluency Disorders',
         slug: 'fluency-speech-therapy',
         description: 'Clinical techniques to improve speech flow and reduce the physical and emotional impact of stuttering.',
-        imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1000',
-        imageHint: 'therapist and patient talking',
+        imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'fluency shaping and speech confidence therapy',
         symptoms: ['Repetition of sounds', 'Prolongations/Blocks', 'Facial tension during speech', 'Avoidance of speaking'],
         treatmentDetails: 'Breath control techniques, easy-onset speech, and desensitization therapy to build speaking confidence.',
         benefits: ['Fluid speech production', 'Increased social confidence', 'Reduced anxiety around speaking'],
@@ -1079,8 +1200,8 @@ export const services: Service[] = [
         name: 'Swallowing Disorders (Dysphagia)',
         slug: 'dysphagia-therapy',
         description: 'Vital clinical intervention to ensure safe swallowing and prevent aspiration in patients with neurological or structural issues.',
-        imageUrl: 'https://images.unsplash.com/photo-1576091162137-024564c7a68e?auto=format&fit=crop&w=1000',
-        imageHint: 'patient being assisted with feeding',
+        imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600',
+        imageHint: 'dysphagia swallowing therapy and safety rehabilitation',
         symptoms: ['Coughing during meals', 'Feeling of food stuck in throat', 'Recurrent pneumonia', 'Unexplained weight loss'],
         treatmentDetails: 'Oral-motor exercises, dietary texture modification, and therapeutic swallowing maneuvers (e.g., Mendelsohn Maneuver).',
         benefits: ['Prevention of aspiration pneumonia', 'Improved nutritional intake', 'Enhanced safety during meals'],
