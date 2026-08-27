@@ -40,12 +40,47 @@ const getServiceDetail = (slug: string) => {
   const name = capitalize(slug);
   const lowerSlug = slug.toLowerCase();
 
+  let imageUrl = 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600';
+  let imageHint = 'advanced clinical physiotherapy treatment';
+
+  if (lowerSlug.includes('sport')) {
+    imageUrl = 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=85&w=1600';
+    imageHint = 'sports physiotherapy athletic recovery and kinetic conditioning';
+  } else if (lowerSlug.includes('neuro') || lowerSlug.includes('stroke') || lowerSlug.includes('paralysis')) {
+    imageUrl = 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=85&w=1600';
+    imageHint = 'neurological rehabilitation stroke recovery and motor reprogramming';
+  } else if (lowerSlug.includes('geriatric') || lowerSlug.includes('elderly') || lowerSlug.includes('senior')) {
+    imageUrl = 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=85&w=1600';
+    imageHint = 'geriatric senior mobility and functional rehabilitation';
+  } else if (lowerSlug.includes('pediatric') || lowerSlug.includes('child')) {
+    imageUrl = 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=85&w=1600';
+    imageHint = 'pediatric physiotherapy developmental therapy and motor milestones';
+  } else if (lowerSlug.includes('ortho') || lowerSlug.includes('joint') || lowerSlug.includes('bone') || lowerSlug.includes('fracture')) {
+    imageUrl = 'https://images.unsplash.com/photo-1588286840104-8957b019727f?auto=format&fit=crop&q=85&w=1600';
+    imageHint = 'orthopedic musculoskeletal rehabilitation and joint mobilization';
+  } else if (lowerSlug.includes('chiro') || lowerSlug.includes('spine') || lowerSlug.includes('back')) {
+    imageUrl = 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=85&w=1600';
+    imageHint = 'chiropractic spinal alignment and manual decompression';
+  } else if (lowerSlug.includes('cardio') || lowerSlug.includes('pulmon') || lowerSlug.includes('chest') || lowerSlug.includes('respiratory')) {
+    imageUrl = 'https://images.unsplash.com/photo-1505751172676-d7405903823d?auto=format&fit=crop&q=85&w=1600';
+    imageHint = 'cardiopulmonary cardiac rehabilitation and lung clearance';
+  } else if (lowerSlug.includes('women') || lowerSlug.includes('pelvic') || lowerSlug.includes('prenatal') || lowerSlug.includes('postnatal')) {
+    imageUrl = 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&q=85&w=1600';
+    imageHint = 'womens health pelvic floor and prenatal physical therapy';
+  } else if (lowerSlug.includes('ergo') || lowerSlug.includes('postur') || lowerSlug.includes('work')) {
+    imageUrl = 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&q=85&w=1600';
+    imageHint = 'ergonomic posture correction and occupational wellness';
+  } else if (lowerSlug.includes('post-op') || lowerSlug.includes('post-surg') || lowerSlug.includes('surg')) {
+    imageUrl = 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=85&w=1600';
+    imageHint = 'post-surgical orthopedic physical rehabilitation and wound protocol';
+  }
+
   const details: any = {
     name,
     slug,
     description: `Expert-led home ${name.toLowerCase()} services provided by Aries PhysioCare. We deliver hospital-grade clinical excellence directly to your doorstep.`,
-    imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=1000',
-    imageHint: 'clinical service'
+    imageUrl,
+    imageHint
   };
   const dynamicFaqs = [
     { id: 's1', question: `What is the clinical process for ${name}?`, answer: `Our expert physiotherapists begin with a thorough biomechanical assessment, followed by an evidence-based ${name} treatment plan utilizing advanced portable modalities.` },

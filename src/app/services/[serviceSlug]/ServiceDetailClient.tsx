@@ -15,9 +15,48 @@ interface ServiceDetailClientProps {
     serviceSlug: string;
 }
 
+const getServiceVisuals = (slug: string) => {
+    const s = slug.toLowerCase();
+    if (s.includes('occupational') || s === 'ot') {
+        return {
+            hero: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=85&w=2000',
+            overview: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&q=85&w=1600'
+        };
+    }
+    if (s.includes('diet') || s.includes('nutrition')) {
+        return {
+            hero: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=85&w=2000',
+            overview: 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?auto=format&fit=crop&q=85&w=1600'
+        };
+    }
+    if (s.includes('nursing')) {
+        return {
+            hero: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=85&w=2000',
+            overview: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&q=85&w=1600'
+        };
+    }
+    if (s.includes('care-taker') || s.includes('caretaker')) {
+        return {
+            hero: 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=85&w=2000',
+            overview: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=85&w=1600'
+        };
+    }
+    if (s.includes('speech')) {
+        return {
+            hero: 'https://images.unsplash.com/photo-1543881062-8e1f5798aee8?auto=format&fit=crop&q=85&w=2000',
+            overview: 'https://images.unsplash.com/photo-1519238263530-990ffce6e4b8?auto=format&fit=crop&q=85&w=1600'
+        };
+    }
+    return {
+        hero: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=2000',
+        overview: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=85&w=1600'
+    };
+};
+
 export default function ServiceDetailClient({ serviceSlug }: ServiceDetailClientProps) {
     const service = getServiceBySlug(serviceSlug);
     const { openModal } = useRequestCallback();
+    const visuals = getServiceVisuals(serviceSlug);
 
     if (!service) {
         return null;
@@ -29,9 +68,10 @@ export default function ServiceDetailClient({ serviceSlug }: ServiceDetailClient
             <section className="relative w-full h-[60vh] flex items-center overflow-hidden bg-primary">
                 <div className="absolute inset-0 z-0 opacity-20">
                     <Image
-                        src={`https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000`}
+                        src={visuals.hero}
                         alt={service.name}
                         fill
+                        priority
                         className="object-cover"
                     />
                 </div>
@@ -80,7 +120,7 @@ export default function ServiceDetailClient({ serviceSlug }: ServiceDetailClient
                         </div>
                         <div className="relative aspect-square rounded-[3rem] overflow-hidden soft-shadow border border-primary/10 shadow-2xl glassmorphic">
                             <Image
-                                src={`https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1000`}
+                                src={visuals.overview}
                                 alt={service.name}
                                 fill
                                 className="object-cover hover:scale-105 transition-transform duration-1000"
