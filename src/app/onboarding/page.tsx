@@ -95,6 +95,15 @@ const REGISTRATION_FEES: Record<string, { amount: number; currency: string; symb
   },
 };
 
+const EARNINGS_ESTIMATES: Record<string, { range: string; subtitle: string }> = {
+  'India': { range: '₹45,000 – ₹95,000 / mo', subtitle: 'Based on 4–6 home visits/day within your designated territory' },
+  'Canada': { range: '$4,500 – $8,200 / mo', subtitle: 'Based on provincial clinic & home visit allocations' },
+  'United Kingdom': { range: '£3,500 – £6,200 / mo', subtitle: 'Based on NHS & private home visit hourly allocations' },
+  'Germany': { range: '€4,000 – €7,500 / mo', subtitle: 'Based on statutory & private health insurance tariffs' },
+  'UAE / Dubai': { range: 'AED 15,000 – AED 28,000 / mo', subtitle: 'Based on premium VIP home healthcare appointments' },
+  'United States': { range: '$4,500 – $8,200 / mo', subtitle: 'Based on regional out-of-network physical therapy visits' },
+};
+
 // ── Mobile App Exact Country Configs ────────────────────
 const COUNTRY_CONFIGS: Record<
   string,
@@ -414,6 +423,20 @@ export default function ProviderOnboardingPage() {
   const [travelCapacity, setTravelCapacity] = useState('Up to 5 visits per day (Standard)');
   const [urgentVisits, setUrgentVisits] = useState(true);
   const [travelTimePreference, setTravelTimePreference] = useState('Flexible / Anytime (8:00 AM – 9:00 PM)');
+
+  // ── Step 1: Verification & OTP States ───────────────
+  const [isEmailVerified, setIsEmailVerified] = useState(true);
+  const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
+  const [isMobileVerified, setIsMobileVerified] = useState(true);
+  const [isVerifyingMobile, setIsVerifyingMobile] = useState(false);
+  const [mobileOtp, setMobileOtp] = useState('');
+  const [showMobileOtpInput, setShowMobileOtpInput] = useState(false);
+
+  // ── Step 2: Extra Certifications Dynamic List ────────
+  const [extraCertDocs, setExtraCertDocs] = useState<{ id: string; label: string; file?: File; name?: string; url?: string }[]>([]);
+
+  // ── Step 4: Max Distance Per Visit ───────────────────
+  const [maxDistancePerVisit, setMaxDistancePerVisit] = useState(25);
 
   // ── Step 5: Compliance Declarations & Fee ───────────
   const [agreeClinicalGuidelines, setAgreeClinicalGuidelines] = useState(true);
@@ -1066,41 +1089,65 @@ export default function ProviderOnboardingPage() {
               {/* Profile Photo & Portrait Studio */}
               <div className="p-6 rounded-3xl bg-slate-900/70 border border-slate-800/80 backdrop-blur-xl relative overflow-hidden">
                 <div className="flex flex-col sm:flex-row items-center gap-6">
-                  <div className="relative group">
-                    <div className="w-28 h-28 rounded-full overflow-hidden ring-4 ring-teal-500/30 bg-slate-800 flex items-center justify-center relative shadow-xl shadow-teal-500/10">
-                      {profilePhotoUrl ? (
-                        <Image
-                          src={profilePhotoUrl}
-                          alt="Profile Avatar"
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      ) : (
-                        <User className="w-12 h-12 text-slate-500" />
-                      )}
-                      {isUploadingPhoto && (
-                        <div className="absolute inset-0 bg-slate-950/70 flex items-center justify-center">
-                          <Loader2 className="w-6 h-6 text-teal-400 animate-spin" />
-                        </div>
-                      )}
+                  <div className="flex items-center gap-2">
+                    {profilePhotoUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setPoseState((prev) => (prev - 1 + 4) % 4)}
+                        className="p-2 rounded-full bg-slate-800 hover:bg-slate-700 text-teal-400 border border-slate-700 transition-all hover:scale-105"
+                        title="Previous Portrait Style"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                    )}
+
+                    <div className="relative group">
+                      <div className="w-28 h-28 rounded-full overflow-hidden ring-4 ring-teal-500/30 bg-slate-800 flex items-center justify-center relative shadow-xl shadow-teal-500/10">
+                        {profilePhotoUrl ? (
+                          <Image
+                            src={profilePhotoUrl}
+                            alt="Profile Avatar"
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
+                        ) : (
+                          <User className="w-12 h-12 text-slate-500" />
+                        )}
+                        {isUploadingPhoto && (
+                          <div className="absolute inset-0 bg-slate-950/70 flex items-center justify-center">
+                            <Loader2 className="w-6 h-6 text-teal-400 animate-spin" />
+                          </div>
+                        )}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="absolute bottom-0 right-0 p-2.5 rounded-full bg-teal-500 text-slate-950 hover:bg-teal-400 shadow-lg shadow-teal-500/30 hover:scale-105 transition-all"
+                        title="Upload New Photo"
+                      >
+                        <Camera className="w-4 h-4" />
+                      </button>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handlePhotoSelect}
+                      />
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="absolute bottom-0 right-0 p-2.5 rounded-full bg-teal-500 text-slate-950 hover:bg-teal-400 shadow-lg shadow-teal-500/30 hover:scale-105 transition-all"
-                      title="Upload New Photo"
-                    >
-                      <Camera className="w-4 h-4" />
-                    </button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handlePhotoSelect}
-                    />
+                    {profilePhotoUrl && (
+                      <button
+                        type="button"
+                        onClick={handleCyclePose}
+                        className="p-2 rounded-full bg-slate-800 hover:bg-slate-700 text-teal-400 border border-slate-700 transition-all hover:scale-105"
+                        title="Next Portrait Style"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
 
                   <div className="flex-1 text-center sm:text-left space-y-2">
@@ -1123,13 +1170,9 @@ export default function ProviderOnboardingPage() {
                         <Upload className="w-3.5 h-3.5 text-teal-400" /> Upload Photo
                       </button>
                       {profilePhotoUrl && (
-                        <button
-                          type="button"
-                          onClick={handleCyclePose}
-                          className="px-3.5 py-1.5 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 text-xs font-semibold text-teal-300 border border-teal-500/30 flex items-center gap-1.5 transition-colors"
-                        >
-                          <Sparkles className="w-3.5 h-3.5 text-teal-400" /> Switch Pose ({poseState + 1}/4)
-                        </button>
+                        <div className="px-3.5 py-1.5 rounded-xl bg-teal-500/10 text-xs font-semibold text-teal-300 border border-teal-500/30 flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-teal-400" /> Portrait Style {poseState + 1} of 4 (AI Enhancements: 1/3) ✨
+                        </div>
                       )}
                     </div>
                   </div>
@@ -1204,18 +1247,38 @@ export default function ProviderOnboardingPage() {
                   </div>
                   <div>
                     <Label className="text-xs text-slate-300">Email Address *</Label>
-                    <div className="relative mt-1.5">
+                    <div className="relative mt-1.5 flex gap-2">
                       <Input
                         type="email"
                         placeholder="doctor@example.com"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="bg-slate-950/80 border-slate-800 text-white rounded-xl focus:border-teal-500 pr-24"
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          setIsEmailVerified(false);
+                        }}
+                        className="bg-slate-950/80 border-slate-800 text-white rounded-xl focus:border-teal-500"
                         required
                       />
-                      <span className="absolute right-2.5 top-2 px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> Verified
-                      </span>
+                      {isEmailVerified ? (
+                        <div className="h-10 px-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center gap-1 shrink-0">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> VERIFIED
+                        </div>
+                      ) : (
+                        <Button
+                          type="button"
+                          onClick={() => {
+                            setIsVerifyingEmail(true);
+                            setTimeout(() => {
+                              setIsVerifyingEmail(false);
+                              setIsEmailVerified(true);
+                            }, 1000);
+                          }}
+                          disabled={isVerifyingEmail || !email.includes('@')}
+                          className="h-10 px-4 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs shrink-0"
+                        >
+                          {isVerifyingEmail ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Verify'}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1224,17 +1287,40 @@ export default function ProviderOnboardingPage() {
                   <div>
                     <Label className="text-xs text-slate-300">Mobile Number *</Label>
                     <div className="relative mt-1.5 flex gap-2">
-                      <div className="w-16 bg-slate-800 rounded-xl flex items-center justify-center text-xs font-semibold text-slate-300 border border-slate-700">
+                      <div className="w-16 bg-slate-800 rounded-xl flex items-center justify-center text-xs font-semibold text-slate-300 border border-slate-700 shrink-0">
                         {currentCountryConfig.phoneCode}
                       </div>
                       <Input
                         type="tel"
                         placeholder="9876543210"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(e) => {
+                          setPhone(e.target.value);
+                          setIsMobileVerified(false);
+                        }}
                         className="bg-slate-950/80 border-slate-800 text-white rounded-xl focus:border-teal-500"
                         required
                       />
+                      {isMobileVerified ? (
+                        <div className="h-10 px-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center gap-1 shrink-0">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> VERIFIED
+                        </div>
+                      ) : (
+                        <Button
+                          type="button"
+                          onClick={() => {
+                            setIsVerifyingMobile(true);
+                            setTimeout(() => {
+                              setIsVerifyingMobile(false);
+                              setIsMobileVerified(true);
+                            }, 1000);
+                          }}
+                          disabled={isVerifyingMobile || phone.length < 7}
+                          className="h-10 px-4 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs shrink-0"
+                        >
+                          {isVerifyingMobile ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Verify'}
+                        </Button>
+                      )}
                     </div>
                   </div>
                   <div>
@@ -1798,6 +1884,82 @@ export default function ProviderOnboardingPage() {
                       </div>
                     );
                   })}
+
+                  {/* Extra Certifications Dynamic Uploads */}
+                  <div className="pt-2 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs text-slate-300 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-teal-400" /> Additional Clinical Certifications Upload (Optional)
+                      </Label>
+                    </div>
+
+                    {extraCertDocs.map((extra, idx) => (
+                      <div
+                        key={extra.id}
+                        className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in"
+                      >
+                        <div className="flex-1 w-full sm:w-auto">
+                          <Input
+                            type="text"
+                            placeholder="Certification Title (e.g. Dry Needling / McKenzie)"
+                            value={extra.label}
+                            onChange={(e) => {
+                              const updated = [...extraCertDocs];
+                              updated[idx].label = e.target.value;
+                              setExtraCertDocs(updated);
+                            }}
+                            className="bg-slate-900 border-slate-700 text-xs rounded-xl text-white"
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <label className="cursor-pointer px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-teal-300 border border-slate-700 flex items-center gap-1.5 transition-colors">
+                            <Upload className="w-3.5 h-3.5 text-teal-400" />
+                            {extra.name ? <span className="max-w-[120px] truncate">{extra.name}</span> : 'Upload File'}
+                            <input
+                              type="file"
+                              accept="image/*,application/pdf"
+                              className="hidden"
+                              onChange={(e) => {
+                                const f = e.target.files?.[0];
+                                if (f) {
+                                  const updated = [...extraCertDocs];
+                                  updated[idx].file = f;
+                                  updated[idx].name = f.name;
+                                  updated[idx].url = URL.createObjectURL(f);
+                                  setExtraCertDocs(updated);
+                                }
+                              }}
+                            />
+                          </label>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setExtraCertDocs(extraCertDocs.filter((_, i) => i !== idx));
+                            }}
+                            className="p-2 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setExtraCertDocs([
+                          ...extraCertDocs,
+                          { id: String(Date.now()), label: '', name: '', url: '' },
+                        ]);
+                      }}
+                      className="w-full py-2.5 rounded-2xl border-dashed border-teal-500/40 text-teal-300 hover:bg-teal-500/10 text-xs font-bold flex items-center justify-center gap-1.5"
+                    >
+                      <Plus className="w-4 h-4" /> Add Another Certification File
+                    </Button>
+                  </div>
                 </div>
               </div>
 
@@ -2008,6 +2170,35 @@ export default function ProviderOnboardingPage() {
           {/* ========================================================================= */}
           {currentStep === 3 && (
             <div className="space-y-8 animate-in fade-in duration-300">
+              {/* Estimated Monthly Earning Card */}
+              {(() => {
+                const earning = EARNINGS_ESTIMATES[selectedCountry] || EARNINGS_ESTIMATES.India;
+                return (
+                  <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-teal-500/10 via-emerald-500/10 to-teal-500/5 border border-teal-500/30 backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-extrabold uppercase tracking-widest text-teal-400 bg-teal-500/10 px-2.5 py-0.5 rounded-full border border-teal-500/20">
+                          Estimated Monthly Earning
+                        </span>
+                        <span className="text-[10px] font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <Sparkles className="w-3 h-3" /> High Demand
+                        </span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-white font-outfit">
+                        {earning.range}
+                      </div>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        {earning.subtitle}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-center sm:text-right space-y-0.5 shrink-0">
+                      <span className="text-[10px] text-slate-400 uppercase font-mono block">Settlement Model</span>
+                      <span className="text-xs font-bold text-teal-300">60% Revenue Share + IMPS</span>
+                    </div>
+                  </div>
+                );
+              })()}
+
               <div className="p-6 rounded-3xl bg-slate-900/70 border border-slate-800/80 backdrop-blur-xl space-y-6">
                 <div className="border-b border-slate-800 pb-4">
                   <h3 className="text-base font-bold text-white flex items-center gap-2">
@@ -2036,13 +2227,17 @@ export default function ProviderOnboardingPage() {
                     </Label>
                     <input
                       type="range"
-                      min={5}
+                      min={2}
                       max={50}
                       step={1}
                       value={serviceRadius}
                       onChange={(e) => setServiceRadius(Number(e.target.value))}
                       className="w-full mt-3 accent-teal-400"
                     />
+                    <div className="flex justify-between text-[10px] font-mono text-slate-500 pt-1">
+                      <span>2 km</span>
+                      <span>50 km</span>
+                    </div>
                   </div>
                 </div>
 
@@ -2177,7 +2372,7 @@ export default function ProviderOnboardingPage() {
                 {(commuteType.includes('Two Wheeler') || commuteType.includes('Four Wheeler')) && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                     <div>
-                      <Label className="text-xs text-slate-300">Driving License Number</Label>
+                      <Label className="text-xs text-slate-300">Driving License Number *</Label>
                       <Input
                         type="text"
                         placeholder="e.g. MH-02-2021-0012345"
@@ -2189,14 +2384,14 @@ export default function ProviderOnboardingPage() {
 
                     <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between gap-4">
                       <div>
-                        <div className="text-xs font-bold text-white">Driving License Document</div>
+                        <div className="text-xs font-bold text-white">Driving License Document *</div>
                         <div className="text-[10px] text-slate-400">
                           {drivingLicenseDoc?.name ? (
                             <span className="text-emerald-400 flex items-center gap-1">
                               <Check className="w-3 h-3" /> {drivingLicenseDoc.name}
                             </span>
                           ) : (
-                            'Upload DL Front (Optional)'
+                            'Upload DL Front/Back'
                           )}
                         </div>
                       </div>
@@ -2220,7 +2415,7 @@ export default function ProviderOnboardingPage() {
                   </div>
                 )}
 
-                {/* Capacity & Time Preferences */}
+                {/* Capacity & Max Distance Sliders */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   <div>
                     <Label className="text-xs text-slate-300">Daily Visit Capacity *</Label>
@@ -2238,18 +2433,52 @@ export default function ProviderOnboardingPage() {
                   </div>
 
                   <div>
-                    <Label className="text-xs text-slate-300">Time Preference *</Label>
-                    <select
-                      value={travelTimePreference}
-                      onChange={(e) => setTravelTimePreference(e.target.value)}
-                      className="w-full mt-1.5 bg-slate-950/80 border border-slate-800 text-white rounded-xl p-3 text-xs focus:border-teal-500 focus:outline-none"
-                    >
-                      {TIME_PREFERENCE_OPTIONS.map((time) => (
-                        <option key={time} value={time} className="bg-slate-900 text-white">
-                          {time}
-                        </option>
-                      ))}
-                    </select>
+                    <Label className="text-xs text-slate-300 flex items-center justify-between">
+                      <span>Max Distance Per Visit *</span>
+                      <span className="text-teal-400 font-bold">{maxDistancePerVisit} km</span>
+                    </Label>
+                    <input
+                      type="range"
+                      min={5}
+                      max={100}
+                      step={5}
+                      value={maxDistancePerVisit}
+                      onChange={(e) => setMaxDistancePerVisit(Number(e.target.value))}
+                      className="w-full mt-3 accent-teal-400"
+                    />
+                    <div className="flex justify-between text-[10px] font-mono text-slate-500 pt-1">
+                      <span>5 km</span>
+                      <span>100 km</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Travel Time Preference Selectable Chips */}
+                <div>
+                  <Label className="text-xs text-slate-300">Travel Time Preference *</Label>
+                  <div className="grid grid-cols-3 gap-3 mt-2">
+                    {[
+                      { id: 'Morning Focus (8:00 AM – 2:00 PM)', label: 'Morning', icon: '☀️' },
+                      { id: 'Evening Focus (3:00 PM – 9:00 PM)', label: 'Evening', icon: '🌙' },
+                      { id: 'Flexible / Anytime (8:00 AM – 9:00 PM)', label: 'Anytime', icon: '⚡' },
+                    ].map((pref) => {
+                      const isSelected = travelTimePreference.includes(pref.label) || travelTimePreference === pref.id;
+                      return (
+                        <button
+                          type="button"
+                          key={pref.id}
+                          onClick={() => setTravelTimePreference(pref.id)}
+                          className={`p-3 rounded-2xl border text-center transition-all ${
+                            isSelected
+                              ? 'bg-teal-500/20 border-teal-500 text-teal-300 shadow-md shadow-teal-500/10'
+                              : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="text-lg mb-1">{pref.icon}</div>
+                          <div className="text-xs font-bold">{pref.label}</div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
