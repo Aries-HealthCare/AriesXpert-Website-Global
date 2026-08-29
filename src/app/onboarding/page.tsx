@@ -45,6 +45,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { LegalPoliciesModal } from '@/components/legal-policies-modal';
 
 // ── Mobile App Exact Stepper ────────────────────────────
 const STEPS = [
@@ -54,6 +55,45 @@ const STEPS = [
   { id: 3, stepNumber: 4, title: 'Service Territory', desc: 'Operating Territory & Commute' },
   { id: 4, stepNumber: 5, title: 'Review & Verification', desc: 'Digital ID & Compliance' },
 ];
+
+const REGISTRATION_FEES: Record<string, { amount: number; currency: string; symbol: string; desc: string }> = {
+  'India': {
+    amount: 999,
+    currency: 'INR',
+    symbol: '₹',
+    desc: 'Covers comprehensive identity verification, State Medical Council badge authentication, practitioner starter kit, and priority home visit broadcast allocation.',
+  },
+  'Canada': {
+    amount: 49,
+    currency: 'CAD',
+    symbol: '$',
+    desc: 'Covers regulatory licensing check, clinical digital ID provisioning, and priority regional visit allocation.',
+  },
+  'United Kingdom': {
+    amount: 39,
+    currency: 'GBP',
+    symbol: '£',
+    desc: 'Covers HCPC credential check, background screening badge, and priority patient booking broadcast.',
+  },
+  'Germany': {
+    amount: 45,
+    currency: 'EUR',
+    symbol: '€',
+    desc: 'Covers professional credential verification, digital ID creation, and priority patient booking broadcast.',
+  },
+  'UAE / Dubai': {
+    amount: 199,
+    currency: 'AED',
+    symbol: 'AED',
+    desc: 'Covers DHA/MOH healthcare licence verification, background screening, and priority patient dispatch.',
+  },
+  'United States': {
+    amount: 49,
+    currency: 'USD',
+    symbol: '$',
+    desc: 'Covers state board licensing review, background check processing, and priority visit allocation.',
+  },
+};
 
 // ── Mobile App Exact Country Configs ────────────────────
 const COUNTRY_CONFIGS: Record<
@@ -375,10 +415,16 @@ export default function ProviderOnboardingPage() {
   const [urgentVisits, setUrgentVisits] = useState(true);
   const [travelTimePreference, setTravelTimePreference] = useState('Flexible / Anytime (8:00 AM – 9:00 PM)');
 
-  // ── Step 5: Compliance Declarations ──────────────────
+  // ── Step 5: Compliance Declarations & Fee ───────────
   const [agreeClinicalGuidelines, setAgreeClinicalGuidelines] = useState(true);
   const [agreeDoorstepSafety, setAgreeDoorstepSafety] = useState(true);
   const [declarationTrue, setDeclarationTrue] = useState(true);
+  const [agreeTermsAndPolicies, setAgreeTermsAndPolicies] = useState(true);
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
+  const [isFeePaid, setIsFeePaid] = useState(false);
+  const [isFeeWaived, setIsFeeWaived] = useState(false);
+  const [isPayingFee, setIsPayingFee] = useState(false);
+  const [isSubmittedSuccess, setIsSubmittedSuccess] = useState(false);
 
   // ── Pre-fill on Mount & Hydrate from Session ─────────
   useEffect(() => {
@@ -866,8 +912,8 @@ export default function ProviderOnboardingPage() {
         setCurrentStep(4);
       } else if (currentStep === 4) {
         // ── Step 5: Compliance Declarations & Final Submit ──
-        if (!declarationTrue || !agreeClinicalGuidelines || !agreeDoorstepSafety) {
-          setErrorMsg('Please accept all clinical and doorstep safety compliance declarations.');
+        if (!declarationTrue || !agreeClinicalGuidelines || !agreeDoorstepSafety || !agreeTermsAndPolicies) {
+          setErrorMsg('Please accept all clinical safety declarations and the AriesXpert Terms & Privacy Policy.');
           setIsSubmitting(false);
           return;
         }
@@ -885,10 +931,7 @@ export default function ProviderOnboardingPage() {
           isTherapistActive: true,
         });
 
-        setSuccessMsg('🎉 Profile submitted successfully! Redirecting to your provider workspace...');
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 1500);
+        setIsSubmittedSuccess(true);
       }
     } catch (err: any) {
       console.error('[Onboarding] Submission error:', err);
@@ -2406,13 +2449,121 @@ export default function ProviderOnboardingPage() {
                 </div>
               </div>
 
+              {/* ========================================================================= */}
+              {/* REGISTRATION & VERIFICATION FEE CARD (MOBILE PARITY)                      */}
+              {/* ========================================================================= */}
+              {(() => {
+                const feeConfig = REGISTRATION_FEES[selectedCountry] || REGISTRATION_FEES.India;
+                return (
+                  <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-amber-500/15 via-slate-900/90 to-slate-950/90 border-2 border-amber-500/30 backdrop-blur-2xl shadow-2xl relative overflow-hidden space-y-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-extrabold tracking-widest uppercase px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            Verification & Credential Fee
+                          </span>
+                          {isFeePaid ? (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3" /> PAID
+                            </span>
+                          ) : isFeeWaived ? (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30 flex items-center gap-1">
+                              <ShieldCheck className="w-3 h-3" /> WAIVED
+                            </span>
+                          ) : null}
+                        </div>
+                        <h3 className="text-2xl sm:text-3xl font-black text-white font-outfit">
+                          {feeConfig.symbol} {feeConfig.amount} <span className="text-xs text-amber-300/80 font-normal font-sans">one-time</span>
+                        </h3>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {!isFeePaid && !isFeeWaived && (
+                          <>
+                            <Button
+                              type="button"
+                              onClick={() => {
+                                setIsPayingFee(true);
+                                setTimeout(() => {
+                                  setIsPayingFee(false);
+                                  setIsFeePaid(true);
+                                }, 1200);
+                              }}
+                              disabled={isPayingFee}
+                              className="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-lg shadow-amber-500/20 flex items-center gap-1.5"
+                            >
+                              {isPayingFee ? (
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <CreditCard className="w-3.5 h-3.5" />
+                              )}
+                              <span>Pay Online</span>
+                            </Button>
+
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => setIsFeeWaived(true)}
+                              className="px-4 py-2.5 rounded-2xl border-slate-700 hover:bg-slate-800 text-slate-300 text-xs font-semibold"
+                            >
+                              Apply Waiver
+                            </Button>
+                          </>
+                        )}
+
+                        {(isFeePaid || isFeeWaived) && (
+                          <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            <span>{isFeePaid ? 'Payment Confirmed' : 'Legacy Waiver Applied'}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-slate-300 leading-relaxed border-t border-slate-800/80 pt-4">
+                      {feeConfig.desc}
+                    </p>
+                  </div>
+                );
+              })()}
+
               {/* Compliance & Declarations */}
               <div className="p-6 rounded-3xl bg-slate-900/70 border border-slate-800/80 backdrop-blur-xl space-y-4">
-                <div className="border-b border-slate-800 pb-3">
+                <div className="border-b border-slate-800 pb-3 flex items-center justify-between">
                   <h3 className="text-base font-bold text-white flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-teal-400" /> Clinical Compliance & Safety Declarations
+                    <ShieldCheck className="w-4 h-4 text-teal-400" /> Clinical Compliance, Terms & Safety Declarations
                   </h3>
+                  <button
+                    type="button"
+                    onClick={() => setIsLegalModalOpen(true)}
+                    className="text-xs font-bold text-teal-400 hover:underline flex items-center gap-1"
+                  >
+                    <FileText className="w-3.5 h-3.5" /> View Policies
+                  </button>
                 </div>
+
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={agreeTermsAndPolicies}
+                    onChange={(e) => setAgreeTermsAndPolicies(e.target.checked)}
+                    className="mt-1 w-4 h-4 accent-teal-500 rounded"
+                  />
+                  <span className="text-xs text-slate-300 leading-relaxed">
+                    I agree to the{' '}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsLegalModalOpen(true);
+                      }}
+                      className="text-teal-400 font-bold hover:underline"
+                    >
+                      AriesXpert Terms of Service, Privacy Policy & Fee Schedule
+                    </button>
+                    .
+                  </span>
+                </label>
 
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
@@ -2483,6 +2634,42 @@ export default function ProviderOnboardingPage() {
             </div>
           )}
         </form>
+
+        {/* ── Pending Review Success Screen (Mobile Parity) ── */}
+        {isSubmittedSuccess && (
+          <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+            <div className="max-w-md w-full p-8 rounded-3xl bg-slate-900 border border-slate-800 text-center space-y-6 shadow-2xl animate-in zoom-in-95">
+              <div className="w-20 h-20 rounded-full bg-teal-500/20 border-2 border-teal-500 text-teal-400 mx-auto flex items-center justify-center shadow-lg shadow-teal-500/20">
+                <ShieldCheck className="w-10 h-10" />
+              </div>
+
+              <div className="space-y-2">
+                <h2 className="text-2xl font-black text-white font-outfit">
+                  Profile Submitted for Review!
+                </h2>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Your clinical credentials, registration council certificate, and background check data have been submitted to the medical compliance team. Expected review time: 24–48 hours.
+                </p>
+              </div>
+
+              <Button
+                type="button"
+                onClick={() => router.push('/dashboard')}
+                className="w-full h-12 rounded-2xl bg-gradient-to-r from-teal-400 to-emerald-500 text-slate-950 font-extrabold text-xs shadow-xl shadow-teal-500/30"
+              >
+                GO TO PROVIDER DASHBOARD
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Legal Policies Modal Instance ──────────────── */}
+        <LegalPoliciesModal
+          isOpen={isLegalModalOpen}
+          onClose={() => setIsLegalModalOpen(false)}
+          onAccept={() => setAgreeTermsAndPolicies(true)}
+          country={selectedCountry}
+        />
       </main>
     </div>
   );
