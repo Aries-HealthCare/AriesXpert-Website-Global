@@ -73,23 +73,26 @@ const nextConfig: NextConfig = {
       { source: '/terms-conditions', destination: '/terms-of-service', permanent: true },
       { source: '/terms-conditions/', destination: '/terms-of-service', permanent: true },
 
-      // ── Login page redirects ─────────────────────────────────
+      // ── Login and Dashboard page redirects ───────────────────
       { source: '/doctors-login', destination: '/login', permanent: true },
       { source: '/doctors-login/', destination: '/login', permanent: true },
       { source: '/patients-login', destination: '/login', permanent: true },
       { source: '/patients-login/', destination: '/login', permanent: true },
+      { source: '/dashboard', destination: '/app', permanent: false },
+      { source: '/dashboard/:path*', destination: '/app/:path*', permanent: false },
     ];
   },
 
   async rewrites() {
+    const backendUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://api.ariesxpert.com').replace(/\/$/, '');
     return [
       {
         source: '/api/app/:path*',
-        destination: 'https://api.ariesxpert.com/api/app/:path*',
+        destination: `${backendUrl}/api/app/:path*`,
       },
       {
         source: '/api/v1/:path*',
-        destination: 'https://api.ariesxpert.com/api/v1/:path*',
+        destination: `${backendUrl}/api/v1/:path*`,
       },
     ];
   },
