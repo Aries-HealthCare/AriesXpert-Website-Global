@@ -27,11 +27,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { CountrySelector, COUNTRIES_CONFIG } from '@/components/country-selector';
 
 export default function ProviderLoginPage() {
   const router = useRouter();
   const { loginWithPhoneOtp, loginWithEmail } = useProviderAuth();
 
+  const [selectedCountry, setSelectedCountry] = useState('India');
   const [activeTab, setActiveTab] = useState<'mobile' | 'email'>('mobile');
   const [mobileNumber, setMobileNumber] = useState('');
   const [otp, setOtp] = useState('');
@@ -65,11 +67,13 @@ export default function ProviderLoginPage() {
     return () => clearInterval(interval);
   }, [otpTimer]);
 
+  const currentCountry = COUNTRIES_CONFIG[selectedCountry] || COUNTRIES_CONFIG['India'];
+
   const handleSendOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    const cleanMobile = mobileNumber.replace(/\D/g, '').slice(-10);
-    if (!cleanMobile || cleanMobile.length < 10) {
-      setErrorMessage('Please enter a valid 10-digit mobile number.');
+    const cleanMobile = mobileNumber.replace(/\D/g, '');
+    if (!cleanMobile || cleanMobile.length < currentCountry.phoneLength - 2) {
+      setErrorMessage(`Please enter a valid mobile number for ${currentCountry.name}.`);
       return;
     }
     setIsLoading(true);
@@ -77,15 +81,16 @@ export default function ProviderLoginPage() {
     try {
       if (typeof window !== 'undefined') {
         localStorage.setItem('cached_login_phone', cleanMobile);
+        localStorage.setItem('cached_login_country', selectedCountry);
       }
       const res = await sendProviderOtp(cleanMobile);
       setOtpSent(true);
       setOtpTimer(45);
-      setSuccessMessage(res.message || `Verification code sent to +91 ${cleanMobile} via SMS.`);
+      setSuccessMessage(res.message || `Verification code sent to ${currentCountry.dialCode} ${cleanMobile} via SMS.`);
     } catch (err: any) {
       setOtpSent(true);
       setOtpTimer(45);
-      setSuccessMessage(`Verification code sent to +91 ${cleanMobile} via SMS.`);
+      setSuccessMessage(`Verification code sent to ${currentCountry.dialCode} ${cleanMobile} via SMS.`);
     } finally {
       setIsLoading(false);
     }
@@ -247,36 +252,45 @@ export default function ProviderLoginPage() {
             <form onSubmit={handleMobileSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="mobile" className="text-xs font-outfit font-bold text-foreground">
-                  Registered Mobile Number
+                  Country & Registered Mobile Number
                 </Label>
-                <div className="relative mt-1.5">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-mono font-bold text-muted-foreground">
-                    +91
-                  </span>
-                  <Input
-                    id="mobile"
-                    type="tel"
-                    maxLength={10}
-                    placeholder="98765 43210"
-                    value={mobileNumber}
-                    onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, ''))}
-                    disabled={otpSent}
-                    className="pl-12 h-12 rounded-2xl text-sm font-mono font-bold"
-                    required
-                  />
-                  {otpSent && (
-                    <button
-                      type="button"
-                      onClick={() => {
+                <div className="flex gap-2 mt-1.5">
+                  <div className="w-28 shrink-0">
+                    <CountrySelector
+                      selectedCountry={selectedCountry}
+                      onSelectCountry={(c) => {
+                        setSelectedCountry(c);
                         setOtpSent(false);
-                        setOtp('');
-                        setSuccessMessage('');
                       }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-outfit font-bold text-primary hover:underline"
-                    >
-                      Change
-                    </button>
-                  )}
+                      compact
+                    />
+                  </div>
+                  <div className="relative flex-1">
+                    <Input
+                      id="mobile"
+                      type="tel"
+                      maxLength={currentCountry.phoneLength + 2}
+                      placeholder={currentCountry.phonePlaceholder}
+                      value={mobileNumber}
+                      onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, ''))}
+                      disabled={otpSent}
+                      className="h-12 rounded-2xl text-sm font-mono font-bold"
+                      required
+                    />
+                    {otpSent && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOtpSent(false);
+                          setOtp('');
+                          setSuccessMessage('');
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-outfit font-bold text-primary hover:underline"
+                      >
+                        Change
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 

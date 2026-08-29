@@ -22,11 +22,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { CountrySelector, COUNTRIES_CONFIG } from '@/components/country-selector';
 
 export default function ProviderRegisterPage() {
   const router = useRouter();
   const { updateUserData } = useProviderAuth();
 
+  const [selectedCountry, setSelectedCountry] = useState('India');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -40,13 +42,15 @@ export default function ProviderRegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  const currentCountry = COUNTRIES_CONFIG[selectedCountry] || COUNTRIES_CONFIG['India'];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
     const cleanPhone = phone.replace(/\D/g, '');
-    if (cleanPhone.length < 10) {
-      setErrorMsg('Please enter a valid 10-digit mobile number.');
+    if (cleanPhone.length < currentCountry.phoneLength - 2) {
+      setErrorMsg(`Please enter a valid mobile number for ${currentCountry.name}.`);
       return;
     }
     if (!fullName.trim() || !email.trim() || !password.trim()) {
@@ -66,12 +70,12 @@ export default function ProviderRegisterPage() {
       try {
         const fd = new FormData();
         fd.append('fullName', fullName);
-        fd.append('phone', cleanPhone.slice(-10));
+        fd.append('phone', cleanPhone);
         fd.append('email', email.toLowerCase().trim());
         fd.append('password', password);
         fd.append('city', city);
-        fd.append('countryCode', '+91');
-        fd.append('countryName', 'India');
+        fd.append('countryCode', currentCountry.dialCode);
+        fd.append('countryName', currentCountry.name);
         fd.append('licenseNumber', licenseNumber);
         fd.append('specialization', qualification);
         fd.append('isMobileNumberVerified', 'false');
@@ -85,13 +89,15 @@ export default function ProviderRegisterPage() {
       }
 
       // 2. Trigger MSG91 OTP
-      await providerApi.sendOTP(cleanPhone.slice(-10));
+      await providerApi.sendOTP(cleanPhone);
 
       // 3. Cache preliminary data to pass to onboarding
       const tempUser = {
         _id: registeredId || 'exp_' + Date.now(),
         fullName,
-        phone: cleanPhone.slice(-10),
+        phone: cleanPhone,
+        countryName: currentCountry.name,
+        countryCode: currentCountry.dialCode,
         email: email.toLowerCase().trim(),
         city,
         licenseNumber,
@@ -101,11 +107,12 @@ export default function ProviderRegisterPage() {
       };
 
       updateUserData(tempUser);
-      localStorage.setItem('temp_register_phone', cleanPhone.slice(-10));
+      localStorage.setItem('temp_register_phone', cleanPhone);
+      localStorage.setItem('temp_register_country', currentCountry.name);
       localStorage.setItem('temp_register_data', JSON.stringify(tempUser));
 
       // 4. Redirect to OTP verification
-      router.push(`/verify?phone=${cleanPhone.slice(-10)}`);
+      router.push(`/verify?phone=${cleanPhone}`);
     } catch (e: any) {
       setErrorMsg(e.message || 'Registration request failed. Please try again.');
     } finally {
@@ -156,38 +163,42 @@ export default function ProviderRegisterPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <Label className="font-bold">Mobile Number (For OTP)</Label>
-                <div className="relative mt-1">
-                  <span className="text-xs font-bold text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 font-mono">
-                    +91
-                  </span>
+            <div>
+              <Label className="font-bold">Country & Mobile Number (For OTP)</Label>
+              <div className="flex gap-2 mt-1">
+                <div className="w-32 shrink-0">
+                  <CountrySelector
+                    selectedCountry={selectedCountry}
+                    onSelectCountry={setSelectedCountry}
+                    compact
+                  />
+                </div>
+                <div className="relative flex-1">
                   <Input
                     type="tel"
-                    maxLength={10}
+                    maxLength={currentCountry.phoneLength + 2}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                    placeholder="98765 43210"
-                    className="pl-12 h-11 rounded-xl text-xs font-mono"
+                    placeholder={currentCountry.phonePlaceholder}
+                    className="h-11 rounded-xl text-xs font-mono"
                     required
                   />
                 </div>
               </div>
+            </div>
 
-              <div>
-                <Label className="font-bold">Email Address</Label>
-                <div className="relative mt-1">
-                  <Mail className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="doctor@example.com"
-                    className="pl-9 h-11 rounded-xl text-xs"
-                    required
-                  />
-                </div>
+            <div>
+              <Label className="font-bold">Email Address</Label>
+              <div className="relative mt-1">
+                <Mail className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="doctor@example.com"
+                  className="pl-9 h-11 rounded-xl text-xs"
+                  required
+                />
               </div>
             </div>
 
