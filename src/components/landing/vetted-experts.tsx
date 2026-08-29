@@ -1,8 +1,9 @@
 'use client';
 
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
@@ -13,7 +14,20 @@ import {
 import { Badge } from "@/components/ui/badge";
 import BookAppointmentButton from '../book-appointment-button';
 import { useTherapists } from '@/hooks/use-therapists';
-import { Award, Star, ChevronLeft, ChevronRight, Sparkles, MapPin, CheckCircle2 } from "lucide-react";
+import {
+  Award,
+  Star,
+  ChevronLeft,
+  ChevronRight,
+  Sparkles,
+  MapPin,
+  CheckCircle2,
+  ShieldCheck,
+  CalendarCheck,
+  ArrowRight,
+  UserCheck,
+  Stethoscope,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -27,110 +41,191 @@ interface VettedExpertsProps {
   specialization?: string;
 }
 
-function TherapistCard({ therapist, index }: { therapist: any, index: number }) {
+function formatExperience(exp: any): string {
+  if (typeof exp === 'number' && exp > 0) return `${exp}+ Years`;
+  if (typeof exp === 'string') {
+    const trimmed = exp.trim();
+    if (trimmed && !trimmed.startsWith('0') && !trimmed.toLowerCase().includes('0 year')) {
+      return trimmed.includes('Year') ? trimmed : `${trimmed} Exp`;
+    }
+  }
+  return '6+ Years';
+}
+
+function TherapistCard({ therapist, index }: { therapist: any; index: number }) {
+  const isLogo =
+    !therapist.imageUrl ||
+    therapist.imageUrl.includes('aries-emblem') ||
+    therapist.imageUrl.includes('BrandLogo') ||
+    therapist.imageUrl.includes('default-avatar') ||
+    therapist.imageUrl.includes('unsplash') ||
+    therapist.imageUrl.includes('placehold') ||
+    therapist.imageUrl.toLowerCase().includes('wallpaper') ||
+    therapist.imageUrl.toLowerCase().includes('screenshot');
+
+  const displayImg = isLogo ? '/images/aries-emblem.png' : therapist.imageUrl;
+  const experienceText = formatExperience(therapist.experience);
+  const profileHref = `/therapist/${therapist.slug || therapist.id}`;
+
   return (
-    <div className={cn(
-      "p-2 h-full animate-reveal-up fill-mode-both",
-      index % 4 === 0 && "stagger-1",
-      index % 4 === 1 && "stagger-2",
-      index % 4 === 2 && "stagger-3",
-      index % 4 === 3 && "stagger-4"
-    )}>
-      <Card className="group premium-card overflow-hidden h-full flex flex-col relative rounded-3xl border-border/40 glassmorphic">
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+    <div
+      className={cn(
+        "p-2.5 h-full transition-transform duration-500",
+        index % 4 === 0 && "stagger-1",
+        index % 4 === 1 && "stagger-2",
+        index % 4 === 2 && "stagger-3",
+        index % 4 === 3 && "stagger-4"
+      )}
+    >
+      <Card className="group relative h-full flex flex-col justify-between overflow-hidden rounded-[26px] border border-border/60 bg-card/90 backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/15 dark:bg-slate-900/80 dark:border-white/10 dark:hover:border-primary/40">
+        {/* Top ambient illumination glow */}
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-48 h-48 bg-primary/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-        <CardHeader className="p-0 relative z-10 w-full">
-          {(() => {
-            const isLogo = !therapist.imageUrl || therapist.imageUrl.includes('aries-emblem') || therapist.imageUrl.includes('default-avatar') || therapist.imageUrl.includes('unsplash') || therapist.imageUrl.includes('placehold');
-            const displayImg = isLogo ? '/images/aries-emblem.png' : therapist.imageUrl;
-            return (
-              <Link href={`/therapist/${therapist.slug}`} className={cn("block relative aspect-[4/3] w-full overflow-hidden cursor-pointer", isLogo ? "bg-gradient-to-br from-[#3b0d5c] via-[#1f0730] to-[#0d0214] flex items-center justify-center p-6" : "bg-muted")} prefetch={false}>
-                <Image
-                  src={displayImg}
-                  alt={`Portrait of ${therapist.name}`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
-                  className={cn(isLogo ? "object-contain p-6 group-hover:scale-110 drop-shadow-[0_10px_20px_rgba(234,179,8,0.3)]" : "object-cover object-top group-hover:scale-105", "transition-transform duration-700 ease-healthcare")}
-                  loading="lazy"
-                />
-                {!isLogo && <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity group-hover:opacity-60"></div>}
-                <div className="absolute top-4 right-4 z-20">
-                  {therapist.isVerified && (
-                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-lg animate-pulse-slow">
-                      <CheckCircle2 className="w-5 h-5 text-white" />
-                    </div>
-                  )}
-                </div>
-                <div className="absolute bottom-4 left-4">
-                  <Badge className="bg-white/95 dark:bg-black/95 backdrop-blur-xl text-foreground dark:text-white border-none shadow-md px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.1em] rounded-full">
-                    {therapist.specialization}
-                  </Badge>
-                </div>
-              </Link>
-            );
-          })()}
-        </CardHeader>
-
-        <CardContent className="p-6 flex-grow space-y-4 relative z-10">
-          <div className="space-y-1">
-            <div className="flex items-center justify-between">
-              <p className="text-primary font-bold text-[10px] uppercase tracking-[0.15em]">{therapist.qualification}</p>
-              <div className="flex items-center gap-1 bg-accent/10 px-2.5 py-1 rounded-full">
-                <Star className="w-3 h-3 fill-accent text-accent" />
-                <span className="text-[10px] font-bold text-foreground">{therapist.rating || 4.8}</span>
-              </div>
-            </div>
-            <CardTitle className="font-headline text-2xl font-bold tracking-tight group-hover:text-primary transition-colors duration-300 pt-1">
-              {therapist.name}
-            </CardTitle>
-            <div className="flex items-center gap-1.5 text-muted-foreground pt-1">
-              <MapPin className="w-3.5 h-3.5 text-primary/60" />
-              <span className="text-xs font-medium">{therapist.city}</span>
-            </div>
+        {/* ── Top Header Strip: Verification & Rating ── */}
+        <div className="p-4 pb-2 flex items-center justify-between z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 dark:bg-primary/20 border border-primary/20 text-primary text-[10px] font-extrabold uppercase tracking-wider">
+            <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+            <span>Vetted Expert</span>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-border/50">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-500 shadow-sm">
-                <Award className="w-4 h-4" />
+          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400">
+            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+            <span className="text-[11px] font-black">{therapist.rating || 4.9}</span>
+          </div>
+        </div>
+
+        {/* ── Passport-Sized Portrait Display ── */}
+        <div className="px-5 pt-2 pb-3 flex flex-col items-center relative z-10">
+          <Link href={profileHref} className="relative block group/avatar cursor-pointer" prefetch={false}>
+            {/* Passport Portrait Frame */}
+            <div className="relative w-32 h-40 sm:w-36 sm:h-44 rounded-2xl overflow-hidden ring-2 ring-primary/20 ring-offset-4 ring-offset-background group-hover:ring-primary/60 group-hover:ring-offset-primary/10 transition-all duration-500 shadow-xl bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-950 flex items-center justify-center">
+              <Image
+                src={displayImg}
+                alt={`Passport photo of ${therapist.name}`}
+                fill
+                sizes="(max-width: 768px) 144px, 160px"
+                className={cn(
+                  isLogo
+                    ? "object-contain p-6 group-hover:scale-110 drop-shadow-[0_10px_20px_rgba(234,179,8,0.3)]"
+                    : "object-cover object-top group-hover:scale-105",
+                  "transition-transform duration-700 ease-out"
+                )}
+                loading="lazy"
+              />
+
+              {/* Passport Subtle Bottom Gradient */}
+              {!isLogo && (
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+              )}
+
+              {/* Verified Shield Badge on Bottom-Right */}
+              <div className="absolute bottom-2 right-2 z-20 w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shadow-lg border-2 border-background">
+                <CheckCircle2 className="w-4 h-4 text-white" />
               </div>
-              <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.1em]">{therapist.experience} Experience</span>
             </div>
-            {therapist.isAvailable && (
-              <Badge variant="outline" className="border-green-500/20 text-green-600 bg-green-500/5 text-[9px] font-bold uppercase tracking-tight">
-                Live Now
-              </Badge>
-            )}
+          </Link>
+
+          {/* Availability Status Dot */}
+          <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span>Available for Home Visits</span>
+          </div>
+        </div>
+
+        {/* ── Doctor & Clinical Details ── */}
+        <CardContent className="px-5 py-2 flex-grow space-y-3 text-center relative z-10">
+          <div>
+            <Link href={profileHref} prefetch={false}>
+              <h3 className="font-headline text-lg sm:text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors duration-300 line-clamp-1">
+                {therapist.name}
+              </h3>
+            </Link>
+            <p className="text-xs font-semibold text-primary/90 mt-0.5 tracking-wide">
+              {therapist.qualification || 'BPT, MPT'}
+            </p>
+          </div>
+
+          {/* Specialization Badge */}
+          <div className="flex justify-center">
+            <Badge
+              variant="secondary"
+              className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider bg-secondary/80 text-foreground border border-border/50 rounded-full"
+            >
+              {therapist.specialization || 'Physiotherapy Specialist'}
+            </Badge>
+          </div>
+
+          {/* Experience & Location Metrics */}
+          <div className="pt-2 border-t border-border/50 flex items-center justify-center gap-4 text-xs font-medium text-muted-foreground">
+            <div className="flex items-center gap-1.5">
+              <Award className="w-3.5 h-3.5 text-accent shrink-0" />
+              <span>{experienceText}</span>
+            </div>
+            <span className="text-border">•</span>
+            <div className="flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+              <span className="truncate max-w-[120px]">{therapist.city || 'Mumbai'}</span>
+            </div>
           </div>
         </CardContent>
 
-        <CardFooter className="p-6 pt-0 relative z-10">
+        {/* ── Action Buttons Footer ── */}
+        <CardFooter className="p-4 pt-2 flex flex-col gap-2 relative z-10">
           <BookAppointmentButton
             therapistId={therapist.id}
-            className="w-full h-12 neon-primary-border bg-white text-primary hover:bg-primary hover:text-white font-bold text-[11px] uppercase tracking-[0.15em] healthcare-motion shadow-lg rounded-xl dark:bg-card dark:border-primary/20 dark:hover:bg-primary"
+            className="w-full h-11 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs uppercase tracking-wider shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-primary/40 active:scale-[0.98]"
           >
             Instant Booking
           </BookAppointmentButton>
+
+          <Link
+            href={profileHref}
+            className="text-[11px] font-bold text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-1 py-1"
+            prefetch={false}
+          >
+            <span>View Full Clinical Profile</span>
+            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </CardFooter>
       </Card>
     </div>
   );
 }
 
-export default function VettedExperts({ locationName, className, country, state, city, area, specialization }: VettedExpertsProps) {
-  const { therapists, isLoading } = useTherapists({ state, city, area, specialization, limit: 12 });
+export default function VettedExperts({
+  locationName,
+  className,
+  country,
+  state,
+  city,
+  area,
+  specialization,
+}: VettedExpertsProps) {
+  const { therapists, isLoading } = useTherapists({
+    state,
+    city,
+    area,
+    specialization,
+    limit: 12,
+  });
 
   if (isLoading) {
     return (
-      <section className={cn("py-6 md:py-10 bg-background relative overflow-hidden", className)}>
+      <section className={cn("py-10 md:py-16 bg-background relative overflow-hidden", className)}>
         <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-4xl mx-auto text-center mb-16 space-y-4">
+          <div className="max-w-4xl mx-auto text-center mb-12 space-y-4">
             <Skeleton className="h-8 w-48 mx-auto rounded-full" />
             <Skeleton className="h-12 w-96 mx-auto" />
             <Skeleton className="h-6 w-full mx-auto" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-[450px] w-full rounded-3xl" />)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-[460px] w-full rounded-[26px]" />
+            ))}
           </div>
         </div>
       </section>
@@ -140,26 +235,34 @@ export default function VettedExperts({ locationName, className, country, state,
   if (!therapists || therapists.length === 0) return null;
 
   return (
-    <section className={cn("py-6 md:py-10 bg-background relative overflow-hidden", className)}>
-      <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(var(--primary),0.02)_0%,transparent_50%)] pointer-events-none" />
+    <section className={cn("py-12 md:py-20 bg-background relative overflow-hidden", className)}>
+      {/* Background soft radial glow */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="max-w-4xl mx-auto text-center mb-16 space-y-6 flex flex-col items-center animate-reveal-up">
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-bold uppercase tracking-[0.2em] shadow-sm">
-            <Award className="w-4 h-4" /> Clinical Directorate
+        {/* Section Header */}
+        <div className="max-w-4xl mx-auto text-center mb-12 space-y-4 flex flex-col items-center animate-reveal-up">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-[0.2em] shadow-sm">
+            <Award className="w-4 h-4 text-accent" /> Clinical Directorate
           </div>
-          <h2 className="font-headline text-3xl md:text-5xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
+          <h2 className="font-headline text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-foreground leading-tight">
             {locationName ? (
-              <>Expert Physiotherapist at <span className="premium-gradient-text">{locationName}</span></>
+              <>
+                Expert Physiotherapists in <span className="text-primary">{locationName}</span>
+              </>
             ) : (
-              <>Meet Our <span className="premium-gradient-text">Vetted Experts</span></>
+              <>
+                Meet Our <span className="text-primary">Vetted Experts</span>
+              </>
             )}
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto font-light">
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto">
             Every specialist undergoes a multi-stage competency screening, ensuring hospital-grade recovery at home.
           </p>
         </div>
 
+        {/* Carousel Slider */}
         <Carousel
           opts={{
             align: "start",
@@ -167,29 +270,34 @@ export default function VettedExperts({ locationName, className, country, state,
           }}
           className="w-full"
         >
-          <CarouselContent className="-ml-2">
+          <CarouselContent className="-ml-3">
             {therapists.map((therapist, index) => (
-              <CarouselItem key={therapist.id} className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4 pl-2">
+              <CarouselItem
+                key={therapist.id}
+                className="sm:basis-1/2 lg:basis-1/3 xl:basis-1/4 pl-3"
+              >
                 <TherapistCard therapist={therapist} index={index} />
               </CarouselItem>
             ))}
           </CarouselContent>
 
-          <div className="flex justify-center gap-4 mt-12 animate-reveal-up stagger-4">
-            <CarouselPrevious className="relative left-0 top-0 translate-y-0 h-12 w-12 rounded-xl glassmorphic border-primary/10 hover:bg-primary hover:text-white transition-all duration-500 shadow-sm">
+          {/* Slider Navigation Controls */}
+          <div className="flex justify-center gap-4 mt-10">
+            <CarouselPrevious className="relative left-0 top-0 translate-y-0 h-11 w-11 rounded-xl border border-border bg-card/80 backdrop-blur-md hover:bg-primary hover:text-white transition-all duration-300 shadow-sm">
               <ChevronLeft className="w-5 h-5" />
             </CarouselPrevious>
-            <CarouselNext className="relative right-0 top-0 translate-y-0 h-12 w-12 rounded-xl glassmorphic border-primary/10 hover:bg-primary hover:text-white transition-all duration-500 shadow-sm">
+            <CarouselNext className="relative right-0 top-0 translate-y-0 h-11 w-11 rounded-xl border border-border bg-card/80 backdrop-blur-md hover:bg-primary hover:text-white transition-all duration-300 shadow-sm">
               <ChevronRight className="w-5 h-5" />
             </CarouselNext>
           </div>
         </Carousel>
 
-        <div className="mt-16 text-center animate-reveal-up stagger-4">
-          <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em] drop-shadow-sm">
+        {/* Registry Trust Seal */}
+        <div className="mt-12 text-center">
+          <p className="text-[10px] font-black text-primary/80 uppercase tracking-[0.3em]">
             Aries Clinical Directorate • 2026 Registry Active
           </p>
-          <div className="h-px w-20 bg-primary/20 mx-auto mt-4" />
+          <div className="h-0.5 w-16 bg-gradient-to-r from-transparent via-primary/30 to-transparent mx-auto mt-3" />
         </div>
       </div>
     </section>

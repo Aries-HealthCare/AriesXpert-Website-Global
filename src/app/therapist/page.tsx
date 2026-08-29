@@ -14,6 +14,7 @@ import {
 import BookAppointmentButton from '@/components/book-appointment-button';
 import { getOrganizationSchema, getBreadcrumbSchema } from '@/lib/seo-schemas';
 import { useTherapists, type TherapistCard } from '@/hooks/use-therapists';
+import { TherapistCard as TherapistCardComponent } from '@/components/therapist-grid';
 import { VERIFIED_THERAPISTS_CATALOG } from '@/lib/verified-therapists';
 import { cn } from '@/lib/utils';
 
@@ -203,90 +204,10 @@ export default function TherapistsPage() {
                                 <p className="text-muted-foreground text-sm">Loading specialists from directory…</p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {filtered.map(t => {
-                                    const isLogo = !t.imageUrl || t.imageUrl.includes('aries-emblem') || t.imageUrl.includes('BrandLogo') || t.imageUrl.includes('default-avatar') || t.imageUrl.includes('unsplash') || t.imageUrl.includes('placehold');
-                                    const displayImg = isLogo ? '/images/aries-emblem.png' : t.imageUrl;
-                                    return (
-                                        <Card key={t.id || t.slug} className="group glassmorphic overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-1">
-                                            <div className="relative">
-                                                <div className={cn("aspect-[4/3] relative overflow-hidden", isLogo ? "bg-gradient-to-br from-[#3b0d5c] via-[#1f0730] to-[#0d0214] flex items-center justify-center p-6" : "bg-secondary/20")}>
-                                                    <Image
-                                                        src={displayImg}
-                                                        alt={`${t.name} — ${t.specialization}`}
-                                                        fill
-                                                        className={cn(isLogo ? "object-contain p-6 group-hover:scale-110 drop-shadow-[0_10px_20px_rgba(234,179,8,0.3)]" : "object-cover object-top group-hover:scale-105", "transition-transform duration-700")}
-                                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                    />
-                                                    {!isLogo && <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />}
-                                                </div>
-
-                                                {/* Availability */}
-                                                <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold ${t.isAvailable ? 'bg-green-500 text-white' : 'bg-secondary text-muted-foreground'}`}>
-                                                    {t.isAvailable ? '✓ Available Today' : 'Fully Booked'}
-                                                </div>
-
-                                                {/* Verified */}
-                                                {t.isVerified && (
-                                                    <div className="absolute top-3 left-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow">
-                                                        <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-                                                    </div>
-                                                )}
-
-                                                {/* Rating */}
-                                                <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1.5 rounded-full">
-                                                    <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-                                                    <span className="text-white text-xs font-bold">{t.rating}</span>
-                                                    {t.reviewCount > 0 && <span className="text-white/60 text-xs">({t.reviewCount})</span>}
-                                                </div>
-                                            </div>
-
-                                        <CardContent className="p-6 space-y-4">
-                                            <div>
-                                                <h3 className="font-headline text-xl font-bold group-hover:text-primary transition-colors">{t.name}</h3>
-                                                <p className="text-sm text-primary font-semibold mt-0.5">{t.qualification}</p>
-                                                <p className="text-sm text-muted-foreground">{t.specialization}</p>
-                                            </div>
-
-                                            <div className="flex items-center gap-4 text-sm">
-                                                {t.experience && (
-                                                    <div className="flex items-center gap-1.5 text-muted-foreground">
-                                                        <Award className="w-4 h-4 text-accent" /><span className="font-medium">{t.experience}</span>
-                                                    </div>
-                                                )}
-                                                {t.city && (
-                                                    <div className="flex items-center gap-1.5 text-muted-foreground">
-                                                        <MapPin className="w-4 h-4 text-primary" /><span>{t.city}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            {t.areas.length > 0 && (
-                                                <div>
-                                                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Covers</p>
-                                                    <div className="flex flex-wrap gap-1.5">
-                                                        {t.areas.slice(0, 3).map(area => (
-                                                            <Badge key={area} variant="secondary" className="text-xs px-2 py-0.5 font-medium">{area}</Badge>
-                                                        ))}
-                                                        {t.areas.length > 3 && <Badge variant="outline" className="text-xs px-2 py-0.5">+{t.areas.length - 3} more</Badge>}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            <div className="flex gap-2 pt-1">
-                                                <BookAppointmentButton className="flex-1 h-10 text-sm font-bold" size="sm">
-                                                    Book Appointment
-                                                </BookAppointmentButton>
-                                                <Button asChild variant="outline" size="sm" className="h-10 px-3">
-                                                    <Link href={`/therapist/${t.slug}`}>
-                                                        Profile <ChevronRight className="w-4 h-4 ml-1" />
-                                                    </Link>
-                                                </Button>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                );
-                            })}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {filtered.map(t => (
+                                    <TherapistCardComponent key={t.id || t.slug} therapist={t} />
+                                ))}
                             </div>
                         )}
 

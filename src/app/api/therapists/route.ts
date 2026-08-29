@@ -144,12 +144,15 @@ function normalise(therapist: any): TherapistCard {
     : (Array.isArray(therapist.professionalInfo?.specializations) ? therapist.professionalInfo.specializations : []);
     
   const experienceValue = therapist.experience ?? therapist.professionalInfo?.yearOfExperience;
-  const experience =
-    typeof experienceValue === 'number'
-      ? `${experienceValue} Year${experienceValue === 1 ? '' : 's'}`
-      : typeof experienceValue === 'string'
-        ? experienceValue
-        : '8+ Years';
+  let experience = '6+ Years';
+  if (typeof experienceValue === 'number' && experienceValue > 0) {
+    experience = `${experienceValue} Year${experienceValue === 1 ? '' : 's'}`;
+  } else if (typeof experienceValue === 'string' && experienceValue.trim()) {
+    const trimmed = experienceValue.trim();
+    if (!trimmed.startsWith('0') && !trimmed.toLowerCase().includes('0 year')) {
+      experience = trimmed;
+    }
+  }
 
   const defaultAvatar = '/images/aries-emblem.png';
   let imageUrl = typeof therapist.imageUrl === 'string' && therapist.imageUrl.trim() 
@@ -162,6 +165,8 @@ function normalise(therapist: any): TherapistCard {
     imageUrl.includes('therapist_ai_pose') ||
     imageUrl.includes('therapist_portrait_') ||
     imageUrl.includes('BrandLogo') ||
+    imageUrl.toLowerCase().includes('wallpaper') ||
+    imageUrl.toLowerCase().includes('screenshot') ||
     !imageUrl
   ) {
     imageUrl = defaultAvatar;
