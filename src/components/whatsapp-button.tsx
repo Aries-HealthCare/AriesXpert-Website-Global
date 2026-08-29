@@ -17,7 +17,7 @@ export default function WhatsAppButton() {
             rel="noopener noreferrer"
             id="whatsapp-floating-button"
             aria-label="Chat with us on WhatsApp"
-            className="fixed bottom-24 right-4 md:bottom-8 md:right-6 z-50 flex items-center gap-2 group"
+            className="hidden md:flex fixed bottom-8 right-6 z-50 items-center gap-2 group"
         >
             {/* Tooltip text - shows on hover on desktop */}
             <span className="hidden md:flex items-center bg-[#128C7E] text-white text-sm font-semibold px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg whitespace-nowrap">

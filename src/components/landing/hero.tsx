@@ -56,7 +56,7 @@ export default function Hero() {
                   fill
                   sizes="100vw"
                   quality={85}
-                  className="object-cover object-center transition-transform duration-[3000ms] scale-110"
+                  className="object-cover object-center transition-transform duration-1000 scale-110"
                   priority={index === 0}
                   loading={index === 0 ? "eager" : "lazy"}
                 />

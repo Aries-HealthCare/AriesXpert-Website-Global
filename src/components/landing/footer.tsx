@@ -14,13 +14,13 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="lg:col-span-4 space-y-8 flex flex-col items-center md:items-start">
             <Link href="/" className="flex items-center gap-3 group w-full" prefetch={false}>
-              <div className="relative h-20 w-64 sm:h-28 sm:w-[400px] lg:w-[500px] xl:w-[600px] transition-all duration-300 group-hover:opacity-95">
+              <div className="relative h-14 w-52 sm:h-16 sm:w-64 md:h-16 md:w-72 transition-all duration-300 group-hover:opacity-95">
                 {/* Light Mode Logo */}
                 <Image
                   src="/logo-light.png"
                   alt="Aries PhysioCare"
                   fill
-                  sizes="(max-width: 640px) 256px, 400px"
+                  sizes="(max-width: 640px) 208px, 288px"
                   className="object-contain block dark:hidden object-center md:object-left"
                 />
                 {/* Dark Mode Logo */}
@@ -28,7 +28,7 @@ export default function Footer() {
                   src="/logo-dark.png"
                   alt="Aries PhysioCare"
                   fill
-                  sizes="(max-width: 640px) 256px, 400px"
+                  sizes="(max-width: 640px) 208px, 288px"
                   className="object-contain hidden dark:block object-center md:object-left"
                 />
               </div>
@@ -132,7 +132,7 @@ export default function Footer() {
             <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4">
               <Link href="/privacy-policy" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link>
               <Link href="/terms-of-service" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link>
-              <Link href="/sitemap" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">Sitemap</Link>
+              <Link href="/sitemap.xml" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">Sitemap</Link>
             </nav>
           </div>
         </div>

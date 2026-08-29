@@ -12,7 +12,7 @@ import { ProviderAuthProvider } from '@/services/provider-auth-context';
 export default function SiteLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const isAppRoute = Boolean(pathname && pathname.startsWith('/app'));
+  const isAppRoute = Boolean(pathname && (pathname.startsWith('/app') || pathname.startsWith('/portal')));
   const isAuthRoute = Boolean(
     pathname &&
       (pathname === '/login' ||

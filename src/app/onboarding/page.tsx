@@ -1005,7 +1005,7 @@ export default function ProviderOnboardingPage() {
           </div>
 
           <Link
-            href="/dashboard"
+            href="/app"
             className="text-xs font-semibold text-slate-400 hover:text-white transition-colors flex items-center gap-1.5"
           >
             Dashboard
@@ -2883,7 +2883,7 @@ export default function ProviderOnboardingPage() {
 
               <Button
                 type="button"
-                onClick={() => router.push('/dashboard')}
+                onClick={() => router.push('/app')}
                 className="w-full h-12 rounded-2xl bg-gradient-to-r from-teal-400 to-emerald-500 text-slate-950 font-extrabold text-xs shadow-xl shadow-teal-500/30"
               >
                 GO TO PROVIDER DASHBOARD

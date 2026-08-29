@@ -155,8 +155,48 @@ export default function ContactPage() {
             </section>
             <section className="py-16 md:py-24 bg-secondary/30">
                 <div className="container mx-auto px-4 md:px-6">
-                    <div className="text-center max-w-3xl mx-auto"><h2 className="font-headline text-3xl md:text-4xl font-bold">Aries PhysioCare Availability Map</h2></div>
-                    <div className="flex justify-center items-center h-96 mt-12 glassmorphic rounded-lg"><p className="text-muted-foreground">Live service availability map will be displayed here.</p></div>
+                    <div className="text-center max-w-3xl mx-auto mb-12">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest mb-3">
+                            <Clock className="w-3.5 h-3.5" /> Pan-India Rapid Response
+                        </div>
+                        <h2 className="font-headline text-3xl md:text-4xl font-bold">Aries PhysioCare Live Service Coverage</h2>
+                        <p className="text-muted-foreground mt-2">
+                            Certified physiotherapists on duty 365 days across major Indian metros with same-day home visit availability.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-5xl mx-auto">
+                        {[
+                            { city: 'Mumbai', state: 'Maharashtra', tag: 'Flagship Clinic & Home Visits', href: '/physiotherapy-in-mumbai' },
+                            { city: 'Delhi NCR', state: 'Delhi, Noida, Gurgaon', tag: 'Complete NCR Coverage', href: '/physiotherapy-in-delhi' },
+                            { city: 'Bengaluru', state: 'Karnataka', tag: 'Tech Hubs & Residential', href: '/physiotherapy-in-bengaluru' },
+                            { city: 'Pune', state: 'Maharashtra', tag: 'East & West Suburbs', href: '/physiotherapy-in-pune' },
+                            { city: 'Hyderabad', state: 'Telangana', tag: 'Cyberabad & Central', href: '/physiotherapy-in-hyderabad' },
+                            { city: 'Chennai', state: 'Tamil Nadu', tag: 'Citywide Doorstep Care', href: '/physiotherapy-in-chennai' },
+                            { city: 'Kolkata', state: 'West Bengal', tag: 'North & South Localities', href: '/physiotherapy-in-kolkata' },
+                            { city: 'Ahmedabad', state: 'Gujarat', tag: 'Central & SG Highway', href: '/physiotherapy-in-ahmedabad' },
+                        ].map((c) => (
+                            <Link
+                                key={c.city}
+                                href={c.href}
+                                className="group p-5 rounded-2xl bg-background border hover:border-primary/50 hover:shadow-lg transition-all duration-300 flex flex-col justify-between"
+                            >
+                                <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="font-headline font-bold text-lg text-foreground group-hover:text-primary transition-colors">
+                                            {c.city}
+                                        </span>
+                                        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">{c.state}</p>
+                                </div>
+                                <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-[11px] font-semibold text-primary">
+                                    <span>{c.tag}</span>
+                                    <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             </section>
             <section className="py-16">
