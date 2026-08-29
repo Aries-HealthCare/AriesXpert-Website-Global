@@ -165,6 +165,7 @@ function normalise(therapist: any): TherapistCard {
     imageUrl.includes('therapist_ai_pose') ||
     imageUrl.includes('therapist_portrait_') ||
     imageUrl.includes('BrandLogo') ||
+    imageUrl.includes('673752dcb05308c0ae620a24') ||
     imageUrl.toLowerCase().includes('wallpaper') ||
     imageUrl.toLowerCase().includes('screenshot') ||
     !imageUrl
