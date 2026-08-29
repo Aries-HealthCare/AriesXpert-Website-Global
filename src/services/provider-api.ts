@@ -377,53 +377,7 @@ class ProviderApiService {
           if (data.success !== false) {
             // If real expert document returned from MongoDB, normalize and return
             if (expert) {
-              const hasCompleted =
-                expert.onboardingStatus === 'completed' ||
-                (expert.onboardingStep !== undefined && expert.onboardingStep >= 4 && expert.licenseNumber);
-
-              const normalizedExpert: MobileExpertProfile = {
-                _id: expert._id || expert.id,
-                fullName: expert.fullName || `${expert.firstName || ''} ${expert.lastName || ''}`.trim() || '',
-                firstName: expert.firstName,
-                lastName: expert.lastName,
-                phone: expert.phone || cleanMobile,
-                email: expert.email || `${cleanMobile}@ariesxpert.com`,
-                city: expert.city || expert.areaOfServiceInfo?.city || '',
-                state: expert.state,
-                zipCode: expert.zipCode || expert.areaOfServiceInfo?.pincode,
-                streetAddress: expert.streetAddress,
-                gender: expert.gender,
-                dob: expert.dob,
-                status: expert.status || 'Active',
-                onboardingStatus: hasCompleted ? 'completed' : (expert.onboardingStatus || 'pending'),
-                onboardingStep: expert.onboardingStep ?? (hasCompleted ? 5 : 0),
-                isTherapistActive: expert.isProfileActive ?? expert.isTherapistActive ?? true,
-                isProfileActive: expert.isProfileActive ?? true,
-                isVerified: expert.isVerified ?? false,
-                rating: expert.rating || expert.averageRating || 4.95,
-                totalReviews: expert.totalReviews || expert.reviewCount || 0,
-                profilePhoto: expert.profilePhoto || expert.profileImageUrl || expert.profileImage || expert.photoUrl || expert.photo || undefined,
-                walletAmount: expert.walletAmount ?? expert.walletBalance ?? 0,
-                totalEarnings: expert.totalEarnings ?? expert.totalEarning ?? 0,
-                ariesId: expert.ariesId || expert.employeeId || expert.axId || expert.therapistId || (`AX-IND-${String(expert.phone || cleanMobile).slice(-4)}`),
-                designation: expert.designation || expert.professionalRole || 'Physiotherapist',
-                specialization:
-                  expert.specialization ||
-                  (expert.professionalInfo?.specializations ? expert.professionalInfo.specializations.join(', ') : null) ||
-                  expert.professionalInfo?.qualification ||
-                  '',
-                licenseNumber:
-                  expert.licenseNumber ||
-                  expert.professionalInfo?.councilRegistrationNumber ||
-                  expert.professionalInfo?.registrationNumber ||
-                  '',
-                yearsOfExperience: expert.yearsOfExperience || expert.professionalInfo?.yearOfExperience || '',
-                serviceAreas: expert.areaOfServiceInfo?.serviceAreas || expert.serviceAreas || [],
-                targetPincodes: expert.areaOfServiceInfo?.targetPincodes || expert.targetPincodes || [],
-                bankInfo: expert.bankInfo,
-                professionalInfo: expert.professionalInfo,
-                areaOfServiceInfo: expert.areaOfServiceInfo,
-              };
+              const normalizedExpert = this.normalizeExpertProfile(expert, cleanMobile);
               return {
                 success: true,
                 token,
@@ -483,6 +437,162 @@ class ProviderApiService {
     };
   }
 
+  public normalizeExpertProfile(expert: any, fallbackPhone?: string): MobileExpertProfile {
+    if (!expert || typeof expert !== 'object') {
+      return {
+        _id: 'exp_' + (fallbackPhone || 'user'),
+        phone: fallbackPhone || '',
+        status: 'Active',
+      };
+    }
+
+    const cleanMobile = (expert.phone || expert.mobileNo || fallbackPhone || '').replace(/\D/g, '').slice(-10);
+    const hasCompleted =
+      expert.onboardingStatus === 'completed' ||
+      expert.status === 'Approved' ||
+      expert.isProfileActive === true ||
+      (expert.onboardingStep !== undefined && expert.onboardingStep >= 4 && (expert.licenseNumber || expert.professionalInfo?.registrationCertificate));
+
+    const pInfo = expert.professionalInfo || {};
+    const bInfo = expert.bankInfo || {};
+    const aInfo = expert.areaOfServiceInfo || {};
+
+    const regCertUrl = pInfo.registrationCertificate?.url || (typeof pInfo.registrationCertificate === 'string' ? pInfo.registrationCertificate : expert.registrationCertificateUrl || expert.registrationCertificate);
+    const degCertUrl = pInfo.degreeCertificate?.url || (typeof pInfo.degreeCertificate === 'string' ? pInfo.degreeCertificate : expert.degreeCertificateUrl || expert.degreeCertificate);
+    const cvUrl = pInfo.cvResume?.url || (typeof pInfo.cvResume === 'string' ? pInfo.cvResume : expert.cvResumeUrl || expert.cvResume);
+
+    const extraCerts: string[] = [];
+    if (Array.isArray(pInfo.extraCertifications)) {
+      for (const c of pInfo.extraCertifications) {
+        if (typeof c === 'string') extraCerts.push(c);
+        else if (c && c.url) extraCerts.push(c.url);
+      }
+    } else if (Array.isArray(expert.extraCertifications)) {
+      for (const c of expert.extraCertifications) {
+        if (typeof c === 'string') extraCerts.push(c);
+        else if (c && c.url) extraCerts.push(c.url);
+      }
+    }
+
+    const chequeUrl = bInfo.cancelledCheque?.url || (typeof bInfo.cancelledCheque === 'string' ? bInfo.cancelledCheque : expert.cancelledCheque);
+    const statementUrl = bInfo.bankStatement?.url || (typeof bInfo.bankStatement === 'string' ? bInfo.bankStatement : expert.bankStatement);
+    const letterUrl = bInfo.bankVerificationLetter?.url || (typeof bInfo.bankVerificationLetter === 'string' ? bInfo.bankVerificationLetter : expert.bankVerificationLetter);
+
+    const licenseDocUrl = aInfo.drivingLicense?.url || (typeof aInfo.drivingLicense === 'string' ? aInfo.drivingLicense : expert.drivingLicenseUrl || expert.drivingLicense);
+
+    return {
+      _id: expert._id || expert.id || ('exp_' + cleanMobile),
+      id: expert._id || expert.id,
+      fullName: expert.fullName || `${expert.firstName || ''} ${expert.lastName || ''}`.trim() || expert.name || '',
+      name: expert.fullName || `${expert.firstName || ''} ${expert.lastName || ''}`.trim() || expert.name || '',
+      firstName: expert.firstName || expert.fullName?.split(' ')[0] || '',
+      lastName: expert.lastName || expert.fullName?.split(' ').slice(1).join(' ') || '',
+      gender: expert.gender || 'male',
+      dob: expert.dob,
+      email: expert.email || `${cleanMobile}@ariesxpert.com`,
+      phone: expert.phone || cleanMobile,
+      mobileNo: expert.phone || cleanMobile,
+      mobileNumber: expert.phone || cleanMobile,
+      isMobileNumberVerified: expert.isMobileNumberVerified ?? expert.mobile_verified ?? true,
+      isVerified: expert.isVerified ?? false,
+      countryCode: expert.countryCode || '+91',
+      countryName: expert.countryName || 'India',
+      streetAddress: expert.streetAddress || expert.address || '',
+      addressLineTwo: expert.addressLineTwo || '',
+      zipCode: expert.zipCode || expert.pincode || aInfo.pincode || '',
+      city: expert.city || aInfo.city || pInfo.city || '',
+      state: expert.state || '',
+      area: expert.area || '',
+      aadharNumber: expert.aadharNumber || '',
+      profilePhoto: expert.profilePhoto || expert.profileImageUrl || expert.profileImage || expert.photoUrl || expert.photo || undefined,
+      profileImageUrl: expert.profilePhoto || expert.profileImageUrl || expert.profileImage || expert.photoUrl || expert.photo || undefined,
+      profileImage: expert.profilePhoto || expert.profileImageUrl || expert.profileImage || expert.photoUrl || expert.photo || undefined,
+      panCard: expert.panCard || bInfo.panNumber,
+      aadharCard: expert.aadharCard,
+      aadharCardBack: expert.aadharCardBack,
+      licenseNumber:
+        expert.licenseNumber ||
+        pInfo.licenseNumber ||
+        pInfo.councilRegistrationNumber ||
+        pInfo.registrationNumber ||
+        '',
+      specialization:
+        expert.specialization ||
+        (Array.isArray(pInfo.specializations) && pInfo.specializations.length > 0 ? pInfo.specializations.join(', ') : null) ||
+        pInfo.qualification ||
+        expert.qualification ||
+        'Musculoskeletal & Orthopedic',
+      designation: expert.designation || pInfo.professionalRole || expert.therapistProfessionalRole || 'Physiotherapist',
+      ariesId: expert.ariesId || expert.employeeId || expert.axId || expert.therapistId || (`AX-IND-${cleanMobile.slice(-4)}`),
+      degreeCertificateUrl: degCertUrl,
+      registrationCertificateUrl: regCertUrl,
+      experience: expert.experience || (typeof pInfo.yearOfExperience === 'number' ? pInfo.yearOfExperience : parseInt(pInfo.yearOfExperience || '0', 10)) || 0,
+      yearsOfExperience: expert.yearsOfExperience || pInfo.yearOfExperience || String(expert.experience || '0'),
+      totalVisits: expert.totalVisits || 0,
+      coins: expert.coins || 0,
+      servicePincodes: aInfo.targetPincodes || expert.servicePincodes || [],
+      serviceAreas: aInfo.serviceAreas || expert.serviceAreas || [],
+      targetPincodes: aInfo.targetPincodes || expert.targetPincodes || [],
+      onboardingStep: expert.onboardingStep ?? (hasCompleted ? 5 : 0),
+      onboardingStatus: hasCompleted ? 'completed' : (expert.onboardingStatus || 'pending'),
+      status: expert.status || (hasCompleted ? 'Active' : 'Pending'),
+      isTherapistActive: expert.isProfileActive ?? expert.isTherapistActive ?? true,
+      isProfileActive: expert.isProfileActive ?? true,
+      rating: expert.rating || expert.averageRating || 4.95,
+      totalReviews: expert.totalReviews || expert.reviewCount || 0,
+      walletAmount: expert.walletAmount ?? expert.walletBalance ?? 0,
+      totalEarnings: expert.totalEarnings ?? expert.totalEarning ?? 0,
+
+      // Professional Info
+      professionalInfo: {
+        professionalRole: pInfo.professionalRole || expert.designation || 'Physiotherapist',
+        qualification: pInfo.qualification || expert.qualification || '',
+        specializations: Array.isArray(pInfo.specializations) ? pInfo.specializations : (expert.specializations || []),
+        yearOfExperience: pInfo.yearOfExperience || expert.yearsOfExperience || '0',
+        currentlyWorkingAt: pInfo.currentlyWorkingAt || expert.currentlyWorkingAt || '',
+        serviceTypes: Array.isArray(pInfo.serviceTypes) ? pInfo.serviceTypes : (expert.serviceTypes || []),
+        hasModalities: pInfo.hasModalities ?? expert.hasModalities ?? false,
+        hasOwnClinic: pInfo.hasOwnClinic ?? expert.hasOwnClinic ?? false,
+        clinicName: pInfo.clinicName || expert.clinicName || '',
+        clinicEstablishmentMonth: pInfo.clinicEstablishmentMonth || expert.clinicEstablishmentMonth || '',
+        clinicEstablishmentYear: pInfo.clinicEstablishmentYear || expert.clinicEstablishmentYear || '',
+        registrationCertificate: regCertUrl,
+        degreeCertificate: degCertUrl,
+        cvResume: cvUrl,
+        extraCertifications: extraCerts,
+      },
+
+      // Bank Info
+      bankInfo: {
+        accountType: bInfo.accountType || 'Individual',
+        businessName: bInfo.businessName || '',
+        accountHolderName: bInfo.accountHolderName || expert.fullName || '',
+        accountNumber: bInfo.accountNumber || '',
+        bankName: bInfo.bankName || '',
+        ifscCode: bInfo.ifscCode || '',
+        upiId: bInfo.upiId || '',
+        panNumber: bInfo.panNumber || expert.panNumber || '',
+        cancelledCheque: chequeUrl,
+      },
+
+      // Area of Service Info
+      areaOfServiceInfo: {
+        city: aInfo.city || expert.city || '',
+        serviceAreas: aInfo.serviceAreas || expert.serviceAreas || [],
+        pincode: aInfo.pincode || expert.pincode || expert.zipCode || '',
+        targetPincodes: aInfo.targetPincodes || expert.targetPincodes || [],
+        serviceRadius: aInfo.serviceRadius || expert.serviceRadius || 10,
+        commuteType: aInfo.commuteType || expert.commuteType || '',
+        travelCapacity: aInfo.travelCapacity || expert.travelCapacity || '',
+        urgentVisits: aInfo.urgentVisits ?? expert.urgentVisits ?? false,
+        maxDistance: aInfo.maxDistance || expert.maxDistance || 20,
+        travelTimePreference: aInfo.travelTimePreference || expert.travelTimePreference || 'Anytime',
+        drivingLicenseNumber: aInfo.drivingLicenseNumber || expert.drivingLicenseNumber || '',
+        drivingLicense: licenseDocUrl,
+      },
+    };
+  }
+
   public async loginFromEmail(
     email: string,
     password: string
@@ -509,10 +619,11 @@ class ProviderApiService {
           }
 
           if (data.success !== false) {
+            const normalizedExpert = expert ? this.normalizeExpertProfile(expert) : undefined;
             return {
               success: true,
               token,
-              result: expert,
+              result: normalizedExpert,
               message: data.message || 'Login successful',
             };
           }
@@ -554,7 +665,9 @@ class ProviderApiService {
         body: JSON.stringify({ phone: clean }),
       });
       const data = await res.json();
-      return { success: data.success !== false, result: data.result || data.data, message: data.message };
+      const rawExpert = data.expert || data.result || data.data;
+      const normalized = rawExpert ? this.normalizeExpertProfile(rawExpert, clean) : undefined;
+      return { success: data.success !== false, result: normalized, message: data.message };
     } catch (e: any) {
       return { success: false, message: e.message };
     }
@@ -570,15 +683,11 @@ class ProviderApiService {
         body: formData,
       });
       const data = await res.json();
-      if (data.accessToken || data.token) {
-        this.saveToken(data.accessToken || data.token);
-      }
-      return {
-        success: data.success !== false,
-        token: data.accessToken || data.token,
-        result: data.result || data.data,
-        message: data.message,
-      };
+      const token = data.accessToken || data.token || data.result?.token;
+      if (token) this.saveToken(token);
+      const rawExpert = data.expert || data.result || data.data;
+      const normalized = rawExpert ? this.normalizeExpertProfile(rawExpert) : undefined;
+      return { success: data.success !== false, token, result: normalized, message: data.message };
     } catch (e: any) {
       console.warn('[API] addPersonalInfo error:', e);
       return {
@@ -605,10 +714,12 @@ class ProviderApiService {
         body: formData,
       });
       const data = await res.json();
-      return { success: data.success !== false, result: data.result || data.data, message: data.message };
+      const rawExpert = data.expert || data.result || data.data;
+      const normalized = rawExpert ? this.normalizeExpertProfile(rawExpert) : undefined;
+      return { success: data.success !== false, result: normalized, message: data.message };
     } catch (e: any) {
       console.warn('[API] addProfessionalInfo error:', e);
-      return { success: true };
+      return { success: false, message: e.message };
     }
   }
 
@@ -622,10 +733,12 @@ class ProviderApiService {
         body: formData,
       });
       const data = await res.json();
-      return { success: data.success !== false, result: data.result || data.data, message: data.message };
+      const rawExpert = data.expert || data.result || data.data;
+      const normalized = rawExpert ? this.normalizeExpertProfile(rawExpert) : undefined;
+      return { success: data.success !== false, result: normalized, message: data.message };
     } catch (e: any) {
       console.warn('[API] addBankInfo error:', e);
-      return { success: true };
+      return { success: false, message: e.message };
     }
   }
 
@@ -639,10 +752,12 @@ class ProviderApiService {
         body: formData,
       });
       const data = await res.json();
-      return { success: data.success !== false, result: data.result || data.data, message: data.message };
+      const rawExpert = data.expert || data.result || data.data;
+      const normalized = rawExpert ? this.normalizeExpertProfile(rawExpert) : undefined;
+      return { success: data.success !== false, result: normalized, message: data.message };
     } catch (e: any) {
       console.warn('[API] addAreaOfServiceInfo error:', e);
-      return { success: true };
+      return { success: false, message: e.message };
     }
   }
 
@@ -691,7 +806,9 @@ class ProviderApiService {
         body: JSON.stringify({ user: expertId }),
       });
       const data = await res.json();
-      return { success: data.success !== false, result: data.result || data.data, message: data.message };
+      const rawExpert = data.expert || data.result || data.data;
+      const normalized = rawExpert ? this.normalizeExpertProfile(rawExpert) : undefined;
+      return { success: data.success !== false, result: normalized, message: data.message };
     } catch (e: any) {
       return { success: false, message: e.message };
     }
@@ -1191,7 +1308,7 @@ class ProviderApiService {
     }
 
     try {
-      const res = await fetch(`/transactions/balance`, {
+      const res = await fetch(`/api/app/wallet/my-wallet`, {
         method: 'GET',
         headers: this.getHeaders(),
       });
@@ -1199,10 +1316,10 @@ class ProviderApiService {
         const data = await res.json();
         const d = data.result || data.data || data;
         return {
-          availableBalance: d.availableBalance ?? balance,
+          availableBalance: d.availableBalance ?? d.walletBalance ?? d.walletAmount ?? balance,
           pendingBalance: d.pendingBalance ?? 0,
           walletStatus: d.walletStatus ?? status,
-          isEligibleForPayout: (d.availableBalance ?? balance) >= 500,
+          isEligibleForPayout: (d.availableBalance ?? d.walletBalance ?? balance) >= 500,
         };
       }
     } catch (_) {}
@@ -1216,28 +1333,22 @@ class ProviderApiService {
   }
 
   /** Matches Flutter PayoutService.getTransactions(expertId) */
-  public async getTransactions(expertId: string): Promise<any[]> {
+  public async getTransactions(expertId?: string): Promise<any[]> {
     const expId = expertId || this.getCurrentUserId();
-    const endpoints = [
-      `/transactions?expertId=${expId}`,
-      `${API_BASE_URL}/transactions?expertId=${expId}`,
-    ];
-
-    for (const url of endpoints) {
-      try {
-        const res = await fetch(url, {
-          method: 'GET',
-          headers: this.getHeaders(),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const result = data.result || data.data || data;
-          if (Array.isArray(result)) return result;
-          if (result && Array.isArray(result.transactions)) return result.transactions;
-        }
-      } catch (e: any) {
-        console.warn(`[API] getTransactions failed on ${url}:`, e);
+    try {
+      const res = await fetch(`/api/app/walletTransaction/fetchWalletTransactions`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ expert: expId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const result = data.result || data.data || data.transactions || data;
+        if (Array.isArray(result)) return result;
+        if (result && Array.isArray(result.transactions)) return result.transactions;
       }
+    } catch (e: any) {
+      console.warn('[API] getTransactions failed:', e);
     }
     return [];
   }
@@ -1556,6 +1667,348 @@ class ProviderApiService {
       ratingBreakdown: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
       reviews: [],
     };
+  }
+
+  // ==========================================
+  // SUPPORT TICKETS & FAQ (1:1 Mobile Parity)
+  // ==========================================
+
+  public async getSupportTickets(expertId?: string): Promise<any[]> {
+    const expId = expertId || this.getCurrentUserId();
+    try {
+      const res = await fetch(`/api/app/supportTicket/fetchSupportTickets`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ expert: expId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const list = data.result || data.tickets || data.data || [];
+        if (Array.isArray(list)) return list;
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  public async fetchFaqs(): Promise<any[]> {
+    try {
+      const res = await fetch(`/api/app/faq/fetchFaqs`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const list = data.result || data.faqs || data.data || [];
+        if (Array.isArray(list)) return list;
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  // ==========================================
+  // EMERGENCY SOS
+  // ==========================================
+
+  public async startSOS(coords?: { lat: number; lng: number }): Promise<{ success: boolean; result?: any; message?: string }> {
+    try {
+      const res = await fetch(`/api/app/sos/start`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ expert: this.getCurrentUserId(), location: coords }),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, result: data.result || data.data, message: data.message };
+    } catch (e: any) {
+      return { success: false, message: e.message };
+    }
+  }
+
+  public async getMySOS(): Promise<any[]> {
+    try {
+      const res = await fetch(`/api/app/sos/my`, { method: 'GET', headers: this.getHeaders() });
+      if (res.ok) {
+        const data = await res.json();
+        const list = data.result || data.data || [];
+        if (Array.isArray(list)) return list;
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  public async resolveSOS(sosId: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await fetch(`/api/app/sos/${sosId}/resolve`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, message: data.message };
+    } catch (e: any) {
+      return { success: false, message: e.message };
+    }
+  }
+
+  public async getQuickDials(): Promise<any[]> {
+    try {
+      const res = await fetch(`/api/app/quickDial/fetchQuickDials`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const list = data.result || data.data || [];
+        if (Array.isArray(list)) return list;
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  // ==========================================
+  // APP SETTINGS (Notifications, Quiet Hours, Visibility)
+  // ==========================================
+
+  public async setNotificationEnabled(enabled: boolean): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await fetch(`/api/app/expert/notificationEnableOrDisable`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ user: this.getCurrentUserId(), isNotificationEnabled: enabled }),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, message: data.message };
+    } catch (e: any) {
+      return { success: false, message: e.message };
+    }
+  }
+
+  public async updateQuietHours(payload: { enabled: boolean; start?: string; end?: string }): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await fetch(`/api/app/expert/updateQuietHours`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ user: this.getCurrentUserId(), ...payload }),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, message: data.message };
+    } catch (e: any) {
+      return { success: false, message: e.message };
+    }
+  }
+
+  public async setActivityTracking(enabled: boolean): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await fetch(`/api/app/expert/isActivityTracking`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ user: this.getCurrentUserId(), isActivityTracking: enabled }),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, message: data.message };
+    } catch (e: any) {
+      return { success: false, message: e.message };
+    }
+  }
+
+  public async setProfileVisible(visible: boolean): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await fetch(`/api/app/expert/isProfileVisible`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ user: this.getCurrentUserId(), isProfileVisible: visible }),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, message: data.message };
+    } catch (e: any) {
+      return { success: false, message: e.message };
+    }
+  }
+
+  // ==========================================
+  // AI CLINICAL BUDDY
+  // ==========================================
+
+  public async getBuddyProfile(): Promise<any> {
+    try {
+      const res = await fetch(`/api/app/buddy/profile?userId=${this.getCurrentUserId()}`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.result || data.data || null;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  public async getBuddyDashboard(): Promise<any> {
+    try {
+      const res = await fetch(`/api/app/buddy/dashboard?userId=${this.getCurrentUserId()}`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.result || data.data || null;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  public async sendBuddyChat(message: string, sessionId?: string): Promise<{ success: boolean; reply?: string; sessionId?: string; message?: string }> {
+    try {
+      const res = await fetch(`/api/app/buddy/chat`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ userId: this.getCurrentUserId(), message, sessionId }),
+      });
+      const data = await res.json();
+      return {
+        success: data.success !== false,
+        reply: data.result?.reply || data.reply || data.result?.message,
+        sessionId: data.result?.sessionId || data.sessionId,
+        message: data.message,
+      };
+    } catch (e: any) {
+      return { success: false, message: e.message };
+    }
+  }
+
+  // ==========================================
+  // REWARDS & GAMING BONUSES
+  // ==========================================
+
+  public async getBonusOffers(): Promise<any[]> {
+    try {
+      const res = await fetch(`/api/app/gaming/bonus-offers?userId=${this.getCurrentUserId()}`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const list = data.result || data.data || [];
+        if (Array.isArray(list)) return list;
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  public async getGamingProfile(): Promise<any> {
+    try {
+      const res = await fetch(`/api/app/gaming/profile?userId=${this.getCurrentUserId()}`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.result || data.data || null;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  public async claimBonus(bonusId: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await fetch(`/api/app/gaming/claim-bonus`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ userId: this.getCurrentUserId(), bonusId }),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, message: data.message };
+    } catch (e: any) {
+      return { success: false, message: e.message };
+    }
+  }
+
+  // ==========================================
+  // CLINICAL ACADEMY (TRAINING) — Proactive Tasks & Quizzes
+  // ==========================================
+
+  public async getTopicQuizzes(): Promise<any[]> {
+    try {
+      const res = await fetch(`/api/app/gaming/topic-quizzes?userId=${this.getCurrentUserId()}`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const list = data.result || data.data || [];
+        if (Array.isArray(list)) return list;
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  public async getProactiveTasks(): Promise<any[]> {
+    try {
+      const res = await fetch(`/api/app/gaming/proactive-task?userId=${this.getCurrentUserId()}`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const list = data.result || data.data || [];
+        if (Array.isArray(list)) return list;
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  // ==========================================
+  // TELEHEALTH
+  // ==========================================
+
+  public async startTelehealth(appointmentId: string): Promise<{ success: boolean; result?: any; message?: string }> {
+    try {
+      const res = await fetch(`/api/app/appointment/${appointmentId}/start-telehealth`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, result: data.result || data.data, message: data.message };
+    } catch (e: any) {
+      return { success: false, message: e.message };
+    }
+  }
+
+  public async endTelehealth(appointmentId: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await fetch(`/api/app/appointment/${appointmentId}/end-telehealth`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, message: data.message };
+    } catch (e: any) {
+      return { success: false, message: e.message };
+    }
+  }
+
+  public async submitTelehealthAssessment(
+    appointmentId: string,
+    payload: { exercises: Array<{ name: string; sets: string; reps: string; hold: string }>; notes?: string }
+  ): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await fetch(`/api/app/appointment/${appointmentId}/assessment`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      return { success: data.success !== false, message: data.message };
+    } catch (e: any) {
+      return { success: false, message: e.message };
+    }
+  }
+
+  /** Telehealth-eligible appointments = live appointments filtered client-side by consultationType/mode */
+  public async getTelehealthAppointments(therapistId?: string): Promise<any[]> {
+    const appointments = await this.getAppointments(therapistId);
+    return appointments.filter((a: any) => {
+      const mode = (a.consultationType || a.mode || a.visitType || a.appointmentType || '').toString().toLowerCase();
+      return mode.includes('tele') || mode.includes('video') || a.isTelehealth === true;
+    });
   }
 }
 

@@ -13,6 +13,7 @@ export interface GrowthBlogPost {
   topic?: string;
   publishedAt?: string;
   url?: string;
+  imageUrl?: string;
   cta?: string;
 }
 
