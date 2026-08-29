@@ -973,14 +973,20 @@ export default function ProviderOnboardingPage() {
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/80 px-4 lg:px-8 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center shadow-lg shadow-teal-500/20 group-hover:scale-105 transition-transform">
-              <Stethoscope className="w-5 h-5 text-slate-950 font-bold" />
+            <div className="w-10 h-10 relative rounded-full overflow-hidden border border-[#FFD700]/50 shadow-lg shadow-[#FFD700]/20 group-hover:scale-105 transition-transform">
+              <Image
+                src="/aries-gold-emblem.png"
+                alt="Aries Logo"
+                fill
+                className="object-contain"
+                priority
+              />
             </div>
             <div>
-              <span className="text-xl font-black tracking-tight text-white flex items-center gap-1">
-                Aries<span className="text-teal-400">Xpert</span>
+              <span className="text-xl font-black tracking-tight text-white flex items-center gap-1 font-outfit">
+                Aries<span className="text-[#FFD700] drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]">Xpert</span>
               </span>
-              <span className="text-[10px] font-semibold tracking-wider text-teal-400/80 uppercase block -mt-1">
+              <span className="text-[10px] font-semibold tracking-wider text-teal-400 uppercase block -mt-1 font-mono">
                 Provider Onboarding
               </span>
             </div>
@@ -1005,7 +1011,7 @@ export default function ProviderOnboardingPage() {
           </div>
 
           <Link
-            href="/app"
+            href="/dashboard"
             className="text-xs font-semibold text-slate-400 hover:text-white transition-colors flex items-center gap-1.5"
           >
             Dashboard
@@ -1624,29 +1630,84 @@ export default function ProviderOnboardingPage() {
                   </div>
                 </div>
 
-                {/* Specializations Chips */}
-                <div>
-                  <Label className="text-xs text-slate-300">Clinical Specializations (Select Multiple) *</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {currentRoleConfig.specializations.map((spec) => {
-                      const isSelected = specializations.includes(spec);
-                      return (
-                        <button
-                          type="button"
-                          key={spec}
-                          onClick={() => toggleSpecialization(spec)}
-                          className={`px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                            isSelected
-                              ? 'bg-teal-500/20 border-teal-500 text-teal-300'
-                              : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'
-                          }`}
-                        >
-                          {isSelected && <Check className="w-3.5 h-3.5 text-teal-400" />} {spec}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                {/* Specializations: Only Masters Degree and Above Have Specializations (Single Select Radio Button) */}
+                {(() => {
+                  const q = (qualification || '').toUpperCase();
+                  const isMasters =
+                    q.includes('MPT') ||
+                    q.includes('MPTH') ||
+                    q.includes('MOT') ||
+                    q.includes('MSC') ||
+                    q.includes('M.SC') ||
+                    q.includes('MASTER') ||
+                    q.includes('PHD') ||
+                    q.includes('DPT') ||
+                    q.includes('DOCTOR');
+
+                  if (isMasters) {
+                    return (
+                      <div className="space-y-2 pt-1 animate-in fade-in">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs text-slate-300 flex items-center gap-1.5 font-bold">
+                            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                            Postgraduate / Master's Clinical Specialization (Select One) *
+                          </Label>
+                          <span className="text-[10px] font-mono text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-400/20">
+                            Master's Required
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400">
+                          As a {qualification} specialist, select your specialized clinical branch:
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 mt-2">
+                          {currentRoleConfig.specializations.map((spec) => {
+                            const isSelected = specializations.includes(spec);
+                            return (
+                              <button
+                                type="button"
+                                key={spec}
+                                onClick={() => setSpecializations([spec])}
+                                className={`p-3 rounded-2xl border text-left text-xs font-semibold transition-all flex items-center justify-between gap-2 ${
+                                  isSelected
+                                    ? 'bg-teal-500/20 border-teal-500 text-teal-300 shadow-md shadow-teal-500/10'
+                                    : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                                }`}
+                              >
+                                <span className="truncate">{spec}</span>
+                                <div
+                                  className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                                    isSelected ? 'border-teal-400 bg-teal-500' : 'border-slate-600'
+                                  }`}
+                                >
+                                  {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80 flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center shrink-0 mt-0.5">
+                        <GraduationCap className="w-4 h-4" />
+                      </div>
+                      <div className="space-y-0.5">
+                        <div className="text-xs font-bold text-white flex items-center gap-2">
+                          <span>General Clinical Practice Track</span>
+                          <span className="text-[10px] font-mono text-teal-300 bg-teal-500/10 px-2 py-0.5 rounded-full border border-teal-500/20">
+                            {qualification}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                          Bachelor's degree graduates (e.g. BPT, BOT, BSc Nursing) practice comprehensive general care. Sub-specialization tracks are activated automatically for Post-graduate / Master's degree (MPT, MOT, MSc, PhD) holders.
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* Certifications Chips (if available) */}
                 {currentRoleConfig.certifications && currentRoleConfig.certifications.length > 0 && (
@@ -2577,11 +2638,21 @@ export default function ProviderOnboardingPage() {
                     </div>
                   </div>
 
-                  <div className="bg-white/5 p-4 rounded-2xl border border-white/10 text-center space-y-2">
-                    <QrCode className="w-16 h-16 text-white m-auto" />
-                    <span className="text-[9px] font-mono text-teal-300 tracking-wider uppercase block">
-                      Digital ID QR
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 relative rounded-full overflow-hidden border border-[#FFD700]/50 shadow-md">
+                      <Image
+                        src="/aries-gold-emblem.png"
+                        alt="Aries Gold Emblem"
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                    <div className="bg-white/5 p-3 rounded-2xl border border-white/10 text-center space-y-1">
+                      <QrCode className="w-12 h-12 text-white m-auto" />
+                      <span className="text-[9px] font-mono text-teal-300 tracking-wider uppercase block">
+                        Digital ID
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2883,7 +2954,7 @@ export default function ProviderOnboardingPage() {
 
               <Button
                 type="button"
-                onClick={() => router.push('/app')}
+                onClick={() => router.push('/dashboard')}
                 className="w-full h-12 rounded-2xl bg-gradient-to-r from-teal-400 to-emerald-500 text-slate-950 font-extrabold text-xs shadow-xl shadow-teal-500/30"
               >
                 GO TO PROVIDER DASHBOARD

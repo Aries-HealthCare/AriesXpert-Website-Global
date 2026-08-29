@@ -248,8 +248,14 @@ export default function ProviderLoginPage() {
       {/* ── Top Bar Header ── */}
       <header className="relative z-10 max-w-5xl w-full mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#0088FF]/30 to-[#0088FF]/10 border border-[#0088FF]/40 p-2 flex items-center justify-center shadow-lg shadow-[#0088FF]/20 group-hover:scale-105 transition-all">
-            <Stethoscope className="w-5 h-5 text-[#0088FF]" />
+          <div className="w-11 h-11 relative rounded-full overflow-hidden border border-[#FFD700]/40 shadow-lg shadow-[#FFD700]/20 group-hover:scale-105 transition-all">
+            <Image
+              src="/aries-gold-emblem.png"
+              alt="Aries PhysioCare Logo"
+              fill
+              className="object-contain"
+              priority
+            />
           </div>
           <div className="flex flex-col">
             <span className="text-base font-black tracking-tight text-white flex items-center gap-1 font-outfit">
@@ -273,10 +279,18 @@ export default function ProviderLoginPage() {
       <main className="relative z-10 max-w-md w-full mx-auto my-auto space-y-6 pt-6">
         {/* Dynamic Logo & Shining Brand Header */}
         <div className="text-center space-y-3">
-          <div className="w-20 h-20 rounded-full mx-auto bg-gradient-to-tr from-[#0088FF]/20 via-[#0088FF]/10 to-[#FFD700]/15 border border-[#0088FF]/30 p-4 flex items-center justify-center shadow-[0_0_40px_rgba(0,136,255,0.25)] relative">
-            <Stethoscope className="w-10 h-10 text-[#0088FF] drop-shadow-[0_0_15px_rgba(0,136,255,0.8)]" />
+          <div className="w-24 h-24 rounded-full mx-auto relative p-1 bg-gradient-to-tr from-[#0088FF]/30 via-[#FFD700]/20 to-[#FFD700]/40 border border-[#FFD700]/50 shadow-[0_0_45px_rgba(255,215,0,0.3)]">
+            <div className="w-full h-full rounded-full overflow-hidden relative">
+              <Image
+                src="/aries-gold-emblem.png"
+                alt="Aries Logo"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
             <div className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-[#0088FF] text-black shadow-md">
-              <Sparkles className="w-3 h-3 text-black fill-black" />
+              <Sparkles className="w-3.5 h-3.5 text-black fill-black" />
             </div>
           </div>
 
