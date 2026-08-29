@@ -2,34 +2,36 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { 
-  CheckCircle2, 
   Sparkles, 
   ShieldCheck, 
   MapPin, 
   Phone, 
-  ArrowRight, 
   Search, 
-  Check, 
   LocateFixed, 
   Loader2, 
   CalendarCheck,
   Zap,
   Activity,
-  HeartPulse
+  Award,
+  Clock,
+  RotateCcw,
+  CheckCircle,
+  HelpCircle
 } from 'lucide-react';
 import { 
   STANDARD_PRICING_TIERS, 
   detectTierFromLocation, 
   searchAllIndiaLocalities, 
-  ALL_INDIA_LOCALITIES_2026,
   type PricingTier,
   type LocalityPricingRecord
 } from '@/lib/pricing-packages';
 import { cn } from '@/lib/utils';
+import Pricing3DScene from './pricing-3d-scene';
+import PricingPackageCard, { type PackageCardData } from './pricing-package-card';
 
 interface PricingPackagesSectionProps {
   initialLocationName?: string;
@@ -44,15 +46,12 @@ const POPULAR_LOCALITIES = [
   { label: 'Hyderabad (Jubilee Hills / HITEC)', query: 'Jubilee Hills Hyderabad' },
   { label: 'Pune (Koregaon / Baner)', query: 'Koregaon Park Pune' },
   { label: 'Chennai (Anna Nagar / OMR)', query: 'Anna Nagar Chennai' },
-  { label: 'Kolkata (Salt Lake / Alipore)', query: 'Salt Lake Kolkata' },
-  { label: 'Ahmedabad (SG Highway)', query: 'SG Highway Ahmedabad' },
 ];
 
 export default function PricingPackagesSection({ 
   initialLocationName, 
   className 
 }: PricingPackagesSectionProps) {
-  // Default to Economy tier (₹1,000/session) if location is not detected
   const [activeTierKey, setActiveTierKey] = useState<string>(() => {
     return initialLocationName ? detectTierFromLocation(initialLocationName) : 'economy';
   });
@@ -69,7 +68,6 @@ export default function PricingPackagesSection({
 
   // ── AUTO-DETECT USER LOCATION ON PAGE MOUNT ──
   useEffect(() => {
-    // 1. If an initial location was passed via props, use it
     if (initialLocationName) {
       const tier = detectTierFromLocation(initialLocationName);
       setActiveTierKey(tier);
@@ -78,7 +76,6 @@ export default function PricingPackagesSection({
       return;
     }
 
-    // 2. Check localStorage if user previously selected/detected location
     try {
       const savedCity = localStorage.getItem('user_city');
       if (savedCity && savedCity.trim().length > 0) {
@@ -88,11 +85,8 @@ export default function PricingPackagesSection({
         setDetectionSource('default');
         return;
       }
-    } catch {
-      // Ignore localStorage read errors
-    }
+    } catch {}
 
-    // 3. Non-intrusive IP-based Geolocation Auto-Detection
     let isCancelled = false;
     const autoDetectByIP = async () => {
       try {
@@ -119,9 +113,7 @@ export default function PricingPackagesSection({
           setActiveLocationLabel(label);
           setDetectionSource('ip');
         }
-      } catch {
-        // If IP detection fails or times out, keep clean default (₹1,000 / session)
-      }
+      } catch {}
     };
 
     autoDetectByIP();
@@ -173,9 +165,7 @@ export default function PricingPackagesSection({
               if (city) localStorage.setItem('user_city', city);
             } catch {}
           }
-        } catch {
-          // Keep current selection on network failure
-        } finally {
+        } catch {} finally {
           setIsDetectingLocation(false);
         }
       },
@@ -186,7 +176,6 @@ export default function PricingPackagesSection({
     );
   }, []);
 
-  // ── REAL-TIME SEARCH SUGGESTIONS ACROSS 2026 REGISTRY ──
   const searchResults = useMemo(() => {
     if (!localitySearch.trim() || localitySearch.trim().length < 2) return [];
     return searchAllIndiaLocalities(localitySearch, 8);
@@ -221,13 +210,13 @@ export default function PricingPackagesSection({
   };
 
   // ── 4 MULTI-DAY PACKAGES CONFIGURATION ──
-  const packageCards = [
+  const packageCards: PackageCardData[] = [
     {
       key: 'days10',
       days: 10,
       title: '10 Days Recovery Plan',
-      badge: '10 Days',
-      badgeClass: 'bg-orange-500/15 text-orange-400 border-orange-500/30',
+      badge: '10 Days Plan',
+      badgeClass: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
       rate: packages.days10.ratePerSession,
       total: packages.days10.totalPrice,
       savings: packages.days10.totalSavings,
@@ -244,8 +233,8 @@ export default function PricingPackagesSection({
       key: 'days15',
       days: 15,
       title: '15 Days Rehabilitation Plan',
-      badge: '15 Days',
-      badgeClass: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+      badge: '15 Days Plan',
+      badgeClass: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
       rate: packages.days15.ratePerSession,
       total: packages.days15.totalPrice,
       savings: packages.days15.totalSavings,
@@ -262,8 +251,8 @@ export default function PricingPackagesSection({
       key: 'days20',
       days: 20,
       title: '20 Days Intensive Rehab Plan',
-      badge: '20 Days',
-      badgeClass: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
+      badge: '20 Days Plan',
+      badgeClass: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
       rate: packages.days20.ratePerSession,
       total: packages.days20.totalPrice,
       savings: packages.days20.totalSavings,
@@ -281,7 +270,7 @@ export default function PricingPackagesSection({
       days: 30,
       title: '30 Days Complete Care Plan',
       badge: '30 Days · Best Value',
-      badgeClass: 'bg-gradient-to-r from-primary via-rose-500 to-pink-500 text-white border-0',
+      badgeClass: 'bg-gradient-to-r from-amber-400 via-rose-500 to-violet-500 text-white border-0',
       rate: packages.days30.ratePerSession,
       total: packages.days30.totalPrice,
       savings: packages.days30.totalSavings,
@@ -297,41 +286,70 @@ export default function PricingPackagesSection({
   ];
 
   return (
-    <section id="pricing-packages" className={cn('py-20 md:py-28 relative overflow-hidden bg-background text-foreground', className)}>
-      {/* Background glow ornaments */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(ellipse_at_top,rgba(225,29,72,0.15),transparent_70%)] pointer-events-none" />
-      <div className="absolute -bottom-24 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/3 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
+    <section id="pricing-packages" className={cn('py-20 md:py-32 relative overflow-hidden bg-[#04060d] text-white', className)}>
+      
+      {/* 1. 3D Motion Graphics Scene (Three.js WebGL Hologram Torus & Kinetic Value Nodes) */}
+      <Pricing3DScene />
 
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
+      {/* 2. Multi-layered Radiant Aurora Lighting */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[450px] bg-[radial-gradient(ellipse_at_top,rgba(124,58,237,0.18),transparent_70%)] pointer-events-none" />
+      <div className="absolute top-1/3 left-10 w-[450px] h-[450px] bg-blue-600/10 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-20 right-10 w-[500px] h-[500px] bg-rose-600/10 rounded-full blur-[140px] pointer-events-none" />
+
+      {/* 3. Futuristic Grid Pattern */}
+      <div 
+        className="absolute inset-0 opacity-[0.07] pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
+          backgroundSize: '48px 48px'
+        }}
+      />
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
+        
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-10">
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-[0.2em] shadow-sm backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5" />
-            Transparent Home Care Pricing
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="text-center max-w-3xl mx-auto space-y-5 mb-12"
+        >
+          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full glassmorphic border border-violet-500/30 bg-violet-950/40 text-violet-300 text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_25px_rgba(124,58,237,0.2)]">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>Transparent Home Care Pricing</span>
           </div>
           
-          <h2 className="font-headline text-3xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15]">
-            Aries PhysioCare <span className="premium-gradient-text">Treatment Packages</span>
+          <h2 className="font-headline text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.08] text-white">
+            Aries PhysioCare <br className="hidden sm:inline" />
+            <span className="bg-gradient-to-r from-blue-400 via-violet-300 to-amber-300 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(99,102,241,0.3)]">
+              Treatment Packages
+            </span>
           </h2>
           
-          <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
+          <p className="text-slate-300/80 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-normal">
             Hospital-grade home physiotherapy delivered by certified BPT/MPT specialists with advanced electrotherapy modalities. Transparent single visit rates and guaranteed decreasing per-day charges on all multi-day packages.
           </p>
-        </div>
+        </motion.div>
 
         {/* ── LOCATION AUTO-DETECTOR & SEARCH BAR ── */}
-        <div className="max-w-3xl mx-auto mb-10 space-y-3">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.15 }}
+          className="max-w-3xl mx-auto mb-10 space-y-3.5"
+        >
           <div className="relative">
-            <div className="relative flex items-center gap-2">
+            <div className="relative flex items-center gap-2.5">
               <div className="relative flex-1 flex items-center">
-                <Search className="w-5 h-5 absolute left-4 text-primary pointer-events-none" />
+                <Search className="w-5 h-5 absolute left-4 text-cyan-400 pointer-events-none" />
                 <input
                   type="text"
                   value={localitySearch}
                   onChange={handleSearchChange}
                   placeholder="Search your Area, Locality, City or 6-Digit Pincode (e.g. Bandra, South Mumbai, Indiranagar, 400050)..."
-                  className="w-full h-14 pl-12 pr-4 bg-card/80 border-2 border-border/80 focus:border-primary rounded-2xl text-sm md:text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-4 focus:ring-primary/20 shadow-xl backdrop-blur-xl transition-all"
+                  className="w-full h-15 pl-12 pr-14 bg-slate-950/80 border border-white/15 focus:border-cyan-400/80 rounded-2xl text-sm sm:text-base text-white placeholder:text-slate-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/20 shadow-2xl backdrop-blur-2xl transition-all"
                 />
                 {localitySearch && (
                   <button
@@ -339,7 +357,7 @@ export default function PricingPackagesSection({
                       setLocalitySearch('');
                       setSelectedLocality(null);
                     }}
-                    className="absolute right-4 text-xs font-bold uppercase text-muted-foreground hover:text-foreground px-2.5 py-1 rounded-lg bg-secondary/80"
+                    className="absolute right-4 text-xs font-bold uppercase text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-white/10 transition-colors"
                   >
                     Clear
                   </button>
@@ -351,13 +369,13 @@ export default function PricingPackagesSection({
                 type="button"
                 onClick={handleGPSDetect}
                 disabled={isDetectingLocation}
-                className="h-14 px-4 sm:px-5 rounded-2xl bg-primary/10 hover:bg-primary/20 border-2 border-primary/30 text-primary font-bold text-xs shrink-0 flex items-center gap-2 transition-all shadow-md"
+                className="h-15 px-5 sm:px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 hover:brightness-110 border border-white/20 text-white font-bold text-xs sm:text-sm shrink-0 flex items-center gap-2 transition-all shadow-xl active:scale-95"
                 title="Detect my location automatically via GPS"
               >
                 {isDetectingLocation ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
                 ) : (
-                  <LocateFixed className="w-4 h-4 text-primary" />
+                  <LocateFixed className="w-4 h-4 text-cyan-300" />
                 )}
                 <span className="hidden sm:inline">Auto-Detect</span>
               </Button>
@@ -365,25 +383,25 @@ export default function PricingPackagesSection({
 
             {/* Instant Search Suggestions Dropdown */}
             {searchResults.length > 0 && !selectedLocality && (
-              <div className="absolute top-full left-0 right-0 mt-2 p-2 bg-card/95 border border-border rounded-2xl shadow-2xl backdrop-blur-2xl z-50 max-h-72 overflow-y-auto divide-y divide-border/40">
+              <div className="absolute top-full left-0 right-0 mt-2 p-2 bg-slate-950/95 border border-white/15 rounded-2xl shadow-2xl backdrop-blur-2xl z-50 max-h-72 overflow-y-auto divide-y divide-white/10">
                 {searchResults.map((loc, idx) => (
                   <button
                     key={`${loc.city}-${loc.subArea}-${idx}`}
                     onClick={() => handleSelectLocality(loc)}
-                    className="w-full p-3 text-left hover:bg-primary/5 rounded-xl flex items-center justify-between transition-colors group"
+                    className="w-full p-3 text-left hover:bg-white/10 rounded-xl flex items-center justify-between transition-colors group"
                   >
                     <div className="flex items-center gap-3">
-                      <MapPin className="w-4 h-4 text-primary shrink-0" />
+                      <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
                       <div>
-                        <div className="text-sm font-bold text-foreground group-hover:text-primary">
+                        <div className="text-sm font-bold text-white group-hover:text-cyan-300">
                           {loc.subArea}
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          {loc.city}, {loc.state} · <span className="font-mono text-primary">{loc.pincodes.join(', ')}</span>
+                        <div className="text-xs text-slate-400">
+                          {loc.city}, {loc.state} · <span className="font-mono text-cyan-400">{loc.pincodes.join(', ')}</span>
                         </div>
                       </div>
                     </div>
-                    <span className="text-xs font-black text-emerald-500 font-mono bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                    <span className="text-xs font-black text-emerald-400 font-mono bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-500/30">
                       ₹{loc.basePrice} / day
                     </span>
                   </button>
@@ -394,182 +412,157 @@ export default function PricingPackagesSection({
 
           {/* Quick Popular Localities Chips */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
-            <span className="text-muted-foreground shrink-0 flex items-center gap-1 font-semibold">
-              <MapPin className="w-3 h-3 text-primary" /> Quick Select:
+            <span className="text-slate-400 shrink-0 flex items-center gap-1 font-semibold">
+              <MapPin className="w-3.5 h-3.5 text-cyan-400" /> Quick Select:
             </span>
             {POPULAR_LOCALITIES.map((preset) => (
               <button
                 key={preset.label}
                 type="button"
                 onClick={() => handlePresetClick(preset)}
-                className="shrink-0 px-3 py-1.5 rounded-full bg-card hover:bg-primary/10 border border-border/80 hover:border-primary/40 text-muted-foreground hover:text-foreground transition-colors"
+                className="shrink-0 px-3.5 py-1.5 rounded-full bg-slate-950/70 hover:bg-white/15 border border-white/10 hover:border-cyan-400/40 text-slate-300 hover:text-white transition-all shadow-sm"
               >
                 {preset.label}
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* ── AUTO-DETECTED LOCATION & PER-DAY CHARGE HERO BANNER ── */}
-        <div className="max-w-4xl mx-auto mb-12 p-6 md:p-7 rounded-3xl bg-card/60 border border-primary/20 shadow-2xl backdrop-blur-xl">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="flex h-2.5 w-2.5 relative">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.96 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.25 }}
+          className="max-w-4xl mx-auto mb-14 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-slate-950/90 via-slate-900/90 to-slate-950/90 border border-white/15 shadow-2xl backdrop-blur-2xl relative overflow-hidden"
+        >
+          {/* Subtle Accent Glow */}
+          <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-cyan-500/10 via-violet-500/5 to-transparent pointer-events-none" />
+
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <span className="flex h-3 w-3 relative">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
                 </span>
-                <span className="text-xs font-bold text-primary uppercase tracking-wider">
+                <span className="text-xs font-black text-cyan-300 uppercase tracking-widest">
                   {detectionSource === 'gps' 
                     ? 'GPS Verified Location:' 
                     : (detectionSource === 'ip' ? 'Auto-Detected Location:' : 'Active Location Rates:')}
                 </span>
-                <Badge className="bg-primary/10 text-primary border-primary/20 text-xs font-bold font-sans">
+                <Badge className="bg-cyan-950/60 text-cyan-300 border-cyan-500/30 text-xs font-bold px-3 py-1 shadow-sm">
                   {activeLocationLabel}
                 </Badge>
               </div>
 
-              <p className="text-xs text-muted-foreground leading-relaxed max-w-lg">
+              <p className="text-xs sm:text-[13px] text-slate-300 leading-relaxed max-w-lg">
                 Includes verified BPT/MPT physiotherapist in-home visit, comprehensive physical examination, personalized rehabilitation roadmap, and hospital-grade electrotherapy gear (IFT/TENS/Ultrasound) at your home.
               </p>
             </div>
 
             {/* Per-Day Single Session Charge Box */}
-            <div className="p-4 md:p-5 rounded-2xl bg-background/80 border border-primary/20 shrink-0 text-center md:text-right w-full md:w-auto shadow-xl">
-              <div className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+            <div className="p-5 rounded-2xl bg-slate-950/90 border border-white/15 shrink-0 text-center md:text-right w-full md:w-auto shadow-2xl">
+              <div className="text-[11px] font-black uppercase tracking-wider text-slate-400">
                 Single Session (Per Day)
               </div>
-              <div className="text-3xl md:text-4xl font-black font-mono text-emerald-500 mt-0.5">
+              <div className="text-3xl sm:text-4xl font-black font-mono text-emerald-400 mt-1 tracking-tight">
                 ₹{currentTier.basePrice.toLocaleString('en-IN')}
-                <span className="text-xs text-muted-foreground font-sans font-normal ml-1">/ day</span>
+                <span className="text-xs text-slate-400 font-sans font-normal ml-1">/ day</span>
               </div>
-              <div className="text-[10px] text-muted-foreground mt-1">
-                No advance registration charges
+              <div className="text-[10px] font-semibold text-slate-400 mt-1 flex items-center justify-center md:justify-end gap-1">
+                <ShieldCheck className="w-3 h-3 text-cyan-400" /> No advance registration charges
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* ── 4 MULTI-DAY RECOVERY PACKAGES ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
-          {packageCards.map((pkg) => (
-            <Card
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-7 max-w-7xl mx-auto mb-16">
+          {packageCards.map((pkg, index) => (
+            <PricingPackageCard
               key={pkg.key}
-              className={cn(
-                'relative flex flex-col justify-between overflow-hidden rounded-3xl border transition-all duration-300 group hover:-translate-y-2',
-                pkg.popular
-                  ? 'bg-card border-primary shadow-2xl shadow-primary/10 ring-2 ring-primary/30'
-                  : 'bg-card/70 hover:bg-card border-border/80 hover:border-primary/40 shadow-xl'
-              )}
-            >
-              {/* Top Banner for Best Value */}
-              {pkg.popular && (
-                <div className="w-full bg-gradient-to-r from-primary via-rose-500 to-pink-500 py-1.5 text-center text-[11px] font-black uppercase tracking-widest text-white shadow-md">
-                  ★ Most Popular · Maximum Recovery
-                </div>
-              )}
-
-              <CardContent className="p-6 md:p-7 flex flex-col justify-between h-full space-y-6">
-                {/* Header info */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Badge variant="outline" className={cn('text-[11px] font-black uppercase tracking-wider px-2.5 py-1', pkg.badgeClass)}>
-                      {pkg.badge}
-                    </Badge>
-                    <Badge variant="outline" className="text-[10px] border-emerald-500/30 text-emerald-500 font-bold bg-emerald-500/10">
-                      Save ₹{pkg.savings.toLocaleString('en-IN')}
-                    </Badge>
-                  </div>
-
-                  <div>
-                    <h3 className="font-headline text-lg font-bold text-foreground group-hover:text-primary transition-colors">
-                      {pkg.title}
-                    </h3>
-                    <p className="text-muted-foreground text-xs mt-1 leading-relaxed">
-                      {pkg.description}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Pricing Box */}
-                <div className="p-4 rounded-2xl bg-secondary/40 border border-border/50 space-y-2">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-xs text-muted-foreground">Rate / Day</span>
-                    <div className="text-right">
-                      <span className="text-2xl font-black font-mono text-foreground">
-                        ₹{pkg.rate.toLocaleString('en-IN')}
-                      </span>
-                      <span className="text-xs text-muted-foreground font-sans ml-1">/ day</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-border/40 text-xs">
-                    <span className="text-muted-foreground">Total ({pkg.days} Days)</span>
-                    <span className="text-base font-black text-emerald-500 font-mono">
-                      ₹{pkg.total.toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Features list */}
-                <div className="space-y-2.5 text-xs text-foreground/80">
-                  {pkg.features.map((feat, fIdx) => (
-                    <div key={fIdx} className="flex items-start gap-2">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
-                      <span className="leading-snug">{feat}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Booking Button */}
-                <Button
-                  asChild
-                  className={cn(
-                    'w-full h-12 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300',
-                    pkg.popular
-                      ? 'bg-gradient-to-r from-primary to-rose-600 hover:from-primary/90 hover:to-rose-500 text-white shadow-lg shadow-primary/25'
-                      : 'bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/20 hover:border-primary'
-                  )}
-                >
-                  <Link href={`/book-appointment?location=${encodeURIComponent(activeLocationLabel)}&package=${pkg.days}`}>
-                    Book {pkg.days}-Day Plan
-                    <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
+              pkg={pkg}
+              activeLocationLabel={activeLocationLabel}
+              index={index}
+            />
           ))}
         </div>
 
-        {/* ── BOTTOM CONSULTATION CALLOUT ── */}
-        <div className="max-w-4xl mx-auto p-6 md:p-8 rounded-3xl bg-card/60 border border-border shadow-2xl backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start gap-2 text-primary font-bold text-xs uppercase tracking-wider">
-              <CalendarCheck className="w-4 h-4" />
-              Custom Rehabilitation Consultation
+        {/* ── CLINICAL ASSURANCES & TRANSPARENCY METRICS ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.4 }}
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-5xl mx-auto mb-12"
+        >
+          <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/10 flex items-center gap-3 backdrop-blur-md">
+            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5 text-cyan-400" />
             </div>
-            <h4 className="font-headline text-xl font-black text-foreground">
+            <div>
+              <div className="text-xs font-bold text-white">Same Therapist Continuity</div>
+              <div className="text-[11px] text-slate-400">1-on-1 dedicated care throughout plan</div>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/10 flex items-center gap-3 backdrop-blur-md">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
+              <RotateCcw className="w-5 h-5 text-amber-400" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-white">Unused Session Refund</div>
+              <div className="text-[11px] text-slate-400">Zero lock-in penalties on early recovery</div>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/10 flex items-center gap-3 backdrop-blur-md">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
+              <Zap className="w-5 h-5 text-emerald-400" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-white">All Modalities Included</div>
+              <div className="text-[11px] text-slate-400">IFT, TENS & Ultrasound carried to home</div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── BOTTOM CONSULTATION CALLOUT ── */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.5 }}
+          className="max-w-4xl mx-auto p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-slate-950/90 via-violet-950/40 to-slate-950/90 border border-violet-500/30 shadow-2xl backdrop-blur-2xl flex flex-col md:flex-row items-center justify-between gap-6"
+        >
+          <div className="space-y-2 text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start gap-2 text-amber-300 font-bold text-xs uppercase tracking-wider">
+              <CalendarCheck className="w-4 h-4" />
+              <span>Custom Rehabilitation Consultation</span>
+            </div>
+            <h4 className="font-headline text-xl sm:text-2xl font-black text-white">
               Need Help Choosing Your Recovery Plan?
             </h4>
-            <p className="text-xs text-muted-foreground max-w-md">
+            <p className="text-xs sm:text-sm text-slate-300 max-w-md">
               Speak directly with our clinical physiotherapists for a free tele-consultation and personalized recovery assessment for your area.
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            <Button asChild variant="outline" className="h-12 px-6 border-border hover:bg-secondary text-foreground font-bold text-xs uppercase tracking-wider rounded-xl">
+          <div className="flex flex-col sm:flex-row gap-3.5 w-full md:w-auto">
+            <Button asChild variant="outline" className="h-13 px-6 border-white/20 hover:bg-white/10 text-white font-bold text-xs uppercase tracking-wider rounded-2xl">
               <a href="tel:+919136447006" className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-emerald-500" />
-                Call +91 9136447006
+                <Phone className="w-4 h-4 text-emerald-400" />
+                <span>Call +91 9136447006</span>
               </a>
             </Button>
-            <Button asChild className="h-12 px-8 bg-gradient-to-r from-primary to-rose-600 hover:from-primary/90 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20">
+            <Button asChild className="h-13 px-8 bg-gradient-to-r from-blue-600 via-violet-600 to-rose-600 hover:brightness-110 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-xl shadow-violet-600/30">
               <Link href={`/book-appointment?location=${encodeURIComponent(activeLocationLabel)}`}>
                 Book Home Assessment
               </Link>
             </Button>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
