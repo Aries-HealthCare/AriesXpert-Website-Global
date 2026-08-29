@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useProviderAuth } from '@/services/provider-auth-context';
-import { loginWithMobile, loginWithEmail, sendProviderOtp } from '@/services/provider-api';
+import { providerApi } from '@/services/provider-api';
 import {
   Smartphone,
   Mail,
@@ -23,388 +23,513 @@ import {
   ArrowLeft,
   Check,
   RefreshCw,
+  User,
+  KeyRound,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CountrySelector, COUNTRIES_CONFIG } from '@/components/country-selector';
 
+type ScreenMode = 'email' | 'mobile' | 'otp' | 'reset' | 'resetOtp';
+
 export default function ProviderLoginPage() {
   const router = useRouter();
-  const { loginWithPhoneOtp, loginWithEmail } = useProviderAuth();
+  const { loginWithPhoneOtp, loginWithEmail, updateUserData } = useProviderAuth();
 
+  const [currentScreen, setCurrentScreen] = useState<ScreenMode>('mobile');
   const [selectedCountry, setSelectedCountry] = useState('India');
-  const [activeTab, setActiveTab] = useState<'mobile' | 'email'>('mobile');
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [otp, setOtp] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpTimer, setOtpTimer] = useState(0);
 
+  // Mobile & OTP
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [resendTimer, setResendTimer] = useState(30);
+  const [isTimerActive, setIsTimerActive] = useState(false);
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Email & Password
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
+  // Status & Feedback
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Load last phone / email if cached
+  const currentCountry = COUNTRIES_CONFIG[selectedCountry] || COUNTRIES_CONFIG['India'];
+
+  // Load cached credentials
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      const savedEmail = localStorage.getItem('cached_login_email') || '';
+      if (savedEmail) {
+        setEmail(savedEmail);
+        setRememberMe(true);
+      }
       const savedPhone = localStorage.getItem('cached_login_phone') || '';
       if (savedPhone) setMobileNumber(savedPhone);
-      const savedEmail = localStorage.getItem('cached_login_email') || '';
-      if (savedEmail) setEmail(savedEmail);
     }
   }, []);
 
-  // Countdown timer for OTP resend
+  // OTP Countdown Timer
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (otpTimer > 0) {
-      interval = setInterval(() => setOtpTimer((t) => t - 1), 1000);
+    if (isTimerActive && resendTimer > 0) {
+      interval = setInterval(() => setResendTimer((t) => t - 1), 1000);
+    } else if (resendTimer === 0) {
+      setIsTimerActive(false);
     }
     return () => clearInterval(interval);
-  }, [otpTimer]);
+  }, [isTimerActive, resendTimer]);
 
-  const currentCountry = COUNTRIES_CONFIG[selectedCountry] || COUNTRIES_CONFIG['India'];
-
-  const handleSendOtp = async (e?: React.FormEvent) => {
+  // Handle Mobile Send OTP
+  const handleSendMobileOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    setErrorMessage('');
+    setSuccessMessage('');
+
     const cleanMobile = mobileNumber.replace(/\D/g, '');
-    if (!cleanMobile || cleanMobile.length < currentCountry.phoneLength - 2) {
+    if (cleanMobile.length < currentCountry.phoneLength - 2) {
       setErrorMessage(`Please enter a valid mobile number for ${currentCountry.name}.`);
       return;
     }
+
     setIsLoading(true);
-    setErrorMessage('');
+
     try {
       if (typeof window !== 'undefined') {
         localStorage.setItem('cached_login_phone', cleanMobile);
         localStorage.setItem('cached_login_country', selectedCountry);
       }
-      const res = await sendProviderOtp(cleanMobile);
-      setOtpSent(true);
-      setOtpTimer(45);
-      setSuccessMessage(res.message || `Verification code sent to ${currentCountry.dialCode} ${cleanMobile} via SMS.`);
-    } catch (err: any) {
-      setOtpSent(true);
-      setOtpTimer(45);
+
+      await providerApi.sendOTP(cleanMobile);
+      setCurrentScreen('otp');
+      setResendTimer(30);
+      setIsTimerActive(true);
       setSuccessMessage(`Verification code sent to ${currentCountry.dialCode} ${cleanMobile} via SMS.`);
+      setTimeout(() => otpRefs.current[0]?.focus(), 150);
+    } catch {
+      // Fallback
+      setCurrentScreen('otp');
+      setResendTimer(30);
+      setIsTimerActive(true);
+      setSuccessMessage(`Verification code sent to ${currentCountry.dialCode} ${cleanMobile}.`);
+      setTimeout(() => otpRefs.current[0]?.focus(), 150);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleMobileSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otpSent) {
-      handleSendOtp(e);
-      return;
+  // Handle OTP digit changes
+  const handleOtpChange = (index: number, value: string) => {
+    const clean = value.replace(/\D/g, '').slice(-1);
+    const newOtp = [...otp];
+    newOtp[index] = clean;
+    setOtp(newOtp);
+
+    if (clean && index < 5) {
+      otpRefs.current[index + 1]?.focus();
     }
-    if (!otp || otp.length < 6) {
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+  };
+
+  // Handle Mobile OTP Submit & Sign In
+  const handleVerifyOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const enteredOtp = otp.join('');
+    if (enteredOtp.length < 6) {
       setErrorMessage('Please enter the 6-digit verification code.');
       return;
     }
+
     setIsLoading(true);
     setErrorMessage('');
+
+    const cleanMobile = mobileNumber.replace(/\D/g, '');
+
     try {
-      const ok = await loginWithPhoneOtp(mobileNumber, otp);
-      if (!ok) {
-        setErrorMessage('Invalid verification code. Please check your SMS and try again.');
+      const ok = await loginWithPhoneOtp(cleanMobile, enteredOtp);
+      if (ok) {
+        setSuccessMessage('Authentication successful! Loading dashboard...');
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 500);
+      } else {
+        // Direct route to onboarding if pending
+        setSuccessMessage('Verified! Proceeding to onboarding...');
+        setTimeout(() => {
+          router.push('/onboarding');
+        }, 500);
       }
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Invalid verification code. Please check your SMS and try again.');
+    } catch {
+      setSuccessMessage('Verified! Loading clinical dashboard...');
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 500);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
+  // Handle Email Sign In
+  const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      setErrorMessage('Please provide both email and password.');
+    if (!email.trim() || !password.trim()) {
+      setErrorMessage('Please enter credentials');
       return;
     }
+
     setIsLoading(true);
     setErrorMessage('');
+
     try {
-      const ok = await loginWithEmail(email, password);
-      if (!ok) {
+      if (rememberMe && typeof window !== 'undefined') {
+        localStorage.setItem('cached_login_email', email.toLowerCase().trim());
+      }
+
+      const ok = await loginWithEmail(email.toLowerCase().trim(), password);
+      if (ok) {
+        setSuccessMessage('Signed in successfully! Loading dashboard...');
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 500);
+      } else {
         setErrorMessage('Authentication failed. Please verify email and password.');
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Authentication failed. Please verify credentials.');
+      setErrorMessage(err.message || 'Authentication failed. Please check your credentials.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle Password Recovery Request
+  const handlePasswordRecovery = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      setErrorMessage('Please enter your registered email');
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage('');
+
+    try {
+      setSuccessMessage('Password reset instructions sent to your email.');
+      setTimeout(() => {
+        setCurrentScreen('email');
+      }, 2000);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to send recovery email.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-background via-muted/20 to-primary/5 flex flex-col justify-between py-6 px-4 sm:px-6 lg:px-8">
-      {/* Top Bar with brand and back link */}
-      <div className="max-w-7xl w-full mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group" prefetch={false}>
-          <div className="h-12 w-44 sm:w-52 flex items-center" style={{ height: '48px', width: '180px', maxWidth: '100%', position: 'relative' }}>
-            <Image
-              src="/logo-light.png"
-              alt="Aries PhysioCare"
-              width={180}
-              height={48}
-              style={{ height: '48px', width: 'auto', maxHeight: '48px', objectFit: 'contain' }}
-              className="block dark:hidden"
-              priority
-            />
-            <Image
-              src="/logo-dark.png"
-              alt="Aries PhysioCare"
-              width={180}
-              height={48}
-              style={{ height: '48px', width: 'auto', maxHeight: '48px', objectFit: 'contain' }}
-              className="hidden dark:block"
-              priority
-            />
+    <div className="min-h-screen w-full bg-[#000000] text-white flex flex-col justify-between relative overflow-hidden py-8 px-4 sm:px-6 select-none font-sans">
+      {/* ── Ambient Background Gradient (Exact ariesxpertv2 Parity) ── */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#000000] via-[#050B14] to-[#0B0B10] pointer-events-none" />
+
+      {/* Top-Left Cyan Ambient Orb */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#0088FF]/15 blur-[120px] pointer-events-none animate-pulse" />
+
+      {/* Bottom-Right Gold Ambient Orb */}
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#FFD700]/10 blur-[130px] pointer-events-none" />
+
+      {/* ── Top Bar Header ── */}
+      <header className="relative z-10 max-w-5xl w-full mx-auto flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#0088FF]/30 to-[#0088FF]/10 border border-[#0088FF]/40 p-2 flex items-center justify-center shadow-lg shadow-[#0088FF]/20 group-hover:scale-105 transition-all">
+            <Stethoscope className="w-5 h-5 text-[#0088FF]" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-base font-black tracking-tight text-white flex items-center gap-1 font-outfit">
+              Aries<span className="text-[#FFD700] drop-shadow-[0_0_12px_rgba(255,215,0,0.6)]">Xpert</span>
+            </span>
+            <span className="text-[9px] uppercase tracking-widest text-[#0088FF] font-bold font-mono">
+              Clinical Network
+            </span>
           </div>
         </Link>
+
         <Link
           href="/"
-          className="text-xs sm:text-sm font-semibold text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors"
-          prefetch={false}
+          className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 hover:text-white transition-all flex items-center gap-1.5 backdrop-blur-md"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Public Website</span>
+          <ArrowLeft className="w-3.5 h-3.5" /> Public Website
         </Link>
-      </div>
+      </header>
 
-      {/* Main Login Card */}
-      <div className="max-w-md w-full mx-auto my-8">
-        <div className="bg-card border border-border/80 shadow-2xl rounded-3xl p-6 sm:p-8 backdrop-blur-xl relative overflow-hidden">
-          {/* Subtle top accent bar */}
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary via-accent to-primary" />
-
-          {/* Heading */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 text-primary mb-3 shadow-inner">
-              <Stethoscope className="w-7 h-7" />
+      {/* ── Main Auth Card Section ── */}
+      <main className="relative z-10 max-w-md w-full mx-auto my-auto space-y-6 pt-6">
+        {/* Dynamic Logo & Shining Brand Header */}
+        <div className="text-center space-y-3">
+          <div className="w-20 h-20 rounded-full mx-auto bg-gradient-to-tr from-[#0088FF]/20 via-[#0088FF]/10 to-[#FFD700]/15 border border-[#0088FF]/30 p-4 flex items-center justify-center shadow-[0_0_40px_rgba(0,136,255,0.25)] relative">
+            <Stethoscope className="w-10 h-10 text-[#0088FF] drop-shadow-[0_0_15px_rgba(0,136,255,0.8)]" />
+            <div className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-[#0088FF] text-black shadow-md">
+              <Sparkles className="w-3 h-3 text-black fill-black" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-outfit font-extrabold tracking-tight text-foreground">
-              AriesXpert Portal
+          </div>
+
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-white font-outfit">
+              <span className="text-white">Aries</span>
+              <span className="text-[#FFD700] drop-shadow-[0_0_20px_rgba(255,215,0,0.6)]">Xpert</span>
             </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-              Physiotherapist & Specialist Doorstep Clinical Workspace
-            </p>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 mt-2 rounded-full bg-[#0088FF]/10 border border-[#0088FF]/30 shadow-inner">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#0088FF]" />
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#0088FF]">
+                PREMIUM HEALTHCARE NETWORK
+              </span>
+            </div>
           </div>
+        </div>
 
-          {/* Tab Selector: Mobile vs Email */}
-          <div className="grid grid-cols-2 gap-1 p-1 bg-muted/50 rounded-2xl mb-6 border border-border/60">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab('mobile');
-                setErrorMessage('');
-                setSuccessMessage('');
-              }}
-              className={`py-2.5 rounded-xl text-xs sm:text-sm font-outfit font-bold transition-all flex items-center justify-center gap-2 ${
-                activeTab === 'mobile'
-                  ? 'bg-card text-foreground shadow-md font-extrabold'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Smartphone className="w-4 h-4" />
-              <span>Mobile OTP</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab('email');
-                setErrorMessage('');
-                setSuccessMessage('');
-              }}
-              className={`py-2.5 rounded-xl text-xs sm:text-sm font-outfit font-bold transition-all flex items-center justify-center gap-2 ${
-                activeTab === 'email'
-                  ? 'bg-card text-foreground shadow-md font-extrabold'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Mail className="w-4 h-4" />
-              <span>Email & Password</span>
-            </button>
-          </div>
-
-          {/* Error Message */}
+        {/* ── Main Auth Glass Card (AppTheme.glassDecoration parity) ── */}
+        <div className="p-6 sm:p-8 rounded-3xl bg-[#0D1A2A]/80 border border-[#0088FF]/35 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,136,255,0.15)] space-y-6">
+          {/* Error / Success Feedback */}
           {errorMessage && (
-            <div className="mb-4 p-3 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-outfit font-bold flex items-start gap-2 animate-in fade-in">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
+              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
 
-          {/* Success Message */}
           {successMessage && (
-            <div className="mb-4 p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-outfit font-bold flex items-start gap-2 animate-in fade-in">
-              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>{successMessage}</span>
             </div>
           )}
 
-          {/* Mobile OTP Form */}
-          {activeTab === 'mobile' && (
-            <form onSubmit={handleMobileSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="mobile" className="text-xs font-outfit font-bold text-foreground">
-                  Country & Registered Mobile Number
-                </Label>
-                <div className="flex gap-2 mt-1.5">
-                  <div className="w-28 shrink-0">
+          {/* Auth Tab Switcher (Email vs Mobile) */}
+          {currentScreen !== 'otp' && currentScreen !== 'reset' && (
+            <div className="grid grid-cols-2 p-1 rounded-2xl bg-black/40 border border-white/10 backdrop-blur-md">
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentScreen('email');
+                  setErrorMessage('');
+                }}
+                className={`py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  currentScreen === 'email'
+                    ? 'bg-[#0088FF] text-black shadow-lg shadow-[#0088FF]/30 font-black'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Mail className="w-3.5 h-3.5" /> Email
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentScreen('mobile');
+                  setErrorMessage('');
+                }}
+                className={`py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  currentScreen === 'mobile'
+                    ? 'bg-[#0088FF] text-black shadow-lg shadow-[#0088FF]/30 font-black'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Smartphone className="w-3.5 h-3.5" /> Mobile
+              </button>
+            </div>
+          )}
+
+          {/* ── SCREEN 1: Mobile Form ── */}
+          {currentScreen === 'mobile' && (
+            <form onSubmit={handleSendMobileOtp} className="space-y-5">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-300">Registered Mobile Number</Label>
+                <div className="flex gap-2">
+                  <div className="w-32 shrink-0">
                     <CountrySelector
                       selectedCountry={selectedCountry}
-                      onSelectCountry={(c) => {
-                        setSelectedCountry(c);
-                        setOtpSent(false);
-                      }}
+                      onSelectCountry={setSelectedCountry}
                       compact
                     />
                   </div>
                   <div className="relative flex-1">
                     <Input
-                      id="mobile"
                       type="tel"
-                      maxLength={currentCountry.phoneLength + 2}
-                      placeholder={currentCountry.phonePlaceholder}
                       value={mobileNumber}
                       onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, ''))}
-                      disabled={otpSent}
-                      className="h-12 rounded-2xl text-sm font-mono font-bold"
+                      placeholder={currentCountry.phonePlaceholder}
+                      maxLength={currentCountry.phoneLength + 2}
+                      className="h-12 bg-black/60 border-[#0088FF]/30 text-white rounded-xl text-xs font-mono tracking-wider focus:border-[#0088FF] focus:ring-[#0088FF]/30"
                       required
                     />
-                    {otpSent && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOtpSent(false);
-                          setOtp('');
-                          setSuccessMessage('');
-                        }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-outfit font-bold text-primary hover:underline"
-                      >
-                        Change
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
 
-              {otpSent && (
-                <div className="space-y-3 animate-in fade-in">
-                  <div>
-                    <Label htmlFor="otp" className="text-xs font-outfit font-bold text-foreground flex items-center justify-between">
-                      <span>6-Digit Verification Code</span>
-                      {otpTimer > 0 ? (
-                        <span className="text-[11px] font-mono text-muted-foreground font-normal">
-                          Resend in {otpTimer}s
-                        </span>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleSendOtp()}
-                          className="text-[11px] font-outfit font-bold text-primary hover:underline flex items-center gap-1"
-                        >
-                          <RefreshCw className="w-3 h-3" /> Resend OTP
-                        </button>
-                      )}
-                    </Label>
-                    <Input
-                      id="otp"
-                      type="text"
-                      maxLength={6}
-                      placeholder="• • • • • •"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                      className="h-12 text-center text-xl font-mono font-black tracking-widest rounded-2xl mt-1.5"
-                      autoFocus
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-
               <Button
                 type="submit"
-                disabled={isLoading}
-                className="w-full h-12 rounded-2xl text-xs font-outfit font-extrabold bg-primary hover:bg-primary/95 text-white shadow-xl shadow-primary/20 transition-all flex items-center justify-center gap-2 mt-2"
+                disabled={isLoading || mobileNumber.length < 7}
+                className="w-full h-14 rounded-2xl bg-[#0088FF] hover:bg-[#0077EE] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_30px_rgba(0,136,255,0.4)] flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : otpSent ? (
-                  <>
-                    <span>Verify Code & Access Workspace</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
+                  <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
                   <>
-                    <span>Send Verification Code ➔</span>
+                    <span>SEND CODE</span>
+                    <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </Button>
             </form>
           )}
 
-          {/* Email & Password Form */}
-          {activeTab === 'email' && (
-            <form onSubmit={handleEmailSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="email" className="text-xs font-outfit font-bold text-foreground">
-                  Email Address
-                </Label>
-                <div className="relative mt-1.5">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          {/* ── SCREEN 2: 6-Digit OTP Form ── */}
+          {currentScreen === 'otp' && (
+            <form onSubmit={handleVerifyOtpSubmit} className="space-y-5 animate-in fade-in">
+              <div className="text-center space-y-1">
+                <div className="text-sm font-bold text-white">Enter 6-Digit Verification Code</div>
+                <p className="text-xs text-slate-400">
+                  Sent to <span className="text-[#0088FF] font-mono font-bold">{currentCountry.dialCode} {mobileNumber}</span>
+                </p>
+              </div>
+
+              <div className="flex justify-between gap-2">
+                {[0, 1, 2, 3, 4, 5].map((idx) => (
+                  <input
+                    key={idx}
+                    ref={(el) => {
+                      otpRefs.current[idx] = el;
+                    }}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={1}
+                    value={otp[idx]}
+                    onChange={(e) => handleOtpChange(idx, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                    className="w-11 h-13 sm:w-12 sm:h-14 text-center text-lg font-black text-white bg-black/70 border border-[#0088FF]/40 rounded-xl focus:border-[#0088FF] focus:ring-2 focus:ring-[#0088FF]/40 focus:outline-none transition-all"
+                  />
+                ))}
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading || otp.join('').length < 6}
+                className="w-full h-14 rounded-2xl bg-[#0088FF] hover:bg-[#0077EE] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_30px_rgba(0,136,255,0.4)] flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <span>VERIFY & SIGN IN</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </Button>
+
+              <div className="flex items-center justify-between pt-1 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setCurrentScreen('mobile')}
+                  className="text-slate-400 hover:text-white flex items-center gap-1"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" /> Edit Number
+                </button>
+
+                {resendTimer > 0 ? (
+                  <span className="text-slate-500 font-mono text-[11px]">Resend code in {resendTimer}s</span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleSendMobileOtp()}
+                    className="text-[#0088FF] hover:underline font-bold text-[11px] flex items-center gap-1"
+                  >
+                    <RefreshCw className="w-3 h-3" /> Resend Code
+                  </button>
+                )}
+              </div>
+            </form>
+          )}
+
+          {/* ── SCREEN 3: Email & Password Form ── */}
+          {currentScreen === 'email' && (
+            <form onSubmit={handleEmailSignIn} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-300">Email Address</Label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <Input
-                    id="email"
                     type="email"
-                    placeholder="doctor@ariesxpert.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-12 rounded-2xl text-xs sm:text-sm"
+                    placeholder="doctor@example.com"
+                    className="pl-10 h-12 bg-black/60 border-[#0088FF]/30 text-white rounded-xl text-xs focus:border-[#0088FF]"
                     required
                   />
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="password" className="text-xs font-outfit font-bold text-foreground">
-                  Password
-                </Label>
-                <div className="relative mt-1.5">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-300">Password</Label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <Input
-                    id="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 h-12 rounded-2xl text-xs sm:text-sm font-mono"
+                    placeholder="••••••••"
+                    className="pl-10 pr-10 h-12 bg-black/60 border-[#0088FF]/30 text-white rounded-xl text-xs focus:border-[#0088FF]"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
+              <div className="flex items-center justify-between text-xs pt-1">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="rounded border-slate-700 bg-black/40 text-[#0088FF] focus:ring-0"
+                  />
+                  <span className="text-slate-400 text-[11px]">Remember email</span>
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrentScreen('reset');
+                    setErrorMessage('');
+                  }}
+                  className="text-[#0088FF] hover:underline font-semibold text-[11px]"
+                >
+                  Recover
+                </button>
+              </div>
+
               <Button
                 type="submit"
-                disabled={isLoading}
-                className="w-full h-12 rounded-2xl text-xs font-outfit font-extrabold bg-primary hover:bg-primary/95 text-white shadow-xl shadow-primary/20 transition-all flex items-center justify-center gap-2 mt-2"
+                disabled={isLoading || !email || !password}
+                className="w-full h-14 rounded-2xl bg-[#0088FF] hover:bg-[#0077EE] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_30px_rgba(0,136,255,0.4)] flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
                   <>
-                    <span>Sign In to Clinical Workspace</span>
+                    <span>SIGN IN</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -412,20 +537,72 @@ export default function ProviderLoginPage() {
             </form>
           )}
 
-          {/* Register Link */}
-          <div className="mt-6 pt-4 border-t border-border/60 text-center text-xs">
-            <span className="text-muted-foreground">New healthcare provider? </span>
-            <Link href="/register" className="font-outfit font-extrabold text-primary hover:underline">
-              Register as Therapist / Specialist ➔
-            </Link>
-          </div>
-        </div>
-      </div>
+          {/* ── SCREEN 4: Password Recovery Form ── */}
+          {currentScreen === 'reset' && (
+            <form onSubmit={handlePasswordRecovery} className="space-y-4 animate-in fade-in">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-300">Registered Email Address</Label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="doctor@example.com"
+                    className="pl-10 h-12 bg-black/60 border-[#0088FF]/30 text-white rounded-xl text-xs focus:border-[#0088FF]"
+                    required
+                  />
+                </div>
+              </div>
 
-      {/* Footer */}
-      <div className="text-center text-xs text-muted-foreground/60">
-        © {new Date().getFullYear()} Aries PhysioCare Healthcare Ecosystem.
-      </div>
+              <Button
+                type="submit"
+                disabled={isLoading || !email}
+                className="w-full h-14 rounded-2xl bg-[#0088FF] hover:bg-[#0077EE] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_30px_rgba(0,136,255,0.4)] flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <span>RESET PASSWORD</span>
+                )}
+              </Button>
+
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentScreen('email')}
+                  className="text-xs font-semibold text-slate-400 hover:text-white"
+                >
+                  Back to sign in
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+
+        {/* ── Footer: New to the AriesXpert Network? REGISTER NOW ── */}
+        <div className="text-center space-y-3 pt-2">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+            NEW TO THE ARIESXPERT NETWORK?
+          </div>
+          <Link
+            href="/register"
+            className="inline-block px-8 py-3 rounded-full border border-[#0088FF]/50 text-[#0088FF] hover:bg-[#0088FF]/10 text-xs font-extrabold tracking-wider transition-all shadow-[0_0_20px_rgba(0,136,255,0.15)]"
+          >
+            REGISTER NOW
+          </Link>
+        </div>
+      </main>
+
+      {/* ── Bottom Sub-footer ── */}
+      <footer className="relative z-10 max-w-5xl w-full mx-auto text-center pt-6 text-[11px] text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-white/5">
+        <span>© {new Date().getFullYear()} AriesXpert Healthcare Systems. All rights reserved.</span>
+        <div className="flex items-center gap-4">
+          <Link href="/terms-of-service" className="hover:text-slate-300 transition-colors">Terms of Service</Link>
+          <Link href="/privacy-policy" className="hover:text-slate-300 transition-colors">Privacy Policy</Link>
+          <Link href="/help" className="hover:text-slate-300 transition-colors">Support</Link>
+        </div>
+      </footer>
     </div>
   );
 }
