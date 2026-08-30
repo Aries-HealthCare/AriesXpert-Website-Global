@@ -18,11 +18,12 @@ import { services } from '@/lib/placeholder-data';
 import CityLandingPageTemplate from '@/components/location/city-page-template';
 import AreaLandingPageTemplate from '@/components/location/area-page-template';
 
-// ─── Generate ALL slugs: city pages + area pages + sub-area pages ───
+export const dynamicParams = true;
+export const revalidate = 86400; // 24 hours ISR cache
+
+// ─── Fast Production Builds: Pre-render core city hubs; render localities on-demand ───
 export async function generateStaticParams() {
-    const citySlugs = citySeoPages.map(city => ({ citySlug: city.pageSlug }));
-    const areaSlugs = getAllLocationPageSlugs().map(slug => ({ citySlug: slug }));
-    return [...citySlugs, ...areaSlugs];
+    return citySeoPages.map(city => ({ citySlug: city.pageSlug }));
 }
 
 // ─── Per-page metadata ────────────────────────────────────────────────
