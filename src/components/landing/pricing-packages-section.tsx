@@ -31,8 +31,12 @@ import {
   type PricingTier,
   type LocalityPricingRecord
 } from '@/lib/pricing-packages';
+import dynamic from 'next/dynamic';
 import { cn } from '@/lib/utils';
-import Pricing3DScene from './pricing-3d-scene';
+const Pricing3DScene = dynamic(() => import('./pricing-3d-scene'), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 pointer-events-none" />
+});
 import PricingPackageCard, { type PackageCardData } from './pricing-package-card';
 
 interface PricingPackagesSectionProps {

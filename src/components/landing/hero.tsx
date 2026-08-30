@@ -5,8 +5,13 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useRequestCallback } from '@/components/request-callback-provider';
 import BookAppointmentButton from "../book-appointment-button";
+import dynamic from "next/dynamic";
 import type { WebsiteStats } from "@/app/api/stats/route";
-import Hero3DScene from "./hero-3d-scene";
+
+const Hero3DScene = dynamic(() => import("./hero-3d-scene"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 pointer-events-none" />
+});
 import HeroInteractiveCard from "./hero-interactive-card";
 import { 
   ShieldCheck, 
