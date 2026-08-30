@@ -43,48 +43,6 @@ interface ReferredPatientItem {
   earningsGenerated: number;
 }
 
-const INITIAL_REFERRED_PATIENTS: ReferredPatientItem[] = [
-  {
-    id: 'ref_p1',
-    patientName: 'Mrs. Jayashree Kothari',
-    patientPhone: '+91 98204 55192',
-    condition: 'Post-TKR Left Knee Joint Replacement Rehab',
-    city: 'Mumbai',
-    area: 'Borivali West (400092)',
-    dateReferred: '14 Aug 2026',
-    visitsDone: 6,
-    totalVisits: 10,
-    status: 'In Treatment',
-    earningsGenerated: 468, // 6 visits * ₹78
-  },
-  {
-    id: 'ref_p2',
-    patientName: 'Mr. Hemant Somani',
-    patientPhone: '+91 98191 22340',
-    condition: 'Lumbar Canal Stenosis & Sciatica',
-    city: 'Mumbai',
-    area: 'Kandivali East (400101)',
-    dateReferred: '08 Aug 2026',
-    visitsDone: 10,
-    totalVisits: 10,
-    status: 'Treatment Completed',
-    earningsGenerated: 780, // 10 visits * ₹78
-  },
-  {
-    id: 'ref_p3',
-    patientName: 'Master Aarav Deshmukh',
-    patientPhone: '+91 98200 11982',
-    condition: 'Cerebral Palsy Pediatric Gait Training',
-    city: 'Mumbai',
-    area: 'Andheri West (400053)',
-    dateReferred: '20 Aug 2026',
-    visitsDone: 1,
-    totalVisits: 15,
-    status: 'In Treatment',
-    earningsGenerated: 78,
-  },
-];
-
 export default function ProviderReferPatientPage() {
   const { user } = useProviderAuth();
   const [referredList, setReferredList] = useState<ReferredPatientItem[]>([]);

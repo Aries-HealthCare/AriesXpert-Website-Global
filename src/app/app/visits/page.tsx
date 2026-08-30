@@ -90,7 +90,7 @@ export default function ProviderVisitsPage() {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [formMode, setFormMode] = useState<'dynamic' | 'soap'>('dynamic');
   const [selectedAssessmentForm, setSelectedAssessmentForm] = useState<DynamicAssessmentForm | null>(null);
-  const [treatmentSeconds, setTreatmentSeconds] = useState(1122); // 18m 42s default
+  const [treatmentSeconds, setTreatmentSeconds] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(true);
 
   // Treatment stopwatch timer

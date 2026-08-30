@@ -1490,21 +1490,21 @@ class ProviderApiService {
       });
       const data = await res.json();
       return data.result || data.data || {
-        coins: 500,
-        rank: 12,
-        weeklyScore: 3820,
-        completedQuests: 14,
-        streakDays: 8,
-        tier: 'Gold Specialist',
+        coins: 0,
+        rank: 1,
+        weeklyScore: 0,
+        completedQuests: 0,
+        streakDays: 0,
+        tier: 'Verified Practitioner',
       };
     } catch {
       return {
-        coins: 500,
-        rank: 12,
-        weeklyScore: 3820,
-        completedQuests: 14,
-        streakDays: 8,
-        tier: 'Gold Specialist',
+        coins: 0,
+        rank: 1,
+        weeklyScore: 0,
+        completedQuests: 0,
+        streakDays: 0,
+        tier: 'Verified Practitioner',
       };
     }
   }

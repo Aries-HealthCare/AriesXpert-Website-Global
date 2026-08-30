@@ -66,19 +66,19 @@ export default function ProviderAppointmentsPage() {
           return {
             id: item._id || item.id || 'apt_' + idx,
             patientName: `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.name || patient.fullName || 'Patient',
-            patientAge: patient.age || 45,
+            patientAge: patient.age || 0,
             patientGender: patient.gender || 'Patient',
             phone: patient.phone || patient.mobileNo || '',
             condition: patient.condition || item.condition || 'Physical Therapy Consultation',
             serviceType: item.visitType === 'clinic' ? 'Clinic Visit' : 'Home Visit',
             date: isToday ? 'Today' : 'Upcoming',
-            timeSlot: item.timeSlot || (item.scheduledAt ? new Date(item.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '10:00 AM - 11:00 AM'),
+            timeSlot: item.timeSlot || (item.scheduledAt ? new Date(item.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Scheduled Time'),
             address: patient.address ? (typeof patient.address === 'object' ? `${patient.address.street || ''}, ${patient.address.city || ''}` : patient.address) : (item.location || 'Doorstep Visit'),
-            pincode: patient.address?.zipCode || item.pincode || '400001',
+            pincode: patient.address?.zipCode || item.pincode || '',
             status,
-            sessionNumber: item.sessionNumber || 1,
-            totalSessions: item.totalSessions || 10,
-            fee: item.sessionAmount || item.therapistSessionAmount || 600,
+            sessionNumber: item.sessionIndex || item.sessionNumber || 1,
+            totalSessions: item.totalSessions || 1,
+            fee: item.fee || item.amount || item.therapistSessionAmount || 600,
           };
         });
         setAppointments(mapped);

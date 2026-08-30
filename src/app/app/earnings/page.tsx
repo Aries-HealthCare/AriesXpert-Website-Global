@@ -25,14 +25,14 @@ export default function ProviderEarningsPage() {
     providerApi.getDashboardStats().then((data) => setStats(data));
   }, []);
 
-  const lifetime = user?.totalEarnings ?? stats?.totalEarnings ?? (user?.walletAmount ? user.walletAmount * 1.5 : 0);
-  const monthly = Math.round(lifetime * 0.65);
-  const weekly = Math.round(monthly * 0.28);
+  const lifetime = user?.totalEarnings ?? stats?.totalEarnings ?? (user?.walletAmount ?? 0);
+  const monthly = stats?.monthlyEarnings ?? (stats?.totalVisits ? stats.totalVisits * 600 : 0);
+  const weekly = stats?.todayEarnings ?? (stats?.todayVisits ? stats.todayVisits * 600 : 0);
 
   const currentRevenue = period === 'WEEK' ? weekly : period === 'MONTH' ? monthly : lifetime;
-  const visitPayouts = Math.round(currentRevenue * 0.88);
-  const refCommissions = Math.round(currentRevenue * 0.08);
-  const travelBonus = currentRevenue - visitPayouts - refCommissions;
+  const visitPayouts = currentRevenue;
+  const refCommissions = 0;
+  const travelBonus = 0;
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
