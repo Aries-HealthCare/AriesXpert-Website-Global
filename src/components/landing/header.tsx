@@ -384,7 +384,7 @@ function MobileMenu({ currentLocationName }: { currentLocationName: string | nul
                 <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full">Sign In →</span>
               </Link>
               <Link
-                href="/register"
+                href="/onboarding"
                 className="flex items-center justify-between py-2 px-3 text-xs text-muted-foreground hover:text-foreground font-medium"
                 prefetch={false}
               >

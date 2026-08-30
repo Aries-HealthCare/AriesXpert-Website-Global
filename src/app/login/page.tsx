@@ -600,10 +600,10 @@ export default function ProviderLoginPage() {
             NEW TO THE ARIESXPERT NETWORK?
           </div>
           <Link
-            href="/register"
+            href="/onboarding"
             className="inline-block px-8 py-3 rounded-full border border-[#0088FF]/50 text-[#0088FF] hover:bg-[#0088FF]/10 text-xs font-extrabold tracking-wider transition-all shadow-[0_0_20px_rgba(0,136,255,0.15)]"
           >
-            REGISTER NOW
+            REGISTER & START ONBOARDING
           </Link>
         </div>
       </main>

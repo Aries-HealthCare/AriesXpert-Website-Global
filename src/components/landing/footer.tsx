@@ -80,7 +80,7 @@ export default function Footer() {
               <li><Link href="/blogs" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">Health Insights Blog</Link></li>
               <li><Link href="/work-with-us" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">Work With Us</Link></li>
               <li><Link href="/login" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors inline-block hover:translate-x-1 duration-200">AriesXpert Provider Login</Link></li>
-              <li><Link href="/register" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">Join as Physiotherapist</Link></li>
+              <li><Link href="/onboarding" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">Join as Physiotherapist</Link></li>
               <li><Link href="/free-tele-consultation" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">Free Consultation</Link></li>
             </ul>
           </div>

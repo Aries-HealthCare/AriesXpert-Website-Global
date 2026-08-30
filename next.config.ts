@@ -80,6 +80,8 @@ const nextConfig: NextConfig = {
       { source: '/patients-login/', destination: '/login', permanent: true },
       { source: '/dashboard', destination: '/app', permanent: false },
       { source: '/dashboard/:path*', destination: '/app/:path*', permanent: false },
+      { source: '/register', destination: '/onboarding', permanent: false },
+      { source: '/register/', destination: '/onboarding', permanent: false },
     ];
   },
 
