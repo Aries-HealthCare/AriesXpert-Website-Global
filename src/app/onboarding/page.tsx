@@ -41,6 +41,7 @@ import {
   Globe,
   Clock,
   Zap,
+  Lock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -346,6 +347,8 @@ export default function ProviderOnboardingPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [currentStep, setCurrentStep] = useState(0);
+  const [maxUnlockedStep, setMaxUnlockedStep] = useState(0);
+  const [lastSavedText, setLastSavedText] = useState('Autosaved');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -539,6 +542,7 @@ export default function ProviderOnboardingPage() {
       }
 
       if (user.onboardingStep !== undefined && user.onboardingStep >= 0 && user.onboardingStep <= 4) {
+        setMaxUnlockedStep(Math.max(user.onboardingStep, 0));
         setCurrentStep(user.onboardingStep);
       }
     }
@@ -548,6 +552,13 @@ export default function ProviderOnboardingPage() {
     if (cached) {
       try {
         const d = JSON.parse(cached);
+        if (d.maxUnlockedStep !== undefined && typeof d.maxUnlockedStep === 'number') {
+          setMaxUnlockedStep((prev) => Math.max(prev, d.maxUnlockedStep));
+        }
+        if (d.currentStep !== undefined && typeof d.currentStep === 'number') {
+          const validStep = Math.min(d.currentStep, d.maxUnlockedStep ?? 0);
+          setCurrentStep(validStep);
+        }
         if (d.fullName && !user?.fullName) {
           setFullName(d.fullName);
           const parts = d.fullName.trim().split(' ');
@@ -573,7 +584,7 @@ export default function ProviderOnboardingPage() {
     if (combined) setFullName(combined);
   }, [firstName, lastName]);
 
-  // Auto-persist draft
+  // Auto-persist draft to localStorage with real-time feedback
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const draft = {
@@ -617,9 +628,12 @@ export default function ProviderOnboardingPage() {
       travelCapacity,
       urgentVisits,
       travelTimePreference,
+      maxUnlockedStep,
       currentStep,
+      lastSavedAt: new Date().toISOString(),
     };
     localStorage.setItem('onboarding_full_draft_v3', JSON.stringify(draft));
+    setLastSavedText('Autosaved just now');
   }, [
     selectedCountry,
     firstName,
@@ -804,6 +818,7 @@ export default function ProviderOnboardingPage() {
           profilePhoto: profilePhotoUrl,
           onboardingStep: 1,
         });
+        setMaxUnlockedStep((prev) => Math.max(prev, 1));
         setCurrentStep(1);
       } else if (currentStep === 1) {
         // ── Step 2: Professional Qualifications ──
@@ -854,6 +869,7 @@ export default function ProviderOnboardingPage() {
           yearsOfExperience: yearOfExperience,
           onboardingStep: 2,
         });
+        setMaxUnlockedStep((prev) => Math.max(prev, 2));
         setCurrentStep(2);
       } else if (currentStep === 2) {
         // ── Step 3: Banking & Payouts ──
@@ -893,6 +909,7 @@ export default function ProviderOnboardingPage() {
 
         await providerApi.addBankInfo(fd);
         updateUserData({ onboardingStep: 3 });
+        setMaxUnlockedStep((prev) => Math.max(prev, 3));
         setCurrentStep(3);
       } else if (currentStep === 3) {
         // ── Step 4: Service Territory & Commute ──
@@ -932,6 +949,7 @@ export default function ProviderOnboardingPage() {
           targetPincodes,
           onboardingStep: 4,
         });
+        setMaxUnlockedStep((prev) => Math.max(prev, 4));
         setCurrentStep(4);
       } else if (currentStep === 4) {
         // ── Step 5: Compliance Declarations & Final Submit ──
@@ -994,6 +1012,12 @@ export default function ProviderOnboardingPage() {
         </div>
 
         <div className="flex items-center gap-4">
+          {/* Real-time Autosave Indicator */}
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-medium font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>{lastSavedText}</span>
+          </div>
+
           {/* Country Switcher */}
           <div className="relative flex items-center gap-2 bg-slate-800/80 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs">
             <Globe className="w-4 h-4 text-teal-400" />
@@ -1024,18 +1048,25 @@ export default function ProviderOnboardingPage() {
         <div className="mb-8">
           <div className="grid grid-cols-5 gap-2 lg:gap-4 mb-4">
             {STEPS.map((step, idx) => {
-              const isDone = currentStep > step.id;
+              const isDone = currentStep > step.id || maxUnlockedStep > step.id;
               const isCurrent = currentStep === step.id;
+              const isUnlocked = step.id <= maxUnlockedStep;
+
               return (
                 <button
                   key={step.id}
-                  onClick={() => setCurrentStep(step.id)}
+                  disabled={!isUnlocked}
+                  onClick={() => {
+                    if (isUnlocked) {
+                      setCurrentStep(step.id);
+                    }
+                  }}
                   className={`text-left p-3 rounded-2xl border transition-all relative overflow-hidden ${
                     isCurrent
                       ? 'bg-gradient-to-br from-teal-500/15 to-emerald-500/5 border-teal-500/50 shadow-lg shadow-teal-500/10'
                       : isDone
-                      ? 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
-                      : 'bg-slate-950/40 border-slate-900/80 text-slate-600 opacity-60'
+                      ? 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700 cursor-pointer'
+                      : 'bg-slate-950/40 border-slate-900/80 text-slate-600 opacity-50 cursor-not-allowed'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1.5">
@@ -1045,15 +1076,27 @@ export default function ProviderOnboardingPage() {
                           ? 'bg-emerald-500 text-slate-950'
                           : isCurrent
                           ? 'bg-teal-400 text-slate-950'
-                          : 'bg-slate-800 text-slate-400'
+                          : isUnlocked
+                          ? 'bg-slate-800 text-slate-300'
+                          : 'bg-slate-900 text-slate-600'
                       }`}
                     >
-                      {isDone ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : step.stepNumber}
+                      {isDone ? (
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      ) : isUnlocked ? (
+                        step.stepNumber
+                      ) : (
+                        <Lock className="w-3 h-3 text-slate-500" />
+                      )}
                     </span>
-                    <span className="text-[10px] font-mono text-slate-500 hidden sm:inline">0{step.stepNumber}/05</span>
+                    <span className="text-[10px] font-mono text-slate-500 hidden sm:inline">
+                      {isUnlocked ? `0${step.stepNumber}/05` : 'LOCKED'}
+                    </span>
                   </div>
                   <div className="text-xs font-bold text-white truncate">{step.title}</div>
-                  <div className="text-[10px] text-slate-400 truncate hidden md:block">{step.desc}</div>
+                  <div className="text-[10px] text-slate-400 truncate hidden md:block">
+                    {isUnlocked ? step.desc : 'Complete previous step'}
+                  </div>
                 </button>
               );
             })}
