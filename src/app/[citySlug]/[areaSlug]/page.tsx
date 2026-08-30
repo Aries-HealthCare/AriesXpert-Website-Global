@@ -24,6 +24,9 @@ const PROFESSION_MAP: Record<string, { title: string; backend: string }> = {
     'massage-therapy': { title: 'Massage Therapy', backend: 'massage_therapy' },
 };
 
+export const dynamicParams = true;
+export const revalidate = 86400;
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { citySlug, areaSlug } = await params;
     const prof = PROFESSION_MAP[citySlug];
