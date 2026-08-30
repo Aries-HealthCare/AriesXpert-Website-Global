@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
   },
   poweredByHeader: false,
   compress: true,
+  productionBrowserSourceMaps: false,
 
   // ============================================================
   // SEO CRITICAL: 301 Redirects from old WordPress URLs
