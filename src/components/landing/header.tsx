@@ -115,6 +115,14 @@ export default function Header() {
           <div className="hidden xl:block">
             <ThemeToggle />
           </div>
+          <Link
+            href="/login"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 2xl:px-4 2xl:py-2.5 rounded-full border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary text-xs 2xl:text-[13px] font-bold transition-all hover:scale-105 whitespace-nowrap shrink-0"
+            prefetch={false}
+          >
+            <Stethoscope className="w-3.5 h-3.5" />
+            <span>Login</span>
+          </Link>
           <div className="hidden sm:inline-flex shrink-0">
             <BookAppointmentButton className="neon-primary-border bg-primary text-white hover:bg-primary/95 shadow-xl transition-all rounded-full px-4 py-2 2xl:px-6 2xl:py-2.5 text-xs 2xl:text-sm font-black tracking-wide hover:-translate-y-0.5 whitespace-nowrap shrink-0">
               Book Home Visit
@@ -363,13 +371,25 @@ function MobileMenu({ currentLocationName }: { currentLocationName: string | nul
             <Link href="/contact" className="text-lg font-medium hover:text-primary transition-colors py-3 px-2" prefetch={false}>Contact Us</Link>
 
             <div className="mt-4 pt-4 border-t border-border/40">
+              <div className="text-xs uppercase font-bold text-muted-foreground tracking-wider px-2 mb-2">AriesXpert Professionals</div>
               <Link
-                href="/work-with-us/for-physiotherapists"
-                className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-primary/10 text-primary font-bold text-sm"
+                href="/login"
+                className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-primary/10 text-primary font-bold text-sm mb-2"
+                prefetch={false}
+              >
+                <div className="flex items-center gap-2">
+                  <Stethoscope className="h-4 w-4" />
+                  <span>Provider Login</span>
+                </div>
+                <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full">Sign In →</span>
+              </Link>
+              <Link
+                href="/register"
+                className="flex items-center justify-between py-2 px-3 text-xs text-muted-foreground hover:text-foreground font-medium"
                 prefetch={false}
               >
                 <span>Join as Physiotherapist</span>
-                <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full">Apply →</span>
+                <span>Register →</span>
               </Link>
             </div>
           </nav>
