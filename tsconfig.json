@@ -22,17 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "src/**/*.ts", "src/**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": [
-    "node_modules",
-    "AriesXpert-Admin-Dashboard",
-    "AriesXpert-Website-Canada",
-    "AriesXpert-Website-India",
-    "OmniRoute",
-    "ai-avatar-system",
-    "aries-avatar-render-engine",
-    "ariesxpert-backend",
-    "ariesxpertv2",
-    "goblin-ai"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }
