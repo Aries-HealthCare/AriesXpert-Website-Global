@@ -50,11 +50,11 @@ const TOPIC_QUIZZES = [
 ];
 
 const DAILY_TASKS = [
-  { id: 't1', title: 'Complete 2 Doorstep Visits on Time', reward: 150, progress: 2, total: 2, completed: true, claimed: false },
-  { id: 't2', title: 'Fill 100% Dynamic Assessment Forms', reward: 200, progress: 1, total: 1, completed: true, claimed: true },
-  { id: 't3', title: 'Achieve a 5-Star Patient Review', reward: 300, progress: 1, total: 1, completed: true, claimed: false },
+  { id: 't1', title: 'Complete 2 Doorstep Visits on Time', reward: 150, progress: 0, total: 2, completed: false, claimed: false },
+  { id: 't2', title: 'Fill 100% Dynamic Assessment Forms', reward: 200, progress: 0, total: 1, completed: false, claimed: false },
+  { id: 't3', title: 'Achieve a 5-Star Patient Review', reward: 300, progress: 0, total: 1, completed: false, claimed: false },
   { id: 't4', title: 'Complete Daily Clinical Tournament', reward: 250, progress: 0, total: 1, completed: false, claimed: false },
-  { id: 't5', title: 'Read 1 Clinical Academy SOP', reward: 100, progress: 1, total: 1, completed: true, claimed: false },
+  { id: 't5', title: 'Read 1 Clinical Academy SOP', reward: 100, progress: 0, total: 1, completed: false, claimed: false },
 ];
 
 const SHOP_ITEMS = [

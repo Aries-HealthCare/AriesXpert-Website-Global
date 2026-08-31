@@ -66,7 +66,7 @@ export default function ProviderDashboardPage() {
   const therapistName = user?.fullName || user?.name
     || (user?.firstName ? `${user.firstName} ${user?.lastName || ''}`.trim() : 'Provider');
   const axId = user?.axId || user?.therapistId || user?.uid || '—';
-  const rating = user?.rating ?? 4.9;
+  const rating = user?.rating ?? 0;
   const walletBalance = user?.walletAmount ?? user?.walletBalance ?? 0;
 
   // Monthly target tracker

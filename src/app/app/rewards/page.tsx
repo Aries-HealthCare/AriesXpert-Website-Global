@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 export default function ProviderRewardsPage() {
   const { user } = useProviderAuth();
   const completed = user?.completedVisitsCount ?? user?.totalVisits ?? 0;
-  const rating = user?.rating ?? 4.95;
+  const rating = user?.rating ?? 0;
 
   let tierName = 'Silver Practitioner Tier';
   let nextTier = 'Gold Specialist';

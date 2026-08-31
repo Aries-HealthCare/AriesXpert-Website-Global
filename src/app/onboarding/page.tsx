@@ -1033,13 +1033,6 @@ export default function ProviderOnboardingPage() {
               ))}
             </select>
           </div>
-
-          <Link
-            href="/dashboard"
-            className="text-xs font-semibold text-slate-400 hover:text-white transition-colors flex items-center gap-1.5"
-          >
-            Dashboard
-          </Link>
         </div>
       </header>
 
@@ -1242,7 +1235,7 @@ export default function ProviderOnboardingPage() {
                     <Label className="text-xs text-slate-300">First Name *</Label>
                     <Input
                       type="text"
-                      placeholder="e.g. Rohan"
+                      placeholder="First Name"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       className="mt-1.5 bg-slate-950/80 border-slate-800 text-white rounded-xl focus:border-teal-500"
@@ -1253,7 +1246,7 @@ export default function ProviderOnboardingPage() {
                     <Label className="text-xs text-slate-300">Last Name *</Label>
                     <Input
                       type="text"
-                      placeholder="e.g. Sharma"
+                      placeholder="Last Name"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       className="mt-1.5 bg-slate-950/80 border-slate-800 text-white rounded-xl focus:border-teal-500"
@@ -2997,10 +2990,10 @@ export default function ProviderOnboardingPage() {
 
               <Button
                 type="button"
-                onClick={() => router.push('/dashboard')}
+                onClick={() => router.push('/')}
                 className="w-full h-12 rounded-2xl bg-gradient-to-r from-teal-400 to-emerald-500 text-slate-950 font-extrabold text-xs shadow-xl shadow-teal-500/30"
               >
-                GO TO PROVIDER DASHBOARD
+                RETURN TO HOME
               </Button>
             </div>
           </div>
