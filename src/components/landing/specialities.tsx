@@ -1,5 +1,7 @@
 'use client';
 
+import React from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { specialities } from "@/lib/placeholder-data";
 import {
@@ -14,7 +16,10 @@ import {
   UserRound,
   Award,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Activity,
+  Crosshair,
+  Stethoscope
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
@@ -31,102 +36,99 @@ const icons = [
 ];
 
 export default function Specialities() {
-  // Duplicate for seamless infinite scroll (Set A | Set A)
+  // Duplicate for seamless infinite scroll
   const displaySpecialities = [...specialities, ...specialities, ...specialities];
 
   return (
-    <section className="py-6 md:py-10 relative overflow-hidden bg-background">
-      {/* Dynamic Background Atmosphere */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(var(--primary),0.02)_0%,transparent_70%)] pointer-events-none" />
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none opacity-50" />
+    <section className="py-18 md:py-28 lg:py-32 relative overflow-hidden bg-[#02050e] text-white">
+      {/* ── Ambient Radial Lighting ── */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-7xl h-[450px] bg-[radial-gradient(ellipse_at_center,rgba(56,189,248,0.08),transparent_70%)] pointer-events-none" />
 
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
-        {/* Centered Clinical Header */}
-        <div className="max-w-5xl mx-auto text-center mb-12 md:mb-16 space-y-6 flex flex-col items-center animate-reveal-up">
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-bold uppercase tracking-[0.2em] shadow-sm">
-            <Award className="w-4 h-4" /> Clinical Portfolio
+      {/* ── Precision Telemetry Mesh Grid ── */}
+      <div 
+        className="absolute inset-0 opacity-[0.05] pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.15) 1px, transparent 1px)`,
+          backgroundSize: '48px 48px'
+        }}
+      />
+
+      {/* ── Fluid Widescreen Header ── */}
+      <div className="w-full max-w-[1780px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="max-w-3xl mx-auto text-center mb-14 space-y-4 flex flex-col items-center"
+        >
+          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full glassmorphic border border-cyan-500/40 bg-cyan-950/40 text-cyan-300 text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_30px_rgba(6,182,212,0.25)]">
+            <Award className="w-3.5 h-3.5 text-amber-300" />
+            <span>Comprehensive Clinical Specialities</span>
           </div>
-          <h2 className="font-headline text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-tight md:whitespace-nowrap">
-            Our Clinical <span className="premium-gradient-text">Specialities</span>
+
+          <h2 className="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.06] text-white">
+            Specialized Care. <br className="hidden sm:inline" />
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-[0_0_50px_rgba(56,189,248,0.35)]">
+              Targeted Recovery.
+            </span>
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-3xl mx-auto font-light">
-            Phased, evidence-based recovery programs designed by our clinical directorate to ensure the highest standards of functional restoration.
+
+          <p className="text-slate-300 text-base sm:text-lg lg:text-xl leading-relaxed max-w-2xl mx-auto font-light">
+            Phased, evidence-based recovery programs designed by our Clinical Directorate to ensure the highest standard of functional restoration.
           </p>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Infinite Horizontal Carousel */}
+      {/* ── Infinite Horizontal Carousel Stream with Medical HealthCare Cards ── */}
       <div className="relative w-full overflow-hidden group">
-        <div className="flex w-max gap-8 px-4 animate-scroll-infinite hover:[animation-play-state:paused]">
-          {displaySpecialities.map((speciality, index) => {
-            const Icon = icons[index % icons.length];
+        <div className="flex w-max gap-6 px-4 animate-scroll-infinite hover:[animation-play-state:paused]">
+          {displaySpecialities.map((item, index) => {
+            const Icon = icons[index % icons.length] || Bone;
             return (
               <div
-                key={`${speciality.id}-${index}`}
-                className="w-[300px] md:w-[400px] shrink-0"
+                key={`${item.id}-${index}`}
+                className="w-[340px] sm:w-[380px] flex-shrink-0"
               >
-                <Card
-                  className={cn(
-                    "group/card premium-card border-primary/5 healthcare-motion flex flex-col p-2 shadow-sm relative overflow-hidden h-full min-h-[320px]",
-                    "hover:border-primary/30 hover:shadow-[0_0_40px_rgba(var(--primary),0.12)] hover:neon-primary-border"
-                  )}
-                >
-                  {/* Atmospheric Liquid Glow Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-primary/5 opacity-0 group-hover/card:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+                <div className="h-full rounded-[26px] p-[1.5px] bg-gradient-to-b from-white/20 via-cyan-500/15 to-violet-600/25 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:border-cyan-400/50 hover:shadow-[0_20px_50px_rgba(6,182,212,0.2)]">
+                  <div className="h-full rounded-[24px] bg-[#070c1a]/95 border border-white/10 p-6 flex flex-col justify-between space-y-4">
+                    
+                    <div className="flex items-center justify-between border-b border-white/10 pb-3 text-[9px] font-mono text-cyan-400/80">
+                      <span className="flex items-center gap-1">
+                        <Crosshair className="w-3 h-3" /> CLIN-SPEC-0{((index % specialities.length) + 1)}
+                      </span>
+                      <span className="text-slate-400">COUNCIL VERIFIED</span>
+                    </div>
 
-                  <CardHeader className="space-y-8 p-8 relative z-10 flex-grow">
-                    <div className="flex items-center justify-between">
-                      <div className="relative">
-                        {/* Icon Ambient Glow Core */}
-                        <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-0 group-hover/card:scale-150 transition-transform duration-1000 opacity-0 group-hover/card:opacity-100" />
-                        <div className="w-16 h-16 rounded-2xl bg-primary/5 text-primary flex items-center justify-center transition-all duration-500 group-hover/card:scale-110 group-hover/card:bg-primary group-hover/card:text-white shadow-sm relative z-10">
-                          <Icon className="w-8 h-8 transition-transform duration-700 group-hover/card:rotate-3" />
-                        </div>
+                    <div className="space-y-3">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-600 flex items-center justify-center text-white shadow-lg">
+                        <Icon className="w-6 h-6" />
                       </div>
-                      <div className="flex flex-col items-end">
-                        <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/40 group-hover/card:text-primary transition-colors">
-                          Protocol 0{(index % specialities.length) + 1}
-                        </div>
-                        {index % specialities.length < 3 && (
-                          <div className="flex items-center gap-1 text-[9px] font-bold uppercase text-accent mt-1">
-                            <Sparkles className="w-3 h-3" /> High Priority
-                          </div>
-                        )}
-                      </div>
+
+                      <h3 className="font-headline text-xl font-black tracking-tight text-white group-hover:text-cyan-300 transition-colors">
+                        {item.name}
+                      </h3>
+
+                      <p className="text-xs sm:text-[13px] text-slate-300/85 leading-relaxed font-light line-clamp-3">
+                        {item.description}
+                      </p>
                     </div>
 
-                    <div className="space-y-4">
-                      <CardTitle className="font-headline text-2xl lg:text-3xl font-bold tracking-tight group-hover/card:text-primary transition-colors duration-300">
-                        {speciality.name}
-                      </CardTitle>
-                      <CardDescription className="text-sm md:text-base leading-relaxed font-light text-muted-foreground group-hover/card:text-foreground transition-colors line-clamp-3">
-                        {speciality.description}
-                      </CardDescription>
+                    <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-cyan-400 font-bold">
+                      <span>Explore Protocol</span>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </div>
-                  </CardHeader>
 
-                  <div className="px-8 pb-8 relative z-10 mt-auto">
-                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-primary opacity-50 group-hover/card:opacity-100 transition-all transform translate-x-[-10px] group-hover/card:translate-x-0 cursor-pointer">
-                      View Clinical Path <ChevronRight className="w-4 h-4 transition-transform group-hover/card:translate-x-1" />
-                    </div>
                   </div>
-                </Card>
+                </div>
               </div>
             );
           })}
         </div>
 
-        {/* Edge Fades for Clinical Depth */}
-        <div className="absolute inset-y-0 left-0 w-32 md:w-64 bg-gradient-to-r from-background via-background/80 to-transparent pointer-events-none z-20" />
-        <div className="absolute inset-y-0 right-0 w-32 md:w-64 bg-gradient-to-l from-background via-background/80 to-transparent pointer-events-none z-20" />
-      </div>
-
-      {/* Registry Footer Tag */}
-      <div className="container mx-auto px-4 md:px-6 mt-16 text-center animate-reveal-up stagger-4 opacity-0 [animation-fill-mode:forwards]">
-        <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4">
-          Custom recovery roadmaps available for 150+ conditions
-        </p>
-        <div className="h-px w-24 bg-primary/10 mx-auto" />
+        {/* Edge Clinical Fades */}
+        <div className="absolute inset-y-0 left-0 w-32 sm:w-48 bg-gradient-to-r from-[#02050e] via-[#02050e]/80 to-transparent pointer-events-none z-10" />
+        <div className="absolute inset-y-0 right-0 w-32 sm:w-48 bg-gradient-to-l from-[#02050e] via-[#02050e]/80 to-transparent pointer-events-none z-10" />
       </div>
 
       <style jsx>{`
@@ -139,7 +141,7 @@ export default function Specialities() {
           }
         }
         .animate-scroll-infinite {
-          animation: scroll-infinite 60s linear infinite;
+          animation: scroll-infinite 45s linear infinite;
         }
       `}</style>
     </section>

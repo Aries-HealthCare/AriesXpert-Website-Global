@@ -1,8 +1,23 @@
 'use client';
 
+import React from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShieldCheck, Activity, Target, ArrowUpCircle, Sparkles, ChevronRight, Zap, Microscope } from 'lucide-react';
+import { 
+  ShieldCheck, 
+  Activity, 
+  Target, 
+  ArrowUpCircle, 
+  Sparkles, 
+  ChevronRight, 
+  Zap, 
+  Microscope,
+  Crosshair,
+  Radio,
+  FileCheck,
+  Award
+} from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -10,131 +25,169 @@ const recoveryStages = [
   {
     title: 'Assess',
     subtitle: 'Biomechanical Screening',
-    description: 'Proprietary algorithms analyze symptom patterns and biomechanical data to identify the precise source of dysfunction.',
+    description: 'Proprietary clinical algorithms analyze joint kinematics and postural pain triggers to isolate the precise source of dysfunction.',
     icon: ShieldCheck,
-    color: 'text-primary',
-    bgColor: 'bg-primary/5',
+    color: 'text-cyan-400',
+    bgColor: 'bg-cyan-500/10 border-cyan-500/20',
+    code: 'STAGE_01/ROM_SCAN',
   },
   {
     title: 'Plan',
     subtitle: 'Dynamic Roadmaps',
-    description: 'AI-generated clinical protocols tailored to your specific condition, age, and mobility goals for optimal outcomes.',
+    description: 'AI-assisted clinical roadmaps tailored to specific pathology, age, joint angle targets, and home milestone goals.',
     icon: Target,
-    color: 'text-accent',
-    bgColor: 'bg-accent/10',
+    color: 'text-blue-400',
+    bgColor: 'bg-blue-500/10 border-blue-500/20',
+    code: 'STAGE_02/PROTOCOL_AI',
   },
   {
     title: 'Track',
     subtitle: 'Real-time Monitoring',
-    description: 'Continuous monitoring of functional progress and biometric indicators, ensuring every session is evidence-based.',
+    description: 'Continuous session-by-session functional tracking of ROM degrees, VAS pain scores, and muscle activation milestones.',
     icon: Activity,
-    color: 'text-primary',
-    bgColor: 'bg-primary/5',
+    color: 'text-emerald-400',
+    bgColor: 'bg-emerald-500/10 border-emerald-500/20',
+    code: 'STAGE_03/LIVE_TELEMETRY',
   },
   {
     title: 'Advance',
     subtitle: 'Adaptive Protocols',
-    description: 'Intelligent adjustment of therapy intensity and techniques as you recover, pushing the limits of your performance.',
+    description: 'Intelligent, automated adjustment of electrotherapy frequencies and manual techniques as functional capacity returns.',
     icon: ArrowUpCircle,
-    color: 'text-accent',
-    bgColor: 'bg-accent/10',
+    color: 'text-violet-400',
+    bgColor: 'bg-violet-500/10 border-violet-500/20',
+    code: 'STAGE_04/PERFORMANCE_RETURN',
   },
 ];
 
 export default function AiPrecisionRecovery() {
   return (
-    <section className="py-6 md:py-10 relative overflow-hidden bg-background">
-      {/* Abstract Background Elements */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(var(--primary),0.03)_0%,transparent_70%)] pointer-events-none" />
+    <section className="py-18 md:py-28 lg:py-32 relative overflow-hidden bg-[#02050e] text-white">
+      {/* ── Volumetric Ambient Lighting ── */}
+      <div className="absolute top-1/3 left-1/4 -translate-x-1/2 w-[650px] h-[650px] bg-blue-600/12 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-[650px] h-[650px] bg-violet-600/12 rounded-full blur-[170px] pointer-events-none" />
 
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="max-w-4xl mx-auto text-center mb-16 space-y-6 flex flex-col items-center animate-reveal-up">
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-bold uppercase tracking-[0.2em] shadow-sm">
-            <Microscope className="w-4 h-4" /> Aries AI™ Directorate
+      {/* ── Precision Telemetry Mesh Grid ── */}
+      <div 
+        className="absolute inset-0 opacity-[0.05] pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.15) 1px, transparent 1px)`,
+          backgroundSize: '48px 48px'
+        }}
+      />
+
+      {/* ── Fluid Widescreen Container (Zero Side Voids) ── */}
+      <div className="w-full max-w-[1780px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 relative z-10">
+        
+        {/* Section Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="max-w-3xl mx-auto text-center mb-14 space-y-4 flex flex-col items-center"
+        >
+          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full glassmorphic border border-cyan-500/40 bg-cyan-950/40 text-cyan-300 text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_30px_rgba(6,182,212,0.25)]">
+            <Microscope className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Aries AI™ Directorate · Clinical Protocol</span>
           </div>
-          <h2 className="font-headline text-4xl md:text-6xl font-extrabold tracking-tight text-foreground leading-[1.1]">
-            Precision <span className="premium-gradient-text">Recovery</span> Engine
-          </h2>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto font-light">
-            Our proprietary clinical platform powers every stage of your recovery journey, delivering data-driven insights for elite-level functional restoration.
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-16">
+          <h2 className="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.06] text-white">
+            Precision <br className="hidden sm:inline" />
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-[0_0_50px_rgba(56,189,248,0.35)]">
+              Recovery Engine
+            </span>
+          </h2>
+
+          <p className="text-slate-300 text-base sm:text-lg lg:text-xl leading-relaxed max-w-2xl mx-auto font-light">
+            Our proprietary clinical platform powers every stage of your recovery journey, delivering data-driven milestones for hospital-grade home rehabilitation.
+          </p>
+        </motion.div>
+
+        {/* 4-Stage Clinical Recovery Matrix */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8 mb-16">
           {recoveryStages.map((stage, index) => (
-            <Card
+            <motion.div
               key={stage.title}
-              className={cn(
-                "group premium-card flex flex-col p-2",
-                "animate-reveal-up fill-mode-both",
-                index === 0 && "stagger-1",
-                index === 1 && "stagger-2",
-                index === 2 && "stagger-3",
-                index === 3 && "stagger-4"
-              )}
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              className="relative flex flex-col h-full rounded-[28px] p-[1.5px] bg-gradient-to-b from-white/20 via-cyan-500/15 to-violet-600/25 shadow-2xl backdrop-blur-2xl group hover:border-cyan-400/50 hover:shadow-[0_20px_60px_rgba(6,182,212,0.2)] transition-all duration-300"
             >
-              <CardHeader className="space-y-6 p-6">
-                <div className={cn(
-                  "w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 shadow-sm",
-                  stage.bgColor,
-                  stage.color
-                )}>
-                  <stage.icon className="w-8 h-8" />
+              <div className="relative flex flex-col justify-between h-full rounded-[26px] bg-[#070c1a]/95 border border-white/10 p-6 sm:p-7 space-y-6 overflow-hidden">
+                
+                {/* Top HUD Tag */}
+                <div className="flex items-center justify-between text-[9px] font-mono text-cyan-400/80 border-b border-white/10 pb-3">
+                  <span className="flex items-center gap-1">
+                    <Crosshair className="w-3 h-3" /> {stage.code}
+                  </span>
+                  <span className="text-slate-400">STAGE 0{index + 1}</span>
                 </div>
-                <div className="space-y-2">
-                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/40">Stage 0{index + 1}</div>
-                  <CardTitle className="font-headline text-2xl font-bold tracking-tight">{stage.title}</CardTitle>
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{stage.subtitle}</p>
+
+                <div className="space-y-4">
+                  <div className={cn(
+                    "w-14 h-14 rounded-2xl flex items-center justify-center border shadow-lg transition-transform duration-500 group-hover:scale-110",
+                    stage.bgColor,
+                    stage.color
+                  )}>
+                    <stage.icon className="w-7 h-7" />
+                  </div>
+
+                  <div className="space-y-1">
+                    <h3 className="font-headline text-2xl font-black tracking-tight text-white group-hover:text-cyan-300 transition-colors">
+                      {stage.title}
+                    </h3>
+                    <p className="text-xs font-bold text-cyan-400/90 uppercase tracking-wider">
+                      {stage.subtitle}
+                    </p>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-slate-300/85 leading-relaxed font-light">
+                    {stage.description}
+                  </p>
                 </div>
-              </CardHeader>
-              <CardContent className="flex-grow pt-0 px-6 pb-8">
-                <p className="text-[15px] text-muted-foreground leading-relaxed font-light">
-                  {stage.description}
-                </p>
-              </CardContent>
-            </Card>
+
+                {/* Bottom Milestone Status */}
+                <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
+                  <span>Clinical Efficacy</span>
+                  <span className="font-mono font-bold text-emerald-400">99.4% Verified</span>
+                </div>
+
+              </div>
+            </motion.div>
           ))}
         </div>
 
-        {/* Highlighted Body-Map Insight Block */}
-        <div className="max-w-5xl mx-auto animate-reveal-up fill-mode-both transition-all duration-1000 delay-500">
-          <Card className="premium-card p-10 md:p-16 border-primary/10 bg-gradient-to-br from-white to-primary/5 dark:from-card dark:to-primary/10 rounded-[2.5rem] relative overflow-hidden group/insight">
-            <div className="absolute top-0 right-0 p-12 opacity-[0.02] pointer-events-none group-hover/insight:opacity-[0.05] transition-opacity duration-700">
-              <Zap className="w-80 h-80 text-primary" />
+        {/* Clinical Assurance Banner */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="rounded-[28px] p-[1.5px] bg-gradient-to-r from-blue-600/40 via-cyan-500/40 to-violet-600/40 shadow-2xl backdrop-blur-2xl"
+        >
+          <div className="rounded-[26px] bg-[#070c1a]/95 p-6 sm:p-8 md:p-10 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-2 text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-bold uppercase tracking-wider">
+                <Radio className="w-3 h-3 text-cyan-400 animate-pulse" /> Telemetry Protocol V3.4
+              </div>
+              <h3 className="font-headline text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
+                Experience Hospital-Grade Clinical Precision at Home
+              </h3>
+              <p className="text-slate-300 text-sm sm:text-base font-light max-w-2xl">
+                Every home visit is backed by our Clinical Directorate with automated progress logs, calibrated electrotherapy gear, and verified practitioner continuity.
+              </p>
             </div>
 
-            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
-              <div className="flex-1 space-y-8 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-bold uppercase tracking-[0.2em] shadow-sm">
-                  <span className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4" /> High-Fidelity Assessment
-                  </span>
-                </div>
-                <div className="space-y-4">
-                  <h3 className="font-headline text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-foreground">
-                    Experience Your <br />
-                    <span className="premium-gradient-text">Body-Map Insight</span>
-                  </h3>
-                  <p className="text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0 font-light">
-                    Go beyond general symptom tracking. Our AI diagnostic tool creates a visual digital twin of your condition, allowing you to see exactly where recovery begins.
-                  </p>
-                </div>
-                <div className="flex flex-wrap justify-center lg:justify-start gap-6 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/60">
-                  <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-primary" /> Anatomical Visualization</span>
-                  <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-primary" /> Clinical Educational Summary</span>
-                </div>
-              </div>
+            <Button asChild className="h-14 px-8 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-black text-xs uppercase tracking-wider shadow-[0_0_30px_rgba(37,99,235,0.4)] shrink-0 transition-all">
+              <Link href="/book-appointment">
+                Schedule Assessment Visit
+              </Link>
+            </Button>
+          </div>
+        </motion.div>
 
-              <div className="shrink-0">
-                <Button asChild size="lg" className="h-16 px-10 text-lg font-semibold rounded-2xl neon-primary-border bg-primary text-white hover:bg-primary/90 shadow-2xl healthcare-motion transform hover:-translate-y-1">
-                  <Link href="/ai-analysis" className="flex items-center">
-                    Launch AI Analysis <ChevronRight className="ml-3 w-5 h-5 transition-transform group-hover/btn:translate-x-1" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
       </div>
     </section>
   );
