@@ -15,13 +15,16 @@ import {
   Activity,
   TrendingDown,
   Clock,
-  CalendarCheck
+  CalendarCheck,
+  Crosshair,
+  FileCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface PackageCardData {
   key: string;
   days: number;
+  protocolCode: string;
   title: string;
   badge: string;
   badgeClass: string;
@@ -90,13 +93,13 @@ export default function PricingPackageCard({
         pkg.popular ? "lg:-translate-y-3 z-20" : "z-10"
       )}
     >
-      {/* ── Stable Luxury Glass Card Container ── */}
+      {/* ── Stable Medical HealthCare Grade Card Container ── */}
       <div
         className={cn(
           "relative flex flex-col justify-between h-full rounded-[30px] overflow-hidden backdrop-blur-2xl transition-all duration-300 group shadow-2xl",
           pkg.popular
             ? "p-[2px] bg-gradient-to-b from-amber-400 via-rose-500 to-violet-600 shadow-[0_25px_80px_rgba(225,29,72,0.35)] ring-1 ring-amber-400/50"
-            : "p-[1px] bg-gradient-to-b from-white/20 via-white/10 to-white/5 hover:border-cyan-400/40 hover:shadow-[0_20px_50px_rgba(6,182,212,0.18)]"
+            : "p-[1px] bg-gradient-to-b from-white/20 via-cyan-500/20 to-white/5 hover:border-cyan-400/50 hover:shadow-[0_20px_50px_rgba(6,182,212,0.2)]"
         )}
       >
         {/* Ambient Halo for Popular Card */}
@@ -104,14 +107,14 @@ export default function PricingPackageCard({
           <div className="absolute -inset-3 bg-gradient-to-r from-rose-600/35 via-violet-600/35 to-amber-400/35 rounded-[34px] blur-2xl -z-10 opacity-75 group-hover:opacity-100 transition-opacity duration-500" />
         )}
 
-        {/* ── Inner Card Surface ── */}
+        {/* ── Inner Card Surface with Telemetry HUD Accents ── */}
         <div className="relative flex flex-col justify-between h-full rounded-[28px] bg-[#070c1a]/95 border border-white/10 overflow-hidden">
           
           {/* Top Banner for Best Value / Most Popular */}
           {pkg.popular ? (
             <div className="w-full bg-gradient-to-r from-amber-500 via-rose-600 to-violet-600 py-2.5 px-4 text-center text-xs font-black uppercase tracking-widest text-white shadow-lg flex items-center justify-center gap-2">
               <Star className="w-4 h-4 fill-amber-300 text-amber-300 animate-pulse" />
-              <span>Most Popular · Maximum Recovery</span>
+              <span>Most Popular · Clinical Gold Standard</span>
               <Sparkles className="w-4 h-4 text-amber-300" />
             </div>
           ) : (
@@ -120,23 +123,26 @@ export default function PricingPackageCard({
 
           <div className="p-6 sm:p-7 flex flex-col justify-between flex-1 space-y-6">
             
-            {/* Header Badges & Plan Title */}
+            {/* Header Badges & Protocol Code */}
             <div className="space-y-3.5">
               <div className="flex items-center justify-between gap-2">
-                <Badge 
-                  variant="outline" 
-                  className={cn(
-                    'text-xs font-black uppercase tracking-wider px-3.5 py-1.5 rounded-xl shadow-sm border', 
-                    pkg.badgeClass
-                  )}
-                >
-                  {pkg.badge}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge 
+                    variant="outline" 
+                    className={cn(
+                      'text-xs font-black uppercase tracking-wider px-3 py-1 rounded-xl shadow-sm border', 
+                      pkg.badgeClass
+                    )}
+                  >
+                    {pkg.badge}
+                  </Badge>
+                  <span className="text-[10px] font-mono text-cyan-400/80 hidden sm:inline">{pkg.protocolCode}</span>
+                </div>
                 
                 <div className="relative overflow-hidden rounded-xl">
                   <Badge 
                     variant="outline" 
-                    className="text-xs border-emerald-500/40 text-emerald-300 font-black bg-emerald-950/70 px-3 py-1.5 flex items-center gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.25)]"
+                    className="text-xs border-emerald-500/40 text-emerald-300 font-black bg-emerald-950/70 px-3 py-1 flex items-center gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.25)]"
                   >
                     <Zap className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" />
                     Save ₹{pkg.savings.toLocaleString('en-IN')}
@@ -187,7 +193,7 @@ export default function PricingPackageCard({
                   </div>
                   <div className="flex items-center gap-1 text-[11px] font-extrabold text-emerald-400">
                     <TrendingDown className="w-3.5 h-3.5" />
-                    <span>Best Per-Day Value</span>
+                    <span>Decreasing Daily Rate</span>
                   </div>
                 </div>
 
@@ -201,7 +207,7 @@ export default function PricingPackageCard({
                 </div>
 
                 <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs">
-                  <span className="text-slate-400">Total Package Investment:</span>
+                  <span className="text-slate-400 font-mono">TOTAL INVESTMENT:</span>
                   <span className="font-black text-white text-sm">
                     ₹{pkg.total.toLocaleString('en-IN')}
                   </span>
@@ -211,8 +217,9 @@ export default function PricingPackageCard({
 
             {/* ── Key Inclusions & Clinical Deliverables ── */}
             <div className="space-y-3 pt-1">
-              <div className="text-[11px] font-black uppercase tracking-widest text-slate-400">
-                Package Deliverables:
+              <div className="text-[11px] font-black uppercase tracking-widest text-slate-400 flex items-center justify-between">
+                <span>Clinical Inclusions:</span>
+                <span className="text-[10px] text-cyan-400 font-mono">MODALITIES_INCL</span>
               </div>
               <ul className="space-y-2.5">
                 {pkg.features.map((feat, fIdx) => (

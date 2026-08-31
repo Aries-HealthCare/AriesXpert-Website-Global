@@ -14,7 +14,10 @@ import {
   Award,
   Clock,
   Stethoscope,
-  ChevronRight
+  ChevronRight,
+  Crosshair,
+  Radio,
+  FileCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -31,13 +34,14 @@ interface Modality {
   metricValue: string;
   specialistTitle: string;
   badgeAccent: string;
+  clinicalCode: string;
 }
 
 const MODALITIES: Modality[] = [
   {
     id: 'post-op',
     name: 'Post-Surgery',
-    tag: 'POST-OPERATIVE REHAB',
+    tag: 'POST-OPERATIVE REHAB PROTOCOL',
     tagClass: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
     title: 'Post-Surgical Joint Restoration',
     subtitle: 'Evidence-based clinical protocols for TKR, THR, ACL reconstruction, ligament repair & fracture mobilization.',
@@ -47,6 +51,7 @@ const MODALITIES: Modality[] = [
     metricValue: '100% Milestone',
     specialistTitle: 'Clinical Rehab Lead',
     badgeAccent: 'from-blue-600 to-indigo-600',
+    clinicalCode: 'CLIN-PROT: TKR/THR-V4',
   },
   {
     id: 'spine',
@@ -61,11 +66,12 @@ const MODALITIES: Modality[] = [
     metricValue: '+48° ROM Gain',
     specialistTitle: 'Senior Spine Specialist',
     badgeAccent: 'from-emerald-600 to-teal-600',
+    clinicalCode: 'CLIN-PROT: LUMBAR-DEC-02',
   },
   {
     id: 'needling',
     name: 'Dry Needling',
-    tag: 'NEUROMUSCULAR TRIGGER POINT',
+    tag: 'NEUROMUSCULAR TRIGGER POINT RESET',
     tagClass: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
     title: 'Dry Needling & Neuromuscular Reset',
     subtitle: 'Target deep intramuscular trigger points for instantaneous pain inhibition, spasm relief & rapid muscle reactivation.',
@@ -75,11 +81,12 @@ const MODALITIES: Modality[] = [
     metricValue: '-85% VAS Drop',
     specialistTitle: 'Certified Needling Expert',
     badgeAccent: 'from-violet-600 to-purple-600',
+    clinicalCode: 'CLIN-PROT: DN-MYO-V1',
   },
   {
     id: 'sports',
     name: 'Sports Kinetic',
-    tag: 'SPORTS & ATHLETIC RECOVERY',
+    tag: 'SPORTS & ATHLETIC RESTORATION',
     tagClass: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
     title: 'High-Performance Functional Return',
     subtitle: 'Biomechanical movement restoration for rotator cuff, tendonitis, ankle instability & athletic muscle tears.',
@@ -89,6 +96,7 @@ const MODALITIES: Modality[] = [
     metricValue: 'Elite Tier Return',
     specialistTitle: 'Sports Physiotherapist',
     badgeAccent: 'from-amber-600 to-orange-600',
+    clinicalCode: 'CLIN-PROT: KINETIC-ELITE',
   },
 ];
 
@@ -141,7 +149,7 @@ export default function HeroInteractiveCard() {
       {/* ── Outer Ambient Holographic Glow Aura ── */}
       <div className="absolute -inset-6 bg-gradient-to-tr from-blue-600/25 via-violet-600/25 to-cyan-500/20 rounded-[36px] blur-3xl -z-10 opacity-70 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
-      {/* ── 3D Perspective Card Container ── */}
+      {/* ── Medical HealthCare Grade HUD Card Container ── */}
       <div
         ref={cardRef}
         onMouseMove={handleMouseMove}
@@ -152,7 +160,7 @@ export default function HeroInteractiveCard() {
         }}
         className="relative rounded-[32px] p-[1.5px] bg-gradient-to-b from-white/25 via-cyan-500/20 to-violet-600/30 shadow-[0_30px_90px_rgba(0,0,0,0.85)] backdrop-blur-2xl transition-all duration-300 overflow-hidden"
       >
-        {/* Dynamic Light Reflection on Cursor Hover */}
+        {/* Dynamic Light Sheen on Cursor Hover */}
         <div
           className="pointer-events-none absolute inset-0 rounded-[32px] transition-opacity duration-300 z-30"
           style={{
@@ -160,10 +168,18 @@ export default function HeroInteractiveCard() {
           }}
         />
 
-        {/* ── Main Showcase Surface ── */}
-        <div className="relative rounded-[30px] bg-[#070c18]/95 border border-white/10 p-5 sm:p-6 lg:p-7 flex flex-col justify-between space-y-6">
+        {/* ── Main Showcase Surface with Medical HUD Accents ── */}
+        <div className="relative rounded-[30px] bg-[#070c18]/95 border border-white/10 p-5 sm:p-6 lg:p-7 flex flex-col justify-between space-y-5">
           
-          {/* ── 1. Top Modality Selector Tabs ── */}
+          {/* Top HUD Telemetry Line */}
+          <div className="flex items-center justify-between text-[9px] font-mono uppercase tracking-widest text-slate-400 border-b border-white/10 pb-2">
+            <span className="flex items-center gap-1 text-cyan-400">
+              <Crosshair className="w-3 h-3" /> CLINICAL_HUD: LIVE
+            </span>
+            <span className="text-slate-400">{activeModality.clinicalCode}</span>
+          </div>
+
+          {/* ── 1. Modality Selector Tabs ── */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
             {MODALITIES.map((modality, idx) => {
               const isActive = idx === activeIndex;
@@ -187,7 +203,7 @@ export default function HeroInteractiveCard() {
             })}
           </div>
 
-          {/* ── 2. Cinematic Visual Viewport (Uncluttered Image Frame) ── */}
+          {/* ── 2. Cinematic Medical Visual Viewport ── */}
           <div className="relative w-full aspect-[16/10] sm:aspect-[16/9.5] rounded-2xl overflow-hidden border border-white/15 bg-black/70 shadow-inner group">
             
             <AnimatePresence mode="wait">
@@ -249,8 +265,8 @@ export default function HeroInteractiveCard() {
 
           </div>
 
-          {/* ── 3. Dedicated Treatment Details (Completely Uncluttered & Spaced) ── */}
-          <div className="text-left space-y-2">
+          {/* ── 3. Dedicated Treatment Details ── */}
+          <div className="text-left space-y-1.5">
             <h4 className="font-headline text-lg sm:text-xl font-black text-white tracking-tight leading-snug">
               {activeModality.title}
             </h4>

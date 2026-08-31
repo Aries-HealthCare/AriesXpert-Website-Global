@@ -25,7 +25,10 @@ import {
   CheckCircle2,
   Activity,
   Stethoscope,
-  HeartHandshake
+  HeartHandshake,
+  Crosshair,
+  Radio,
+  FileCheck
 } from "lucide-react";
 
 function formatCount(n: number | undefined | null, fallback = '450+'): string {
@@ -53,61 +56,66 @@ export default function Hero() {
   return (
     <section className="relative w-full min-h-[92vh] flex items-center overflow-hidden bg-[#02050e] py-12 md:py-20 lg:py-24">
       
-      {/* ── 1. Interactive 3D WebGL Kinetic Canvas (Three.js Biomechanical Wave & Neural Field) ── */}
+      {/* ── 1. Interactive 3D WebGL Kinetic Canvas (Biomechanical Spine Wave & Neural Field) ── */}
       <Hero3DScene />
 
-      {/* ── 2. Cinematic Volumetric Ambient Lighting & Glows ── */}
+      {/* ── 2. Volumetric Ambient Medical Lighting & Radial Blooms ── */}
       <div className="absolute top-1/4 left-1/5 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-blue-600/15 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute top-1/3 right-1/6 w-[750px] h-[750px] bg-violet-600/15 rounded-full blur-[170px] pointer-events-none" />
-      <div className="absolute bottom-10 left-1/3 w-[550px] h-[550px] bg-amber-500/10 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-10 left-1/3 w-[550px] h-[550px] bg-cyan-500/10 rounded-full blur-[130px] pointer-events-none" />
 
-      {/* ── 3. Cybernetic Precision Mesh Grid ── */}
+      {/* ── 3. Medical Precision Telemetry Mesh Grid ── */}
       <div 
-        className="absolute inset-0 opacity-[0.05] pointer-events-none"
+        className="absolute inset-0 opacity-[0.06] pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px)`,
-          backgroundSize: '44px 44px'
+          backgroundImage: `linear-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.15) 1px, transparent 1px)`,
+          backgroundSize: '48px 48px'
         }}
       />
 
-      {/* ── 4. Main Hero Container (Expansive Widescreen Fit without Side Emptiness) ── */}
+      {/* ── 4. Main Hero Container (Medical HealthCare Grade Fluid Widescreen Geometry) ── */}
       <div className="w-full max-w-[1780px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 xl:gap-16 items-center">
           
-          {/* ── Left Column: Hero Content, Badges & High-Impact CTAs ── */}
+          {/* ── Left Column: Clinical Directive, Value Badges & High-Impact CTAs ── */}
           <div className="lg:col-span-7 text-left space-y-7 lg:space-y-9">
             
-            {/* Top Glowing Status Pills */}
+            {/* Top Medical HealthCare Telemetry HUD Badges */}
             <motion.div 
               initial={{ opacity: 0, y: -16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="flex flex-wrap items-center gap-3.5"
+              className="flex flex-wrap items-center gap-3"
             >
-              <div className="glassmorphic py-2 px-4.5 rounded-full border border-emerald-500/40 bg-emerald-950/40 flex items-center gap-2.5 shadow-[0_0_25px_rgba(16,185,129,0.2)]">
+              <div className="glassmorphic py-1.5 px-4 rounded-full border border-emerald-500/40 bg-emerald-950/50 flex items-center gap-2 shadow-[0_0_25px_rgba(16,185,129,0.25)]">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
                 </span>
-                <span className="text-xs font-black uppercase tracking-wider text-emerald-300">
+                <span className="text-[11px] font-black uppercase tracking-wider text-emerald-300">
                   Hospital-Grade Home Care
                 </span>
               </div>
 
-              <div className="glassmorphic py-2 px-4.5 rounded-full border border-violet-500/40 bg-violet-950/40 flex items-center gap-2 text-violet-300 shadow-[0_0_25px_rgba(124,58,237,0.2)]">
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span className="text-xs font-black uppercase tracking-wider text-white/95">
-                  AI Clinical Precision
+              <div className="glassmorphic py-1.5 px-4 rounded-full border border-cyan-500/40 bg-cyan-950/40 flex items-center gap-2 text-cyan-300 shadow-[0_0_25px_rgba(6,182,212,0.2)]">
+                <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                <span className="text-[11px] font-black uppercase tracking-wider text-white/95">
+                  AI Clinical Precision · Tier-1
                 </span>
+              </div>
+
+              <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-slate-400 text-[10px] font-mono uppercase tracking-widest">
+                <FileCheck className="w-3.5 h-3.5 text-amber-400" />
+                <span>ISO 9001:2015 Protocol</span>
               </div>
             </motion.div>
 
-            {/* Epic Multi-line Headline */}
+            {/* Medical Precision Grand Headline */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
-              className="space-y-1.5"
+              className="space-y-2"
             >
               <h1 className="font-headline text-4xl sm:text-6xl md:text-7xl lg:text-[4.8rem] xl:text-[5.4rem] 2xl:text-[5.8rem] font-black text-white tracking-tight leading-[1.04] drop-shadow-2xl">
                 Advanced Recovery <br />
@@ -117,7 +125,7 @@ export default function Hero() {
               </h1>
             </motion.div>
 
-            {/* Subtitle & Value Proposition with Generous Breathing Room */}
+            {/* Clinical Value Proposition with Generous Breathing Room */}
             <motion.p
               initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
@@ -127,7 +135,7 @@ export default function Hero() {
               Hospital-grade physiotherapy, post-surgical rehabilitation, and specialized nursing care delivered directly to your doorstep by verified BPT/MPT specialists with complete portable electrotherapy gear.
             </motion.p>
 
-            {/* Quick Feature Checklist with Glowing Icons */}
+            {/* Quick Clinical Feature Checklist */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -154,7 +162,7 @@ export default function Hero() {
               </div>
             </motion.div>
 
-            {/* Action CTA Buttons Group */}
+            {/* High-Impact Clinical Action CTAs */}
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
@@ -163,10 +171,10 @@ export default function Hero() {
             >
               {/* Primary Glowing Luxury Button */}
               <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition duration-300 group-hover:scale-105" />
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition duration-300 group-hover:scale-105" />
                 <BookAppointmentButton 
                   size="lg" 
-                  className="relative h-15 sm:h-16 px-9 sm:px-11 text-base font-black rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-700 text-white shadow-2xl hover:brightness-110 active:scale-95 transition-all duration-300 border border-white/20 flex items-center justify-center gap-3 w-full sm:w-auto"
+                  className="relative h-15 sm:h-16 px-9 sm:px-11 text-base font-black rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white shadow-2xl hover:brightness-110 active:scale-95 transition-all duration-300 border border-white/20 flex items-center justify-center gap-3 w-full sm:w-auto"
                 >
                   <span>Book Home Visit</span>
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
@@ -185,45 +193,49 @@ export default function Hero() {
               </Button>
             </motion.div>
 
-            {/* Key Trust Stats Grid (Cleanly Separated with Individual Glass Tiles) */}
+            {/* Medical Telemetry Trust Stats Grid with Crosshair Accents */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.9, delay: 0.5 }}
               className="pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5"
             >
-              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left">
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left relative overflow-hidden group/tile hover:border-cyan-500/40 transition-colors">
+                <div className="absolute top-2 right-2 text-cyan-400/40 text-[9px] font-mono">01/HUD</div>
                 <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
                   {stats ? formatCount(stats.therapistCount) : '450+'}
                 </p>
-                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-400 mt-1">
+                <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-slate-400 mt-1">
                   Specialists
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left">
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left relative overflow-hidden group/tile hover:border-cyan-500/40 transition-colors">
+                <div className="absolute top-2 right-2 text-cyan-400/40 text-[9px] font-mono">02/HUD</div>
                 <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
                   {stats ? formatCount(stats.patientCount, '15k+') : '15k+'}
                 </p>
-                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-400 mt-1">
+                <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-slate-400 mt-1">
                   Patients Served
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left">
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left relative overflow-hidden group/tile hover:border-cyan-500/40 transition-colors">
+                <div className="absolute top-2 right-2 text-cyan-400/40 text-[9px] font-mono">03/HUD</div>
                 <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
                   Same-Day
                 </p>
-                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-400 mt-1">
+                <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-slate-400 mt-1">
                   Service Start
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left">
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left relative overflow-hidden group/tile hover:border-cyan-500/40 transition-colors">
+                <div className="absolute top-2 right-2 text-amber-400/40 text-[9px] font-mono">04/HUD</div>
                 <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-amber-400 tracking-tight flex items-center gap-1">
                   4.9 <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-400 text-amber-400" />
                 </p>
-                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-400 mt-1">
+                <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-slate-400 mt-1">
                   Google Rated
                 </p>
               </div>
@@ -231,7 +243,7 @@ export default function Hero() {
 
           </div>
 
-          {/* ── Right Column: 3D Perspective Interactive Showcase ── */}
+          {/* ── Right Column: Medical HealthCare Grade Interactive Telemetry Showcase ── */}
           <div className="lg:col-span-5 relative w-full flex justify-center lg:justify-end">
             <motion.div
               initial={{ opacity: 0, scale: 0.94, y: 30 }}
@@ -241,7 +253,7 @@ export default function Hero() {
             >
               <HeroInteractiveCard />
 
-              {/* Bottom Clinical Trust Guarantee Pill */}
+              {/* Bottom Clinical Trust Protocol Banner */}
               <div className="mt-5 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400 font-semibold">
                 <span className="flex items-center gap-1.5 text-emerald-400">
                   <ShieldCheck className="w-4 h-4" /> Verified Clinicians
