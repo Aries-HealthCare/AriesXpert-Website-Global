@@ -31,7 +31,8 @@ import {
   HeartPulse,
   Clock,
   Zap,
-  Check
+  Check,
+  UserCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -80,7 +81,7 @@ function getSpecialtyIcon(spec: string = '') {
 }
 
 function TherapistCard({ therapist, index }: { therapist: any; index: number }) {
-  // 3D Tilt specifically for the photo frame ONLY (not the whole card)
+  // 3D Tilt specifically for the photo frame ONLY
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
   const [glarePosition, setGlarePosition] = useState({ x: 50, y: 50, opacity: 0 });
@@ -130,32 +131,18 @@ function TherapistCard({ therapist, index }: { therapist: any; index: number }) 
   };
 
   return (
-    <div className="p-2 sm:p-2.5 h-full">
-      {/* Stable Luxury Card Container (No card-level tilt) */}
+    <div className="p-2 sm:p-3 h-full">
+      {/* ── Modern Luxury Passport Card Surface ── */}
       <div className="relative h-full flex flex-col justify-between rounded-[32px] p-[1.5px] bg-gradient-to-b from-white/20 via-cyan-500/15 to-violet-600/25 shadow-[0_25px_70px_rgba(0,0,0,0.85)] backdrop-blur-2xl transition-all duration-300 group hover:border-cyan-400/50 hover:shadow-[0_30px_90px_rgba(6,182,212,0.2)] overflow-hidden">
         
-        {/* Inner Card Surface */}
-        <div className="relative flex flex-col justify-between h-full rounded-[30px] bg-[#070c1a]/95 border border-white/10 p-5 sm:p-6 space-y-5 overflow-hidden">
+        {/* Inner Card Container */}
+        <div className="relative flex flex-col justify-between h-full rounded-[30px] bg-[#070c1a]/95 border border-white/10 p-5 sm:p-6 space-y-6 overflow-hidden">
           
-          {/* ── Top Header Strip: Verification Pill & Star Rating ── */}
-          <div className="flex items-center justify-between gap-2 z-10">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-wider shadow-sm">
-              <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Clinical Directorate</span>
-            </div>
-
-            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 shadow-sm">
-              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-              <span className="text-xs font-black">{therapist.rating || 4.9}</span>
-              <span className="text-[10px] text-slate-400 font-semibold">(100+)</span>
-            </div>
-          </div>
-
-          {/* ── Full Doctor Portrait Display (3D Perspective Tilt ONLY on Photo) ── */}
-          <div className="flex flex-col items-center relative z-10 w-full">
+          {/* ── 1. Full Doctor Hero Visual Stage (3D Tilt ON Photo Frame ONLY) ── */}
+          <div className="relative w-full">
             <Link href={profileHref} className="relative block w-full group/avatar cursor-pointer" prefetch={false}>
               
-              {/* Photo Box with 3D Tilt specifically on hover */}
+              {/* Photo Box with Smooth 3D Hover Tilt */}
               <div
                 ref={photoBoxRef}
                 onMouseMove={handlePhotoMouseMove}
@@ -164,108 +151,119 @@ function TherapistCard({ therapist, index }: { therapist: any; index: number }) 
                   transform: `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
                   transition: 'transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)',
                 }}
-                className="relative w-full aspect-[4/4.6] sm:aspect-[4/4.5] rounded-2xl p-[2px] bg-gradient-to-br from-cyan-500/50 via-blue-600/30 to-violet-600/50 shadow-2xl ring-1 ring-white/20 transition-all duration-300 group-hover/avatar:ring-cyan-400/80 group-hover/avatar:shadow-[0_0_35px_rgba(6,182,212,0.35)] overflow-hidden"
+                className="relative w-full aspect-[3/3.6] sm:aspect-[3/3.5] rounded-2xl p-[2px] bg-gradient-to-br from-cyan-500/40 via-blue-600/30 to-violet-600/40 shadow-2xl ring-1 ring-white/20 transition-all duration-300 group-hover/avatar:ring-cyan-400/80 group-hover/avatar:shadow-[0_0_35px_rgba(6,182,212,0.35)] overflow-hidden"
               >
-                {/* Dynamic Glare Sheen over Photo */}
+                {/* Dynamic Cursor Light Sheen */}
                 <div
                   className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-300 z-30"
                   style={{
-                    background: `radial-gradient(circle 250px at ${glarePosition.x}% ${glarePosition.y}%, rgba(255,255,255,${glarePosition.opacity}), transparent 80%)`,
+                    background: `radial-gradient(circle 260px at ${glarePosition.x}% ${glarePosition.y}%, rgba(255,255,255,${glarePosition.opacity}), transparent 80%)`,
                   }}
                 />
 
-                {/* Inner Image Container showing Full Apron & Doctor Badge */}
-                <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-gradient-to-b from-[#0e1629] via-[#090f1d] to-[#04070f] flex items-center justify-center">
+                {/* Inner Image Surface Showing Full Doctor Coat/Apron & Logo */}
+                <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-gradient-to-b from-[#0f172a] via-[#090e1c] to-[#04060e] flex items-center justify-center">
                   <Image
                     src={displayImg}
-                    alt={`Portrait of ${therapist.name}`}
+                    alt={`Full clinical portrait of ${therapist.name}`}
                     fill
-                    sizes="(max-width: 768px) 100vw, 380px"
+                    sizes="(max-width: 768px) 100vw, 420px"
                     className={cn(
                       isLogo
-                        ? "object-contain p-8 group-hover/avatar:scale-110 drop-shadow-[0_10px_30px_rgba(245,158,11,0.4)]"
+                        ? "object-contain p-8 group-hover/avatar:scale-110 drop-shadow-[0_10px_35px_rgba(245,158,11,0.4)]"
                         : "object-cover object-top group-hover/avatar:scale-105",
-                      "transition-transform duration-700 ease-out brightness-[0.96] contrast-[1.05]"
+                      "transition-transform duration-700 ease-out brightness-[0.97] contrast-[1.04]"
                     )}
                     priority={index < 4}
                   />
 
-                  {/* Soft Cinematic Edge Vignette */}
+                  {/* Soft Vignette Overlay */}
                   {!isLogo && (
                     <div className="absolute inset-0 bg-gradient-to-t from-[#070c1a] via-transparent to-transparent pointer-events-none" />
                   )}
 
-                  {/* Verified Checkmark Badge on Bottom-Right */}
-                  <div className="absolute bottom-2.5 right-2.5 z-20 w-6 h-6 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white flex items-center justify-center shadow-lg border-2 border-[#070c1a]">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                  {/* Top-Left: Floating Live Availability Status Ribbon */}
+                  <div className="absolute top-3 left-3 z-20">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/85 border border-emerald-500/40 backdrop-blur-md shadow-lg text-emerald-300 text-[10px] font-black uppercase tracking-wider">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                      </span>
+                      <span>Available Today</span>
+                    </div>
+                  </div>
+
+                  {/* Top-Right: Star Rating Badge */}
+                  <div className="absolute top-3 right-3 z-20">
+                    <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-950/85 border border-amber-500/40 backdrop-blur-md shadow-lg text-amber-300 text-xs font-black">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <span>{therapist.rating || 4.9}</span>
+                    </div>
+                  </div>
+
+                  {/* Bottom-Right: Council Verified Directorate Seal */}
+                  <div className="absolute bottom-2.5 right-2.5 z-20 flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-950/90 border border-cyan-400/40 backdrop-blur-md shadow-lg text-cyan-300 text-[10px] font-black tracking-wider uppercase">
+                    <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Verified Doctor</span>
                   </div>
                 </div>
               </div>
             </Link>
-
-            {/* Live Availability Status Ribbon */}
-            <div className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-black uppercase tracking-wider shadow-sm">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
-              </span>
-              <span>Available Today · Home Visits</span>
-            </div>
           </div>
 
-          {/* ── Doctor & Clinical Details ── */}
-          <div className="space-y-2.5 text-center relative z-10 flex-grow">
+          {/* ── 2. Doctor Clinical Identity & Specialization Deck ── */}
+          <div className="space-y-3 text-center relative z-10 flex-grow">
             <div>
               <Link href={profileHref} prefetch={false}>
-                <h3 className="font-headline text-lg sm:text-xl font-black tracking-tight text-white group-hover:text-cyan-300 transition-colors duration-300 line-clamp-1">
+                <h3 className="font-headline text-xl sm:text-2xl font-black tracking-tight text-white group-hover:text-cyan-300 transition-colors duration-300 line-clamp-1">
                   {therapist.name}
                 </h3>
               </Link>
-              <p className="text-xs font-bold text-cyan-400/90 mt-0.5 tracking-wide">
-                {therapist.qualification || 'BPT, MPT · Certified Specialist'}
+              <p className="text-xs font-bold text-cyan-400/90 mt-1 tracking-wide">
+                {therapist.qualification || 'BPT, MPT · Certified Physiotherapist'}
               </p>
             </div>
 
-            {/* Specialization Badge */}
+            {/* Specialization Category Badge */}
             <div className="flex justify-center">
               <Badge
                 variant="secondary"
-                className="px-3.5 py-1 text-[11px] font-black uppercase tracking-wider bg-white/[0.05] text-slate-200 border border-white/10 rounded-xl flex items-center gap-1.5 shadow-sm"
+                className="px-3.5 py-1.5 text-xs font-black uppercase tracking-wider bg-white/[0.05] text-slate-200 border border-white/10 rounded-xl flex items-center gap-2 shadow-sm"
               >
-                <SpecIcon className="w-3.5 h-3.5 text-cyan-400" />
+                <SpecIcon className="w-4 h-4 text-cyan-400" />
                 <span>{therapist.specialization || 'Physiotherapy Specialist'}</span>
               </Badge>
             </div>
 
-            {/* Credentials Metric Micro-Grid */}
+            {/* Micro-Credentials Grid */}
             <div className="pt-3 border-t border-white/10 grid grid-cols-2 gap-2 text-xs font-semibold text-slate-300">
               <div className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-white/[0.03] border border-white/5">
-                <Award className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <Award className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>{experienceText} Exp</span>
               </div>
               <div className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-white/[0.03] border border-white/5">
-                <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                <span className="truncate max-w-[95px]">{therapist.city || 'Mumbai'}</span>
+                <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
+                <span className="truncate max-w-[100px]">{therapist.city || 'Mumbai'}</span>
               </div>
             </div>
           </div>
 
-          {/* ── Action Buttons Footer ── */}
+          {/* ── 3. High-Conversion Action Button Area ── */}
           <div className="space-y-2.5 pt-1 relative z-10">
             <BookAppointmentButton
               therapistId={therapist.id}
-              className="w-full h-12 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(37,99,235,0.35)] hover:brightness-110 active:scale-[0.98] transition-all duration-300"
+              className="w-full h-13 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(37,99,235,0.35)] hover:brightness-110 active:scale-[0.98] transition-all duration-300"
             >
-              Instant Booking
+              Instant Home Booking
             </BookAppointmentButton>
 
             <Link
               href={profileHref}
-              className="text-[11px] font-bold text-slate-400 hover:text-cyan-300 transition-colors flex items-center justify-center gap-1 py-0.5 group/link"
+              className="text-[11px] font-bold text-slate-400 hover:text-cyan-300 transition-colors flex items-center justify-center gap-1.5 py-0.5 group/link"
               prefetch={false}
             >
-              <span>View Full Clinical Profile</span>
-              <ArrowRight className="w-3 h-3 group-hover/link:translate-x-1 transition-transform" />
+              <span>View Clinical Profile & Case Studies</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
             </Link>
           </div>
 
@@ -317,7 +315,7 @@ export default function VettedExperts({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-[540px] w-full rounded-[32px] bg-white/10" />
+              <Skeleton key={i} className="h-[560px] w-full rounded-[32px] bg-white/10" />
             ))}
           </div>
         </div>
