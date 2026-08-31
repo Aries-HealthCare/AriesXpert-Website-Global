@@ -31,7 +31,8 @@ export interface PackageCardData {
   description: string;
   features: string[];
   popular: boolean;
-  accentColor?: string;
+  accentGradient?: string;
+  borderAccent?: string;
 }
 
 interface PricingPackageCardProps {
@@ -60,15 +61,15 @@ export default function PricingPackageCard({
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rotX = -((y - centerY) / centerY) * 12;
-    const rotY = ((x - centerX) / centerX) * 12;
+    const rotX = -((y - centerY) / centerY) * 10;
+    const rotY = ((x - centerX) / centerX) * 10;
 
     setRotateX(rotX);
     setRotateY(rotY);
     setGlarePosition({
       x: (x / rect.width) * 100,
       y: (y / rect.height) * 100,
-      opacity: pkg.popular ? 0.45 : 0.3,
+      opacity: pkg.popular ? 0.4 : 0.25,
     });
   };
 
@@ -80,10 +81,10 @@ export default function PricingPackageCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 35 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.6, delay: index * 0.12 }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
       className={cn(
         "relative flex flex-col h-full",
         pkg.popular ? "lg:-translate-y-3 z-20" : "z-10"
@@ -94,8 +95,8 @@ export default function PricingPackageCard({
         className={cn(
           "relative flex flex-col justify-between h-full rounded-[30px] overflow-hidden backdrop-blur-2xl transition-all duration-300 group shadow-2xl",
           pkg.popular
-            ? "p-[2px] bg-gradient-to-b from-amber-400 via-rose-500 to-violet-600 shadow-[0_20px_70px_rgba(225,29,72,0.3)] ring-1 ring-amber-400/50"
-            : "p-[1px] bg-gradient-to-b from-white/20 via-white/10 to-white/5 hover:border-cyan-400/40 hover:shadow-[0_15px_40px_rgba(6,182,212,0.15)]"
+            ? "p-[2px] bg-gradient-to-b from-amber-400 via-rose-500 to-violet-600 shadow-[0_25px_80px_rgba(225,29,72,0.35)] ring-1 ring-amber-400/50"
+            : "p-[1px] bg-gradient-to-b from-white/20 via-white/10 to-white/5 hover:border-cyan-400/40 hover:shadow-[0_20px_50px_rgba(6,182,212,0.18)]"
         )}
       >
         {/* Ambient Halo for Popular Card */}
@@ -104,7 +105,7 @@ export default function PricingPackageCard({
         )}
 
         {/* ── Inner Card Surface ── */}
-        <div className="relative flex flex-col justify-between h-full rounded-[28px] bg-[#070b18]/95 border border-white/10 overflow-hidden">
+        <div className="relative flex flex-col justify-between h-full rounded-[28px] bg-[#070c1a]/95 border border-white/10 overflow-hidden">
           
           {/* Top Banner for Best Value / Most Popular */}
           {pkg.popular ? (
@@ -114,13 +115,13 @@ export default function PricingPackageCard({
               <Sparkles className="w-4 h-4 text-amber-300" />
             </div>
           ) : (
-            <div className="h-2 w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <div className="h-2 w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
           )}
 
-          <div className="p-6 sm:p-7 flex flex-col justify-between flex-1 space-y-7">
+          <div className="p-6 sm:p-7 flex flex-col justify-between flex-1 space-y-6">
             
-            {/* Header badges & Title */}
-            <div className="space-y-4">
+            {/* Header Badges & Plan Title */}
+            <div className="space-y-3.5">
               <div className="flex items-center justify-between gap-2">
                 <Badge 
                   variant="outline" 
@@ -149,7 +150,7 @@ export default function PricingPackageCard({
                 <h3 className="font-headline text-xl sm:text-2xl font-black text-white group-hover:text-cyan-300 transition-colors tracking-tight">
                   {pkg.title}
                 </h3>
-                <p className="text-slate-300/85 text-xs sm:text-sm mt-2 leading-relaxed font-normal">
+                <p className="text-slate-300/85 text-xs sm:text-sm mt-2 leading-relaxed font-light">
                   {pkg.description}
                 </p>
               </div>

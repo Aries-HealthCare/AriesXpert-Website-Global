@@ -20,13 +20,13 @@ export default function Pricing3DScene() {
     }
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x04060d, 0.0016);
+    scene.fog = new THREE.FogExp2(0x02050e, 0.0014);
 
     let width = container.clientWidth || window.innerWidth;
     let height = container.clientHeight || window.innerHeight;
 
-    const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-    camera.position.set(0, 0, 125);
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    camera.position.set(0, 0, 135);
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -39,35 +39,35 @@ export default function Pricing3DScene() {
     container.appendChild(renderer.domElement);
 
     // ── 1. Floating Holographic Torus Ring (Kinetic Pricing Core) ──
-    const torusGeo = new THREE.TorusGeometry(38, 1.3, 16, 120);
+    const torusGeo = new THREE.TorusGeometry(42, 1.4, 16, 120);
     const torusMat = new THREE.MeshBasicMaterial({
       color: 0x8b5cf6,
       wireframe: true,
       transparent: true,
-      opacity: 0.25,
+      opacity: 0.22,
     });
     const torusMesh = new THREE.Mesh(torusGeo, torusMat);
-    torusMesh.position.set(45, 12, -35);
+    torusMesh.position.set(55, 14, -35);
     torusMesh.rotation.x = Math.PI / 3;
     scene.add(torusMesh);
 
     // Second Inner Ring with Radiant Cyan Glow
-    const torusGeo2 = new THREE.TorusGeometry(26, 0.9, 16, 90);
+    const torusGeo2 = new THREE.TorusGeometry(28, 1.0, 16, 90);
     const torusMat2 = new THREE.MeshBasicMaterial({
       color: 0x06b6d4,
       wireframe: true,
       transparent: true,
-      opacity: 0.32,
+      opacity: 0.28,
     });
     const torusMesh2 = new THREE.Mesh(torusGeo2, torusMat2);
-    torusMesh2.position.set(45, 12, -35);
+    torusMesh2.position.set(55, 14, -35);
     torusMesh2.rotation.y = Math.PI / 4;
     scene.add(torusMesh2);
 
     // ── 2. Floating Gold, Emerald & Cyan Value Nodes (Icosahedrons) ──
     const nodeGroup = new THREE.Group();
-    const nodeCount = 24;
-    const icosaGeo = new THREE.IcosahedronGeometry(2.8, 0);
+    const nodeCount = 28;
+    const icosaGeo = new THREE.IcosahedronGeometry(3.0, 0);
 
     const nodeMats = [
       new THREE.MeshBasicMaterial({ color: 0xf59e0b, wireframe: true, transparent: true, opacity: 0.55 }), // Gold
@@ -81,9 +81,9 @@ export default function Pricing3DScene() {
       const mat = nodeMats[i % nodeMats.length];
       const mesh = new THREE.Mesh(icosaGeo, mat);
 
-      const x = (Math.random() - 0.5) * 220;
-      const y = (Math.random() - 0.5) * 120;
-      const z = (Math.random() - 0.5) * 70 - 25;
+      const x = (Math.random() - 0.5) * 240;
+      const y = (Math.random() - 0.5) * 140;
+      const z = (Math.random() - 0.5) * 80 - 25;
 
       mesh.position.set(x, y, z);
       const scale = Math.random() * 0.9 + 0.6;
@@ -103,7 +103,7 @@ export default function Pricing3DScene() {
     scene.add(nodeGroup);
 
     // ── 3. Expansive Ambient Particle Constellation ──
-    const particleCount = 1200;
+    const particleCount = 1400;
     const particleGeo = new THREE.BufferGeometry();
     const particlePos = new Float32Array(particleCount * 3);
     const particleColors = new Float32Array(particleCount * 3);
@@ -113,9 +113,9 @@ export default function Pricing3DScene() {
     const colCyan = new THREE.Color(0x06b6d4);
 
     for (let i = 0; i < particleCount; i++) {
-      particlePos[i * 3] = (Math.random() - 0.5) * 250;
-      particlePos[i * 3 + 1] = (Math.random() - 0.5) * 150;
-      particlePos[i * 3 + 2] = (Math.random() - 0.5) * 90 - 15;
+      particlePos[i * 3] = (Math.random() - 0.5) * 260;
+      particlePos[i * 3 + 1] = (Math.random() - 0.5) * 160;
+      particlePos[i * 3 + 2] = (Math.random() - 0.5) * 100 - 15;
 
       const r = Math.random();
       const c = r < 0.4 ? colViolet : (r < 0.75 ? colCyan : colGold);
@@ -142,7 +142,7 @@ export default function Pricing3DScene() {
     const pTex = new THREE.CanvasTexture(pCanvas);
 
     const particleMat = new THREE.PointsMaterial({
-      size: 2.6,
+      size: 2.8,
       vertexColors: true,
       map: pTex,
       transparent: true,

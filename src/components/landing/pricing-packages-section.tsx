@@ -19,7 +19,7 @@ import {
   Award,
   Clock,
   RotateCcw,
-  CheckCircle,
+  CheckCircle2,
   HelpCircle,
   TrendingDown,
   Stethoscope
@@ -33,6 +33,7 @@ import {
 } from '@/lib/pricing-packages';
 import dynamic from 'next/dynamic';
 import { cn } from '@/lib/utils';
+
 const Pricing3DScene = dynamic(() => import('./pricing-3d-scene'), {
   ssr: false,
   loading: () => <div className="absolute inset-0 pointer-events-none" />
@@ -292,27 +293,27 @@ export default function PricingPackagesSection({
   ];
 
   return (
-    <section id="pricing-packages" className={cn('py-20 md:py-32 relative overflow-hidden bg-[#030611] text-white', className)}>
+    <section id="pricing-packages" className={cn('py-18 md:py-28 lg:py-32 relative overflow-hidden bg-[#02050e] text-white', className)}>
       
       {/* ── 1. 3D Motion Graphics Scene (Three.js WebGL Hologram Torus & Kinetic Value Nodes) ── */}
       <Pricing3DScene />
 
       {/* ── 2. Cinematic Volumetric Lighting & Glows ── */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[450px] bg-[radial-gradient(ellipse_at_top,rgba(124,58,237,0.22),transparent_70%)] pointer-events-none" />
-      <div className="absolute top-1/3 left-10 w-[550px] h-[550px] bg-blue-600/12 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-20 right-10 w-[600px] h-[600px] bg-rose-600/12 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[450px] bg-[radial-gradient(ellipse_at_top,rgba(124,58,237,0.2),transparent_70%)] pointer-events-none" />
+      <div className="absolute top-1/3 left-10 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-20 right-10 w-[650px] h-[650px] bg-rose-600/10 rounded-full blur-[160px] pointer-events-none" />
 
       {/* ── 3. Cybernetic Precision Mesh Grid ── */}
       <div 
-        className="absolute inset-0 opacity-[0.06] pointer-events-none"
+        className="absolute inset-0 opacity-[0.05] pointer-events-none"
         style={{
-          backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
-          backgroundSize: '48px 48px'
+          backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px)`,
+          backgroundSize: '44px 44px'
         }}
       />
 
-      {/* ── 4. Main Section Container (Full-Bleed Widescreen Fit without Side Emptiness) ── */}
-      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 relative z-10">
+      {/* ── 4. Main Section Container (Expansive Widescreen Fit without Side Emptiness) ── */}
+      <div className="w-full max-w-[1780px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 relative z-10">
         
         {/* ── Section Header ── */}
         <motion.div 
@@ -320,10 +321,10 @@ export default function PricingPackagesSection({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="text-center max-w-3xl mx-auto space-y-6 mb-14"
+          className="text-center max-w-3xl mx-auto space-y-5 mb-12"
         >
-          <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full glassmorphic border border-violet-500/40 bg-violet-950/40 text-violet-300 text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_30px_rgba(124,58,237,0.25)]">
-            <Sparkles className="w-4 h-4 text-amber-300" />
+          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full glassmorphic border border-violet-500/40 bg-violet-950/40 text-violet-300 text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_30px_rgba(124,58,237,0.25)]">
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>Transparent Home Care Pricing</span>
           </div>
           
@@ -344,8 +345,8 @@ export default function PricingPackagesSection({
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.15 }}
-          className="max-w-4xl mx-auto mb-12 space-y-4"
+          transition={{ duration: 0.7, delay: 0.12 }}
+          className="max-w-5xl mx-auto mb-10 space-y-4"
         >
           <div className="relative">
             <div className="relative flex items-center gap-3">
@@ -361,7 +362,7 @@ export default function PricingPackagesSection({
                 {localitySearch && (
                   <button
                     onClick={() => setLocalitySearch('')}
-                    className="absolute right-4 text-slate-400 hover:text-white text-xs font-bold px-2 py-1 bg-white/10 rounded-lg"
+                    className="absolute right-4 text-slate-400 hover:text-white text-xs font-bold px-2.5 py-1 bg-white/10 rounded-lg"
                   >
                     Clear
                   </button>
@@ -386,7 +387,7 @@ export default function PricingPackagesSection({
 
             {/* Instant Search Results Dropdown */}
             {searchResults.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 z-50 rounded-2xl bg-[#0a0f1d] border border-cyan-500/40 backdrop-blur-2xl shadow-2xl max-h-72 overflow-y-auto p-2 space-y-1">
+              <div className="absolute top-full left-0 right-0 mt-2 z-50 rounded-2xl bg-[#090e1c] border border-cyan-500/40 backdrop-blur-2xl shadow-2xl max-h-72 overflow-y-auto p-2 space-y-1">
                 {searchResults.map((result) => (
                   <button
                     key={`${result.subArea}-${result.city}`}
@@ -414,7 +415,7 @@ export default function PricingPackagesSection({
           </div>
 
           {/* Popular Metro Quick Select Chips */}
-          <div className="flex flex-wrap items-center gap-2 pt-1">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
             <span className="text-xs font-bold text-slate-400 flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5 text-cyan-400" /> Quick Select:
             </span>
@@ -440,8 +441,8 @@ export default function PricingPackagesSection({
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="max-w-4xl mx-auto mb-14 rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-blue-950/40 via-slate-900/80 to-violet-950/40 border border-white/15 backdrop-blur-2xl shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6"
+          transition={{ duration: 0.6, delay: 0.18 }}
+          className="max-w-5xl mx-auto mb-12 rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-blue-950/40 via-slate-900/80 to-violet-950/40 border border-white/15 backdrop-blur-2xl shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6"
         >
           <div className="space-y-2 text-left flex-1">
             <div className="flex items-center gap-2">
@@ -453,7 +454,7 @@ export default function PricingPackagesSection({
                 {activeLocationLabel}
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-light">
               Includes verified BPT/MPT physiotherapist in-home visit, comprehensive physical examination, personalized rehabilitation roadmap, and hospital-grade electrotherapy gear (IFT/TENS/Ultrasound) at your home.
             </p>
           </div>
@@ -474,7 +475,7 @@ export default function PricingPackagesSection({
         </motion.div>
 
         {/* ── 4-COLUMN RESPONSIVE MULTI-DAY PACKAGE CARDS GRID ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 xl:gap-8 items-stretch">
           {packageCards.map((pkg, idx) => (
             <PricingPackageCard
               key={pkg.key}
@@ -490,25 +491,25 @@ export default function PricingPackagesSection({
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-16 pt-8 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center"
+          transition={{ duration: 0.8, delay: 0.35 }}
+          className="mt-16 pt-8 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-5 sm:gap-6 text-center"
         >
-          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1">
+          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1">
             <Zap className="w-6 h-6 text-amber-400 mx-auto" />
             <div className="text-xs font-bold text-white">Full Modalities Included</div>
             <div className="text-[11px] text-slate-400">IFT, TENS, Ultrasound & Laser gear</div>
           </div>
-          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1">
+          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1">
             <Stethoscope className="w-6 h-6 text-cyan-400 mx-auto" />
             <div className="text-xs font-bold text-white">Certified Specialists</div>
             <div className="text-[11px] text-slate-400">Council-registered BPT/MPT clinicians</div>
           </div>
-          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1">
+          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1">
             <Activity className="w-6 h-6 text-emerald-400 mx-auto" />
             <div className="text-xs font-bold text-white">Milestone Audits</div>
             <div className="text-[11px] text-slate-400">Weekly clinical recovery tracking</div>
           </div>
-          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1">
+          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1">
             <ShieldCheck className="w-6 h-6 text-violet-400 mx-auto" />
             <div className="text-xs font-bold text-white">100% Transparent</div>
             <div className="text-[11px] text-slate-400">Zero hidden fees or advance locks</div>

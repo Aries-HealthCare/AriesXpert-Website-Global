@@ -21,8 +21,8 @@ import {
   Award, 
   Users, 
   Clock, 
-  ArrowRight,
-  CheckCircle,
+  ArrowRight, 
+  CheckCircle2,
   Activity,
   Stethoscope,
   HeartHandshake
@@ -51,35 +51,35 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative w-full min-h-[94vh] flex items-center overflow-hidden bg-[#030611] py-14 md:py-24 lg:py-28">
+    <section className="relative w-full min-h-[92vh] flex items-center overflow-hidden bg-[#02050e] py-12 md:py-20 lg:py-24">
       
       {/* ── 1. Interactive 3D WebGL Kinetic Canvas (Three.js Biomechanical Wave & Neural Field) ── */}
       <Hero3DScene />
 
       {/* ── 2. Cinematic Volumetric Ambient Lighting & Glows ── */}
-      <div className="absolute top-1/4 left-1/5 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] bg-blue-600/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute top-1/3 right-1/6 w-[700px] h-[700px] bg-violet-600/15 rounded-full blur-[160px] pointer-events-none" />
-      <div className="absolute bottom-10 left-1/3 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/5 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-blue-600/15 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/3 right-1/6 w-[750px] h-[750px] bg-violet-600/15 rounded-full blur-[170px] pointer-events-none" />
+      <div className="absolute bottom-10 left-1/3 w-[550px] h-[550px] bg-amber-500/10 rounded-full blur-[130px] pointer-events-none" />
 
       {/* ── 3. Cybernetic Precision Mesh Grid ── */}
       <div 
-        className="absolute inset-0 opacity-[0.06] pointer-events-none"
+        className="absolute inset-0 opacity-[0.05] pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.25) 1px, transparent 1px)`,
-          backgroundSize: '48px 48px'
+          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px)`,
+          backgroundSize: '44px 44px'
         }}
       />
 
-      {/* ── 4. Main Hero Container (Full-Bleed Widescreen Fit without Side Emptiness) ── */}
-      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 relative z-10">
+      {/* ── 4. Main Hero Container (Expansive Widescreen Fit without Side Emptiness) ── */}
+      <div className="w-full max-w-[1780px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 xl:gap-16 items-center">
           
-          {/* ── Left Column: Hero Content, Value Badges & High-Impact CTAs ── */}
-          <div className="lg:col-span-7 text-left space-y-8 lg:space-y-10">
+          {/* ── Left Column: Hero Content, Badges & High-Impact CTAs ── */}
+          <div className="lg:col-span-7 text-left space-y-7 lg:space-y-9">
             
             {/* Top Glowing Status Pills */}
             <motion.div 
-              initial={{ opacity: 0, y: -18 }}
+              initial={{ opacity: 0, y: -16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               className="flex flex-wrap items-center gap-3.5"
@@ -104,51 +104,51 @@ export default function Hero() {
 
             {/* Epic Multi-line Headline */}
             <motion.div
-              initial={{ opacity: 0, x: -25 }}
+              initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              className="space-y-2"
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="space-y-1.5"
             >
-              <h1 className="font-headline text-4xl sm:text-6xl md:text-7xl lg:text-[5rem] xl:text-[5.5rem] font-black text-white tracking-tight leading-[1.04] drop-shadow-2xl">
+              <h1 className="font-headline text-4xl sm:text-6xl md:text-7xl lg:text-[4.8rem] xl:text-[5.4rem] 2xl:text-[5.8rem] font-black text-white tracking-tight leading-[1.04] drop-shadow-2xl">
                 Advanced Recovery <br />
                 <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-[0_0_50px_rgba(56,189,248,0.35)]">
-                  At Your Doorstep.
+                  At Your Home.
                 </span>
               </h1>
             </motion.div>
 
             {/* Subtitle & Value Proposition with Generous Breathing Room */}
             <motion.p
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.22 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
               className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-300 font-light max-w-2xl leading-relaxed drop-shadow"
             >
-              Hospital-grade physiotherapy, post-surgical rehabilitation, and specialized nursing care delivered directly to your home by verified BPT/MPT specialists with complete portable electrotherapy modalities.
+              Hospital-grade physiotherapy, post-surgical rehabilitation, and specialized nursing care delivered directly to your doorstep by verified BPT/MPT specialists with complete portable electrotherapy gear.
             </motion.p>
 
             {/* Quick Feature Checklist with Glowing Icons */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.32 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
               className="flex flex-wrap gap-x-8 gap-y-3 text-xs sm:text-sm text-slate-200 font-semibold"
             >
               <div className="flex items-center gap-2.5">
                 <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                  <CheckCircle className="w-3.5 h-3.5" />
+                  <CheckCircle2 className="w-3.5 h-3.5" />
                 </div>
                 <span>Zero Clinic Commute</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <div className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400">
-                  <CheckCircle className="w-3.5 h-3.5" />
+                  <CheckCircle2 className="w-3.5 h-3.5" />
                 </div>
                 <span>Certified Doctors & Physios</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
-                  <CheckCircle className="w-3.5 h-3.5" />
+                  <CheckCircle2 className="w-3.5 h-3.5" />
                 </div>
                 <span>Full Treatment Gear Brought</span>
               </div>
@@ -156,9 +156,9 @@ export default function Hero() {
 
             {/* Action CTA Buttons Group */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.42 }}
+              transition={{ duration: 0.7, delay: 0.4 }}
               className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2"
             >
               {/* Primary Glowing Luxury Button */}
@@ -185,59 +185,59 @@ export default function Hero() {
               </Button>
             </motion.div>
 
-            {/* Key Trust Stats Grid (Cleanly Separated with Generous Padding) */}
+            {/* Key Trust Stats Grid (Cleanly Separated with Individual Glass Tiles) */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 0.55 }}
-              className="pt-8 border-t border-white/10 grid grid-cols-3 sm:grid-cols-4 gap-6 sm:gap-8"
+              transition={{ duration: 0.9, delay: 0.5 }}
+              className="pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5"
             >
-              <div>
-                <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight flex items-center">
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left">
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
                   {stats ? formatCount(stats.therapistCount) : '450+'}
                 </p>
-                <p className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">
+                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-400 mt-1">
                   Specialists
                 </p>
               </div>
 
-              <div>
-                <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight flex items-center">
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left">
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
                   {stats ? formatCount(stats.patientCount, '15k+') : '15k+'}
                 </p>
-                <p className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">
+                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-400 mt-1">
                   Patients Served
                 </p>
               </div>
 
-              <div>
-                <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight">
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left">
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
                   Same-Day
                 </p>
-                <p className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">
+                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-400 mt-1">
                   Service Start
                 </p>
               </div>
 
-              <div className="hidden sm:block">
-                <p className="text-3xl sm:text-4xl md:text-5xl font-black text-amber-400 tracking-tight flex items-center gap-1.5">
-                  4.9 <Star className="w-5 h-5 sm:w-6 sm:h-6 fill-amber-400 text-amber-400" />
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left">
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-amber-400 tracking-tight flex items-center gap-1">
+                  4.9 <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-400 text-amber-400" />
                 </p>
-                <p className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">
-                  Google Rating
+                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-400 mt-1">
+                  Google Rated
                 </p>
               </div>
             </motion.div>
 
           </div>
 
-          {/* ── Right Column: 3D Motion Graphics & Interactive Physiotherapy Showcase ── */}
-          <div className="lg:col-span-5 relative w-full">
+          {/* ── Right Column: 3D Perspective Interactive Showcase ── */}
+          <div className="lg:col-span-5 relative w-full flex justify-center lg:justify-end">
             <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 35 }}
+              initial={{ opacity: 0, scale: 0.94, y: 30 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.2, ease: "easeOut" }}
-              className="relative"
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+              className="w-full"
             >
               <HeroInteractiveCard />
 
