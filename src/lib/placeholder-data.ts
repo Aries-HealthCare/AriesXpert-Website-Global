@@ -145,7 +145,7 @@ export const locations: Location[] = [
     address: 'Borivali West / All Mumbai Hubs, Maharashtra',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1529253355930-ddbe423a2ac7?auto=format&fit=crop&q=85&w=1600',
+    mapImageUrl: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&q=85&w=1200',
     mapImageHint: 'mumbai healthcare hub'
   },
   {
@@ -154,7 +154,7 @@ export const locations: Location[] = [
     address: 'Koregaon Park / Baner Hub, Maharashtra',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1562778612-e1e0cda9915c?auto=format&fit=crop&q=85&w=1600',
+    mapImageUrl: 'https://images.unsplash.com/photo-1595658658481-d53d3f999875?auto=format&fit=crop&q=85&w=1200',
     mapImageHint: 'pune healthcare hub'
   },
   {
@@ -163,7 +163,7 @@ export const locations: Location[] = [
     address: 'Indiranagar / Whitefield Hub, Karnataka',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&q=85&w=1600',
+    mapImageUrl: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&q=85&w=1200',
     mapImageHint: 'bengaluru healthcare hub'
   },
   {
@@ -172,7 +172,7 @@ export const locations: Location[] = [
     address: 'Anna Nagar / Adyar Hub, Tamil Nadu',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1582510003544-2d095665039b?auto=format&fit=crop&q=85&w=1600',
+    mapImageUrl: 'https://images.unsplash.com/photo-1616843413587-9e3a37f7bbd8?auto=format&fit=crop&q=85&w=1200',
     mapImageHint: 'chennai healthcare hub'
   },
   {
@@ -181,7 +181,7 @@ export const locations: Location[] = [
     address: 'Jubilee Hills / HITEC City Hub, Telangana',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&q=85&w=1600',
+    mapImageUrl: 'https://images.unsplash.com/photo-1605469237567-a39930679526?auto=format&fit=crop&q=85&w=1200',
     mapImageHint: 'hyderabad healthcare hub'
   },
   {
@@ -190,7 +190,7 @@ export const locations: Location[] = [
     address: 'South Delhi / Gurugram Hub, Delhi NCR',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&q=85&w=1600',
+    mapImageUrl: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&q=85&w=1200',
     mapImageHint: 'delhi ncr healthcare hub'
   },
   {
@@ -199,7 +199,7 @@ export const locations: Location[] = [
     address: 'Salt Lake / Alipore Hub, West Bengal',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1558431382-27e39cb14bc8?auto=format&fit=crop&q=85&w=1600',
+    mapImageUrl: 'https://images.unsplash.com/photo-1558431382-27e39cb14bc8?auto=format&fit=crop&q=85&w=1200',
     mapImageHint: 'kolkata healthcare hub'
   },
 ];
