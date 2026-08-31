@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useRequestCallback } from '@/components/request-callback-provider';
 import BookAppointmentButton from "../book-appointment-button";
 import HeroInteractiveCard from "./hero-interactive-card";
+import HeroSplineBackground from "./hero-spline-background";
 import { 
   ShieldCheck, 
   PhoneCall, 
@@ -49,30 +50,8 @@ export default function Hero() {
   return (
     <section className="relative w-full min-h-[90vh] flex items-center overflow-hidden bg-[#050814] dark:bg-[#050814] light:bg-[#f8fafc] py-12 md:py-16 lg:py-20">
       
-      {/* ── 1. Volumetric Ambient Lighting Blooms ── */}
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-blue-600/15 dark:bg-blue-600/15 light:bg-blue-200/30 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute top-1/3 right-1/4 w-[750px] h-[750px] bg-cyan-500/10 dark:bg-cyan-500/10 light:bg-cyan-200/20 rounded-full blur-[160px] pointer-events-none" />
-
-      {/* ── 2. Subtle Precision Telemetry Mesh Grid ── */}
-      <div 
-        className="absolute inset-0 opacity-[0.05] dark:opacity-[0.05] light:opacity-[0.03] pointer-events-none"
-        style={{
-          backgroundImage: `linear-gradient(rgba(56, 189, 248, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.2) 1px, transparent 1px)`,
-          backgroundSize: '48px 48px'
-        }}
-      />
-
-      {/* ── 3. Background 3D Translucent Anatomical Runner Watermark ── */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] lg:w-[650px] lg:h-[650px] pointer-events-none select-none z-0 opacity-40 dark:opacity-40 light:opacity-20 mix-blend-screen dark:mix-blend-screen light:mix-blend-multiply">
-        <Image
-          src="/hero/anatomy-runner.jpg"
-          alt="Biomechanical Anatomy"
-          fill
-          sizes="650px"
-          className="object-contain"
-          priority
-        />
-      </div>
+      {/* ── 1. Medical 3D Animated Spline & Biomechanical Kinematics Background ── */}
+      <HeroSplineBackground />
 
       {/* ── 4. Main Hero Container ── */}
       <div className="w-full max-w-[1780px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 relative z-10">
