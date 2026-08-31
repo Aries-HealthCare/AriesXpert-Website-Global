@@ -143,10 +143,15 @@ export function ProviderAuthProvider({ children }: { children: React.ReactNode }
   };
 
   const updateUserData = (data: Partial<MobileExpertProfile>) => {
-    if (!user) return;
-    const updated = { ...user, ...data };
-    setUser(updated);
-    localStorage.setItem('expert_user_data', JSON.stringify(updated));
+    setUser((prev) => {
+      const updated = { ...(prev || {}), ...data } as MobileExpertProfile;
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('expert_user_data', JSON.stringify(updated));
+        } catch (_) {}
+      }
+      return updated;
+    });
   };
 
   const logout = () => {

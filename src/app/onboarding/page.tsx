@@ -552,6 +552,12 @@ export default function ProviderOnboardingPage() {
     if (cached) {
       try {
         const d = JSON.parse(cached);
+        if (d.selectedCountry && COUNTRY_CONFIGS[d.selectedCountry]) {
+          setSelectedCountry(d.selectedCountry);
+        }
+        if (d.profilePhotoUrl && !profilePhotoUrl) {
+          setProfilePhotoUrl(d.profilePhotoUrl);
+        }
         if (d.maxUnlockedStep !== undefined && typeof d.maxUnlockedStep === 'number') {
           setMaxUnlockedStep((prev) => Math.max(prev, d.maxUnlockedStep));
         }
@@ -589,6 +595,7 @@ export default function ProviderOnboardingPage() {
     if (typeof window === 'undefined') return;
     const draft = {
       selectedCountry,
+      profilePhotoUrl,
       firstName,
       lastName,
       fullName,
@@ -632,10 +639,13 @@ export default function ProviderOnboardingPage() {
       currentStep,
       lastSavedAt: new Date().toISOString(),
     };
-    localStorage.setItem('onboarding_full_draft_v3', JSON.stringify(draft));
+    try {
+      localStorage.setItem('onboarding_full_draft_v3', JSON.stringify(draft));
+    } catch (_) {}
     setLastSavedText('Autosaved just now');
   }, [
     selectedCountry,
+    profilePhotoUrl,
     firstName,
     lastName,
     fullName,
@@ -675,6 +685,7 @@ export default function ProviderOnboardingPage() {
     travelCapacity,
     urgentVisits,
     travelTimePreference,
+    maxUnlockedStep,
     currentStep,
   ]);
 
@@ -683,20 +694,25 @@ export default function ProviderOnboardingPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setProfilePhotoFile(file);
-    const localUrl = URL.createObjectURL(file);
-    setProfilePhotoUrl(localUrl);
 
-    setIsUploadingPhoto(true);
-    try {
-      const res = await providerApi.uploadProfilePhoto(file, gender.toLowerCase());
-      if (res.url) {
-        setProfilePhotoUrl(res.url);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = reader.result as string;
+      setProfilePhotoUrl(dataUrl);
+
+      setIsUploadingPhoto(true);
+      try {
+        const res = await providerApi.uploadProfilePhoto(file, gender.toLowerCase());
+        if (res.url) {
+          setProfilePhotoUrl(res.url);
+        }
+      } catch (err) {
+        console.warn('[Onboarding] Profile photo upload fallback to data URL:', err);
+      } finally {
+        setIsUploadingPhoto(false);
       }
-    } catch (err) {
-      console.warn('[Onboarding] Profile photo upload fallback to local URL:', err);
-    } finally {
-      setIsUploadingPhoto(false);
-    }
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleCyclePose = () => {
@@ -805,10 +821,10 @@ export default function ProviderOnboardingPage() {
         });
 
         const res = await providerApi.addPersonalInfo(fd);
-        const registeredId = res.result?._id || res.result?.id || (isValidMongoId(user?._id) ? user?._id : undefined);
+        const registeredId = res.result?._id || res.result?.id || (isValidMongoId(user?._id) ? user?._id : ('exp_' + phone.replace(/\D/g, '').slice(-10)));
 
         updateUserData({
-          _id: registeredId || user?._id,
+          _id: registeredId,
           fullName,
           email,
           phone,
@@ -816,6 +832,7 @@ export default function ProviderOnboardingPage() {
           state: stateVal,
           countryName: selectedCountry,
           profilePhoto: profilePhotoUrl,
+          profileImageUrl: profilePhotoUrl,
           onboardingStep: 1,
         });
         setMaxUnlockedStep((prev) => Math.max(prev, 1));
@@ -823,7 +840,7 @@ export default function ProviderOnboardingPage() {
       } else if (currentStep === 1) {
         // ── Step 2: Professional Qualifications ──
         if (!qualification || !licenseNumber) {
-          setErrorMsg(`Please enter your ${COUNTRY_CONFIGS[selectedCountry]?.licenseLabel || 'Medical Council Registration Number'} and Qualification.`);
+          setErrorMsg(`Please enter your ${(COUNTRY_CONFIGS[selectedCountry] || COUNTRY_CONFIGS.India).licenseLabel || 'Medical Council Registration Number'} and Qualification.`);
           setIsSubmitting(false);
           return;
         }
@@ -860,6 +877,12 @@ export default function ProviderOnboardingPage() {
         if (profDocs.regCert?.file) fd.append('registrationCertificate', profDocs.regCert.file);
         if (profDocs.degreeCert?.file) fd.append('degreeCertificate', profDocs.degreeCert.file);
         if (profDocs.cvResume?.file) fd.append('cvResume', profDocs.cvResume.file);
+        if (profDocs.experienceCert?.file) fd.append('experienceCertificate', profDocs.experienceCert.file);
+
+        // Upload dynamic extra certifications
+        extraCertDocs.forEach((cert, idx) => {
+          if (cert.file) fd.append(`extraCertification_${idx}`, cert.file);
+        });
 
         await providerApi.addProfessionalInfo(fd);
         updateUserData({
@@ -873,7 +896,8 @@ export default function ProviderOnboardingPage() {
         setCurrentStep(2);
       } else if (currentStep === 2) {
         // ── Step 3: Banking & Payouts ──
-        const mandatoryList = COUNTRY_CONFIGS[selectedCountry]?.banking.fields.filter((f) => f.isMandatory !== false) || [];
+        const currentCountry = COUNTRY_CONFIGS[selectedCountry] || COUNTRY_CONFIGS.India;
+        const mandatoryList = currentCountry.banking?.fields?.filter((f) => f.isMandatory !== false) || [];
         for (const f of mandatoryList) {
           if (!bankFieldValues[f.id] || bankFieldValues[f.id].trim() === '') {
             setErrorMsg(`Please enter your ${f.label}.`);
