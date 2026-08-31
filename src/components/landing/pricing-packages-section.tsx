@@ -2,46 +2,34 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { 
+  CheckCircle2, 
   Sparkles, 
   ShieldCheck, 
   MapPin, 
   Phone, 
+  ArrowRight, 
   Search, 
+  Check, 
   LocateFixed, 
   Loader2, 
   CalendarCheck,
   Zap,
   Activity,
-  Award,
-  Clock,
-  RotateCcw,
-  CheckCircle2,
-  HelpCircle,
-  TrendingDown,
-  Stethoscope,
-  Radio,
-  Crosshair,
-  FileCheck
+  HeartPulse
 } from 'lucide-react';
 import { 
   STANDARD_PRICING_TIERS, 
   detectTierFromLocation, 
   searchAllIndiaLocalities, 
+  ALL_INDIA_LOCALITIES_2026,
   type PricingTier,
   type LocalityPricingRecord
 } from '@/lib/pricing-packages';
-import dynamic from 'next/dynamic';
 import { cn } from '@/lib/utils';
-
-const Pricing3DScene = dynamic(() => import('./pricing-3d-scene'), {
-  ssr: false,
-  loading: () => <div className="absolute inset-0 pointer-events-none" />
-});
-import PricingPackageCard, { type PackageCardData } from './pricing-package-card';
 
 interface PricingPackagesSectionProps {
   initialLocationName?: string;
@@ -56,12 +44,15 @@ const POPULAR_LOCALITIES = [
   { label: 'Hyderabad (Jubilee Hills / HITEC)', query: 'Jubilee Hills Hyderabad' },
   { label: 'Pune (Koregaon / Baner)', query: 'Koregaon Park Pune' },
   { label: 'Chennai (Anna Nagar / OMR)', query: 'Anna Nagar Chennai' },
+  { label: 'Kolkata (Salt Lake / Alipore)', query: 'Salt Lake Kolkata' },
+  { label: 'Ahmedabad (SG Highway)', query: 'SG Highway Ahmedabad' },
 ];
 
 export default function PricingPackagesSection({ 
   initialLocationName, 
   className 
 }: PricingPackagesSectionProps) {
+  // Default to Economy tier (₹1,000/session) if location is not detected
   const [activeTierKey, setActiveTierKey] = useState<string>(() => {
     return initialLocationName ? detectTierFromLocation(initialLocationName) : 'economy';
   });
@@ -78,6 +69,7 @@ export default function PricingPackagesSection({
 
   // ── AUTO-DETECT USER LOCATION ON PAGE MOUNT ──
   useEffect(() => {
+    // 1. If an initial location was passed via props, use it
     if (initialLocationName) {
       const tier = detectTierFromLocation(initialLocationName);
       setActiveTierKey(tier);
@@ -86,6 +78,7 @@ export default function PricingPackagesSection({
       return;
     }
 
+    // 2. Check localStorage if user previously selected/detected location
     try {
       const savedCity = localStorage.getItem('user_city');
       if (savedCity && savedCity.trim().length > 0) {
@@ -95,8 +88,11 @@ export default function PricingPackagesSection({
         setDetectionSource('default');
         return;
       }
-    } catch {}
+    } catch {
+      // Ignore localStorage read errors
+    }
 
+    // 3. Non-intrusive IP-based Geolocation Auto-Detection
     let isCancelled = false;
     const autoDetectByIP = async () => {
       try {
@@ -124,53 +120,61 @@ export default function PricingPackagesSection({
           setDetectionSource('ip');
         }
       } catch {
-        // Fallback silently to standard tier
+        // If IP detection fails or times out, keep clean default (₹1,000 / session)
       }
     };
 
     autoDetectByIP();
+
     return () => {
       isCancelled = true;
     };
   }, [initialLocationName]);
 
-  // ── HIGH ACCURACY GPS AUTO-DETECT TRIGGER ──
+  // ── PRECISE GPS ONE-CLICK AUTO-DETECT ──
   const handleGPSDetect = useCallback(() => {
-    if (typeof window === 'undefined' || !navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.');
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
       return;
     }
 
     setIsDetectingLocation(true);
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        try {
-          const { latitude, longitude } = pos.coords;
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=14&addressdetails=1`
-          );
-          if (res.ok) {
-            const data = await res.json();
-            const addr = data.address || {};
-            const suburb = addr.suburb || addr.neighbourhood || addr.residential || '';
-            const city = addr.city || addr.town || addr.state_district || addr.county || '';
-            const state = addr.state || '';
-            const postcode = addr.postcode || '';
 
-            const combinedQuery = `${suburb} ${city} ${state} ${postcode}`.trim();
-            const detectedTier = detectTierFromLocation(combinedQuery);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+            { headers: { 'Accept-Language': 'en' } }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            const address = data.address || {};
+            const suburb = address.suburb || address.neighbourhood || address.residential || address.commercial || '';
+            const city = address.city || address.town || address.state_district || address.county || '';
+            const state = address.state || '';
+            const postcode = address.postcode || '';
+
+            const fullLocString = `${suburb} ${city} ${state} ${postcode}`.trim();
+            const detectedTier = detectTierFromLocation(fullLocString);
             const displayLabel = suburb 
-              ? `${suburb}, ${city}${postcode ? ` - ${postcode}` : ''}`
-              : `${city || state}${postcode ? ` - ${postcode}` : ''}`;
+              ? `${suburb}, ${city || state}${postcode ? ` (${postcode})` : ''}`
+              : (city ? `${city}, ${state}${postcode ? ` (${postcode})` : ''}` : fullLocString);
 
             setActiveTierKey(detectedTier);
-            setActiveLocationLabel(displayLabel || 'Your Current GPS Location');
-            setSelectedLocality(null);
+            setActiveLocationLabel(displayLabel);
             setDetectionSource('gps');
+            setSelectedLocality(null);
             setLocalitySearch('');
+
+            try {
+              if (city) localStorage.setItem('user_city', city);
+            } catch {}
           }
         } catch {
-          // GPS Geocode error fallback
+          // Keep current selection on network failure
         } finally {
           setIsDetectingLocation(false);
         }
@@ -178,20 +182,20 @@ export default function PricingPackagesSection({
       () => {
         setIsDetectingLocation(false);
       },
-      { timeout: 8000, enableHighAccuracy: true }
+      { timeout: 8000, maximumAge: 60000, enableHighAccuracy: true }
     );
   }, []);
 
-  // ── LOCALITY SEARCH AUTOCOMPLETE ──
+  // ── REAL-TIME SEARCH SUGGESTIONS ACROSS 2026 REGISTRY ──
   const searchResults = useMemo(() => {
-    if (!localitySearch || localitySearch.trim().length < 2) return [];
-    return searchAllIndiaLocalities(localitySearch, 6);
+    if (!localitySearch.trim() || localitySearch.trim().length < 2) return [];
+    return searchAllIndiaLocalities(localitySearch, 8);
   }, [localitySearch]);
 
-  const handleSelectSearchResult = (loc: LocalityPricingRecord) => {
+  const handleSelectLocality = (loc: LocalityPricingRecord) => {
     setSelectedLocality(loc);
-    setActiveTierKey(loc.tierId || 'economy');
-    setActiveLocationLabel(`${loc.subArea || loc.city}, ${loc.city} (${loc.state})`);
+    setActiveTierKey(loc.tierId);
+    setActiveLocationLabel(`${loc.subArea}, ${loc.city} (${loc.pincodes[0] || ''})`);
     setDetectionSource('search');
     setLocalitySearch('');
   };
@@ -216,22 +220,21 @@ export default function PricingPackagesSection({
     setLocalitySearch('');
   };
 
-  // ── 4 MULTI-DAY MEDICAL PROTOCOLS CONFIGURATION ──
-  const packageCards: PackageCardData[] = [
+  // ── 4 MULTI-DAY PACKAGES CONFIGURATION ──
+  const packageCards = [
     {
       key: 'days10',
       days: 10,
-      protocolCode: 'CLIN-PROT: 10-ACUTE',
       title: '10 Days Recovery Plan',
-      badge: '10 Days Plan',
-      badgeClass: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
+      badge: '10 Days',
+      badgeClass: 'bg-orange-500/15 text-orange-400 border-orange-500/30',
       rate: packages.days10.ratePerSession,
       total: packages.days10.totalPrice,
       savings: packages.days10.totalSavings,
       description: 'Ideal for acute muscle spasms, neck/back stiffness, minor sprains & initial mobility restoration.',
       features: [
         '10 In-Home Clinical Sessions',
-        'Electrotherapy & Modalities Included (IFT/TENS/US)',
+        'Electrotherapy & Modalities Included',
         'Certified BPT/MPT Physiotherapist',
         'Daily Pain & Range-of-Motion Tracking',
       ],
@@ -240,10 +243,9 @@ export default function PricingPackagesSection({
     {
       key: 'days15',
       days: 15,
-      protocolCode: 'CLIN-PROT: 15-REHAB',
       title: '15 Days Rehabilitation Plan',
-      badge: '15 Days Plan',
-      badgeClass: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40',
+      badge: '15 Days',
+      badgeClass: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
       rate: packages.days15.ratePerSession,
       total: packages.days15.totalPrice,
       savings: packages.days15.totalSavings,
@@ -259,10 +261,9 @@ export default function PricingPackagesSection({
     {
       key: 'days20',
       days: 20,
-      protocolCode: 'CLIN-PROT: 20-POSTOP',
       title: '20 Days Intensive Rehab Plan',
-      badge: '20 Days Plan',
-      badgeClass: 'bg-rose-500/15 text-rose-300 border-rose-500/40',
+      badge: '20 Days',
+      badgeClass: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
       rate: packages.days20.ratePerSession,
       total: packages.days20.totalPrice,
       savings: packages.days20.totalSavings,
@@ -278,10 +279,9 @@ export default function PricingPackagesSection({
     {
       key: 'days30',
       days: 30,
-      protocolCode: 'CLIN-PROT: 30-NEURO',
       title: '30 Days Complete Care Plan',
       badge: '30 Days · Best Value',
-      badgeClass: 'bg-gradient-to-r from-amber-400 via-rose-500 to-violet-500 text-white border-0',
+      badgeClass: 'bg-gradient-to-r from-primary via-rose-500 to-pink-500 text-white border-0',
       rate: packages.days30.ratePerSession,
       total: packages.days30.totalPrice,
       savings: packages.days30.totalSavings,
@@ -297,236 +297,279 @@ export default function PricingPackagesSection({
   ];
 
   return (
-    <section id="pricing-packages" className={cn('py-18 md:py-28 lg:py-32 relative overflow-hidden bg-[#02050e] text-white', className)}>
-      
-      {/* ── 1. 3D Motion Graphics Scene (Three.js WebGL Hologram Torus & Kinetic Value Nodes) ── */}
-      <Pricing3DScene />
+    <section id="pricing-packages" className={cn('py-20 md:py-28 relative overflow-hidden bg-background text-foreground', className)}>
+      {/* Background glow ornaments */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(ellipse_at_top,rgba(225,29,72,0.15),transparent_70%)] pointer-events-none" />
+      <div className="absolute -bottom-24 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/3 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
 
-      {/* ── 2. Cinematic Volumetric Lighting & Glows ── */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[450px] bg-[radial-gradient(ellipse_at_top,rgba(124,58,237,0.2),transparent_70%)] pointer-events-none" />
-      <div className="absolute top-1/3 left-10 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-20 right-10 w-[650px] h-[650px] bg-rose-600/10 rounded-full blur-[160px] pointer-events-none" />
-
-      {/* ── 3. Medical Precision Telemetry Mesh Grid ── */}
-      <div 
-        className="absolute inset-0 opacity-[0.05] pointer-events-none"
-        style={{
-          backgroundImage: `linear-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.15) 1px, transparent 1px)`,
-          backgroundSize: '48px 48px'
-        }}
-      />
-
-      {/* ── 4. Main Section Container (Medical HealthCare Grade Fluid Widescreen Geometry) ── */}
-      <div className="w-full max-w-[1780px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 relative z-10">
-        
-        {/* ── Section Header ── */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="max-w-3xl mx-auto text-center mb-10 space-y-4 flex flex-col items-center"
-        >
-          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full glassmorphic border border-cyan-500/40 bg-cyan-950/40 text-cyan-300 text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_30px_rgba(6,182,212,0.25)]">
-            <Activity className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-            <span>Clinical Protocols & Transparent Pricing</span>
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto space-y-4 mb-10">
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-[0.2em] shadow-sm backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5" />
+            Transparent Home Care Pricing
           </div>
-
-          <h2 className="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.06] text-white">
-            Hospital-Grade Care. <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-[0_0_50px_rgba(56,189,248,0.35)]">
-              Zero Hidden Charges.
-            </span>
+          
+          <h2 className="font-headline text-3xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15]">
+            Aries PhysioCare <span className="premium-gradient-text">Treatment Packages</span>
           </h2>
-
-          <p className="text-slate-300 text-base sm:text-lg lg:text-xl leading-relaxed max-w-2xl mx-auto font-light">
-            Evidence-based rehabilitation delivered to your home. Every visit includes dedicated certified specialists, complete portable electrotherapy gear, and progressive recovery tracking.
+          
+          <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
+            Hospital-grade home physiotherapy delivered by certified BPT/MPT specialists with advanced electrotherapy modalities. Transparent single visit rates and guaranteed decreasing per-day charges on all multi-day packages.
           </p>
-        </motion.div>
+        </div>
 
-        {/* ── 5. Medical Telemetry Location Radar & Auto-Detect Bar ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="max-w-4xl mx-auto mb-14"
-        >
-          <div className="rounded-[26px] p-[1.5px] bg-gradient-to-r from-blue-600/40 via-cyan-500/40 to-violet-600/40 shadow-2xl backdrop-blur-2xl">
-            <div className="rounded-[24px] bg-[#070c1a]/95 p-4 sm:p-6 border border-white/10 space-y-4">
-              
-              {/* Active Detected City / Locality Status HUD */}
-              <div className="flex flex-wrap items-center justify-between gap-3 text-xs border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2 text-slate-300">
-                  <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
-                  <span>Active Pricing Area:</span>
-                  <span className="font-black text-white bg-white/[0.08] px-3 py-1 rounded-full border border-white/10">
-                    {activeLocationLabel}
-                  </span>
-                  {detectionSource === 'gps' && (
-                    <Badge variant="outline" className="text-[10px] border-emerald-500/50 text-emerald-300 bg-emerald-950/40">
-                      GPS Locked
-                    </Badge>
-                  )}
-                  {detectionSource === 'ip' && (
-                    <Badge variant="outline" className="text-[10px] border-blue-500/50 text-blue-300 bg-blue-950/40">
-                      Auto-Detected
-                    </Badge>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2 text-[11px] text-cyan-300 font-mono">
-                  <Crosshair className="w-3.5 h-3.5" />
-                  <span>TIER: {(currentTier.id || activeTierKey || 'economy').toUpperCase()}</span>
-                </div>
-              </div>
-
-              {/* Search Box & GPS Button Row */}
-              <div className="flex flex-col sm:flex-row items-center gap-3">
-                <div className="relative flex-1 w-full">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type="text"
-                    value={localitySearch}
-                    onChange={handleSearchChange}
-                    placeholder="Search your city, locality, or pincode (e.g. Bandra, Indiranagar, 400050)..."
-                    className="w-full h-12 pl-11 pr-4 rounded-xl bg-white/[0.05] border border-white/15 text-white placeholder:text-slate-400 text-sm focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
-                  />
-                  {searchResults.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-2 rounded-xl bg-[#090e1e] border border-white/15 shadow-2xl p-2 z-50 max-h-60 overflow-y-auto space-y-1">
-                      {searchResults.map((loc, lIdx) => (
-                        <button
-                          key={lIdx}
-                          onClick={() => handleSelectSearchResult(loc)}
-                          className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-slate-200 hover:bg-cyan-500/20 hover:text-cyan-300 flex items-center justify-between transition-colors"
-                        >
-                          <span>{loc.subArea || loc.city}, {loc.city}</span>
-                          <span className="text-[10px] text-slate-400">{loc.state}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <Button
-                  onClick={handleGPSDetect}
-                  disabled={isDetectingLocation}
-                  variant="outline"
-                  className="h-12 px-5 rounded-xl border-white/20 bg-white/[0.05] hover:bg-white/[0.1] text-white text-xs font-bold flex items-center gap-2 shrink-0 transition-all"
-                >
-                  {isDetectingLocation ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
-                      <span>Scanning GPS...</span>
-                    </>
-                  ) : (
-                    <>
-                      <LocateFixed className="w-4 h-4 text-cyan-400" />
-                      <span>Detect My GPS</span>
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {/* Quick Preset City Badges */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pt-1 no-scrollbar text-xs">
-                <span className="text-slate-400 text-[11px] font-bold mr-1 shrink-0">Popular:</span>
-                {POPULAR_LOCALITIES.map((p, idx) => (
+        {/* ── LOCATION AUTO-DETECTOR & SEARCH BAR ── */}
+        <div className="max-w-3xl mx-auto mb-10 space-y-3">
+          <div className="relative">
+            <div className="relative flex items-center gap-2">
+              <div className="relative flex-1 flex items-center">
+                <Search className="w-5 h-5 absolute left-4 text-primary pointer-events-none" />
+                <input
+                  type="text"
+                  value={localitySearch}
+                  onChange={handleSearchChange}
+                  placeholder="Search your Area, Locality, City or 6-Digit Pincode (e.g. Bandra, South Mumbai, Indiranagar, 400050)..."
+                  className="w-full h-14 pl-12 pr-4 bg-card/80 border-2 border-border/80 focus:border-primary rounded-2xl text-sm md:text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-4 focus:ring-primary/20 shadow-xl backdrop-blur-xl transition-all"
+                />
+                {localitySearch && (
                   <button
-                    key={idx}
-                    onClick={() => handlePresetClick(p)}
-                    className="px-2.5 py-1 rounded-lg bg-white/[0.04] hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-200 border border-white/5 text-[11px] font-medium shrink-0 transition-colors"
+                    onClick={() => {
+                      setLocalitySearch('');
+                      setSelectedLocality(null);
+                    }}
+                    className="absolute right-4 text-xs font-bold uppercase text-muted-foreground hover:text-foreground px-2.5 py-1 rounded-lg bg-secondary/80"
                   >
-                    {p.label}
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              {/* One-Click GPS Auto-Detect Button */}
+              <Button
+                type="button"
+                onClick={handleGPSDetect}
+                disabled={isDetectingLocation}
+                className="h-14 px-4 sm:px-5 rounded-2xl bg-primary/10 hover:bg-primary/20 border-2 border-primary/30 text-primary font-bold text-xs shrink-0 flex items-center gap-2 transition-all shadow-md"
+                title="Detect my location automatically via GPS"
+              >
+                {isDetectingLocation ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                ) : (
+                  <LocateFixed className="w-4 h-4 text-primary" />
+                )}
+                <span className="hidden sm:inline">Auto-Detect</span>
+              </Button>
+            </div>
+
+            {/* Instant Search Suggestions Dropdown */}
+            {searchResults.length > 0 && !selectedLocality && (
+              <div className="absolute top-full left-0 right-0 mt-2 p-2 bg-card/95 border border-border rounded-2xl shadow-2xl backdrop-blur-2xl z-50 max-h-72 overflow-y-auto divide-y divide-border/40">
+                {searchResults.map((loc, idx) => (
+                  <button
+                    key={`${loc.city}-${loc.subArea}-${idx}`}
+                    onClick={() => handleSelectLocality(loc)}
+                    className="w-full p-3 text-left hover:bg-primary/5 rounded-xl flex items-center justify-between transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <MapPin className="w-4 h-4 text-primary shrink-0" />
+                      <div>
+                        <div className="text-sm font-bold text-foreground group-hover:text-primary">
+                          {loc.subArea}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {loc.city}, {loc.state} · <span className="font-mono text-primary">{loc.pincodes.join(', ')}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-xs font-black text-emerald-500 font-mono bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                      ₹{loc.basePrice} / day
+                    </span>
                   </button>
                 ))}
               </div>
+            )}
+          </div>
 
+          {/* Quick Popular Localities Chips */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
+            <span className="text-muted-foreground shrink-0 flex items-center gap-1 font-semibold">
+              <MapPin className="w-3 h-3 text-primary" /> Quick Select:
+            </span>
+            {POPULAR_LOCALITIES.map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                onClick={() => handlePresetClick(preset)}
+                className="shrink-0 px-3 py-1.5 rounded-full bg-card hover:bg-primary/10 border border-border/80 hover:border-primary/40 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── AUTO-DETECTED LOCATION & PER-DAY CHARGE HERO BANNER ── */}
+        <div className="max-w-4xl mx-auto mb-12 p-6 md:p-7 rounded-3xl bg-card/60 border border-primary/20 shadow-2xl backdrop-blur-xl">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="flex h-2.5 w-2.5 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                </span>
+                <span className="text-xs font-bold text-primary uppercase tracking-wider">
+                  {detectionSource === 'gps' 
+                    ? 'GPS Verified Location:' 
+                    : (detectionSource === 'ip' ? 'Auto-Detected Location:' : 'Active Location Rates:')}
+                </span>
+                <Badge className="bg-primary/10 text-primary border-primary/20 text-xs font-bold font-sans">
+                  {activeLocationLabel}
+                </Badge>
+              </div>
+
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-lg">
+                Includes verified BPT/MPT physiotherapist in-home visit, comprehensive physical examination, personalized rehabilitation roadmap, and hospital-grade electrotherapy gear (IFT/TENS/Ultrasound) at your home.
+              </p>
+            </div>
+
+            {/* Per-Day Single Session Charge Box */}
+            <div className="p-4 md:p-5 rounded-2xl bg-background/80 border border-primary/20 shrink-0 text-center md:text-right w-full md:w-auto shadow-xl">
+              <div className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+                Single Session (Per Day)
+              </div>
+              <div className="text-3xl md:text-4xl font-black font-mono text-emerald-500 mt-0.5">
+                ₹{currentTier.basePrice.toLocaleString('en-IN')}
+                <span className="text-xs text-muted-foreground font-sans font-normal ml-1">/ day</span>
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-1">
+                No advance registration charges
+              </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* ── 6. Single Session Benchmark Rate Banner ── */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.15 }}
-          className="max-w-4xl mx-auto mb-14"
-        >
-          <div className="rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-blue-950/40 via-indigo-950/40 to-cyan-950/40 border border-cyan-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
-            <div className="flex items-center gap-3.5 text-left">
-              <div className="w-11 h-11 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-300 shrink-0">
-                <Stethoscope className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-cyan-300 uppercase tracking-wider">
-                  Single In-Home Clinical Session
-                </div>
-                <div className="text-xs text-slate-300 mt-0.5">
-                  Complete Assessment + 1-on-1 Treatment + All Portable Modalities Included
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 shrink-0">
-              <div className="text-right">
-                <div className="text-[10px] font-bold uppercase text-slate-400">Pay-As-You-Go</div>
-                <div className="text-2xl font-black text-white">
-                  ₹{(currentTier.basePrice || 1000).toLocaleString('en-IN')}
-                </div>
-              </div>
-              <Button asChild className="h-11 px-5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg">
-                <Link href={`/book-appointment?locality=${encodeURIComponent(activeLocationLabel)}`}>
-                  Book Single Visit
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* ── 7. 4 Multi-Day Medical Protocol Cards Grid (Fluid Widescreen 4-Column Layout) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8 items-stretch">
-          {packageCards.map((pkg, index) => (
-            <PricingPackageCard
+        {/* ── 4 MULTI-DAY RECOVERY PACKAGES ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
+          {packageCards.map((pkg) => (
+            <Card
               key={pkg.key}
-              pkg={pkg}
-              activeLocationLabel={activeLocationLabel}
-              index={index}
-            />
+              className={cn(
+                'relative flex flex-col justify-between overflow-hidden rounded-3xl border transition-all duration-300 group hover:-translate-y-2',
+                pkg.popular
+                  ? 'bg-card border-primary shadow-2xl shadow-primary/10 ring-2 ring-primary/30'
+                  : 'bg-card/70 hover:bg-card border-border/80 hover:border-primary/40 shadow-xl'
+              )}
+            >
+              {/* Top Banner for Best Value */}
+              {pkg.popular && (
+                <div className="w-full bg-gradient-to-r from-primary via-rose-500 to-pink-500 py-1.5 text-center text-[11px] font-black uppercase tracking-widest text-white shadow-md">
+                  ★ Most Popular · Maximum Recovery
+                </div>
+              )}
+
+              <CardContent className="p-6 md:p-7 flex flex-col justify-between h-full space-y-6">
+                {/* Header info */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="outline" className={cn('text-[11px] font-black uppercase tracking-wider px-2.5 py-1', pkg.badgeClass)}>
+                      {pkg.badge}
+                    </Badge>
+                    <Badge variant="outline" className="text-[10px] border-emerald-500/30 text-emerald-500 font-bold bg-emerald-500/10">
+                      Save ₹{pkg.savings.toLocaleString('en-IN')}
+                    </Badge>
+                  </div>
+
+                  <div>
+                    <h3 className="font-headline text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                      {pkg.title}
+                    </h3>
+                    <p className="text-muted-foreground text-xs mt-1 leading-relaxed">
+                      {pkg.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Pricing Box */}
+                <div className="p-4 rounded-2xl bg-secondary/40 border border-border/50 space-y-2">
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-xs text-muted-foreground">Rate / Day</span>
+                    <div className="text-right">
+                      <span className="text-2xl font-black font-mono text-foreground">
+                        ₹{pkg.rate.toLocaleString('en-IN')}
+                      </span>
+                      <span className="text-xs text-muted-foreground font-sans ml-1">/ day</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-border/40 text-xs">
+                    <span className="text-muted-foreground">Total ({pkg.days} Days)</span>
+                    <span className="text-base font-black text-emerald-500 font-mono">
+                      ₹{pkg.total.toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Features list */}
+                <div className="space-y-2.5 text-xs text-foreground/80">
+                  {pkg.features.map((feat, fIdx) => (
+                    <div key={fIdx} className="flex items-start gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                      <span className="leading-snug">{feat}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Booking Button */}
+                <Button
+                  asChild
+                  className={cn(
+                    'w-full h-12 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300',
+                    pkg.popular
+                      ? 'bg-gradient-to-r from-primary to-rose-600 hover:from-primary/90 hover:to-rose-500 text-white shadow-lg shadow-primary/25'
+                      : 'bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/20 hover:border-primary'
+                  )}
+                >
+                  <Link href={`/book-appointment?location=${encodeURIComponent(activeLocationLabel)}&package=${pkg.days}`}>
+                    Book {pkg.days}-Day Plan
+                    <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
           ))}
         </div>
 
-        {/* ── 8. Bottom Clinical Trust & Guarantee Seal ── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="mt-16 pt-8 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-5 sm:gap-6 text-center"
-        >
-          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1">
-            <ShieldCheck className="w-6 h-6 text-emerald-400 mx-auto" />
-            <div className="text-xs font-bold text-white">Council Verified BPT/MPT</div>
-            <div className="text-[11px] text-slate-400">100% verified clinical credentials</div>
+        {/* ── BOTTOM CONSULTATION CALLOUT ── */}
+        <div className="max-w-4xl mx-auto p-6 md:p-8 rounded-3xl bg-card/60 border border-border shadow-2xl backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start gap-2 text-primary font-bold text-xs uppercase tracking-wider">
+              <CalendarCheck className="w-4 h-4" />
+              Custom Rehabilitation Consultation
+            </div>
+            <h4 className="font-headline text-xl font-black text-foreground">
+              Need Help Choosing Your Recovery Plan?
+            </h4>
+            <p className="text-xs text-muted-foreground max-w-md">
+              Speak directly with our clinical physiotherapists for a free tele-consultation and personalized recovery assessment for your area.
+            </p>
           </div>
-          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1">
-            <Zap className="w-6 h-6 text-amber-400 mx-auto" />
-            <div className="text-xs font-bold text-white">Full Treatment Gear Brought</div>
-            <div className="text-[11px] text-slate-400">IFT, TENS & Ultrasound modalities</div>
-          </div>
-          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1">
-            <Clock className="w-6 h-6 text-cyan-400 mx-auto" />
-            <div className="text-xs font-bold text-white">Same-Day Home Visits</div>
-            <div className="text-[11px] text-slate-400">Rapid local dispatch across your area</div>
-          </div>
-          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1">
-            <Award className="w-6 h-6 text-violet-400 mx-auto" />
-            <div className="text-xs font-bold text-white">Zero Registration Fee</div>
-            <div className="text-[11px] text-slate-400">Pay only after your first session</div>
-          </div>
-        </motion.div>
 
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <Button asChild variant="outline" className="h-12 px-6 border-border hover:bg-secondary text-foreground font-bold text-xs uppercase tracking-wider rounded-xl">
+              <a href="tel:+919136447006" className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-emerald-500" />
+                Call +91 9136447006
+              </a>
+            </Button>
+            <Button asChild className="h-12 px-8 bg-gradient-to-r from-primary to-rose-600 hover:from-primary/90 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20">
+              <Link href={`/book-appointment?location=${encodeURIComponent(activeLocationLabel)}`}>
+                Book Home Assessment
+              </Link>
+            </Button>
+          </div>
+        </div>
       </div>
     </section>
   );
