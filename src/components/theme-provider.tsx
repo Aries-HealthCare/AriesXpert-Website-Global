@@ -25,13 +25,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     
     const initialTheme = storedTheme || preferredTheme;
     setThemeState(initialTheme);
+    document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(initialTheme);
 
   }, []);
 
   const setTheme = (newTheme: Theme) => {
     localStorage.setItem("theme", newTheme);
-    document.documentElement.classList.remove(theme);
+    document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(newTheme);
     setThemeState(newTheme);
   };

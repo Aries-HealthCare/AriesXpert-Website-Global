@@ -112,7 +112,7 @@ export default function Header() {
           <div className="hidden md:block">
             <LocationSelector current={currentLocationName} />
           </div>
-          <div className="hidden xl:block">
+          <div className="flex items-center">
             <ThemeToggle />
           </div>
           <Link
