@@ -7,29 +7,20 @@ import Footer from '@/components/landing/footer';
 import CountryPopup from '@/components/landing/country-popup';
 import MobileCtaFooter from '@/components/mobile-cta-footer';
 import WhatsAppButton from '@/components/whatsapp-button';
-import { ProviderAuthProvider } from '@/services/provider-auth-context';
 
 export default function SiteLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-
-  const isAppRoute = Boolean(pathname && (pathname.startsWith('/app') || pathname.startsWith('/portal')));
-  const isAuthRoute = Boolean(
-    pathname &&
-      (pathname === '/login' ||
-        pathname === '/register' ||
-        pathname === '/verify' ||
-        pathname === '/onboarding')
-  );
+  const isPortalRoute = Boolean(pathname && pathname.startsWith('/portal'));
 
   return (
-    <ProviderAuthProvider>
-      {!isAppRoute && !isAuthRoute && <Header />}
+    <>
+      {!isPortalRoute && <Header />}
       
-      <main className={`flex-1 ${isAppRoute ? 'bg-background' : ''}`}>
+      <main className="flex-1 bg-background text-foreground">
         {children}
       </main>
 
-      {!isAppRoute && !isAuthRoute && (
+      {!isPortalRoute && (
         <>
           <Footer />
           <CountryPopup />
@@ -37,6 +28,6 @@ export default function SiteLayoutWrapper({ children }: { children: React.ReactN
           <WhatsAppButton />
         </>
       )}
-    </ProviderAuthProvider>
+    </>
   );
 }

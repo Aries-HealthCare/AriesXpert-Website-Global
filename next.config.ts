@@ -74,15 +74,23 @@ const nextConfig: NextConfig = {
       { source: '/terms-conditions', destination: '/terms-of-service', permanent: true },
       { source: '/terms-conditions/', destination: '/terms-of-service', permanent: true },
 
-      // ── Login and Dashboard page redirects ───────────────────
-      { source: '/doctors-login', destination: '/login', permanent: true },
-      { source: '/doctors-login/', destination: '/login', permanent: true },
-      { source: '/patients-login', destination: '/login', permanent: true },
-      { source: '/patients-login/', destination: '/login', permanent: true },
-      { source: '/dashboard', destination: '/app', permanent: false },
-      { source: '/dashboard/:path*', destination: '/app/:path*', permanent: false },
-      { source: '/register', destination: '/onboarding', permanent: false },
-      { source: '/register/', destination: '/onboarding', permanent: false },
+      // ── Parity App Subdomain Redirects ───────────────────────
+      { source: '/app', destination: 'https://app.ariesphysiocare.com', permanent: true },
+      { source: '/app/:path*', destination: 'https://app.ariesphysiocare.com/:path*', permanent: true },
+      { source: '/login', destination: 'https://app.ariesphysiocare.com/login', permanent: true },
+      { source: '/login/', destination: 'https://app.ariesphysiocare.com/login', permanent: true },
+      { source: '/onboarding', destination: 'https://app.ariesphysiocare.com/onboarding', permanent: true },
+      { source: '/onboarding/', destination: 'https://app.ariesphysiocare.com/onboarding', permanent: true },
+      { source: '/verify', destination: 'https://app.ariesphysiocare.com/verify', permanent: true },
+      { source: '/verify/', destination: 'https://app.ariesphysiocare.com/verify', permanent: true },
+      { source: '/doctors-login', destination: 'https://app.ariesphysiocare.com/login', permanent: true },
+      { source: '/doctors-login/', destination: 'https://app.ariesphysiocare.com/login', permanent: true },
+      { source: '/patients-login', destination: 'https://app.ariesphysiocare.com/login', permanent: true },
+      { source: '/patients-login/', destination: 'https://app.ariesphysiocare.com/login', permanent: true },
+      { source: '/dashboard', destination: 'https://app.ariesphysiocare.com', permanent: true },
+      { source: '/dashboard/:path*', destination: 'https://app.ariesphysiocare.com/:path*', permanent: true },
+      { source: '/register', destination: 'https://app.ariesphysiocare.com/onboarding', permanent: true },
+      { source: '/register/', destination: 'https://app.ariesphysiocare.com/onboarding', permanent: true },
     ];
   },
 
