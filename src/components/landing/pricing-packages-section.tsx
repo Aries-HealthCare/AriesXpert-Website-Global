@@ -190,8 +190,8 @@ export default function PricingPackagesSection({
 
   const handleSelectSearchResult = (loc: LocalityPricingRecord) => {
     setSelectedLocality(loc);
-    setActiveTierKey(loc.tier);
-    setActiveLocationLabel(`${loc.localityName}, ${loc.city} (${loc.state})`);
+    setActiveTierKey(loc.tierId || 'economy');
+    setActiveLocationLabel(`${loc.subArea || loc.city}, ${loc.city} (${loc.state})`);
     setDetectionSource('search');
     setLocalitySearch('');
   };
@@ -377,7 +377,7 @@ export default function PricingPackagesSection({
 
                 <div className="flex items-center gap-2 text-[11px] text-cyan-300 font-mono">
                   <Crosshair className="w-3.5 h-3.5" />
-                  <span>TIER: {currentTier.tier.toUpperCase()}</span>
+                  <span>TIER: {(currentTier.id || activeTierKey || 'economy').toUpperCase()}</span>
                 </div>
               </div>
 
@@ -394,13 +394,13 @@ export default function PricingPackagesSection({
                   />
                   {searchResults.length > 0 && (
                     <div className="absolute top-full left-0 right-0 mt-2 rounded-xl bg-[#090e1e] border border-white/15 shadow-2xl p-2 z-50 max-h-60 overflow-y-auto space-y-1">
-                      {searchResults.map((loc) => (
+                      {searchResults.map((loc, lIdx) => (
                         <button
-                          key={loc.id}
+                          key={lIdx}
                           onClick={() => handleSelectSearchResult(loc)}
                           className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-slate-200 hover:bg-cyan-500/20 hover:text-cyan-300 flex items-center justify-between transition-colors"
                         >
-                          <span>{loc.localityName}, {loc.city}</span>
+                          <span>{loc.subArea || loc.city}, {loc.city}</span>
                           <span className="text-[10px] text-slate-400">{loc.state}</span>
                         </button>
                       ))}
@@ -473,7 +473,7 @@ export default function PricingPackagesSection({
               <div className="text-right">
                 <div className="text-[10px] font-bold uppercase text-slate-400">Pay-As-You-Go</div>
                 <div className="text-2xl font-black text-white">
-                  ₹{currentTier.singleSessionRate.toLocaleString('en-IN')}
+                  ₹{(currentTier.basePrice || 1000).toLocaleString('en-IN')}
                 </div>
               </div>
               <Button asChild className="h-11 px-5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg">
