@@ -28,3 +28,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# nested workspaces
+AriesXpert-Admin-Dashboard/
+AriesXpert-Website-Canada/
+AriesXpert-Website-India/
+OmniRoute/
+ai-avatar-system/
+aries-avatar-render-engine/
+ariesxpert-backend/
+ariesxpertv2/
+goblin-ai/
+

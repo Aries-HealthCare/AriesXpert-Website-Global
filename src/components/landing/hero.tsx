@@ -1,40 +1,33 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useRequestCallback } from '@/components/request-callback-provider';
 import BookAppointmentButton from "../book-appointment-button";
-import dynamic from "next/dynamic";
-import type { WebsiteStats } from "@/app/api/stats/route";
-
-const Hero3DScene = dynamic(() => import("./hero-3d-scene"), {
-  ssr: false,
-  loading: () => <div className="absolute inset-0 pointer-events-none" />
-});
 import HeroInteractiveCard from "./hero-interactive-card";
 import { 
   ShieldCheck, 
-  Sparkles, 
   PhoneCall, 
   Star, 
-  Award, 
   Users, 
   Clock, 
   ArrowRight, 
   CheckCircle2,
-  Activity,
   Stethoscope,
-  HeartHandshake,
-  Crosshair,
   Radio,
-  FileCheck
+  FileCheck,
+  Briefcase,
+  User,
+  MessageSquare
 } from "lucide-react";
+import type { WebsiteStats } from "@/app/api/stats/route";
 
 function formatCount(n: number | undefined | null, fallback = '450+'): string {
   if (n == null || isNaN(n)) return fallback;
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M+`;
-  if (n >= 1_000) return `${Math.floor(n / 1_000)}k+`;
+  if (n >= 1_000) return `${Math.floor(n / 1_000)}K+`;
   return `${n}+`;
 }
 
@@ -54,138 +47,152 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative w-full min-h-[92vh] flex items-center overflow-hidden bg-[#02050e] py-12 md:py-20 lg:py-24">
+    <section className="relative w-full min-h-[90vh] flex items-center overflow-hidden bg-[#050814] dark:bg-[#050814] light:bg-[#f8fafc] py-12 md:py-16 lg:py-20">
       
-      {/* ── 1. Interactive 3D WebGL Kinetic Canvas (Biomechanical Spine Wave & Neural Field) ── */}
-      <Hero3DScene />
+      {/* ── 1. Volumetric Ambient Lighting Blooms ── */}
+      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-blue-600/15 dark:bg-blue-600/15 light:bg-blue-200/30 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/3 right-1/4 w-[750px] h-[750px] bg-cyan-500/10 dark:bg-cyan-500/10 light:bg-cyan-200/20 rounded-full blur-[160px] pointer-events-none" />
 
-      {/* ── 2. Volumetric Ambient Medical Lighting & Radial Blooms ── */}
-      <div className="absolute top-1/4 left-1/5 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-blue-600/15 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute top-1/3 right-1/6 w-[750px] h-[750px] bg-violet-600/15 rounded-full blur-[170px] pointer-events-none" />
-      <div className="absolute bottom-10 left-1/3 w-[550px] h-[550px] bg-cyan-500/10 rounded-full blur-[130px] pointer-events-none" />
-
-      {/* ── 3. Medical Precision Telemetry Mesh Grid ── */}
+      {/* ── 2. Subtle Precision Telemetry Mesh Grid ── */}
       <div 
-        className="absolute inset-0 opacity-[0.06] pointer-events-none"
+        className="absolute inset-0 opacity-[0.05] dark:opacity-[0.05] light:opacity-[0.03] pointer-events-none"
         style={{
-          backgroundImage: `linear-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.15) 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(rgba(56, 189, 248, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.2) 1px, transparent 1px)`,
           backgroundSize: '48px 48px'
         }}
       />
 
-      {/* ── 4. Main Hero Container (Medical HealthCare Grade Fluid Widescreen Geometry) ── */}
-      <div className="w-full max-w-[1780px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 xl:gap-16 items-center">
+      {/* ── 3. Background 3D Translucent Anatomical Runner Watermark ── */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] lg:w-[650px] lg:h-[650px] pointer-events-none select-none z-0 opacity-40 dark:opacity-40 light:opacity-20 mix-blend-screen dark:mix-blend-screen light:mix-blend-multiply">
+        <Image
+          src="/hero/anatomy-runner.jpg"
+          alt="Biomechanical Anatomy"
+          fill
+          sizes="650px"
+          className="object-contain"
+          priority
+        />
+      </div>
+
+      {/* ── 4. Main Hero Container ── */}
+      <div className="w-full max-w-[1780px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-10 xl:gap-14 items-center">
           
-          {/* ── Left Column: Clinical Directive, Value Badges & High-Impact CTAs ── */}
-          <div className="lg:col-span-7 text-left space-y-7 lg:space-y-9">
+          {/* ── Left Column: Headline, Bullets, CTAs & 4 Stats Cards (7 cols) ── */}
+          <div className="lg:col-span-7 text-left space-y-6 lg:space-y-8">
             
-            {/* Top Medical HealthCare Telemetry HUD Badges */}
+            {/* Top 3 Micro-Capsule Badges */}
             <motion.div 
-              initial={{ opacity: 0, y: -16 }}
+              initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="flex flex-wrap items-center gap-3"
+              transition={{ duration: 0.5 }}
+              className="flex flex-wrap items-center gap-2.5 sm:gap-3"
             >
-              <div className="glassmorphic py-1.5 px-4 rounded-full border border-emerald-500/40 bg-emerald-950/50 flex items-center gap-2 shadow-[0_0_25px_rgba(16,185,129,0.25)]">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+              {/* Badge 1: Hospital-Grade Home Care */}
+              <div className="py-1.5 px-3.5 rounded-full border border-emerald-500/30 bg-emerald-950/40 dark:bg-emerald-950/40 light:bg-emerald-50 text-emerald-400 dark:text-emerald-300 light:text-emerald-700 flex items-center gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shadow-sm">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
                 </span>
-                <span className="text-[11px] font-black uppercase tracking-wider text-emerald-300">
-                  Hospital-Grade Home Care
-                </span>
+                <span>HOSPITAL-GRADE HOME CARE</span>
               </div>
 
-              <div className="glassmorphic py-1.5 px-4 rounded-full border border-cyan-500/40 bg-cyan-950/40 flex items-center gap-2 text-cyan-300 shadow-[0_0_25px_rgba(6,182,212,0.2)]">
+              {/* Badge 2: AI Clinical Precision */}
+              <div className="py-1.5 px-3.5 rounded-full border border-cyan-500/30 bg-cyan-950/40 dark:bg-cyan-950/40 light:bg-cyan-50 text-cyan-400 dark:text-cyan-300 light:text-cyan-700 flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shadow-sm">
                 <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-                <span className="text-[11px] font-black uppercase tracking-wider text-white/95">
-                  AI Clinical Precision · Tier-1
-                </span>
+                <span>AI CLINICAL PRECISION · TIER-1</span>
               </div>
 
-              <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-slate-400 text-[10px] font-mono uppercase tracking-widest">
-                <FileCheck className="w-3.5 h-3.5 text-amber-400" />
-                <span>ISO 9001:2015 Protocol</span>
+              {/* Badge 3: ISO Protocol */}
+              <div className="py-1.5 px-3.5 rounded-full border border-slate-700/60 dark:border-slate-800 light:border-slate-200 bg-slate-900/40 dark:bg-slate-900/40 light:bg-slate-100 text-slate-400 dark:text-slate-400 light:text-slate-600 flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono uppercase tracking-widest">
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                <span>ISO 9001:2015 PROTOCOL</span>
               </div>
             </motion.div>
 
-            {/* Medical Precision Grand Headline */}
+            {/* Main Bold Headline */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              className="space-y-2"
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="space-y-1"
             >
-              <h1 className="font-headline text-4xl sm:text-6xl md:text-7xl lg:text-[4.8rem] xl:text-[5.4rem] 2xl:text-[5.8rem] font-black text-white tracking-tight leading-[1.04] drop-shadow-2xl">
+              <h1 className="font-headline text-4xl sm:text-6xl md:text-7xl lg:text-[4.6rem] xl:text-[5.2rem] font-extrabold text-white dark:text-white light:text-slate-900 tracking-tight leading-[1.06]">
                 Advanced Recovery <br />
-                <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-[0_0_50px_rgba(56,189,248,0.35)]">
+                <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 bg-clip-text text-transparent">
                   At Your Home.
                 </span>
               </h1>
             </motion.div>
 
-            {/* Clinical Value Proposition with Generous Breathing Room */}
+            {/* Supporting Clinical Message */}
             <motion.p
-              initial={{ opacity: 0, x: -16 }}
+              initial={{ opacity: 0, x: -12 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-300 font-light max-w-2xl leading-relaxed drop-shadow"
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-sm sm:text-base md:text-lg text-slate-400 dark:text-slate-300 light:text-slate-600 font-light max-w-2xl leading-relaxed"
             >
               Hospital-grade physiotherapy, post-surgical rehabilitation, and specialized nursing care delivered directly to your doorstep by verified BPT/MPT specialists with complete portable electrotherapy gear.
             </motion.p>
 
-            {/* Quick Clinical Feature Checklist */}
+            {/* 3 Clinical Feature Bullets */}
             <motion.div
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              className="flex flex-wrap gap-x-8 gap-y-3 text-xs sm:text-sm text-slate-200 font-semibold"
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm text-slate-300 dark:text-slate-200 light:text-slate-700"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                <div className="p-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                  <ShieldCheck className="w-4 h-4" />
                 </div>
-                <span>Zero Clinic Commute</span>
+                <div>
+                  <div className="font-bold text-white dark:text-white light:text-slate-900 text-xs">Zero</div>
+                  <div className="text-[11px] text-slate-400 light:text-slate-500">Clinic Commute</div>
+                </div>
               </div>
+
               <div className="flex items-center gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                <div className="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+                  <Stethoscope className="w-4 h-4" />
                 </div>
-                <span>Certified Doctors & Physios</span>
+                <div>
+                  <div className="font-bold text-white dark:text-white light:text-slate-900 text-xs">Certified</div>
+                  <div className="text-[11px] text-slate-400 light:text-slate-500">Doctors & Physios</div>
+                </div>
               </div>
+
               <div className="flex items-center gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                  <Briefcase className="w-4 h-4" />
                 </div>
-                <span>Full Treatment Gear Brought</span>
+                <div>
+                  <div className="font-bold text-white dark:text-white light:text-slate-900 text-xs">Full Treatment</div>
+                  <div className="text-[11px] text-slate-400 light:text-slate-500">Gear Brought</div>
+                </div>
               </div>
             </motion.div>
 
-            {/* High-Impact Clinical Action CTAs */}
+            {/* Action CTA Buttons */}
             <motion.div
-              initial={{ opacity: 0, y: 18 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.4 }}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2"
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2"
             >
-              {/* Primary Glowing Luxury Button */}
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition duration-300 group-hover:scale-105" />
-                <BookAppointmentButton 
-                  size="lg" 
-                  className="relative h-15 sm:h-16 px-9 sm:px-11 text-base font-black rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white shadow-2xl hover:brightness-110 active:scale-95 transition-all duration-300 border border-white/20 flex items-center justify-center gap-3 w-full sm:w-auto"
-                >
-                  <span>Book Home Visit</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
-                </BookAppointmentButton>
-              </div>
+              <BookAppointmentButton 
+                size="lg" 
+                className="h-14 sm:h-15 px-8 sm:px-9 rounded-2xl bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white font-bold text-sm shadow-xl shadow-blue-500/25 flex items-center justify-center gap-2.5 transition-all"
+              >
+                <Stethoscope className="w-4 h-4" />
+                <span>Book Home Visit</span>
+                <ArrowRight className="w-4 h-4 ml-0.5" />
+              </BookAppointmentButton>
               
-              {/* Secondary Frosted Glass Consultation Button */}
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="h-15 sm:h-16 px-8 sm:px-10 text-base font-bold rounded-2xl bg-white/5 text-white border-white/20 hover:bg-white/15 hover:border-white/40 hover:text-white backdrop-blur-xl transition-all duration-300 shadow-xl flex items-center justify-center gap-3"
+                className="h-14 sm:h-15 px-7 sm:px-8 rounded-2xl bg-slate-900/60 dark:bg-slate-900/60 light:bg-white text-slate-200 dark:text-slate-200 light:text-slate-800 border-slate-700 dark:border-slate-700 light:border-slate-300 hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-100 font-bold text-sm shadow-md flex items-center justify-center gap-2.5 transition-all"
                 onClick={() => openModal()}
               >
                 <PhoneCall className="w-4 h-4 text-amber-400" />
@@ -193,80 +200,69 @@ export default function Hero() {
               </Button>
             </motion.div>
 
-            {/* Medical Telemetry Trust Stats Grid with Crosshair Accents */}
+            {/* 4 Stat Metric Cards in a Row */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.9, delay: 0.5 }}
-              className="pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5"
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4"
             >
-              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left relative overflow-hidden group/tile hover:border-cyan-500/40 transition-colors">
-                <div className="absolute top-2 right-2 text-cyan-400/40 text-[9px] font-mono">01/HUD</div>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
-                  {stats ? formatCount(stats.therapistCount) : '450+'}
-                </p>
-                <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-slate-400 mt-1">
-                  Specialists
-                </p>
+              {/* Card 1 */}
+              <div className="p-4 rounded-2xl bg-slate-900/50 dark:bg-slate-900/50 light:bg-white border border-slate-800/80 dark:border-slate-800/80 light:border-slate-200/90 text-left space-y-1 shadow-sm">
+                <Users className="w-5 h-5 text-blue-400 mb-1" />
+                <div className="text-2xl sm:text-3xl font-extrabold text-white dark:text-white light:text-slate-900 tracking-tight font-headline">
+                  {stats ? formatCount(stats.therapistCount, '450+') : '450+'}
+                </div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 light:text-slate-500">
+                  SPECIALISTS
+                </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left relative overflow-hidden group/tile hover:border-cyan-500/40 transition-colors">
-                <div className="absolute top-2 right-2 text-cyan-400/40 text-[9px] font-mono">02/HUD</div>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
-                  {stats ? formatCount(stats.patientCount, '15k+') : '15k+'}
-                </p>
-                <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-slate-400 mt-1">
-                  Patients Served
-                </p>
+              {/* Card 2 */}
+              <div className="p-4 rounded-2xl bg-slate-900/50 dark:bg-slate-900/50 light:bg-white border border-slate-800/80 dark:border-slate-800/80 light:border-slate-200/90 text-left space-y-1 shadow-sm">
+                <User className="w-5 h-5 text-cyan-400 mb-1" />
+                <div className="text-2xl sm:text-3xl font-extrabold text-white dark:text-white light:text-slate-900 tracking-tight font-headline">
+                  {stats ? formatCount(stats.patientCount, '15K+') : '15K+'}
+                </div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 light:text-slate-500">
+                  PATIENTS SERVED
+                </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left relative overflow-hidden group/tile hover:border-cyan-500/40 transition-colors">
-                <div className="absolute top-2 right-2 text-cyan-400/40 text-[9px] font-mono">03/HUD</div>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
+              {/* Card 3 */}
+              <div className="p-4 rounded-2xl bg-slate-900/50 dark:bg-slate-900/50 light:bg-white border border-slate-800/80 dark:border-slate-800/80 light:border-slate-200/90 text-left space-y-1 shadow-sm">
+                <Clock className="w-5 h-5 text-emerald-400 mb-1" />
+                <div className="text-xl sm:text-2xl font-extrabold text-white dark:text-white light:text-slate-900 tracking-tight font-headline pt-0.5">
                   Same-Day
-                </p>
-                <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-slate-400 mt-1">
-                  Service Start
-                </p>
+                </div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 light:text-slate-500">
+                  SERVICE START
+                </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-left relative overflow-hidden group/tile hover:border-cyan-500/40 transition-colors">
-                <div className="absolute top-2 right-2 text-amber-400/40 text-[9px] font-mono">04/HUD</div>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-amber-400 tracking-tight flex items-center gap-1">
-                  4.9 <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-400 text-amber-400" />
-                </p>
-                <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-slate-400 mt-1">
-                  Google Rated
-                </p>
+              {/* Card 4 */}
+              <div className="p-4 rounded-2xl bg-slate-900/50 dark:bg-slate-900/50 light:bg-white border border-slate-800/80 dark:border-slate-800/80 light:border-slate-200/90 text-left space-y-1 shadow-sm">
+                <Star className="w-5 h-5 text-amber-400 fill-amber-400 mb-1" />
+                <div className="text-2xl sm:text-3xl font-extrabold text-white dark:text-white light:text-slate-900 tracking-tight font-headline flex items-center gap-1">
+                  4.9★
+                </div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 light:text-slate-500">
+                  GOOGLE RATED
+                </div>
               </div>
             </motion.div>
 
           </div>
 
-          {/* ── Right Column: Medical HealthCare Grade Interactive Telemetry Showcase ── */}
+          {/* ── Right Column: Interactive Clinical Hub Card (5 cols) ── */}
           <div className="lg:col-span-5 relative w-full flex justify-center lg:justify-end">
             <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 30 }}
+              initial={{ opacity: 0, scale: 0.96, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+              transition={{ duration: 0.7, delay: 0.2 }}
               className="w-full"
             >
               <HeroInteractiveCard />
-
-              {/* Bottom Clinical Trust Protocol Banner */}
-              <div className="mt-5 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400 font-semibold">
-                <span className="flex items-center gap-1.5 text-emerald-400">
-                  <ShieldCheck className="w-4 h-4" /> Verified Clinicians
-                </span>
-                <span>•</span>
-                <span className="flex items-center gap-1.5 text-cyan-400">
-                  <Activity className="w-4 h-4" /> Clinical Portability
-                </span>
-                <span>•</span>
-                <span className="flex items-center gap-1.5 text-amber-400">
-                  <Award className="w-4 h-4" /> High Recovery Rate
-                </span>
-              </div>
             </motion.div>
           </div>
 
