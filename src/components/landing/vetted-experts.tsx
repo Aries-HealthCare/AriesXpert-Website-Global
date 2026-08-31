@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Carousel,
   CarouselContent,
@@ -80,10 +80,11 @@ function getSpecialtyIcon(spec: string = '') {
 }
 
 function TherapistCard({ therapist, index }: { therapist: any; index: number }) {
+  // 3D Tilt specifically for the photo frame ONLY (not the whole card)
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
   const [glarePosition, setGlarePosition] = useState({ x: 50, y: 50, opacity: 0 });
-  const cardRef = useRef<HTMLDivElement>(null);
+  const photoBoxRef = useRef<HTMLDivElement>(null);
 
   const isLogo =
     !therapist.imageUrl ||
@@ -101,58 +102,42 @@ function TherapistCard({ therapist, index }: { therapist: any; index: number }) 
   const profileHref = `/therapist/${therapist.slug || therapist.id}`;
   const SpecIcon = getSpecialtyIcon(therapist.specialization);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
+  const handlePhotoMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!photoBoxRef.current) return;
+    const rect = photoBoxRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rotX = -((y - centerY) / centerY) * 8;
-    const rotY = ((x - centerX) / centerX) * 8;
+    const rotX = -((y - centerY) / centerY) * 12;
+    const rotY = ((x - centerX) / centerX) * 12;
 
     setRotateX(rotX);
     setRotateY(rotY);
     setGlarePosition({
       x: (x / rect.width) * 100,
       y: (y / rect.height) * 100,
-      opacity: 0.25,
+      opacity: 0.35,
     });
   };
 
-  const handleMouseLeave = () => {
+  const handlePhotoMouseLeave = () => {
     setRotateX(0);
     setRotateY(0);
     setGlarePosition((prev) => ({ ...prev, opacity: 0 }));
   };
 
   return (
-    <div className="p-2 sm:p-3 h-full perspective-1000">
-      {/* 3D Perspective Card Container */}
-      <div
-        ref={cardRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        style={{
-          transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
-          transition: 'transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1)',
-        }}
-        className="relative h-full flex flex-col justify-between rounded-[32px] p-[1.5px] bg-gradient-to-b from-white/20 via-cyan-500/15 to-violet-600/25 shadow-[0_25px_70px_rgba(0,0,0,0.85)] backdrop-blur-2xl transition-all duration-300 group hover:border-cyan-400/50 overflow-hidden"
-      >
-        {/* Dynamic Light Sheen on Cursor Hover */}
-        <div
-          className="pointer-events-none absolute inset-0 rounded-[32px] transition-opacity duration-300 z-30"
-          style={{
-            background: `radial-gradient(circle 350px at ${glarePosition.x}% ${glarePosition.y}%, rgba(255,255,255,${glarePosition.opacity}), transparent 80%)`,
-          }}
-        />
-
+    <div className="p-2 sm:p-2.5 h-full">
+      {/* Stable Luxury Card Container (No card-level tilt) */}
+      <div className="relative h-full flex flex-col justify-between rounded-[32px] p-[1.5px] bg-gradient-to-b from-white/20 via-cyan-500/15 to-violet-600/25 shadow-[0_25px_70px_rgba(0,0,0,0.85)] backdrop-blur-2xl transition-all duration-300 group hover:border-cyan-400/50 hover:shadow-[0_30px_90px_rgba(6,182,212,0.2)] overflow-hidden">
+        
         {/* Inner Card Surface */}
         <div className="relative flex flex-col justify-between h-full rounded-[30px] bg-[#070c1a]/95 border border-white/10 p-5 sm:p-6 space-y-5 overflow-hidden">
           
-          {/* Top Header Strip: Verification Pill & Star Rating */}
+          {/* ── Top Header Strip: Verification Pill & Star Rating ── */}
           <div className="flex items-center justify-between gap-2 z-10">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-wider shadow-sm">
               <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
@@ -166,31 +151,52 @@ function TherapistCard({ therapist, index }: { therapist: any; index: number }) 
             </div>
           </div>
 
-          {/* High-Definition Doctor Portrait Display */}
-          <div className="flex flex-col items-center relative z-10 pt-1">
-            <Link href={profileHref} className="relative block group/avatar cursor-pointer" prefetch={false}>
-              <div className="relative w-36 h-44 sm:w-40 sm:h-48 p-[3px] rounded-2xl bg-gradient-to-br from-cyan-500/40 via-blue-600/30 to-violet-600/40 shadow-2xl ring-1 ring-white/20 transition-all duration-500 group-hover/avatar:ring-cyan-400/70 group-hover/avatar:shadow-[0_0_30px_rgba(6,182,212,0.3)] flex items-center justify-center">
-                <div className="relative w-full h-full rounded-[13px] overflow-hidden bg-gradient-to-b from-slate-900 to-black flex items-center justify-center">
+          {/* ── Full Doctor Portrait Display (3D Perspective Tilt ONLY on Photo) ── */}
+          <div className="flex flex-col items-center relative z-10 w-full">
+            <Link href={profileHref} className="relative block w-full group/avatar cursor-pointer" prefetch={false}>
+              
+              {/* Photo Box with 3D Tilt specifically on hover */}
+              <div
+                ref={photoBoxRef}
+                onMouseMove={handlePhotoMouseMove}
+                onMouseLeave={handlePhotoMouseLeave}
+                style={{
+                  transform: `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+                  transition: 'transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)',
+                }}
+                className="relative w-full aspect-[4/4.6] sm:aspect-[4/4.5] rounded-2xl p-[2px] bg-gradient-to-br from-cyan-500/50 via-blue-600/30 to-violet-600/50 shadow-2xl ring-1 ring-white/20 transition-all duration-300 group-hover/avatar:ring-cyan-400/80 group-hover/avatar:shadow-[0_0_35px_rgba(6,182,212,0.35)] overflow-hidden"
+              >
+                {/* Dynamic Glare Sheen over Photo */}
+                <div
+                  className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-300 z-30"
+                  style={{
+                    background: `radial-gradient(circle 250px at ${glarePosition.x}% ${glarePosition.y}%, rgba(255,255,255,${glarePosition.opacity}), transparent 80%)`,
+                  }}
+                />
+
+                {/* Inner Image Container showing Full Apron & Doctor Badge */}
+                <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-gradient-to-b from-[#0e1629] via-[#090f1d] to-[#04070f] flex items-center justify-center">
                   <Image
                     src={displayImg}
                     alt={`Portrait of ${therapist.name}`}
                     fill
-                    sizes="(max-width: 768px) 160px, 180px"
+                    sizes="(max-width: 768px) 100vw, 380px"
                     className={cn(
                       isLogo
-                        ? "object-contain p-5 group-hover/avatar:scale-110 drop-shadow-[0_10px_25px_rgba(245,158,11,0.35)]"
+                        ? "object-contain p-8 group-hover/avatar:scale-110 drop-shadow-[0_10px_30px_rgba(245,158,11,0.4)]"
                         : "object-cover object-top group-hover/avatar:scale-105",
-                      "transition-transform duration-700 ease-out brightness-95 contrast-105"
+                      "transition-transform duration-700 ease-out brightness-[0.96] contrast-[1.05]"
                     )}
-                    loading="lazy"
+                    priority={index < 4}
                   />
 
+                  {/* Soft Cinematic Edge Vignette */}
                   {!isLogo && (
                     <div className="absolute inset-0 bg-gradient-to-t from-[#070c1a] via-transparent to-transparent pointer-events-none" />
                   )}
 
                   {/* Verified Checkmark Badge on Bottom-Right */}
-                  <div className="absolute bottom-2 right-2 z-20 w-6 h-6 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white flex items-center justify-center shadow-lg border-2 border-[#070c1a]">
+                  <div className="absolute bottom-2.5 right-2.5 z-20 w-6 h-6 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white flex items-center justify-center shadow-lg border-2 border-[#070c1a]">
                     <CheckCircle2 className="w-3.5 h-3.5 text-white" />
                   </div>
                 </div>
@@ -198,7 +204,7 @@ function TherapistCard({ therapist, index }: { therapist: any; index: number }) 
             </Link>
 
             {/* Live Availability Status Ribbon */}
-            <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-black uppercase tracking-wider shadow-sm">
+            <div className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-black uppercase tracking-wider shadow-sm">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
@@ -207,7 +213,7 @@ function TherapistCard({ therapist, index }: { therapist: any; index: number }) 
             </div>
           </div>
 
-          {/* Doctor & Clinical Details */}
+          {/* ── Doctor & Clinical Details ── */}
           <div className="space-y-2.5 text-center relative z-10 flex-grow">
             <div>
               <Link href={profileHref} prefetch={false}>
@@ -244,7 +250,7 @@ function TherapistCard({ therapist, index }: { therapist: any; index: number }) 
             </div>
           </div>
 
-          {/* Action Buttons Footer */}
+          {/* ── Action Buttons Footer ── */}
           <div className="space-y-2.5 pt-1 relative z-10">
             <BookAppointmentButton
               therapistId={therapist.id}
@@ -311,7 +317,7 @@ export default function VettedExperts({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-[520px] w-full rounded-[32px] bg-white/10" />
+              <Skeleton key={i} className="h-[540px] w-full rounded-[32px] bg-white/10" />
             ))}
           </div>
         </div>
@@ -385,7 +391,7 @@ export default function VettedExperts({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-10"
+          className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-12"
         >
           {SPECIALTY_FILTERS.map((f) => {
             const isActive = activeFilter === f.value;
@@ -407,14 +413,14 @@ export default function VettedExperts({
           })}
         </motion.div>
 
-        {/* Carousel Slider */}
-        <div className="relative">
+        {/* ── Carousel Slider with Flanked Side Navigation Arrows ── */}
+        <div className="relative px-2 sm:px-6 md:px-10 lg:px-12">
           <Carousel
             opts={{
               align: "start",
               loop: true,
             }}
-            className="w-full"
+            className="w-full relative"
           >
             <CarouselContent className="-ml-3 sm:-ml-4">
               {(filteredTherapists.length > 0 ? filteredTherapists : therapists).map((therapist, index) => (
@@ -427,15 +433,13 @@ export default function VettedExperts({
               ))}
             </CarouselContent>
 
-            {/* Slider Navigation Controls */}
-            <div className="flex items-center justify-center gap-4 mt-10">
-              <CarouselPrevious className="relative left-0 top-0 translate-y-0 h-12 w-12 rounded-2xl border border-white/20 bg-slate-950/80 backdrop-blur-xl hover:bg-cyan-500 hover:text-white hover:border-cyan-400 transition-all duration-300 shadow-xl text-white">
-                <ChevronLeft className="w-5 h-5" />
-              </CarouselPrevious>
-              <CarouselNext className="relative right-0 top-0 translate-y-0 h-12 w-12 rounded-2xl border border-white/20 bg-slate-950/80 backdrop-blur-xl hover:bg-cyan-500 hover:text-white hover:border-cyan-400 transition-all duration-300 shadow-xl text-white">
-                <ChevronRight className="w-5 h-5" />
-              </CarouselNext>
-            </div>
+            {/* Flanked Side Navigation Controls (Vertically Centered on Card Row Sides) */}
+            <CarouselPrevious className="absolute -left-2 sm:-left-4 md:-left-6 lg:-left-8 top-1/2 -translate-y-1/2 h-12 w-12 sm:h-14 sm:w-14 rounded-2xl border border-white/20 bg-[#070c1a]/90 backdrop-blur-xl hover:bg-cyan-500 hover:text-white hover:border-cyan-400 transition-all duration-300 shadow-[0_10px_30px_rgba(0,0,0,0.8)] text-white z-30 flex items-center justify-center">
+              <ChevronLeft className="w-6 h-6" />
+            </CarouselPrevious>
+            <CarouselNext className="absolute -right-2 sm:-right-4 md:-right-6 lg:-right-8 top-1/2 -translate-y-1/2 h-12 w-12 sm:h-14 sm:w-14 rounded-2xl border border-white/20 bg-[#070c1a]/90 backdrop-blur-xl hover:bg-cyan-500 hover:text-white hover:border-cyan-400 transition-all duration-300 shadow-[0_10px_30px_rgba(0,0,0,0.8)] text-white z-30 flex items-center justify-center">
+              <ChevronRight className="w-6 h-6" />
+            </CarouselNext>
           </Carousel>
         </div>
 
