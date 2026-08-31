@@ -30,6 +30,7 @@ yarn-error.log*
 next-env.d.ts
 
 # nested workspaces
+Aries-PhysioCare-Parity-App/
 AriesXpert-Admin-Dashboard/
 AriesXpert-Website-Canada/
 AriesXpert-Website-India/
