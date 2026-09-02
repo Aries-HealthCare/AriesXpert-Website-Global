@@ -6,16 +6,14 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { PlaceHolderImages, ImagePlaceholder } from "@/lib/placeholder-images";
 import { useRequestCallback } from '@/components/request-callback-provider';
 import BookAppointmentButton from "../book-appointment-button";
 import type { WebsiteStats } from "@/app/api/stats/route";
 
-const heroImages = PlaceHolderImages.filter(p => p.id.startsWith('hero-'));
+const heroImages: ImagePlaceholder[] = (PlaceHolderImages || []).filter((p: ImagePlaceholder) => p.id.startsWith('hero-'));
 
 function formatCount(n: number | undefined | null, fallback = '450+'): string {
   if (n == null || isNaN(n)) return fallback;
@@ -35,8 +33,8 @@ export default function Hero() {
   useEffect(() => {
     fetch('/api/stats')
       .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setStats(data); })
-      .catch(() => {}); // Non-blocking: hero renders fine without stats
+      .then((data: WebsiteStats | null) => { if (data) setStats(data); })
+      .catch(() => {});
   }, []);
 
   return (
@@ -47,7 +45,7 @@ export default function Hero() {
         opts={{ loop: true }}
       >
         <CarouselContent className="h-full">
-          {heroImages.map((image, index) => (
+          {heroImages.map((image: ImagePlaceholder, index: number) => (
             <CarouselItem key={image.id} className="h-full relative px-0">
               <div className="relative w-full h-full overflow-hidden">
                 <Image
