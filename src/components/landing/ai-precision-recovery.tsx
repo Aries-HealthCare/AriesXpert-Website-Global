@@ -48,6 +48,7 @@ const stages = [
         'bg-gradient-to-br from-white via-purple-50/40 to-purple-100/30 dark:from-card dark:via-purple-950/20 dark:to-card',
       watermark: 'text-purple-400/20 dark:text-purple-400/10',
       checkBg: 'bg-purple-600 text-white',
+      imageBorder: 'border-purple-200/80 dark:border-purple-800/50',
     },
     icon: Search,
     image: '/images/precision-recovery/stage1-assess.webp',
@@ -72,6 +73,7 @@ const stages = [
         'bg-gradient-to-br from-white via-amber-50/40 to-amber-100/30 dark:from-card dark:via-amber-950/20 dark:to-card',
       watermark: 'text-amber-400/20 dark:text-amber-400/10',
       checkBg: 'bg-amber-600 text-white',
+      imageBorder: 'border-amber-200/80 dark:border-amber-800/50',
     },
     icon: FileText,
     image: '/images/precision-recovery/stage2-plan.webp',
@@ -96,6 +98,7 @@ const stages = [
         'bg-gradient-to-br from-white via-sky-50/40 to-sky-100/30 dark:from-card dark:via-sky-950/20 dark:to-card',
       watermark: 'text-sky-400/20 dark:text-sky-400/10',
       checkBg: 'bg-sky-600 text-white',
+      imageBorder: 'border-sky-200/80 dark:border-sky-800/50',
     },
     icon: Activity,
     image: '/images/precision-recovery/stage3-track.webp',
@@ -120,6 +123,7 @@ const stages = [
         'bg-gradient-to-br from-white via-emerald-50/40 to-emerald-100/30 dark:from-card dark:via-emerald-950/20 dark:to-card',
       watermark: 'text-emerald-400/20 dark:text-emerald-400/10',
       checkBg: 'bg-emerald-600 text-white',
+      imageBorder: 'border-emerald-200/80 dark:border-emerald-800/50',
     },
     icon: ChevronsUp,
     image: '/images/precision-recovery/stage4-advance.webp',
@@ -130,9 +134,9 @@ export default function AiPrecisionRecovery() {
   const { openBookingModal } = useRequestCallback();
 
   return (
-    <section className="py-12 md:py-18 relative overflow-hidden bg-background">
+    <section className="py-12 md:py-20 relative overflow-hidden bg-background">
       {/* Background Ambience */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(circle_at_center,rgba(147,51,234,0.06)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[650px] bg-[radial-gradient(circle_at_center,rgba(147,51,234,0.08)_0%,transparent_70%)] pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10 space-y-10 md:space-y-14">
         {/* Top Header Section */}
@@ -146,30 +150,36 @@ export default function AiPrecisionRecovery() {
 
           {/* Top-Right Feature Stack */}
           <div className="hidden lg:flex flex-col gap-2 absolute right-0 top-0 items-start pointer-events-none select-none">
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-card/90 border border-purple-100 dark:border-purple-900/40 shadow-xs text-xs font-semibold text-foreground">
-              <div className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-950/60 flex items-center justify-center text-purple-600 dark:text-purple-400">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-card/95 border border-purple-200/70 dark:border-purple-900/50 shadow-xs text-xs font-semibold text-foreground backdrop-blur-sm">
+              <div className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-950/70 flex items-center justify-center text-purple-600 dark:text-purple-400">
                 <Brain className="w-3 h-3" />
               </div>
               <span>AI-Powered Insights</span>
             </div>
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-card/90 border border-purple-100 dark:border-purple-900/40 shadow-xs text-xs font-semibold text-foreground">
-              <div className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-950/60 flex items-center justify-center text-purple-600 dark:text-purple-400">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-card/95 border border-purple-200/70 dark:border-purple-900/50 shadow-xs text-xs font-semibold text-foreground backdrop-blur-sm">
+              <div className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-950/70 flex items-center justify-center text-purple-600 dark:text-purple-400">
                 <BarChart3 className="w-3 h-3" />
               </div>
               <span>Evidence-Based Care</span>
             </div>
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-card/90 border border-purple-100 dark:border-purple-900/40 shadow-xs text-xs font-semibold text-foreground">
-              <div className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-950/60 flex items-center justify-center text-purple-600 dark:text-purple-400">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-card/95 border border-purple-200/70 dark:border-purple-900/50 shadow-xs text-xs font-semibold text-foreground backdrop-blur-sm">
+              <div className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-950/70 flex items-center justify-center text-purple-600 dark:text-purple-400">
                 <User className="w-3 h-3" />
               </div>
               <span>Personalized for You</span>
             </div>
           </div>
 
-          {/* Center Badge & Headlines */}
-          <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-purple-100/80 dark:bg-purple-950/50 border border-purple-200/80 dark:border-purple-800/40 text-purple-700 dark:text-purple-300 text-[11px] font-extrabold uppercase tracking-[0.25em] shadow-xs mb-3">
-            <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
-            Our Technology
+          {/* Center Badge with Official Aries Brand Logo */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-100/90 dark:bg-purple-950/60 border border-purple-300/80 dark:border-purple-700/50 text-purple-800 dark:text-purple-200 text-[11px] font-extrabold uppercase tracking-[0.22em] shadow-xs mb-3">
+            <Image
+              src="/images/Arieslogo.png"
+              alt="Aries PhysioCare Brand Logo"
+              width={20}
+              height={20}
+              className="w-5 h-5 rounded-full shadow-xs object-contain"
+            />
+            Aries AI™ Technology
           </div>
 
           <h2 className="font-headline text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground leading-[1.15] mb-3">
@@ -206,7 +216,7 @@ export default function AiPrecisionRecovery() {
               <div
                 key={stage.stageNumber}
                 className={cn(
-                  'group relative flex flex-col justify-between rounded-2xl p-5 border transition-all duration-500 hover:shadow-xl hover:-translate-y-1 overflow-hidden min-h-[340px]',
+                  'group relative flex flex-col justify-between rounded-2xl p-5 border transition-all duration-500 hover:shadow-xl hover:-translate-y-1 overflow-hidden min-h-[360px]',
                   stage.theme.border,
                   stage.theme.cardBg
                 )}
@@ -258,10 +268,10 @@ export default function AiPrecisionRecovery() {
                   </p>
                 </div>
 
-                {/* Card Bottom Content: Bullets on Left + 3D Visual on Right */}
-                <div className="relative z-10 grid grid-cols-12 gap-2 items-end pt-3 mt-auto">
+                {/* Card Bottom Content: Bullets on Left + Dedicated Ultra HD Visual Frame on Right */}
+                <div className="relative z-10 flex items-end justify-between gap-3 pt-4 mt-auto">
                   {/* Left: Bullets */}
-                  <div className="col-span-7 space-y-1.5">
+                  <div className="space-y-2 flex-1">
                     {stage.bullets.map((bullet, i) => (
                       <div
                         key={i}
@@ -280,14 +290,19 @@ export default function AiPrecisionRecovery() {
                     ))}
                   </div>
 
-                  {/* Right: 3D Visual */}
-                  <div className="col-span-5 relative -mr-3 -mb-3 h-28 sm:h-32 flex items-end justify-end pointer-events-none select-none">
+                  {/* Right: Ultra HD Visual Frame */}
+                  <div
+                    className={cn(
+                      'w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden shadow-md border shrink-0 relative bg-white/90 dark:bg-card/90',
+                      stage.theme.imageBorder
+                    )}
+                  >
                     <Image
                       src={stage.image}
-                      alt={`${stage.title} Visual`}
-                      width={180}
-                      height={140}
-                      className="object-contain object-bottom max-h-full w-auto transition-transform duration-700 group-hover:scale-105"
+                      alt={`${stage.title} Ultra HD Visual`}
+                      width={160}
+                      height={160}
+                      className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
                     />
                   </div>
                 </div>
@@ -297,17 +312,17 @@ export default function AiPrecisionRecovery() {
         </div>
 
         {/* Row 2: Two Large Featured Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           {/* Featured Card 1: Experience Your Body-Map Insight */}
-          <div className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/70 dark:border-purple-900/40 bg-gradient-to-br from-white via-purple-50/40 to-indigo-100/30 dark:from-card dark:via-purple-950/20 dark:to-card shadow-md hover:shadow-xl transition-all duration-500 flex flex-col justify-between overflow-hidden">
+          <div className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/80 dark:border-purple-900/50 bg-gradient-to-br from-white via-purple-50/50 to-indigo-100/40 dark:from-card dark:via-purple-950/25 dark:to-card shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden">
             {/* Background Accent Glow */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/5 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/10 dark:bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
               {/* Left Content */}
-              <div className="md:col-span-7 space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/60 border border-purple-200/80 dark:border-purple-800/40 text-purple-700 dark:text-purple-300 text-[10px] font-bold uppercase tracking-[0.2em] shadow-xs">
-                  <Sparkles className="w-3 h-3" /> AI-Powered Insights
+              <div className="md:col-span-6 space-y-4">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-800/60 text-purple-700 dark:text-purple-300 text-[10px] font-bold uppercase tracking-[0.2em] shadow-xs">
+                  <Sparkles className="w-3 h-3 text-purple-600" /> AI-Powered Insights
                 </div>
 
                 <h3 className="font-headline text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground leading-tight">
@@ -323,15 +338,15 @@ export default function AiPrecisionRecovery() {
 
                 {/* 3 Pills */}
                 <div className="flex flex-wrap gap-2 pt-1">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 dark:bg-card/80 border border-purple-100 dark:border-purple-900/40 text-[11px] font-medium text-foreground shadow-xs">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 dark:bg-card/90 border border-purple-100 dark:border-purple-900/50 text-[11px] font-medium text-foreground shadow-xs">
                     <Eye className="w-3 h-3 text-purple-600" />
                     Anatomical Visualization
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 dark:bg-card/80 border border-purple-100 dark:border-purple-900/40 text-[11px] font-medium text-foreground shadow-xs">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 dark:bg-card/90 border border-purple-100 dark:border-purple-900/50 text-[11px] font-medium text-foreground shadow-xs">
                     <BarChart3 className="w-3 h-3 text-purple-600" />
                     Clinical Insights
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 dark:bg-card/80 border border-purple-100 dark:border-purple-900/40 text-[11px] font-medium text-foreground shadow-xs">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 dark:bg-card/90 border border-purple-100 dark:border-purple-900/50 text-[11px] font-medium text-foreground shadow-xs">
                     <FileText className="w-3 h-3 text-purple-600" />
                     Personalized Report
                   </span>
@@ -342,7 +357,7 @@ export default function AiPrecisionRecovery() {
                   <Button
                     asChild
                     size="lg"
-                    className="h-12 px-6 text-sm font-semibold rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-md shadow-purple-500/20 hover:shadow-purple-500/30 transition-all duration-300 transform hover:-translate-y-0.5"
+                    className="h-12 px-7 text-sm font-semibold rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/35 transition-all duration-300 transform hover:-translate-y-0.5"
                   >
                     <Link href="/ai-analysis" className="inline-flex items-center">
                       Launch AI Analysis <ArrowRight className="ml-2 w-4 h-4" />
@@ -351,37 +366,53 @@ export default function AiPrecisionRecovery() {
                 </div>
               </div>
 
-              {/* Right Visual Image */}
-              <div className="md:col-span-5 relative flex items-center justify-center min-h-[200px] sm:min-h-[240px] pointer-events-none select-none">
+              {/* Right Visual Image: Ultra HD 3D Digital Twin with Crisp Vector Callouts */}
+              <div className="md:col-span-6 relative rounded-2xl overflow-hidden shadow-xl border border-white/60 dark:border-white/10 bg-slate-950 flex items-center justify-center min-h-[260px] sm:min-h-[300px]">
                 <Image
                   src="/images/precision-recovery/bodymap-insight.webp"
-                  alt="AI Body Map Insight"
-                  width={320}
-                  height={280}
-                  className="object-contain max-h-[240px] sm:max-h-[270px] w-auto transition-transform duration-700 group-hover:scale-105"
+                  alt="Ultra HD AI Musculoskeletal Digital Twin Body Map"
+                  width={600}
+                  height={450}
+                  className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
                   priority
                 />
+
+                {/* Crisp Vector Callout Badges Overlaid over Anatomical Landmarks */}
+                <div className="absolute top-4 left-3 sm:left-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 border border-emerald-300/80 dark:border-emerald-700/80 shadow-lg text-[10px] sm:text-[11px] font-bold text-foreground backdrop-blur-md">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Neck Mobility 85% Improved
+                </div>
+
+                <div className="absolute top-[38%] right-2 sm:right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 border border-emerald-300/80 dark:border-emerald-700/80 shadow-lg text-[10px] sm:text-[11px] font-bold text-foreground backdrop-blur-md">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Shoulder Movement 70% Improved
+                </div>
+
+                <div className="absolute bottom-4 right-3 sm:right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 border border-emerald-300/80 dark:border-emerald-700/80 shadow-lg text-[10px] sm:text-[11px] font-bold text-foreground backdrop-blur-md">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Lower Back Strength 60% Improved
+                </div>
               </div>
             </div>
           </div>
 
           {/* Featured Card 2: Free Live Online Consultation */}
-          <div className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/70 dark:border-purple-900/40 bg-gradient-to-br from-white via-purple-50/40 to-indigo-100/30 dark:from-card dark:via-purple-950/20 dark:to-card shadow-md hover:shadow-xl transition-all duration-500 flex flex-col justify-between overflow-hidden">
+          <div className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/80 dark:border-purple-900/50 bg-gradient-to-br from-white via-purple-50/50 to-indigo-100/40 dark:from-card dark:via-purple-950/25 dark:to-card shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden">
             {/* Background Accent Glow */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 dark:bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
 
             {/* Top Right Script Note */}
-            <div className="hidden sm:block absolute right-8 top-6 pointer-events-none select-none">
-              <span className="font-script text-xl md:text-2xl text-purple-600 dark:text-purple-400 font-bold rotate-[4deg] inline-block leading-tight">
+            <div className="hidden sm:block absolute right-8 top-5 z-30 pointer-events-none select-none">
+              <span className="font-script text-xl md:text-2xl text-purple-600 dark:text-purple-400 font-bold rotate-[4deg] inline-block leading-tight drop-shadow-xs">
                 Care Connects Heals ♡
               </span>
             </div>
 
-            <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
               {/* Left Content */}
-              <div className="md:col-span-7 space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/60 border border-purple-200/80 dark:border-purple-800/40 text-purple-700 dark:text-purple-300 text-[10px] font-bold uppercase tracking-[0.2em] shadow-xs">
-                  <Video className="w-3 h-3" /> Expert Clinical Guidance
+              <div className="md:col-span-6 space-y-4">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-800/60 text-purple-700 dark:text-purple-300 text-[10px] font-bold uppercase tracking-[0.2em] shadow-xs">
+                  <Video className="w-3 h-3 text-purple-600" /> Expert Clinical Guidance
                 </div>
 
                 <h3 className="font-headline text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground leading-tight">
@@ -397,15 +428,15 @@ export default function AiPrecisionRecovery() {
 
                 {/* 3 Pills */}
                 <div className="flex flex-wrap gap-2 pt-1">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 dark:bg-card/80 border border-purple-100 dark:border-purple-900/40 text-[11px] font-medium text-foreground shadow-xs">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 dark:bg-card/90 border border-purple-100 dark:border-purple-900/50 text-[11px] font-medium text-foreground shadow-xs">
                     <Headphones className="w-3 h-3 text-purple-600" />
                     Talk to Experts from Anywhere
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 dark:bg-card/80 border border-purple-100 dark:border-purple-900/40 text-[11px] font-medium text-foreground shadow-xs">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 dark:bg-card/90 border border-purple-100 dark:border-purple-900/50 text-[11px] font-medium text-foreground shadow-xs">
                     <Calendar className="w-3 h-3 text-purple-600" />
                     Flexible Time Slots
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 dark:bg-card/80 border border-purple-100 dark:border-purple-900/40 text-[11px] font-medium text-foreground shadow-xs">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 dark:bg-card/90 border border-purple-100 dark:border-purple-900/50 text-[11px] font-medium text-foreground shadow-xs">
                     <ShieldCheck className="w-3 h-3 text-purple-600" />
                     Secure Video Consultation
                   </span>
@@ -421,7 +452,7 @@ export default function AiPrecisionRecovery() {
                       })
                     }
                     size="lg"
-                    className="h-12 px-6 text-sm font-semibold rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-md shadow-purple-500/20 hover:shadow-purple-500/30 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer"
+                    className="h-12 px-7 text-sm font-semibold rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/35 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer"
                   >
                     <Video className="mr-2 w-4 h-4" /> Consult Online Now{' '}
                     <ArrowRight className="ml-2 w-4 h-4" />
@@ -429,16 +460,54 @@ export default function AiPrecisionRecovery() {
                 </div>
               </div>
 
-              {/* Right Visual Image (Doctor with official Aries logo badge on uniform) */}
-              <div className="md:col-span-5 relative flex items-center justify-center min-h-[200px] sm:min-h-[240px] pointer-events-none select-none">
+              {/* Right Visual Image: Ultra HD Doctor with Official Aries Logo Badge */}
+              <div className="md:col-span-6 relative rounded-2xl overflow-hidden shadow-xl border border-white/60 dark:border-white/10 flex items-center justify-center min-h-[260px] sm:min-h-[300px]">
                 <Image
                   src="/images/precision-recovery/doctor-consultation.webp"
-                  alt="Online Physiotherapy Doctor Consultation"
-                  width={320}
-                  height={280}
-                  className="object-contain max-h-[240px] sm:max-h-[270px] w-auto transition-transform duration-700 group-hover:scale-105"
+                  alt="Online Physiotherapy Doctor Consultation with Aries Brand Logo"
+                  width={600}
+                  height={450}
+                  className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
                   priority
                 />
+
+                {/* Floating Verified Badge with Real Therapist Avatars & Live Indicator */}
+                <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-20 flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-purple-200/80 dark:border-purple-800/60 shadow-xl backdrop-blur-md">
+                  <div className="flex -space-x-2 overflow-hidden">
+                    <Image
+                      src="/images/therapist_avatar_1.jpg"
+                      alt="Doctor"
+                      width={28}
+                      height={28}
+                      className="inline-block h-7 w-7 rounded-full ring-2 ring-white object-cover"
+                    />
+                    <Image
+                      src="/images/therapist_avatar_2.jpg"
+                      alt="Doctor"
+                      width={28}
+                      height={28}
+                      className="inline-block h-7 w-7 rounded-full ring-2 ring-white object-cover"
+                    />
+                    <Image
+                      src="/images/therapist_avatar_3.jpg"
+                      alt="Doctor"
+                      width={28}
+                      height={28}
+                      className="inline-block h-7 w-7 rounded-full ring-2 ring-white object-cover"
+                    />
+                  </div>
+                  <div className="leading-tight">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-black text-foreground">
+                        25,000+
+                      </span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    </div>
+                    <span className="text-[10px] font-semibold text-muted-foreground">
+                      Patients Consulted
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
