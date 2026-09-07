@@ -17,7 +17,6 @@ import {
     Home,
     Star,
     Calendar,
-    Sparkles,
     User,
     Mail,
     CalendarDays,
@@ -380,19 +379,13 @@ export default function ServiceLocationClient({ serviceSlug, location }: Service
                                 <Card id="quick-booking-card" className="bg-white/95 dark:bg-[#120d20]/95 backdrop-blur-xl border border-purple-100 dark:border-purple-900/40 rounded-[2rem] p-5 sm:p-6 shadow-2xl shadow-purple-900/10 relative overflow-hidden">
                                     
                                     {/* Card Header */}
-                                    <div className="flex items-center justify-between mb-3.5">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-2xl bg-purple-100 dark:bg-purple-900/50 text-primary flex items-center justify-center shrink-0 shadow-sm">
-                                                <Calendar className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <h3 className="font-headline text-xl font-bold text-slate-900 dark:text-white">Quick Booking</h3>
-                                                <p className="text-xs text-slate-500 dark:text-slate-400">Schedule your home physiotherapy visit in just a few steps.</p>
-                                            </div>
+                                    <div className="flex items-center gap-3 mb-3.5">
+                                        <div className="w-10 h-10 rounded-2xl bg-purple-100 dark:bg-purple-900/50 text-primary flex items-center justify-center shrink-0 shadow-sm">
+                                            <Calendar className="w-5 h-5" />
                                         </div>
-                                        <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/80 border border-purple-200 dark:border-purple-800 text-primary text-[10px] font-black tracking-wider uppercase shrink-0">
-                                            <Sparkles className="w-3 h-3 text-primary" />
-                                            STEP 1 OF 4
+                                        <div>
+                                            <h3 className="font-headline text-xl font-bold text-slate-900 dark:text-white">Quick Booking</h3>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">Schedule your home physiotherapy visit in just a few steps.</p>
                                         </div>
                                     </div>
 
