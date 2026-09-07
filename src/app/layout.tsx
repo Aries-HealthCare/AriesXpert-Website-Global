@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Inter, Space_Grotesk, Outfit } from "next/font/google";
+import { Inter, Space_Grotesk, Outfit, Caveat } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
@@ -31,6 +31,13 @@ const outfit = Outfit({
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-space-grotesk",
+  display: 'swap',
+  preload: true,
+});
+
+const caveat = Caveat({
+  subsets: ["latin"],
+  variable: "--font-caveat",
   display: 'swap',
   preload: true,
 });
@@ -135,7 +142,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${outfit.variable} ${spaceGrotesk.variable} font-body antialiased flex flex-col min-h-screen`}>
+      <body className={`${inter.variable} ${outfit.variable} ${spaceGrotesk.variable} ${caveat.variable} font-body antialiased flex flex-col min-h-screen`}>
         {GA_MEASUREMENT_ID && (
           <>
             <Script
