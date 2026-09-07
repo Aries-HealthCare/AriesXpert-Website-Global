@@ -207,16 +207,16 @@ export default function Team() {
             >
               
               {/* Top Photo with Overlays */}
-              <div className="relative aspect-[4/3] w-full overflow-hidden bg-purple-100 dark:bg-purple-950/40">
+              <div className="relative aspect-[5/6] w-full overflow-hidden bg-purple-100 dark:bg-purple-950/40">
                 <Image
-                  src="/images/team/akshay-patel.png"
+                  src="/images/team/akshay-framed.png"
                   alt="Mr. Akshay Patel - Founder & Chief Executive Officer"
                   fill
                   sizes="(max-width: 768px) 100vw, 500px"
                   priority
-                  className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                  className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 via-35% to-transparent pointer-events-none" />
                 
                 {/* Quote overlay on top */}
                 <div className="absolute top-5 left-5 right-5">
@@ -305,16 +305,16 @@ export default function Team() {
             >
               
               {/* Top Photo with Overlays */}
-              <div className="relative aspect-[4/3] w-full overflow-hidden bg-purple-100 dark:bg-purple-950/40">
+              <div className="relative aspect-[5/6] w-full overflow-hidden bg-purple-100 dark:bg-purple-950/40">
                 <Image
-                  src="/images/team/karishma-rathod.png"
+                  src="/images/team/karishma-framed.png"
                   alt="Ms. Karishma Rathod - Co-Founder & Chief Operating Officer"
                   fill
                   sizes="(max-width: 768px) 100vw, 500px"
                   priority
-                  className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                  className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 via-35% to-transparent pointer-events-none" />
                 
                 {/* Quote overlay on top */}
                 <div className="absolute top-5 left-5 right-5">
