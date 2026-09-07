@@ -370,7 +370,7 @@ export default function WhatWeTreat() {
                     </div>
 
                     {/* Scrollable list of conditions/symptoms/therapies/services */}
-                    <div className="h-[210px] sm:h-[225px] overflow-y-auto pr-2 custom-scrollbar space-y-2">
+                    <div className="h-[250px] sm:h-[265px] overflow-y-auto pr-2 custom-scrollbar space-y-2">
                       {area.items.map((item) => (
                         <Link
                           key={item.slug}
@@ -391,20 +391,6 @@ export default function WhatWeTreat() {
                         </Link>
                       ))}
                     </div>
-                  </div>
-
-                  {/* View All link */}
-                  <div className="pt-4 mt-2 border-t border-slate-100/60 dark:border-purple-950/40">
-                    <Link
-                      href={area.basePath}
-                      className={cn(
-                        "inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold transition-all group",
-                        area.linkText
-                      )}
-                    >
-                      <span>{area.viewAllText}</span>
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </Link>
                   </div>
                 </div>
 
