@@ -91,19 +91,19 @@ export const FLAGSHIP_GALLERY_IMAGES: FlagshipGalleryItem[] = [
   {
     id: 2,
     title: "Advanced Electrotherapy & Ultrasound Plinth",
-    url: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=85&w=1600",
+    url: "/images/clinics/flagship-treatment-2.png",
     thumbUrl: "/images/clinics/flagship-thumb-2.png",
   },
   {
     id: 3,
     title: "Private Consultation & Assessment Chamber",
-    url: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=85&w=1600",
+    url: "/images/clinics/flagship-consult-3.png",
     thumbUrl: "/images/clinics/flagship-thumb-3.png",
   },
   {
     id: 4,
     title: "Spinal Traction & Decompression Unit",
-    url: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600",
+    url: "/images/clinics/flagship-spinal-4.png",
     thumbUrl: "/images/clinics/flagship-thumb-4.png",
   },
 ];
