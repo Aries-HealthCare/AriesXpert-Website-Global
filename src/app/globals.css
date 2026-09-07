@@ -534,6 +534,49 @@
     animation: kpi-shimmer 3s ease-in-out infinite;
   }
 
+  /* ── Auto Carousels / Infinite Marquee Animations ── */
+  @keyframes scroll-services {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-100% / 3));
+    }
+  }
+
+  @keyframes scroll-areas {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-100% / 3));
+    }
+  }
+
+  @keyframes scroll-infinite {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-100% / 3));
+    }
+  }
+
+  .animate-scroll-services {
+    animation: scroll-services 40s linear infinite;
+    will-change: transform;
+  }
+
+  .animate-scroll-areas {
+    animation: scroll-areas 40s linear infinite;
+    will-change: transform;
+  }
+
+  .animate-scroll-infinite {
+    animation: scroll-infinite 60s linear infinite;
+    will-change: transform;
+  }
+
   /* ── Core Web Vitals & Mobile Render Optimization ── */
   .content-auto {
     content-visibility: auto;

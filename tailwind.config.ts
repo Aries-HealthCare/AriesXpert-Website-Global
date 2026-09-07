@@ -118,6 +118,18 @@ const config = {
           "0%, 100%": { opacity: "1", transform: "scale(1)" },
           "50%": { opacity: "0.85", transform: "scale(1.05)" },
         },
+        "scroll-services": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(calc(-100% / 3))" },
+        },
+        "scroll-areas": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(calc(-100% / 3))" },
+        },
+        "scroll-infinite": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(calc(-100% / 3))" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -127,6 +139,9 @@ const config = {
         "float-slow": "float-slow 5s ease-in-out infinite",
         "float-delayed": "float-delayed 7s ease-in-out 1.5s infinite",
         "pulse-soft": "pulse-soft 3s ease-in-out infinite",
+        "scroll-services": "scroll-services 40s linear infinite",
+        "scroll-areas": "scroll-areas 40s linear infinite",
+        "scroll-infinite": "scroll-infinite 60s linear infinite",
       },
     },
   },

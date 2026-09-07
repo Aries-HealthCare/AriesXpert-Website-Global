@@ -95,20 +95,6 @@ export default function AreaCarousel() {
           <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background via-background/80 to-transparent pointer-events-none z-20" />
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes scroll-areas {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(calc(-100% / 3));
-          }
-        }
-        .animate-scroll-areas {
-          animation: scroll-areas 40s linear infinite;
-        }
-      `}</style>
     </section>
   );
 }

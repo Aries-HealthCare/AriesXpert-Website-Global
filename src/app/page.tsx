@@ -76,9 +76,7 @@ export default function Home() {
       <SchemaMarkup data={localBusinessSchema} />
       <Hero />
       <ServicesStrip />
-      <div className="content-auto">
-        <AreaCarousel />
-      </div>
+      <AreaCarousel />
       <div className="content-auto">
         <AiPrecisionRecovery />
       </div>

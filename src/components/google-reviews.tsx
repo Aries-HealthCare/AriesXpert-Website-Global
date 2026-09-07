@@ -75,6 +75,7 @@ export default function GoogleReviews({ locationName, className }: GoogleReviews
             align: "start",
             loop: true,
           }}
+          autoPlay={5000}
           className="w-full"
         >
           <CarouselContent className="-ml-4">

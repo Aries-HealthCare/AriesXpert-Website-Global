@@ -34,6 +34,7 @@ export default function Locations() {
             align: "start",
             loop: true,
           }}
+          autoPlay={4500}
           className="w-full"
         >
           <CarouselContent className="-ml-4">

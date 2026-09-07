@@ -88,6 +88,7 @@ export default function TherapistCarousel({
                             align: "start",
                             loop: true,
                         }}
+                        autoPlay={4000}
                         className="w-full"
                     >
                         <CarouselContent>

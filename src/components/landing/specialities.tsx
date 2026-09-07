@@ -126,22 +126,7 @@ export default function Specialities() {
         <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4">
           Custom recovery roadmaps available for 150+ conditions
         </p>
-        <div className="h-px w-24 bg-primary/10 mx-auto" />
       </div>
-
-      <style jsx>{`
-        @keyframes scroll-infinite {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(calc(-100% / 3));
-          }
-        }
-        .animate-scroll-infinite {
-          animation: scroll-infinite 60s linear infinite;
-        }
-      `}</style>
     </section>
   );
 }

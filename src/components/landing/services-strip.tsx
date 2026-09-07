@@ -42,20 +42,6 @@ export default function ServicesStrip() {
         <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background via-transparent to-transparent pointer-events-none z-10" />
         <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background via-transparent to-transparent pointer-events-none z-10" />
       </div>
-
-      <style jsx>{`
-        @keyframes scroll-services {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(calc(-100% / 3));
-          }
-        }
-        .animate-scroll-services {
-          animation: scroll-services 40s linear infinite;
-        }
-      `}</style>
     </section>
   );
 }

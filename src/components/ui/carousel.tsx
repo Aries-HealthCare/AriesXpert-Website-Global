@@ -19,6 +19,7 @@ type CarouselProps = {
   plugins?: CarouselPlugin
   orientation?: "horizontal" | "vertical"
   setApi?: (api: CarouselApi) => void
+  autoPlay?: boolean | number
 }
 
 type CarouselContextProps = {
@@ -52,6 +53,7 @@ const Carousel = React.forwardRef<
       opts,
       setApi,
       plugins,
+      autoPlay,
       className,
       children,
       ...props
@@ -67,6 +69,7 @@ const Carousel = React.forwardRef<
     )
     const [canScrollPrev, setCanScrollPrev] = React.useState(false)
     const [canScrollNext, setCanScrollNext] = React.useState(false)
+    const [isHovered, setIsHovered] = React.useState(false)
 
     const onSelect = React.useCallback((api: CarouselApi) => {
       if (!api) {
@@ -120,6 +123,23 @@ const Carousel = React.forwardRef<
       }
     }, [api, onSelect])
 
+    React.useEffect(() => {
+      if (!api || !autoPlay || isHovered) {
+        return
+      }
+
+      const delay = typeof autoPlay === "number" ? autoPlay : 4000
+      const timer = setInterval(() => {
+        if (!api.canScrollNext() && !opts?.loop) {
+          api.scrollTo(0)
+        } else {
+          api.scrollNext()
+        }
+      }, delay)
+
+      return () => clearInterval(timer)
+    }, [api, autoPlay, isHovered, opts?.loop])
+
     return (
       <CarouselContext.Provider
         value={{
@@ -132,11 +152,14 @@ const Carousel = React.forwardRef<
           scrollNext,
           canScrollPrev,
           canScrollNext,
+          autoPlay,
         }}
       >
         <div
           ref={ref}
           onKeyDownCapture={handleKeyDown}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           className={cn("relative", className)}
           role="region"
           aria-roledescription="carousel"
