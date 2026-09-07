@@ -29,12 +29,8 @@ const nextConfig: NextConfig = {
       { source: '/contact/', destination: '/contact', permanent: true },
       { source: '/our-expert-doctors', destination: '/physiotherapists', permanent: true },
       { source: '/our-expert-doctors/', destination: '/physiotherapists', permanent: true },
-      { source: '/expert-center', destination: '/locations', permanent: true },
-      { source: '/expert-center/', destination: '/locations', permanent: true },
-      { source: '/clinic', destination: '/locations', permanent: true },
-      { source: '/clinic/', destination: '/locations', permanent: true },
-      { source: '/clinics', destination: '/locations', permanent: true },
-      { source: '/clinics/', destination: '/locations', permanent: true },
+      { source: '/expert-center', destination: '/clinic', permanent: true },
+      { source: '/expert-center/', destination: '/clinic', permanent: true },
 
       // ── Doctor/Therapist profile redirects (DEC-03) ──────────
       { source: '/Doctor/:slug', destination: '/physiotherapists/:slug', permanent: true },
