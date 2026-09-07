@@ -1,8 +1,10 @@
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Phone, Clock, Globe, ChevronRight, Sparkles, ChevronLeft, Award } from "lucide-react";
 import { locations } from "@/lib/placeholder-data";
 import { cn } from "@/lib/utils";
+import { fadeUp, cardReveal, staggerContainer, viewportConfig } from "@/hooks/use-scroll-animation";
 import {
   Carousel,
   CarouselContent,
@@ -17,7 +19,13 @@ export default function Locations() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(var(--primary),0.02)_0%,transparent_70%)] pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="max-w-4xl mx-auto text-center mb-12 space-y-6 flex flex-col items-center animate-reveal-up">
+        <motion.div
+          className="max-w-4xl mx-auto text-center mb-12 space-y-6 flex flex-col items-center"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+          variants={fadeUp}
+        >
           <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-bold uppercase tracking-[0.2em] shadow-sm">
             <Globe className="w-4 h-4" /> Clinical Network
           </div>
@@ -27,7 +35,7 @@ export default function Locations() {
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-3xl mx-auto font-light">
             Standardized clinical excellence delivered across our expanding network of specialized home healthcare hubs.
           </p>
-        </div>
+        </motion.div>
 
         <Carousel
           opts={{
@@ -40,14 +48,14 @@ export default function Locations() {
           <CarouselContent className="-ml-4">
             {locations.map((location, index) => (
               <CarouselItem key={location.id} className="sm:basis-1/2 lg:basis-1/4 pl-4">
-                <div
-                  className={cn(
-                    "h-full animate-reveal-up fill-mode-both p-2",
-                    index % 4 === 0 && "stagger-1",
-                    index % 4 === 1 && "stagger-2",
-                    index % 4 === 2 && "stagger-3",
-                    index % 4 === 3 && "stagger-4"
-                  )}
+                <motion.div
+                  key={location.id}
+                  className="h-full p-2"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={viewportConfig}
+                  variants={cardReveal}
+                  custom={index}
                 >
                   <Card className="group premium-card overflow-hidden h-full flex flex-col relative rounded-3xl">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(var(--primary),0.08)_0%,transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
@@ -115,27 +123,39 @@ export default function Locations() {
                       </div>
                     </CardContent>
                   </Card>
-                </div>
+                </motion.div>
               </CarouselItem>
             ))}
           </CarouselContent>
 
-          <div className="flex justify-center gap-4 mt-12 animate-reveal-up stagger-4">
+          <motion.div
+            className="flex justify-center gap-4 mt-12"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={viewportConfig}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+          >
             <CarouselPrevious className="relative left-0 top-0 translate-y-0 h-12 w-12 rounded-xl glassmorphic border-primary/10 hover:bg-primary hover:text-white transition-all duration-500 shadow-sm">
               <ChevronLeft className="w-5 h-5" />
             </CarouselPrevious>
             <CarouselNext className="relative right-0 top-0 translate-y-0 h-12 w-12 rounded-xl glassmorphic border-primary/10 hover:bg-primary hover:text-white transition-all duration-500 shadow-sm">
               <ChevronRight className="w-5 h-5" />
             </CarouselNext>
-          </div>
+          </motion.div>
         </Carousel>
 
-        <div className="mt-16 text-center animate-reveal-up stagger-4">
+        <motion.div
+          className="mt-16 text-center"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+          variants={fadeUp}
+        >
           <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em] drop-shadow-sm">
             Registry: 2026 Clinical Network Active • India • UAE • UK
           </p>
           <div className="h-px w-20 bg-primary/20 mx-auto mt-4" />
-        </div>
+        </motion.div>
       </div>
     </section>
   );

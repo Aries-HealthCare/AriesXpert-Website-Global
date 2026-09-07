@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { Star, CheckCircle, Quote, ChevronLeft, ChevronRight, Award } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,6 +14,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
+import { fadeUp, viewportConfig } from '@/hooks/use-scroll-animation';
 
 interface GoogleReviewsProps {
   locationName: string;
@@ -61,14 +63,20 @@ export default function GoogleReviews({ locationName, className }: GoogleReviews
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Centered Clinical Staging */}
-        <div className="max-w-4xl mx-auto text-center mb-12 space-y-6 animate-reveal-up">
+        <motion.div
+          className="max-w-4xl mx-auto text-center mb-12 space-y-6"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+          variants={fadeUp}
+        >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.3em]">
             <Award className="w-3 h-3" /> Patient Testimonials
           </div>
           <h2 className="font-headline text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-tight">
             What Patients Say in <span className="text-primary">{locationName}</span>
           </h2>
-        </div>
+        </motion.div>
 
         {reviews.length > 0 && <Carousel
           opts={{

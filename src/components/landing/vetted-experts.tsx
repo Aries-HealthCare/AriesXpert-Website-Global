@@ -1,6 +1,7 @@
 'use client';
 
 import React from "react";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -31,6 +32,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fadeUp, cardReveal, viewportConfig } from '@/hooks/use-scroll-animation';
 
 interface VettedExpertsProps {
   locationName?: string;
@@ -79,14 +81,12 @@ function TherapistCard({ therapist, index }: { therapist: any; index: number }) 
   const SpecIcon = getSpecialtyIcon(therapist.specialization);
 
   return (
-    <div
-      className={cn(
-        "p-2.5 h-full transition-transform duration-500",
-        index % 4 === 0 && "stagger-1",
-        index % 4 === 1 && "stagger-2",
-        index % 4 === 2 && "stagger-3",
-        index % 4 === 3 && "stagger-4"
-      )}
+    <motion.div
+      className="p-2.5 h-full"
+      initial="hidden"
+      whileInView="visible"
+      viewport={viewportConfig}
+      variants={cardReveal}
     >
       <Card className="group relative h-full flex flex-col justify-between overflow-hidden rounded-[28px] border border-white/20 dark:border-white/10 bg-gradient-to-b from-card via-card/95 to-card/90 dark:from-slate-900/90 dark:via-slate-900/80 dark:to-slate-950/95 backdrop-blur-2xl shadow-xl transition-all duration-500 hover:-translate-y-2.5 hover:border-primary/50 hover:shadow-[0_25px_60px_-15px_rgba(0,122,255,0.25)]">
         {/* Top ambient radial glow */}
@@ -205,7 +205,7 @@ function TherapistCard({ therapist, index }: { therapist: any; index: number }) 
           </Link>
         </CardFooter>
       </Card>
-    </div>
+    </motion.div>
   );
 }
 
@@ -255,7 +255,13 @@ export default function VettedExperts({
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         {/* Section Header */}
-        <div className="max-w-4xl mx-auto text-center mb-12 space-y-4 flex flex-col items-center animate-reveal-up">
+        <motion.div
+          className="max-w-4xl mx-auto text-center mb-12 space-y-4 flex flex-col items-center"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+          variants={fadeUp}
+        >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-[0.2em] shadow-sm">
             <Award className="w-4 h-4 text-accent" /> Clinical Directorate
           </div>
@@ -273,7 +279,7 @@ export default function VettedExperts({
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto">
             Every specialist undergoes a multi-stage competency screening, ensuring hospital-grade recovery at home.
           </p>
-        </div>
+        </motion.div>
 
         {/* Carousel Slider */}
         <Carousel

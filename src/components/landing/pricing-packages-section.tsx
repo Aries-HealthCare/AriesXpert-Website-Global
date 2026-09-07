@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,6 +31,7 @@ import {
   type LocalityPricingRecord
 } from '@/lib/pricing-packages';
 import { cn } from '@/lib/utils';
+import { fadeUp, scaleUp, viewportConfig } from '@/hooks/use-scroll-animation';
 
 interface PricingPackagesSectionProps {
   initialLocationName?: string;
@@ -305,7 +307,13 @@ export default function PricingPackagesSection({
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-10">
+        <motion.div
+          className="text-center max-w-3xl mx-auto space-y-4 mb-10"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+          variants={fadeUp}
+        >
           <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-[0.2em] shadow-sm backdrop-blur-md">
             <Sparkles className="w-3.5 h-3.5" />
             Transparent Home Care Pricing
@@ -318,7 +326,7 @@ export default function PricingPackagesSection({
           <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
             Hospital-grade home physiotherapy delivered by certified BPT/MPT specialists with advanced electrotherapy modalities. Transparent single visit rates and guaranteed decreasing per-day charges on all multi-day packages.
           </p>
-        </div>
+        </motion.div>
 
         {/* ── LOCATION AUTO-DETECTOR & SEARCH BAR ── */}
         <div className="max-w-3xl mx-auto mb-10 space-y-3">
@@ -452,11 +460,18 @@ export default function PricingPackagesSection({
 
         {/* ── 4 MULTI-DAY RECOVERY PACKAGES ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full mx-auto mb-16">
-          {packageCards.map((pkg) => (
-            <Card
+          {packageCards.map((pkg, i) => (
+            <motion.div
               key={pkg.key}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportConfig}
+              variants={scaleUp}
+              transition={{ delay: i * 0.08 }}
+            >
+            <Card
               className={cn(
-                'relative flex flex-col justify-between overflow-hidden rounded-3xl border transition-all duration-300 group hover:-translate-y-2',
+                'relative flex flex-col justify-between overflow-hidden rounded-3xl border transition-all duration-300 group hover:-translate-y-2 h-full',
                 pkg.popular
                   ? 'bg-card border-primary shadow-2xl shadow-primary/10 ring-2 ring-primary/30'
                   : 'bg-card/70 hover:bg-card border-border/80 hover:border-primary/40 shadow-xl'
@@ -538,11 +553,18 @@ export default function PricingPackagesSection({
                 </Button>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
         </div>
 
         {/* ── BOTTOM CONSULTATION CALLOUT ── */}
-        <div className="max-w-4xl mx-auto p-6 md:p-8 rounded-3xl bg-card/60 border border-border shadow-2xl backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <motion.div
+          className="max-w-4xl mx-auto p-6 md:p-8 rounded-3xl bg-card/60 border border-border shadow-2xl backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-6"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+          variants={fadeUp}
+        >
           <div className="space-y-2 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2 text-primary font-bold text-xs uppercase tracking-wider">
               <CalendarCheck className="w-4 h-4" />
@@ -569,7 +591,7 @@ export default function PricingPackagesSection({
               </Link>
             </Button>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

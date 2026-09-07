@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { specialities } from "@/lib/placeholder-data";
 import {
@@ -17,6 +18,8 @@ import {
   Sparkles
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { fadeUp, viewportConfig } from '@/hooks/use-scroll-animation';
+
 
 const icons = [
   Bone,           // Orthopedic
@@ -42,7 +45,13 @@ export default function Specialities() {
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         {/* Centered Clinical Header */}
-        <div className="max-w-5xl mx-auto text-center mb-12 md:mb-16 space-y-6 flex flex-col items-center animate-reveal-up">
+        <motion.div
+          className="max-w-5xl mx-auto text-center mb-12 md:mb-16 space-y-6 flex flex-col items-center"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+          variants={fadeUp}
+        >
           <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-bold uppercase tracking-[0.2em] shadow-sm">
             <Award className="w-4 h-4" /> Clinical Portfolio
           </div>
@@ -52,7 +61,7 @@ export default function Specialities() {
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-3xl mx-auto font-light">
             Phased, evidence-based recovery programs designed by our clinical directorate to ensure the highest standards of functional restoration.
           </p>
-        </div>
+        </motion.div>
       </div>
 
       {/* Infinite Horizontal Carousel */}
@@ -122,11 +131,17 @@ export default function Specialities() {
       </div>
 
       {/* Registry Footer Tag */}
-      <div className="container mx-auto px-4 md:px-6 mt-16 text-center animate-reveal-up stagger-4 opacity-0 [animation-fill-mode:forwards]">
+      <motion.div
+        className="container mx-auto px-4 md:px-6 mt-16 text-center"
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportConfig}
+        variants={fadeUp}
+      >
         <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4">
           Custom recovery roadmaps available for 150+ conditions
         </p>
-      </div>
+      </motion.div>
     </section>
   );
 }

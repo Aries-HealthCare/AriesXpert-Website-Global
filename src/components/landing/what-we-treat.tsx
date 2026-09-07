@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRequestCallback } from '@/components/request-callback-provider';
+import { fadeUp, slideInLeft, slideInRight, viewportConfig } from '@/hooks/use-scroll-animation';
 
 const toSlug = (name: string) => name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
@@ -323,7 +325,13 @@ export default function WhatWeTreat() {
           </div>
 
           {/* Center Heading */}
-          <div className="max-w-3xl mx-auto text-center space-y-3">
+          <motion.div
+            className="max-w-3xl mx-auto text-center space-y-3"
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+            variants={fadeUp}
+          >
             <div className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full border border-purple-200 dark:border-purple-800 bg-white/90 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 text-xs font-bold uppercase tracking-wider shadow-xs">
               <Heart className="w-3.5 h-3.5 text-purple-600 fill-purple-600/20" />
               <span>OUR EXPERTISE</span>
@@ -336,14 +344,18 @@ export default function WhatWeTreat() {
             <p className="text-xs sm:text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed font-normal pt-1">
               We provide specialized physiotherapy treatments for neurological, orthopedic, musculoskeletal, pediatric, geriatric, and sports-related conditions — addressing a wide range of symptoms and recovery needs.
             </p>
-          </div>
+          </motion.div>
         </div>
 
         {/* 2x2 Grid of Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 w-full mx-auto">
           {treatmentCategories.map((area, index) => (
-            <div
+            <motion.div
               key={area.title}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportConfig}
+              variants={index % 2 === 0 ? slideInLeft : slideInRight}
               className={cn(
                 "group bg-gradient-to-br rounded-3xl border p-5 sm:p-6 lg:p-7 shadow-lg flex flex-col justify-between relative overflow-hidden transition-all duration-300 hover:shadow-xl",
                 area.cardGradient,
@@ -437,7 +449,7 @@ export default function WhatWeTreat() {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 

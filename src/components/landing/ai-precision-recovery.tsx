@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { fadeUp, slideInLeft, slideInRight, scaleUp, viewportConfig } from '@/hooks/use-scroll-animation';
 
 const stages = [
   {
@@ -140,7 +142,13 @@ export default function AiPrecisionRecovery() {
 
       <div className="container mx-auto px-4 md:px-6 relative z-10 space-y-10 md:space-y-14">
         {/* Top Header Section */}
-        <div className="relative flex flex-col items-center text-center max-w-5xl mx-auto pt-2">
+        <motion.div
+          className="relative flex flex-col items-center text-center max-w-5xl mx-auto pt-2"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+          variants={fadeUp}
+        >
           {/* Top-Left Cursive Annotation */}
           <div className="hidden lg:block absolute left-0 top-0 -translate-y-2 pointer-events-none select-none">
             <span className="font-script text-2xl md:text-3xl text-purple-600 dark:text-purple-400 font-bold rotate-[-6deg] inline-block drop-shadow-sm leading-tight">
@@ -206,15 +214,19 @@ export default function AiPrecisionRecovery() {
               <User className="w-3 h-3 text-purple-600" /> Personalized
             </span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Row 1: 4 Stage Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-          {stages.map((stage) => {
+          {stages.map((stage, i) => {
             const Icon = stage.icon;
             return (
-              <div
+              <motion.div
                 key={stage.stageNumber}
+                initial="hidden"
+                whileInView="visible"
+                viewport={viewportConfig}
+                variants={i % 2 === 0 ? slideInLeft : slideInRight}
                 className={cn(
                   'group relative flex flex-col justify-between rounded-2xl p-5 border transition-all duration-500 hover:shadow-xl hover:-translate-y-1 overflow-hidden min-h-[360px]',
                   stage.theme.border,
@@ -306,7 +318,7 @@ export default function AiPrecisionRecovery() {
                     />
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
@@ -314,7 +326,13 @@ export default function AiPrecisionRecovery() {
         {/* Row 2: Two Large Featured Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           {/* Featured Card 1: Experience Your Body-Map Insight */}
-          <div className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/80 dark:border-purple-900/50 bg-gradient-to-br from-white via-purple-50/50 to-indigo-100/40 dark:from-card dark:via-purple-950/25 dark:to-card shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+            variants={slideInLeft}
+            className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/80 dark:border-purple-900/50 bg-gradient-to-br from-white via-purple-50/50 to-indigo-100/40 dark:from-card dark:via-purple-950/25 dark:to-card shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden"
+          >
             {/* Background Accent Glow */}
             <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/10 dark:bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
 
@@ -394,10 +412,16 @@ export default function AiPrecisionRecovery() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Featured Card 2: Free Live Online Consultation */}
-          <div className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/80 dark:border-purple-900/50 bg-gradient-to-br from-white via-purple-50/50 to-indigo-100/40 dark:from-card dark:via-purple-950/25 dark:to-card shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+            variants={slideInRight}
+            className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/80 dark:border-purple-900/50 bg-gradient-to-br from-white via-purple-50/50 to-indigo-100/40 dark:from-card dark:via-purple-950/25 dark:to-card shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden"
+          >
             {/* Background Accent Glow */}
             <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 dark:bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
 
@@ -510,11 +534,17 @@ export default function AiPrecisionRecovery() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Row 3: Bottom Trust Metrics Strip */}
-        <div className="relative rounded-2xl border border-purple-200/70 dark:border-purple-900/40 bg-white/80 dark:bg-card/80 backdrop-blur-md p-4 sm:p-5 shadow-xs">
+        <motion.div
+          className="relative rounded-2xl border border-purple-200/70 dark:border-purple-900/40 bg-white/80 dark:bg-card/80 backdrop-blur-md p-4 sm:p-5 shadow-xs"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+          variants={scaleUp}
+        >
           <div className="flex flex-col lg:flex-row items-center justify-between gap-5">
             {/* 4 Trust Metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 w-full lg:w-auto flex-1">
@@ -586,7 +616,7 @@ export default function AiPrecisionRecovery() {
               </span>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
