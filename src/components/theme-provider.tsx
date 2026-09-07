@@ -23,7 +23,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       ? "dark"
       : "light";
     
-    const initialTheme = storedTheme || preferredTheme;
+    const urlTheme = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get("theme") as Theme | null : null;
+    const initialTheme = urlTheme || storedTheme || preferredTheme;
     setThemeState(initialTheme);
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(initialTheme);
