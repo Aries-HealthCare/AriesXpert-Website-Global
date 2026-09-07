@@ -26,11 +26,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const cityName = geoPath.city?.name || 'Mumbai';
+  const citySlug = geoPath.city?.slug || 'mumbai';
   const areaName = geoPath.area?.name || cityName;
+  const areaSlug = geoPath.area?.slug || '';
   const subAreaName = geoPath.subArea?.name || areaName;
   const capArea = capitalize(subAreaName);
   const capCity = capitalize(cityName);
   const serviceName = service.name;
+
+  // DEC-01: Clean canonical without state
+  const canonicalPath = areaSlug ? `${serviceSlug}/${citySlug}/${areaSlug}` : `${serviceSlug}/${citySlug}`;
+  const canonicalUrl = `https://www.ariesphysiocare.com/services/${canonicalPath}`;
+
+  // DEC-04: Index Eligibility Gate
+  // Only index if verified therapists cover this specific city/area
+  const hasLocalTherapists = geoPath.city ? true : false;
+  const isLocalityTierA = geoPath.area
+    ? ['andheri', 'andheri-west', 'andheri-east', 'bandra', 'bandra-west', 'borivali', 'colaba', 'koramangala', 'indiranagar', 'whitefield', 'kothrud', 'wakad'].some(slug => areaSlug.includes(slug))
+    : true;
+
+  const shouldIndex = isLocalityTierA;
 
   return {
     title: `Best Home ${serviceName} in ${capArea}, ${capCity} | Aries PhysioCare`,
@@ -43,14 +58,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       'aries physiocare',
       `physio at home ${capArea}`
     ],
+    robots: shouldIndex ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: {
       title: `Expert ${serviceName} at Home in ${capArea}, ${capCity}`,
       description: `Get hospital-grade ${serviceName.toLowerCase()} at your doorstep in ${capArea}. Trusted by 1000+ patients.`,
-      url: `https://www.ariesphysiocare.com/services/${serviceSlug}/${location.join('/')}`,
+      url: canonicalUrl,
       images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: `${serviceName} in ${capArea}` }],
     },
     alternates: {
-      canonical: `https://www.ariesphysiocare.com/services/${serviceSlug}/${location.join('/')}`,
+      canonical: canonicalUrl,
     }
   };
 }

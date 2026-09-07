@@ -150,6 +150,9 @@ interface BookingFormProps {
   service?: string;
   condition?: string;
   therapist?: string;
+  city?: string;
+  area?: string;
+  state?: string;
   onSubmitted?: () => void;
   onClose?: () => void;
   className?: string;
@@ -160,6 +163,9 @@ export default function BookingForm({
   service: initialService,
   condition,
   therapist,
+  city: initialCity,
+  area: initialArea,
+  state: initialState,
   onSubmitted,
   onClose,
   className,
@@ -187,9 +193,9 @@ export default function BookingForm({
       age: '',
       gender: '',
       preferredLanguage: 'English',
-      state: 'maharashtra',
-      city: 'mumbai',
-      area: 'bandra-west',
+      state: initialState || 'maharashtra',
+      city: initialCity || 'mumbai',
+      area: initialArea || 'bandra-west',
       address: '',
       service: initialService || 'back-neck-pain',
       date: 'Tue, 16 Feb 2026',

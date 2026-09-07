@@ -10,6 +10,8 @@ interface BookAppointmentButtonProps extends ButtonProps {
   serviceSlug?: string;
   conditionSlug?: string;
   therapistId?: string;
+  city?: string;
+  area?: string;
   children: React.ReactNode;
   enableTilt?: boolean;
 }
@@ -18,6 +20,8 @@ export default function BookAppointmentButton({
   serviceSlug,
   conditionSlug,
   therapistId,
+  city,
+  area,
   children,
   onClick,
   enableTilt = true,
@@ -64,6 +68,8 @@ export default function BookAppointmentButton({
       service: serviceSlug || searchParams?.get('service') || '',
       condition: conditionSlug || searchParams?.get('condition') || '',
       therapist: therapistId || searchParams?.get('therapist') || '',
+      city: city || searchParams?.get('city') || '',
+      area: area || searchParams?.get('area') || '',
       sourcePath: pathname || '',
     });
   };

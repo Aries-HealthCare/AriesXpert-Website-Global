@@ -104,7 +104,12 @@ export function getLocalBusinessSchema(params: {
             postalCode: params.postalCode || '',
             addressCountry: 'IN',
         },
-        geo: { '@type': 'GeoCoordinates' },
+        ...(params.postalCode ? {
+            geo: {
+                '@type': 'GeoCoordinates',
+                addressCountry: 'IN'
+            }
+        } : {}),
         openingHoursSpecification: [
             { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '20:00' },
             { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Saturday', 'Sunday'], opens: '09:00', closes: '18:00' },
@@ -159,9 +164,9 @@ export function getHealthcareServiceSchema(params: {
 }
 
 // ─────────────────────────────────────────────────
-// Physician Schema (therapist/doctor pages)
+// Practitioner Schema (Person with Physiotherapist role)
 // ─────────────────────────────────────────────────
-export function getPhysicianSchema(params: {
+export function getPractitionerSchema(params: {
     name: string;
     qualification: string;
     experience: string;
@@ -171,23 +176,45 @@ export function getPhysicianSchema(params: {
     imageUrl?: string;
     rating?: number;
     reviewCount?: number;
+    city?: string;
+    state?: string;
+    bio?: string;
+    education?: string[];
+    registrationNumber?: string;
 }) {
     return {
         '@context': 'https://schema.org',
-        '@type': ['Person', 'Physician', 'MedicalBusiness'],
+        '@type': 'Person',
         name: params.name,
-        jobTitle: `${params.qualification} - ${params.specialization}`,
-        description: `${params.name} is a certified physiotherapist with ${params.experience} of experience, specializing in ${params.specialization}.`,
-        url: `${BASE_URL}/therapist/${params.slug}`,
+        jobTitle: `Consultant Physiotherapist - ${params.specialization}`,
+        description: params.bio || `${params.name} is a verified clinical physiotherapist with ${params.experience} of experience, specializing in ${params.specialization}.`,
+        url: `${BASE_URL}/physiotherapists/${params.slug}`,
         image: params.imageUrl || `${BASE_URL}/og-image.jpg`,
         telephone: ORG_PHONE,
+        hasOccupation: {
+            '@type': 'Occupation',
+            name: 'Physiotherapist',
+            occupationalCategory: 'Healthcare Practitioner'
+        },
         worksFor: {
             '@type': 'MedicalOrganization',
             name: 'Aries PhysioCare',
             url: BASE_URL,
         },
+        ...(params.education && params.education.length > 0 && {
+            alumniOf: params.education.map(edu => ({
+                '@type': 'EducationalOrganization',
+                name: edu
+            }))
+        }),
+        ...(params.registrationNumber && {
+            identifier: {
+                '@type': 'PropertyValue',
+                propertyID: 'Council Registration Number',
+                value: params.registrationNumber
+            }
+        }),
         areaServed: params.areas.map(a => ({ '@type': 'Place', name: a })),
-        medicalSpecialty: params.specialization,
         ...(params.rating && {
             aggregateRating: {
                 '@type': 'AggregateRating',
@@ -199,6 +226,9 @@ export function getPhysicianSchema(params: {
         }),
     };
 }
+
+// Retain getPhysicianSchema as backwards-compatible alias to getPractitionerSchema
+export const getPhysicianSchema = getPractitionerSchema;
 
 // ─────────────────────────────────────────────────
 // MedicalClinic Schema (clinic pages)

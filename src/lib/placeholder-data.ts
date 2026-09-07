@@ -1284,5 +1284,25 @@ export function getGeoPath(path: string[]): GeoPath | null {
     return geoPath;
   }
 
+  // 2. DEC-01: Direct City resolution when state is omitted in public URL
+  for (const state of IndianStates) {
+    const city = state.cities.find((c: any) => c.slug === searchPath[0]);
+    if (city) {
+      geoPath.state = state;
+      geoPath.city = city;
+      if (searchPath[1]) {
+        const area = city.areas.find((a: any) => a.slug === searchPath[1]);
+        if (area) {
+          geoPath.area = area;
+          if (searchPath[2]) {
+            const subArea = area.subAreas?.find((sa: any) => sa.slug === searchPath[2]);
+            if (subArea) geoPath.subArea = subArea;
+          }
+        }
+      }
+      return geoPath;
+    }
+  }
+
   return null;
 }

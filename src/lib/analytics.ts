@@ -37,3 +37,93 @@ export function trackEvent(eventName: LeadConversionEvent | string, params?: Rec
     // Analytics must never break the user-facing flow.
   }
 }
+
+export function trackPhoneCall(phoneNumber: string, context?: Record<string, unknown>): void {
+  trackEvent('conversion_phone_call', {
+    phone_number: phoneNumber,
+    page_location: typeof window !== 'undefined' ? window.location.href : '',
+    ...context,
+  });
+}
+
+export function trackWhatsAppClick(destination: string, context?: Record<string, unknown>): void {
+  trackEvent('conversion_whatsapp_click', {
+    chat_destination: destination,
+    page_location: typeof window !== 'undefined' ? window.location.href : '',
+    ...context,
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Downstream Patient Lifecycle Analytics (P0 Directive: Leads First)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function trackLeadCreated(leadId: string, context?: Record<string, unknown>): void {
+  trackEvent('lead_created', {
+    lead_id: leadId,
+    event_category: 'Patient Acquisition Funnel',
+    stage: '1_lead_created',
+    ...context,
+  });
+}
+
+export function trackLeadQualified(leadId: string, context?: Record<string, unknown>): void {
+  trackEvent('lead_qualified', {
+    lead_id: leadId,
+    event_category: 'Patient Acquisition Funnel',
+    stage: '2_lead_qualified',
+    ...context,
+  });
+}
+
+export function trackConsultationScheduled(leadId: string, context?: Record<string, unknown>): void {
+  trackEvent('consultation_scheduled', {
+    lead_id: leadId,
+    event_category: 'Patient Acquisition Funnel',
+    stage: '3_consultation_scheduled',
+    ...context,
+  });
+}
+
+export function trackAppointmentCompleted(leadId: string, context?: Record<string, unknown>): void {
+  trackEvent('appointment_completed', {
+    lead_id: leadId,
+    event_category: 'Patient Acquisition Funnel',
+    stage: '4_appointment_completed',
+    ...context,
+  });
+}
+
+export function trackPatientConverted(leadId: string, value: number, context?: Record<string, unknown>): void {
+  trackEvent('patient_converted', {
+    lead_id: leadId,
+    value,
+    currency: 'INR',
+    event_category: 'Patient Acquisition Funnel',
+    stage: '5_patient_converted',
+    ...context,
+  });
+}
+
+/**
+ * Builds a high-converting contextual WhatsApp chat link preserving service, locality, and doctor context.
+ */
+export function buildContextualWhatsAppUrl(context: {
+  service?: string;
+  city?: string;
+  area?: string;
+  doctorName?: string;
+}): string {
+  const base = 'https://wa.me/919136447006';
+  const service = context.service || 'Physiotherapy';
+  const location = context.area && context.city 
+    ? `${context.area}, ${context.city}` 
+    : context.city || 'Mumbai';
+
+  const message = context.doctorName
+    ? `Hello Aries PhysioCare, I would like to book a home consultation with ${context.doctorName} in ${location}. Please share available appointment slots.`
+    : `Hello Aries PhysioCare, I am looking for expert ${service} in ${location}. Please share consultation availability.`;
+
+  return `${base}?text=${encodeURIComponent(message)}`;
+}
+

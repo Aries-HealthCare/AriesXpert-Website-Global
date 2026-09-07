@@ -29,7 +29,7 @@ export type IndianStateType = {
     cities: IndianCityType[];
 };
 
-export const IndianStates: IndianStateType[] = [
+const rawIndianStates: IndianStateType[] = [
     {
         name: "Maharashtra",
         slug: "maharashtra",
@@ -1823,3 +1823,29 @@ export const IndianStates: IndianStateType[] = [
         ]
     }
 ];
+
+function normalizeStates(states: IndianStateType[]): IndianStateType[] {
+    return states.map(state => ({
+        ...state,
+        cities: state.cities.map(city => ({
+            ...city,
+            areas: city.areas.map(area => {
+                if (!area.subAreas || area.subAreas.length === 0) {
+                    return area;
+                }
+                // DEC-12: Filter out self-nested duplicate sub-areas (e.g., Colaba -> Colaba)
+                const cleanSubAreas = area.subAreas.filter(sub => 
+                    sub.slug !== area.slug && 
+                    sub.name.toLowerCase().trim() !== area.name.toLowerCase().trim()
+                );
+                return {
+                    ...area,
+                    subAreas: cleanSubAreas.length > 0 ? cleanSubAreas : undefined
+                };
+            })
+        }))
+    }));
+}
+
+export const IndianStates: IndianStateType[] = normalizeStates(rawIndianStates);
+
