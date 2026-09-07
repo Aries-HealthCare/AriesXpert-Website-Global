@@ -55,7 +55,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-xl border-b border-border/10 shadow-xs transition-all duration-300">
-      <div className="w-full max-w-7xl 2xl:max-w-[1720px] mx-auto flex h-16 lg:h-18 2xl:h-20 items-center px-4 sm:px-6 lg:px-8 relative justify-between gap-2">
+      <div className="w-full mx-auto flex h-16 lg:h-18 2xl:h-20 items-center px-4 sm:px-6 lg:px-8 xl:px-12 relative justify-between gap-2">
         
         {/* Logo Section */}
         <div className="flex items-center shrink-0">

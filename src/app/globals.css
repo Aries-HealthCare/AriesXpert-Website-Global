@@ -105,6 +105,38 @@
   }
 }
 
+@layer components {
+  /* Expansive edge-to-edge container:
+     Leaves exactly half an inch (48px / 3rem) padding on desktop sides,
+     fitting content to the screen properly without large empty gutters. */
+  .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem !important;
+      padding-right: 1.5rem !important;
+    }
+  }
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem !important;
+      padding-right: 2rem !important;
+    }
+  }
+  @media (min-width: 1280px) {
+    .container {
+      padding-left: 3rem !important;
+      padding-right: 3rem !important;
+    }
+  }
+}
+
 @layer utilities {
   .glassmorphic {
     @apply bg-white/70 dark:bg-black/40 backdrop-blur-2xl border border-white/20 dark:border-white/10 transition-all duration-500;

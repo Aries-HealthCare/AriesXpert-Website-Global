@@ -98,7 +98,7 @@ export default function ServiceDetailClient({ serviceSlug }: ServiceDetailClient
             {/* Focused Service Overview */}
             <section className="py-20 md:py-32 bg-background">
                 <div className="container mx-auto px-4 md:px-6">
-                    <div className="grid lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
+                    <div className="grid lg:grid-cols-2 gap-16 items-center w-full mx-auto">
                         <div className="space-y-8">
                             <h2 className="font-headline text-3xl md:text-5xl font-bold">Understanding {service.name}</h2>
                             <div className="prose prose-lg dark:prose-invert text-muted-foreground leading-relaxed">
@@ -138,7 +138,7 @@ export default function ServiceDetailClient({ serviceSlug }: ServiceDetailClient
                         <h2 className="font-headline text-3xl md:text-5xl font-bold uppercase tracking-tight">Specialized Care Programs</h2>
                         <p className="mt-6 text-lg text-muted-foreground font-medium">Explore the clinical focus areas we address within our {service.name} service to optimize your recovery.</p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mx-auto">
                         {service.conditions.slice(0, 9).map((condition) => (
                             <Card key={condition.id} className="glassmorphic flex flex-col group hover:neon-primary-border transition-all duration-500 rounded-[2rem] overflow-hidden">
                                 <div className="relative aspect-video w-full overflow-hidden">

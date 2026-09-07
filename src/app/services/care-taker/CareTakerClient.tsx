@@ -92,7 +92,7 @@ export default function CareTakerClient() {
             {/* ── CORE VALUES SECTION ─────────────────────────────────── */}
             <section className="py-24 md:py-32 bg-background">
                 <div className="container mx-auto px-4 md:px-6">
-                    <div className="grid lg:grid-cols-2 gap-20 items-center max-w-7xl mx-auto">
+                    <div className="grid lg:grid-cols-2 gap-20 items-center w-full mx-auto">
                         <div className="relative">
                             <div className="aspect-square rounded-[3.5rem] overflow-hidden soft-shadow border-8 border-primary/5 shadow-2xl relative group">
                                 <Image
@@ -152,7 +152,7 @@ export default function CareTakerClient() {
                         <p className="text-xl text-muted-foreground font-medium">Focused assistance for different levels of mobility and health requirements.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 w-full mx-auto">
                         {service.conditions.map((condition) => (
                             <Card key={condition.id} className="group glassmorphic flex flex-col hover:neon-primary-border transition-all duration-500 rounded-[3rem] overflow-hidden border-primary/5 shadow-xl">
                                 <div className="relative aspect-[16/10] w-full overflow-hidden">

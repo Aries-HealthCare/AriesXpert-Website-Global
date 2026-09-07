@@ -199,7 +199,7 @@ export const locations: Location[] = [
     address: 'Salt Lake / Alipore Hub, West Bengal',
     phone: '+91 9136447006',
     timings: '8:00 AM - 9:30 PM',
-    mapImageUrl: 'https://images.unsplash.com/photo-1558431382-27e39cb14bc8?auto=format&fit=crop&q=85&w=1200',
+    mapImageUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&q=85&w=1200',
     mapImageHint: 'kolkata healthcare hub'
   },
 ];

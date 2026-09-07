@@ -299,7 +299,7 @@ export default function PricingPackagesSection({
   return (
     <section id="pricing-packages" className={cn('py-20 md:py-28 relative overflow-hidden bg-background text-foreground', className)}>
       {/* Background glow ornaments */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(ellipse_at_top,rgba(225,29,72,0.15),transparent_70%)] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1820px] h-96 bg-[radial-gradient(ellipse_at_top,rgba(225,29,72,0.15),transparent_70%)] pointer-events-none" />
       <div className="absolute -bottom-24 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/3 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
 
@@ -411,7 +411,7 @@ export default function PricingPackagesSection({
         </div>
 
         {/* ── AUTO-DETECTED LOCATION & PER-DAY CHARGE HERO BANNER ── */}
-        <div className="max-w-4xl mx-auto mb-12 p-6 md:p-7 rounded-3xl bg-card/60 border border-primary/20 shadow-2xl backdrop-blur-xl">
+        <div className="w-full max-w-5xl xl:max-w-6xl mx-auto mb-12 p-6 md:p-7 rounded-3xl bg-card/60 border border-primary/20 shadow-2xl backdrop-blur-xl">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
@@ -451,7 +451,7 @@ export default function PricingPackagesSection({
         </div>
 
         {/* ── 4 MULTI-DAY RECOVERY PACKAGES ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full mx-auto mb-16">
           {packageCards.map((pkg) => (
             <Card
               key={pkg.key}

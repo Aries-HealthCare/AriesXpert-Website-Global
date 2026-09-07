@@ -55,7 +55,7 @@ export default function WhatWeTreat() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 w-full mx-auto">
           {treatmentAreas.map((area, index) => (
             <Card
               key={`${area.title}-${index}`}

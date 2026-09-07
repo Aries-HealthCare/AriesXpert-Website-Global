@@ -97,7 +97,7 @@ export default function AiPrecisionRecovery() {
         </div>
 
         {/* Highlighted Body-Map Insight Block */}
-        <div className="max-w-5xl mx-auto animate-reveal-up fill-mode-both transition-all duration-1000 delay-500">
+        <div className="w-full max-w-6xl xl:max-w-none mx-auto animate-reveal-up fill-mode-both transition-all duration-1000 delay-500">
           <Card className="premium-card p-10 md:p-16 border-primary/10 bg-gradient-to-br from-white to-primary/5 dark:from-card dark:to-primary/10 rounded-[2.5rem] relative overflow-hidden group/insight">
             <div className="absolute top-0 right-0 p-12 opacity-[0.02] pointer-events-none group-hover/insight:opacity-[0.05] transition-opacity duration-700">
               <Zap className="w-80 h-80 text-primary" />

@@ -58,7 +58,7 @@ export default function Hero() {
       <div className="absolute -bottom-16 left-1/3 w-96 h-64 bg-purple-100/40 dark:bg-purple-950/15 rounded-full blur-3xl pointer-events-none" />
 
       {/* Main Container - Expands to fill available hero height and distributes content */}
-      <div className="w-full max-w-7xl 2xl:max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 flex-1 flex flex-col justify-between py-2 sm:py-2.5 lg:py-3 relative z-10">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 flex-1 flex flex-col justify-between py-2 sm:py-2.5 lg:py-3 relative z-10">
         
         {/* ──────── 2-Column Main Content Row ──────── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-7 xl:gap-10 items-center flex-1 my-auto py-1 sm:py-1.5">
@@ -217,7 +217,7 @@ export default function Hero() {
                   alt="Aries PhysioCare Certified Physiotherapist gently assisting patient with home knee rehabilitation"
                   fill
                   priority
-                  quality={95}
+                  quality={90}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 700px"
                   className="object-cover object-[center_16%] scale-[1.01] group-hover:scale-103 transition-transform duration-1000 ease-out"
                 />
@@ -245,8 +245,8 @@ export default function Hero() {
                 </div>
               </div>
 
-              {/* Floating Glassmorphic Card 1 (Top-Right): Benefits List */}
-              <div className="absolute -top-2.5 sm:-top-3.5 right-1 sm:-right-3 z-20 animate-float">
+              {/* Floating Glassmorphic Card 1 (Top-Right): Benefits List (hidden on small mobile to avoid obscuring patient) */}
+              <div className="hidden sm:block absolute -top-3.5 -right-3 z-20 animate-float">
                 <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-2 sm:p-3 shadow-xl shadow-purple-950/10 min-w-[135px] sm:min-w-[160px] space-y-1.5 sm:space-y-2">
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
@@ -286,17 +286,17 @@ export default function Hero() {
                 </div>
               </div>
 
-              {/* Floating Glassmorphic Card 2 (Bottom-Right): Professional Care */}
-              <div className="absolute bottom-2 sm:bottom-3.5 right-2 sm:right-4 z-20 animate-float-delayed">
-                <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 shadow-xl shadow-purple-950/10 flex items-center gap-2.5">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-violet-100 dark:bg-violet-950/80 text-violet-600 dark:text-violet-300 flex items-center justify-center shrink-0">
-                    <Home className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+              {/* Floating Glassmorphic Card 2 (Bottom-Right): Professional Care (tablet & desktop) */}
+              <div className="hidden sm:block absolute bottom-3 sm:bottom-3.5 right-2 sm:right-4 z-20 animate-float-delayed">
+                <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl sm:rounded-2xl p-1.5 sm:p-3 shadow-xl shadow-purple-950/10 flex items-center gap-1.5 sm:gap-2.5">
+                  <div className="w-6 h-6 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-violet-100 dark:bg-violet-950/80 text-violet-600 dark:text-violet-300 flex items-center justify-center shrink-0">
+                    <Home className="w-3 h-3 sm:w-4.5 sm:h-4.5" />
                   </div>
                   <div>
-                    <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight">
+                    <p className="text-[11px] sm:text-sm font-bold text-slate-900 dark:text-white leading-tight whitespace-nowrap">
                       Professional Care
                     </p>
-                    <p className="text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">
+                    <p className="text-[9px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5 leading-tight whitespace-nowrap">
                       In the Comfort of Your Home
                     </p>
                   </div>

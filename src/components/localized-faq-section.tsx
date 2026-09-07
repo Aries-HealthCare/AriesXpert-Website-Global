@@ -58,7 +58,7 @@ export default function LocalizedFaqSection({ geo, className, title, description
           </p>
         </div>
 
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto">
           <Accordion type="single" collapsible className="w-full space-y-4">
             {faqs.map((faq, index) => (
               <AccordionItem
