@@ -169,7 +169,7 @@ export default function CityLandingPageTemplate({ city }: CityLandingPageTemplat
                             <div className="relative">
                                 <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl shadow-primary/10 border border-primary/10">
                                     <Image
-                                        src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=1000"
+                                        src="/images/hero-city-recovery.jpg"
                                         alt={`Home physiotherapy in ${city.cityName} by Aries PhysioCare`}
                                         fill
                                         className="object-cover"

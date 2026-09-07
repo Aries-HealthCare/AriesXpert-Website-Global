@@ -267,8 +267,8 @@ export default function AreaLandingPageTemplate({ location }: AreaLandingPageTem
                             <div className="relative">
                                 <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl shadow-primary/10 border border-primary/10">
                                     <Image
-                                        src="https://images.unsplash.com/photo-1511688878353-3a2f5be94cd7?auto=format&fit=crop&q=80&w=1000"
-                                        alt={`Home physiotherapy in ${location.locationName}, ${location.cityName}`}
+                                        src="/images/hero-city-recovery.jpg"
+                                        alt={`Home physiotherapy in ${location.locationName}, ${location.cityName} by Aries PhysioCare`}
                                         fill
                                         className="object-cover"
                                         sizes="(max-width: 1024px) 100vw, 50vw"
