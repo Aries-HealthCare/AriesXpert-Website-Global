@@ -229,11 +229,12 @@ export default function AiPrecisionRecovery() {
                 variants={cardReveal}
                 custom={i}
                 className={cn(
-                  'group relative flex flex-col justify-between rounded-2xl p-5 border hover:shadow-xl overflow-hidden min-h-[360px]',
+                  'group relative flex flex-col justify-between rounded-2xl p-5 border hover:shadow-2xl overflow-hidden min-h-[360px] shining-card-border cursor-pointer transition-all duration-500',
                   stage.theme.border,
                   stage.theme.cardBg
                 )}
               >
+                <div className="card-shimmer-sweep-overlay" aria-hidden="true" />
                 {/* Watermark Number */}
                 <span
                   className={cn(
@@ -332,10 +333,11 @@ export default function AiPrecisionRecovery() {
             whileInView="visible"
             viewport={viewportConfig}
             variants={fadeUp}
-            className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/80 dark:border-purple-900/50 bg-gradient-to-br from-white via-purple-50/50 to-indigo-100/40 dark:from-card dark:via-purple-950/25 dark:to-card shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden"
+            className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/80 dark:border-purple-900/50 bg-gradient-to-br from-white via-purple-50/50 to-indigo-100/40 dark:from-card dark:via-purple-950/25 dark:to-card shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden shining-card-border cursor-pointer"
           >
+            <div className="card-shimmer-sweep-overlay" aria-hidden="true" />
             {/* Background Accent Glow */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/10 dark:bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 dark:bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
               {/* Left Content */}
@@ -421,10 +423,11 @@ export default function AiPrecisionRecovery() {
             whileInView="visible"
             viewport={viewportConfig}
             variants={fadeUp}
-            className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/80 dark:border-purple-900/50 bg-gradient-to-br from-white via-purple-50/50 to-indigo-100/40 dark:from-card dark:via-purple-950/25 dark:to-card shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden"
+            className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/80 dark:border-purple-900/50 bg-gradient-to-br from-white via-purple-50/50 to-indigo-100/40 dark:from-card dark:via-purple-950/25 dark:to-card shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden shining-card-border cursor-pointer"
           >
+            <div className="card-shimmer-sweep-overlay" aria-hidden="true" />
             {/* Background Accent Glow */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 dark:bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500/10 dark:bg-teal-500/15 rounded-full blur-3xl pointer-events-none" />
 
             {/* Top Right Script Note */}
             <div className="hidden sm:block absolute right-8 top-5 z-30 pointer-events-none select-none">

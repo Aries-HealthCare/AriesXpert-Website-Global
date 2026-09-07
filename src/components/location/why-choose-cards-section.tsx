@@ -225,14 +225,15 @@ export default function WhyChooseCardsSection({
                         return (
                             <div
                                 key={card.id}
-                                className="bg-white/95 dark:bg-[#130d24]/95 backdrop-blur-md rounded-3xl border border-purple-100 dark:border-purple-900/40 p-4 sm:p-5 flex flex-col justify-between shadow-lg shadow-purple-950/5 hover:shadow-2xl hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-300 transform hover:-translate-y-1 group"
+                                className="bg-white/95 dark:bg-[#130d24]/95 backdrop-blur-md rounded-3xl border border-emerald-100 dark:border-emerald-900/40 p-4 sm:p-5 flex flex-col justify-between shadow-lg shadow-emerald-950/5 hover:shadow-2xl hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-500 transform hover:-translate-y-2 group shining-card-border cursor-pointer"
                             >
+                                <div className="card-shimmer-sweep-overlay" aria-hidden="true" />
                                 {/* Top Content */}
-                                <div className="text-center flex flex-col items-center">
-                                    <div className="w-12 h-12 rounded-full bg-purple-100/90 dark:bg-purple-900/50 text-purple-600 dark:text-purple-300 flex items-center justify-center mb-3 shadow-xs group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white dark:group-hover:bg-purple-600 transition-all duration-300">
+                                <div className="text-center flex flex-col items-center relative z-10">
+                                    <div className="w-12 h-12 rounded-full bg-emerald-100/90 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-300 flex items-center justify-center mb-3 shadow-xs group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white dark:group-hover:bg-emerald-600 transition-all duration-300">
                                         <Icon className="w-5 h-5" />
                                     </div>
-                                    <h3 className="font-extrabold text-[15px] sm:text-base text-gray-900 dark:text-white leading-snug group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                                    <h3 className="font-extrabold text-[15px] sm:text-base text-gray-900 dark:text-white leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                                         {card.title}
                                     </h3>
                                     <p className="text-xs text-muted-foreground mt-2 leading-relaxed font-medium">
@@ -241,7 +242,7 @@ export default function WhyChooseCardsSection({
                                 </div>
 
                                 {/* Bottom Image Visual with Rounded Frame */}
-                                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mt-4 border border-purple-100/70 dark:border-purple-800/40 shadow-xs bg-purple-50/50 dark:bg-purple-950/30">
+                                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mt-4 border border-emerald-100/70 dark:border-emerald-800/40 shadow-xs bg-emerald-50/50 dark:bg-emerald-950/30 relative z-10">
                                     <Image
                                         src={card.image}
                                         alt={card.imageAlt}
@@ -253,8 +254,8 @@ export default function WhyChooseCardsSection({
                                     {/* Dynamic Pill Overlay for Card 6 */}
                                     {card.badgeText && (
                                         <div className="absolute bottom-2 inset-x-1 flex justify-center z-10 pointer-events-none">
-                                            <div className="bg-white/95 dark:bg-[#130d24]/95 backdrop-blur-md px-2 py-0.5 rounded-full shadow-md border border-purple-100 dark:border-purple-800/40 text-[9px] sm:text-[10px] 2xl:text-[10.5px] font-bold text-gray-900 dark:text-white flex items-center gap-1 shadow-xs whitespace-nowrap tracking-tight">
-                                                <MapPin className="w-3 h-3 text-purple-600 dark:text-purple-400 shrink-0" />
+                                            <div className="bg-white/95 dark:bg-[#130d24]/95 backdrop-blur-md px-2 py-0.5 rounded-full shadow-md border border-emerald-100 dark:border-emerald-800/40 text-[9px] sm:text-[10px] 2xl:text-[10.5px] font-bold text-gray-900 dark:text-white flex items-center gap-1 shadow-xs whitespace-nowrap tracking-tight">
+                                                <MapPin className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                                 <span>{card.badgeText}</span>
                                             </div>
                                         </div>

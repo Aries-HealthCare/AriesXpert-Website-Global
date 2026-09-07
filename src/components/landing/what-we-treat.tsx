@@ -347,7 +347,7 @@ export default function WhatWeTreat() {
           </motion.div>
         </div>
 
-        {/* 2x2 Grid of Cards */}
+        {/* 2x2 Grid of Cards with Shining Border Beam */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 w-full mx-auto">
           {treatmentCategories.map((area, index) => (
             <motion.div
@@ -358,12 +358,13 @@ export default function WhatWeTreat() {
               variants={cardReveal}
               custom={index}
               className={cn(
-                "group bg-gradient-to-br rounded-3xl border p-5 sm:p-6 lg:p-7 shadow-lg flex flex-col justify-between relative overflow-hidden hover:shadow-xl",
+                "group bg-gradient-to-br rounded-3xl border p-5 sm:p-6 lg:p-7 shadow-lg flex flex-col justify-between relative overflow-hidden hover:shadow-2xl shining-card-border cursor-pointer transition-all duration-500",
                 area.cardGradient,
                 area.cardBorder
               )}
             >
-              <div className="flex flex-col sm:flex-row gap-5 lg:gap-6 items-stretch justify-between h-full">
+              <div className="card-shimmer-sweep-overlay" aria-hidden="true" />
+              <div className="flex flex-col sm:flex-row gap-5 lg:gap-6 items-stretch justify-between h-full relative z-10">
                 {/* Left content: Header, Scrollable List, View All link */}
                 <div className="flex-1 flex flex-col justify-between min-w-0">
                   <div>

@@ -587,4 +587,188 @@
     transform: translateZ(0);
     backface-visibility: hidden;
   }
+
+  /* ── Nature Botanical & Floating Leaves Keyframes ── */
+  @keyframes leaf-drift-1 {
+    0% {
+      transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+    33% {
+      transform: translate(14px, -20px) rotate(12deg) scale(1.04);
+    }
+    66% {
+      transform: translate(-10px, -42px) rotate(-8deg) scale(0.98);
+    }
+    100% {
+      transform: translate(6px, -65px) rotate(6deg) scale(1.02);
+    }
+  }
+
+  @keyframes leaf-drift-2 {
+    0% {
+      transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+    50% {
+      transform: translate(-18px, -30px) rotate(-14deg) scale(1.06);
+    }
+    100% {
+      transform: translate(12px, -60px) rotate(10deg) scale(0.96);
+    }
+  }
+
+  @keyframes leaf-sway {
+    0%, 100% {
+      transform: rotate(-6deg) translateY(0);
+    }
+    50% {
+      transform: rotate(6deg) translateY(-8px);
+    }
+  }
+
+  @keyframes nature-pulse-glow {
+    0%, 100% {
+      opacity: 0.35;
+      transform: scale(0.95);
+    }
+    50% {
+      opacity: 0.7;
+      transform: scale(1.08);
+    }
+  }
+
+  @keyframes border-beam-sweep {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes card-shimmer-sweep {
+    0% {
+      transform: translateX(-150%) skewX(-20deg);
+    }
+    100% {
+      transform: translateX(250%) skewX(-20deg);
+    }
+  }
+
+  .animate-leaf-drift-1 {
+    animation: leaf-drift-1 14s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  .animate-leaf-drift-2 {
+    animation: leaf-drift-2 18s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  .animate-leaf-sway {
+    animation: leaf-sway 6s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .animate-nature-pulse {
+    animation: nature-pulse-glow 8s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+
+  /* ── Ultra-Luxury Shining Card Borders & Glare ── */
+  .shining-card-border {
+    position: relative;
+    border-radius: var(--radius, 1.5rem);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .shining-card-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.75) 0%,
+      rgba(52, 211, 153, 0.2) 35%,
+      rgba(99, 102, 241, 0.5) 70%,
+      rgba(16, 185, 129, 0.8) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.45;
+    transition: opacity 0.4s ease, filter 0.4s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .shining-card-border:hover::before {
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.65));
+  }
+
+  .shining-card-border:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 45px -12px rgba(16, 185, 129, 0.2), 0 0 25px rgba(52, 211, 153, 0.15);
+  }
+
+  .dark .shining-card-border:hover {
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.9), 0 0 35px rgba(16, 185, 129, 0.3);
+  }
+
+  /* Shimmer beam sweep overlay */
+  .card-shimmer-sweep-overlay {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    border-radius: inherit;
+    z-index: 2;
+  }
+
+  .card-shimmer-sweep-overlay::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.12),
+      rgba(52, 211, 153, 0.25),
+      transparent
+    );
+    transform: translateX(-150%) skewX(-20deg);
+    transition: none;
+  }
+
+  .shining-card-border:hover .card-shimmer-sweep-overlay::after {
+    animation: card-shimmer-sweep 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ── 3D Tilt Card & Button Utilities ── */
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .perspective-600 {
+    perspective: 600px;
+  }
+
+  .perspective-800 {
+    perspective: 800px;
+  }
+
+  .nature-backdrop-glow {
+    background: radial-gradient(
+      circle at 50% 50%,
+      rgba(16, 185, 129, 0.12) 0%,
+      rgba(52, 211, 153, 0.06) 40%,
+      transparent 70%
+    );
+  }
 }

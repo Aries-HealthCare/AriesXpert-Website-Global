@@ -24,14 +24,14 @@ export const spring = {
 
 export const easeOut = {
   type: 'tween' as const,
-  ease: [0.16, 1, 0.3, 1],
-  duration: 0.7,
+  ease: [0.22, 1, 0.36, 1],
+  duration: 0.75,
 };
 
 export const gentleEase = {
   type: 'tween' as const,
   ease: [0.25, 0.1, 0.25, 1],
-  duration: 0.65,
+  duration: 0.7,
 };
 
 // ── Animation Variants ────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ export const fadeIn: Variants = {
 
 /** Slide in from left — for alternating stage cards */
 export const slideInLeft: Variants = {
-  hidden: { opacity: 0, x: -60 },
+  hidden: { opacity: 0, x: -50 },
   visible: {
     opacity: 1,
     x: 0,
@@ -67,7 +67,7 @@ export const slideInLeft: Variants = {
 
 /** Slide in from right — for alternating stage cards */
 export const slideInRight: Variants = {
-  hidden: { opacity: 0, x: 60 },
+  hidden: { opacity: 0, x: 50 },
   visible: {
     opacity: 1,
     x: 0,
@@ -77,7 +77,7 @@ export const slideInRight: Variants = {
 
 /** Scale up — for KPI badges, stat pills, pricing card highlights */
 export const scaleUp: Variants = {
-  hidden: { opacity: 0, scale: 0.82 },
+  hidden: { opacity: 0, scale: 0.85 },
   visible: {
     opacity: 1,
     scale: 1,
@@ -85,9 +85,9 @@ export const scaleUp: Variants = {
   },
 };
 
-/** Card reveal — gentle lift + fade for grid cards */
+/** Card reveal — gentle organic lift + fade for grid cards */
 export const cardReveal: Variants = {
-  hidden: { opacity: 0, y: 24, scale: 0.97 },
+  hidden: { opacity: 0, y: 26, scale: 0.96 },
   visible: {
     opacity: 1,
     y: 0,
