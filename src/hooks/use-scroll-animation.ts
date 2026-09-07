@@ -11,7 +11,7 @@ import { Variants } from 'framer-motion';
 // ── Viewport trigger config ───────────────────────────────────────────────────
 export const viewportConfig = {
   once: true,
-  margin: '-80px',
+  amount: 0.15,
 } as const;
 
 // ── Base transition presets ───────────────────────────────────────────────────

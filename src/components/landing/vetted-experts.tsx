@@ -81,13 +81,7 @@ function TherapistCard({ therapist, index }: { therapist: any; index: number }) 
   const SpecIcon = getSpecialtyIcon(therapist.specialization);
 
   return (
-    <motion.div
-      className="p-2.5 h-full"
-      initial="hidden"
-      whileInView="visible"
-      viewport={viewportConfig}
-      variants={cardReveal}
-    >
+    <div className="p-2.5 h-full">
       <Card className="group relative h-full flex flex-col justify-between overflow-hidden rounded-[28px] border border-white/20 dark:border-white/10 bg-gradient-to-b from-card via-card/95 to-card/90 dark:from-slate-900/90 dark:via-slate-900/80 dark:to-slate-950/95 backdrop-blur-2xl shadow-xl transition-all duration-500 hover:-translate-y-2.5 hover:border-primary/50 hover:shadow-[0_25px_60px_-15px_rgba(0,122,255,0.25)]">
         {/* Top ambient radial glow */}
         <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-56 h-56 bg-gradient-to-br from-primary/20 via-blue-500/10 to-transparent rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
@@ -205,7 +199,7 @@ function TherapistCard({ therapist, index }: { therapist: any; index: number }) 
           </Link>
         </CardFooter>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 
@@ -282,35 +276,42 @@ export default function VettedExperts({
         </motion.div>
 
         {/* Carousel Slider */}
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          autoPlay={4000}
-          className="w-full"
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+          variants={fadeUp}
         >
-          <CarouselContent className="-ml-3">
-            {therapists.map((therapist, index) => (
-              <CarouselItem
-                key={therapist.id}
-                className="sm:basis-1/2 lg:basis-1/3 xl:basis-1/4 pl-3"
-              >
-                <TherapistCard therapist={therapist} index={index} />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            autoPlay={4000}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-3">
+              {therapists.map((therapist, index) => (
+                <CarouselItem
+                  key={therapist.id}
+                  className="sm:basis-1/2 lg:basis-1/3 xl:basis-1/4 pl-3"
+                >
+                  <TherapistCard therapist={therapist} index={index} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
 
-          {/* Slider Navigation Controls */}
-          <div className="flex justify-center gap-4 mt-10">
-            <CarouselPrevious className="relative left-0 top-0 translate-y-0 h-11 w-11 rounded-xl border border-border bg-card/80 backdrop-blur-md hover:bg-primary hover:text-white transition-all duration-300 shadow-sm">
-              <ChevronLeft className="w-5 h-5" />
-            </CarouselPrevious>
-            <CarouselNext className="relative right-0 top-0 translate-y-0 h-11 w-11 rounded-xl border border-border bg-card/80 backdrop-blur-md hover:bg-primary hover:text-white transition-all duration-300 shadow-sm">
-              <ChevronRight className="w-5 h-5" />
-            </CarouselNext>
-          </div>
-        </Carousel>
+            {/* Slider Navigation Controls */}
+            <div className="flex justify-center gap-4 mt-10">
+              <CarouselPrevious className="relative left-0 top-0 translate-y-0 h-11 w-11 rounded-xl border border-border bg-card/80 backdrop-blur-md hover:bg-primary hover:text-white transition-all duration-300 shadow-sm">
+                <ChevronLeft className="w-5 h-5" />
+              </CarouselPrevious>
+              <CarouselNext className="relative right-0 top-0 translate-y-0 h-11 w-11 rounded-xl border border-border bg-card/80 backdrop-blur-md hover:bg-primary hover:text-white transition-all duration-300 shadow-sm">
+                <ChevronRight className="w-5 h-5" />
+              </CarouselNext>
+            </div>
+          </Carousel>
+        </motion.div>
 
         {/* Registry Trust Seal */}
         <div className="mt-12 text-center">

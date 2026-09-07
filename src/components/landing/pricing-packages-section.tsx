@@ -31,7 +31,7 @@ import {
   type LocalityPricingRecord
 } from '@/lib/pricing-packages';
 import { cn } from '@/lib/utils';
-import { fadeUp, scaleUp, viewportConfig } from '@/hooks/use-scroll-animation';
+import { fadeUp, cardReveal, viewportConfig } from '@/hooks/use-scroll-animation';
 
 interface PricingPackagesSectionProps {
   initialLocationName?: string;
@@ -466,12 +466,12 @@ export default function PricingPackagesSection({
               initial="hidden"
               whileInView="visible"
               viewport={viewportConfig}
-              variants={scaleUp}
-              transition={{ delay: i * 0.08 }}
+              variants={cardReveal}
+              custom={i}
             >
             <Card
               className={cn(
-                'relative flex flex-col justify-between overflow-hidden rounded-3xl border transition-all duration-300 group hover:-translate-y-2 h-full',
+                'relative flex flex-col justify-between overflow-hidden rounded-3xl border hover:shadow-2xl hover:-translate-y-1 transition-shadow duration-300 h-full',
                 pkg.popular
                   ? 'bg-card border-primary shadow-2xl shadow-primary/10 ring-2 ring-primary/30'
                   : 'bg-card/70 hover:bg-card border-border/80 hover:border-primary/40 shadow-xl'

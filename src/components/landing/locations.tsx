@@ -39,7 +39,13 @@ export default function Locations() {
           </p>
         </motion.div>
 
-        <Carousel
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+          variants={fadeUp}
+        >
+          <Carousel
           opts={{
             align: "start",
             loop: true,
@@ -50,15 +56,7 @@ export default function Locations() {
           <CarouselContent className="-ml-4">
             {locations.map((location, index) => (
               <CarouselItem key={location.id} className="sm:basis-1/2 lg:basis-1/4 pl-4">
-                <motion.div
-                  key={location.id}
-                  className="h-full p-2"
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={viewportConfig}
-                  variants={cardReveal}
-                  custom={index}
-                >
+                <div className="h-full p-2">
                   <Card className="group premium-card overflow-hidden h-full flex flex-col relative rounded-3xl">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(var(--primary),0.08)_0%,transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
 
@@ -125,7 +123,7 @@ export default function Locations() {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               </CarouselItem>
             ))}
           </CarouselContent>
@@ -145,6 +143,7 @@ export default function Locations() {
             </CarouselNext>
           </motion.div>
         </Carousel>
+        </motion.div>
 
         <motion.div
           className="mt-16 text-center"

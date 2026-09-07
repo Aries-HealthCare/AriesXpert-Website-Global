@@ -77,33 +77,15 @@ export default function Home() {
       <Hero />
       <ServicesStrip />
       <AreaCarousel />
-      <div className="content-auto">
-        <AiPrecisionRecovery />
-      </div>
-      <div className="content-auto">
-        <Specialities />
-      </div>
-      <div className="content-auto">
-        <PricingPackagesSection />
-      </div>
-      <div className="content-auto">
-        <GoogleReviews locationName="your city" className="bg-background" />
-      </div>
-      <div className="content-auto">
-        <VettedExperts />
-      </div>
-      <div className="content-auto">
-        <Locations />
-      </div>
-      <div className="content-auto">
-        <WhatWeTreat />
-      </div>
-      <div className="content-auto">
-        <BlogSection />
-      </div>
-      <div className="content-auto">
-        <FaqSection />
-      </div>
+      <AiPrecisionRecovery />
+      <Specialities />
+      <PricingPackagesSection />
+      <GoogleReviews locationName="your city" className="bg-background" />
+      <VettedExperts />
+      <Locations />
+      <WhatWeTreat />
+      <BlogSection />
+      <FaqSection />
     </>
   );
 }

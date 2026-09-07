@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRequestCallback } from '@/components/request-callback-provider';
-import { fadeUp, slideInLeft, slideInRight, viewportConfig } from '@/hooks/use-scroll-animation';
+import { fadeUp, slideInLeft, slideInRight, cardReveal, viewportConfig } from '@/hooks/use-scroll-animation';
 
 const toSlug = (name: string) => name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
@@ -355,9 +355,10 @@ export default function WhatWeTreat() {
               initial="hidden"
               whileInView="visible"
               viewport={viewportConfig}
-              variants={index % 2 === 0 ? slideInLeft : slideInRight}
+              variants={cardReveal}
+              custom={index}
               className={cn(
-                "group bg-gradient-to-br rounded-3xl border p-5 sm:p-6 lg:p-7 shadow-lg flex flex-col justify-between relative overflow-hidden transition-all duration-300 hover:shadow-xl",
+                "group bg-gradient-to-br rounded-3xl border p-5 sm:p-6 lg:p-7 shadow-lg flex flex-col justify-between relative overflow-hidden hover:shadow-xl",
                 area.cardGradient,
                 area.cardBorder
               )}

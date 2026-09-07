@@ -27,7 +27,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { fadeUp, slideInLeft, slideInRight, scaleUp, viewportConfig } from '@/hooks/use-scroll-animation';
+import { fadeUp, slideInLeft, slideInRight, scaleUp, cardReveal, viewportConfig } from '@/hooks/use-scroll-animation';
 
 const stages = [
   {
@@ -226,9 +226,10 @@ export default function AiPrecisionRecovery() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={viewportConfig}
-                variants={i % 2 === 0 ? slideInLeft : slideInRight}
+                variants={cardReveal}
+                custom={i}
                 className={cn(
-                  'group relative flex flex-col justify-between rounded-2xl p-5 border transition-all duration-500 hover:shadow-xl hover:-translate-y-1 overflow-hidden min-h-[360px]',
+                  'group relative flex flex-col justify-between rounded-2xl p-5 border hover:shadow-xl overflow-hidden min-h-[360px]',
                   stage.theme.border,
                   stage.theme.cardBg
                 )}
@@ -330,7 +331,7 @@ export default function AiPrecisionRecovery() {
             initial="hidden"
             whileInView="visible"
             viewport={viewportConfig}
-            variants={slideInLeft}
+            variants={fadeUp}
             className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/80 dark:border-purple-900/50 bg-gradient-to-br from-white via-purple-50/50 to-indigo-100/40 dark:from-card dark:via-purple-950/25 dark:to-card shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden"
           >
             {/* Background Accent Glow */}
@@ -419,7 +420,7 @@ export default function AiPrecisionRecovery() {
             initial="hidden"
             whileInView="visible"
             viewport={viewportConfig}
-            variants={slideInRight}
+            variants={fadeUp}
             className="group relative rounded-[2rem] p-6 sm:p-8 border border-purple-200/80 dark:border-purple-900/50 bg-gradient-to-br from-white via-purple-50/50 to-indigo-100/40 dark:from-card dark:via-purple-950/25 dark:to-card shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden"
           >
             {/* Background Accent Glow */}
