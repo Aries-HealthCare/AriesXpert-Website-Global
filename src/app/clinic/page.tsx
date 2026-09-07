@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -24,9 +24,18 @@ import {
   CheckCircle2,
   Building,
   Zap,
+  Search,
+  X,
+  ExternalLink,
+  Compass,
 } from 'lucide-react';
 import { ARIES_CLINICS_DIRECTORY } from '@/lib/clinics-data';
-import { REGIONAL_HUBS_DATA, FLAGSHIP_GALLERY_IMAGES } from '@/lib/clinics-hubs-data';
+import {
+  REGIONAL_HUBS_DATA,
+  FLAGSHIP_GALLERY_IMAGES,
+  getCityHubDetail,
+  CityHubDetail,
+} from '@/lib/clinics-hubs-data';
 import { getOrganizationSchema, getBreadcrumbSchema, getMedicalClinicSchema } from '@/lib/seo-schemas';
 import { cn } from '@/lib/utils';
 import {
@@ -42,6 +51,52 @@ import {
 export default function ClinicsPage() {
   const clinic = ARIES_CLINICS_DIRECTORY[0];
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
+  const [selectedCitySlug, setSelectedCitySlug] = useState<string>('mumbai');
+  const [localitySearchQuery, setLocalitySearchQuery] = useState<string>('');
+
+  const currentHubDetail = useMemo<CityHubDetail>(() => {
+    return getCityHubDetail(selectedCitySlug) || getCityHubDetail('mumbai')!;
+  }, [selectedCitySlug]);
+
+  const filteredAreas = useMemo(() => {
+    if (!currentHubDetail) return [];
+    const query = localitySearchQuery.toLowerCase().trim();
+    if (!query) return currentHubDetail.areas;
+
+    return currentHubDetail.areas
+      .map((area) => {
+        const areaMatches = area.name.toLowerCase().includes(query);
+        const matchedSubAreas = area.subAreas.filter((sa) =>
+          sa.name.toLowerCase().includes(query)
+        );
+        if (areaMatches) {
+          return area;
+        }
+        if (matchedSubAreas.length > 0) {
+          return {
+            ...area,
+            subAreas: matchedSubAreas,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean) as typeof currentHubDetail.areas;
+  }, [currentHubDetail, localitySearchQuery]);
+
+  const filteredSubAreasCount = useMemo(() => {
+    return filteredAreas.reduce((acc, a) => acc + a.subAreas.length, 0);
+  }, [filteredAreas]);
+
+  const handleSelectCity = (slug: string) => {
+    setSelectedCitySlug(slug);
+    setLocalitySearchQuery('');
+    setTimeout(() => {
+      const el = document.getElementById('city-localities-directory');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 50);
+  };
 
   const prevImage = () => {
     setActiveGalleryIndex((prev) =>
@@ -422,14 +477,29 @@ export default function ClinicsPage() {
               viewport={viewportConfig}
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
             >
-              {REGIONAL_HUBS_DATA.map((hub) => (
-                <motion.div
-                  key={hub.city}
-                  variants={cardReveal}
-                  whileHover={{ y: -4 }}
-                  className="rounded-2xl border border-purple-100/80 dark:border-white/10 bg-white dark:bg-white/[0.03] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between group"
-                >
-                  <Link href={`/${hub.slug}`} className="block h-full">
+              {REGIONAL_HUBS_DATA.map((hub) => {
+                const isSelected = selectedCitySlug === hub.slug;
+                return (
+                  <motion.div
+                    key={hub.city}
+                    variants={cardReveal}
+                    whileHover={{ y: -4 }}
+                    onClick={() => handleSelectCity(hub.slug)}
+                    className={cn(
+                      "rounded-2xl border transition-all duration-300 overflow-hidden flex flex-col justify-between cursor-pointer group relative",
+                      isSelected
+                        ? "border-purple-500/80 bg-purple-50/50 dark:bg-purple-950/30 ring-2 ring-purple-600/60 shadow-lg shadow-purple-500/10"
+                        : "border-purple-100/80 dark:border-white/10 bg-white dark:bg-white/[0.03] shadow-sm hover:shadow-xl hover:border-purple-300 dark:hover:border-purple-700"
+                    )}
+                  >
+                    {/* Selected Badge */}
+                    {isSelected && (
+                      <div className="absolute top-3 left-3 z-20 px-2.5 py-1 rounded-full bg-purple-600 text-white text-[11px] font-bold tracking-wide shadow-md flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        Selected Hub
+                      </div>
+                    )}
+
                     {/* Top Landmark Image */}
                     <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100 dark:bg-white/5">
                       <Image
@@ -439,30 +509,231 @@ export default function ClinicsPage() {
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
                     </div>
 
                     {/* Bottom Content Row */}
-                    <div className="p-4 flex items-center justify-between gap-3">
+                    <div className="p-4 flex flex-col justify-between flex-1 gap-3">
                       <div className="space-y-1 min-w-0">
-                        <h3 className="font-headline text-base font-bold text-slate-900 dark:text-white group-hover:text-purple-600 transition-colors">
-                          {hub.city}
-                        </h3>
-                        <div className="text-xs font-semibold text-purple-600 dark:text-purple-400">
-                          {hub.hubCount}
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-headline text-base font-bold text-slate-900 dark:text-white group-hover:text-purple-600 transition-colors">
+                            {hub.city}
+                          </h3>
+                          <span className="text-[11px] font-bold text-purple-600 dark:text-purple-400 bg-purple-100/80 dark:bg-purple-950/80 px-2 py-0.5 rounded-full">
+                            {hub.hubCount}
+                          </span>
                         </div>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
                           {hub.areas}
                         </p>
                       </div>
 
-                      <div className="w-8 h-8 rounded-full bg-purple-50 dark:bg-white/5 text-purple-600 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-sm">
-                        <ArrowRight className="w-4 h-4" />
+                      <div className="pt-2 border-t border-purple-100/60 dark:border-white/5 flex items-center justify-between gap-2 text-xs">
+                        <span className="font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1 group-hover:underline">
+                          View Sub-Areas ↓
+                        </span>
+                        <Link
+                          href={`/locations/${hub.slug}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-slate-500 hover:text-purple-600 dark:text-slate-400 dark:hover:text-purple-300 font-medium flex items-center gap-1 px-2 py-1 rounded-md hover:bg-purple-50 dark:hover:bg-purple-950/50 transition-colors"
+                          title={`Open ${hub.city} Landing Page`}
+                        >
+                          City Page
+                          <ExternalLink className="w-3 h-3" />
+                        </Link>
                       </div>
                     </div>
-                  </Link>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </motion.div>
+
+            {/* ═══════════════════════════════════════════════════════════════════
+                INTERACTIVE CITY LOCALITIES & SUB-AREAS EXPLORER DIRECTORY
+            ═══════════════════════════════════════════════════════════════════ */}
+            <div
+              id="city-localities-directory"
+              className="mt-14 pt-10 border-t border-purple-200/80 dark:border-purple-800/40 scroll-mt-24"
+            >
+              {/* Directory Header Bar */}
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+                <div className="space-y-2 max-w-3xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 text-xs font-bold uppercase tracking-wider">
+                    <Compass className="w-3.5 h-3.5 text-purple-600" />
+                    {currentHubDetail.city} Regional Hub Directory
+                  </div>
+                  <h3 className="font-headline text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                    All Areas &amp; Sub-Areas in {currentHubDetail.city}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Bedside home care and clinical dispatch coverage across{' '}
+                    <strong className="text-purple-700 dark:text-purple-300">
+                      {currentHubDetail.totalAreasCount} primary zones
+                    </strong>{' '}
+                    and{' '}
+                    <strong className="text-purple-700 dark:text-purple-300">
+                      {currentHubDetail.totalSubAreasCount} sub-areas
+                    </strong>
+                    . Click any area or sub-area to open its specialized physiotherapy landing page.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 self-start lg:self-auto shrink-0">
+                  <Button
+                    asChild
+                    className="h-11 px-5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-purple-500/20"
+                  >
+                    <Link href={`/locations/${selectedCitySlug}`} className="flex items-center gap-2">
+                      View {currentHubDetail.city} Hub Landing Page
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+
+              {/* City Switcher Quick Tabs */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 shrink-0 uppercase tracking-wider mr-1">
+                  Switch Hub:
+                </span>
+                {REGIONAL_HUBS_DATA.map((h) => {
+                  const active = selectedCitySlug === h.slug;
+                  return (
+                    <button
+                      key={h.slug}
+                      type="button"
+                      onClick={() => handleSelectCity(h.slug)}
+                      className={cn(
+                        "px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1.5",
+                        active
+                          ? "bg-purple-600 text-white shadow-md shadow-purple-500/25"
+                          : "bg-white dark:bg-white/[0.05] text-slate-700 dark:text-slate-300 border border-purple-100 dark:border-white/10 hover:border-purple-300 dark:hover:border-purple-700"
+                      )}
+                    >
+                      <span>{h.city}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Search Box & Summary Bar */}
+              <div className="bg-white dark:bg-white/[0.03] border border-purple-100 dark:border-white/10 rounded-2xl p-4 md:p-5 shadow-sm mb-8 space-y-4">
+                <div className="flex flex-col sm:flex-row items-center gap-4 justify-between">
+                  <div className="relative w-full sm:max-w-md">
+                    <Search className="w-4 h-4 text-purple-600 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={localitySearchQuery}
+                      onChange={(e) => setLocalitySearchQuery(e.target.value)}
+                      placeholder={`Filter areas or sub-areas in ${currentHubDetail.city}...`}
+                      className="w-full pl-10 pr-9 py-2.5 text-xs sm:text-sm bg-purple-50/50 dark:bg-white/5 border border-purple-200/80 dark:border-white/10 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-purple-600 transition-all"
+                    />
+                    {localitySearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setLocalitySearchQuery('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="text-xs font-semibold text-slate-600 dark:text-slate-400 self-start sm:self-auto">
+                    Showing <span className="text-purple-600 dark:text-purple-400 font-bold">{filteredAreas.length}</span> primary zones &amp;{' '}
+                    <span className="text-purple-600 dark:text-purple-400 font-bold">{filteredSubAreasCount}</span> sub-areas
+                  </div>
+                </div>
+              </div>
+
+              {/* Localities Directory Grid */}
+              {filteredAreas.length === 0 ? (
+                <div className="text-center py-16 px-4 bg-white dark:bg-white/[0.02] border border-purple-100 dark:border-white/10 rounded-2xl space-y-3">
+                  <MapPin className="w-10 h-10 text-purple-400 mx-auto opacity-60" />
+                  <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                    No areas found matching &quot;{localitySearchQuery}&quot;
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                    Try searching another neighborhood name, or reset the filter to view all coverage in {currentHubDetail.city}.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setLocalitySearchQuery('')}
+                    className="rounded-full text-xs font-bold text-purple-600 border-purple-200"
+                  >
+                    Clear Filter
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {filteredAreas.map((area) => (
+                    <div
+                      key={area.slug}
+                      className="rounded-2xl border border-purple-100/80 dark:border-white/10 bg-white dark:bg-white/[0.03] p-5 flex flex-col justify-between hover:border-purple-300 dark:hover:border-purple-700/60 shadow-2xs hover:shadow-md transition-all duration-200 group/card"
+                    >
+                      <div className="space-y-3">
+                        {/* Area Title & Main Area Landing Page Link */}
+                        <div className="flex items-start justify-between gap-2">
+                          <Link
+                            href={area.landingUrl}
+                            className="font-headline text-base font-bold text-slate-900 dark:text-white group-hover/card:text-purple-600 transition-colors flex items-center gap-1.5"
+                            title={`Open ${area.name} Landing Page`}
+                          >
+                            <MapPin className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
+                            <span className="underline-offset-2 group-hover/card:underline">{area.name}</span>
+                          </Link>
+
+                          <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-900 shrink-0">
+                            {area.subAreas.length > 0 ? `${area.subAreas.length} Sub-Areas` : 'Primary Hub'}
+                          </span>
+                        </div>
+
+                        {/* Sub-Areas Pill Cloud */}
+                        {area.subAreas.length > 0 ? (
+                          <div className="space-y-1.5 pt-1">
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500">
+                              Sub-Areas &amp; Neighborhoods:
+                            </span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {area.subAreas.map((sa) => (
+                                <Link
+                                  key={sa.slug}
+                                  href={sa.landingUrl}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-purple-50/70 dark:bg-white/[0.05] text-slate-800 dark:text-slate-200 border border-purple-100 dark:border-white/10 hover:bg-purple-600 hover:text-white hover:border-purple-600 dark:hover:bg-purple-600 dark:hover:border-purple-600 transition-all duration-150 hover:scale-[1.02] shadow-2xs group/sub"
+                                  title={`Open ${sa.name} Landing Page`}
+                                >
+                                  <span>{sa.name}</span>
+                                  <ArrowRight className="w-3 h-3 opacity-40 group-hover/sub:opacity-100 group-hover/sub:translate-x-0.5 transition-all shrink-0" />
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 italic pt-1">
+                            Full home physiotherapy coverage across all residential sectors of {area.name}.
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Card Footer Link */}
+                      <div className="pt-4 mt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
+                        <Link
+                          href={area.landingUrl}
+                          className="text-xs font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 flex items-center gap-1 transition-colors"
+                        >
+                          Visit {area.name} Page
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                        <span className="text-[11px] text-slate-400 font-medium">
+                          Same-Day Dispatch
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </section>
 

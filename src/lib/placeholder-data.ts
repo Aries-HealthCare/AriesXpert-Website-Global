@@ -1285,18 +1285,39 @@ export function getGeoPath(path: string[]): GeoPath | null {
   }
 
   // 2. DEC-01: Direct City resolution when state is omitted in public URL
+  const CITY_ALIAS_MAP: Record<string, string> = {
+    bangalore: 'bengaluru',
+    bengaluru: 'bengaluru',
+    delhi: 'delhi',
+    'delhi-ncr': 'delhi',
+    kolkatta: 'kolkata',
+    kolkata: 'kolkata',
+  };
+  const normCity = (searchPath[0] || '').toLowerCase();
+  const canonicalCity = CITY_ALIAS_MAP[normCity] || normCity;
+
   for (const state of IndianStates) {
-    const city = state.cities.find((c: any) => c.slug === searchPath[0]);
+    const city = state.cities.find((c: any) => c.slug === canonicalCity || c.slug === normCity);
     if (city) {
       geoPath.state = state;
       geoPath.city = city;
       if (searchPath[1]) {
-        const area = city.areas.find((a: any) => a.slug === searchPath[1]);
+        let area = city.areas.find((a: any) => a.slug === searchPath[1]);
         if (area) {
           geoPath.area = area;
           if (searchPath[2]) {
             const subArea = area.subAreas?.find((sa: any) => sa.slug === searchPath[2]);
             if (subArea) geoPath.subArea = subArea;
+          }
+        } else {
+          // Check if searchPath[1] is a subArea directly under any area in this city
+          for (const parentArea of city.areas) {
+            const subArea = parentArea.subAreas?.find((sa: any) => sa.slug === searchPath[1]);
+            if (subArea) {
+              geoPath.area = parentArea;
+              geoPath.subArea = subArea;
+              break;
+            }
           }
         }
       }

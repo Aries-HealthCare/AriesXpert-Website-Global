@@ -7,6 +7,8 @@ import Header from '@/components/landing/header';
 import Footer from '@/components/landing/footer';
 import { ARIES_CLINICS_DIRECTORY } from '@/lib/clinics-data';
 import { IndianStates } from '@/lib/locations';
+import { getCityHubDetail } from '@/lib/clinics-hubs-data';
+import CityAreasDirectory from '@/components/locations/city-areas-directory';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,7 +27,8 @@ function capitalize(str: string) {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { citySlug } = await params;
-  const cityName = capitalize(citySlug);
+  const hubDetail = getCityHubDetail(citySlug);
+  const cityName = hubDetail ? hubDetail.city : capitalize(citySlug);
 
   return {
     title: `Physiotherapy Clinics & Care Centers in ${cityName} | Aries PhysioCare`,
@@ -43,22 +46,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CityLocationHubPage({ params }: PageProps) {
   const { citySlug } = await params;
-  const cityName = capitalize(citySlug);
+  const hubDetail = getCityHubDetail(citySlug);
+  const cityName = hubDetail ? hubDetail.city : capitalize(citySlug);
 
   // Find clinics in this city
   const clinicsInCity = ARIES_CLINICS_DIRECTORY.filter(
-    (c) => c.city.toLowerCase() === citySlug.toLowerCase()
+    (c) =>
+      c.city.toLowerCase() === citySlug.toLowerCase() ||
+      (hubDetail && c.city.toLowerCase() === hubDetail.city.toLowerCase())
   );
-
-  // Find localities from normalized locations data
-  let localitiesInCity: { name: string; slug: string }[] = [];
-  for (const state of IndianStates) {
-    const matchedCity = state.cities.find(c => c.slug === citySlug || c.name.toLowerCase() === citySlug.toLowerCase());
-    if (matchedCity) {
-      localitiesInCity = matchedCity.areas.map(a => ({ name: a.name, slug: a.slug }));
-      break;
-    }
-  }
 
   return (
     <main className="min-h-screen bg-background text-foreground flex flex-col">
@@ -131,29 +127,20 @@ export default async function CityLocationHubPage({ params }: PageProps) {
         </section>
       )}
 
-      {/* Localities Serviced via Home Care */}
-      {localitiesInCity.length > 0 && (
+      {/* Localities & Sub-Areas Serviced via Home Care */}
+      {hubDetail && hubDetail.areas.length > 0 && (
         <section className="py-12 bg-secondary/10 border-t border-border/40 flex-1">
           <div className="container mx-auto px-4 md:px-6 max-w-5xl space-y-6">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight">Home Care Localities in {cityName}</h2>
+              <h2 className="text-2xl font-bold tracking-tight">
+                All Areas &amp; Sub-Areas Serviced in {cityName}
+              </h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Our specialists provide same-day home physical therapy sessions across all neighborhoods in {cityName}.
+                Our certified specialists provide same-day home physical therapy sessions across {hubDetail.totalAreasCount} primary zones and {hubDetail.totalSubAreasCount} sub-areas in {cityName}. Click any area or neighborhood to open its dedicated clinical landing page.
               </p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {localitiesInCity.map((loc) => (
-                <Link
-                  key={loc.slug}
-                  href={`/services/physiotherapy/${citySlug}/${loc.slug}`}
-                  className="p-3 rounded-xl bg-card border border-border/40 hover:border-primary/50 text-sm font-medium hover:text-primary transition-colors flex items-center justify-between"
-                >
-                  <span className="truncate">{loc.name}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                </Link>
-              ))}
-            </div>
+            <CityAreasDirectory hubDetail={hubDetail} />
           </div>
         </section>
       )}

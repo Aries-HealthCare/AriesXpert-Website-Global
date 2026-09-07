@@ -1,3 +1,30 @@
+import { IndianStates } from '@/lib/locations';
+
+export interface HubSubArea {
+  name: string;
+  slug: string;
+  landingUrl: string;
+}
+
+export interface HubArea {
+  name: string;
+  slug: string;
+  landingUrl: string;
+  subAreas: HubSubArea[];
+}
+
+export interface CityHubDetail {
+  city: string;
+  citySlug: string;
+  canonicalCitySlug: string;
+  state: string;
+  hubCount: string;
+  landingPageUrl: string;
+  totalAreasCount: number;
+  totalSubAreasCount: number;
+  areas: HubArea[];
+}
+
 export interface RegionalHub {
   city: string;
   slug: string;
@@ -107,3 +134,59 @@ export const FLAGSHIP_GALLERY_IMAGES: FlagshipGalleryItem[] = [
     thumbUrl: "/images/clinics/flagship-thumb-4.png",
   },
 ];
+
+const CITY_ALIAS_MAP: Record<string, string> = {
+  bangalore: 'bengaluru',
+  bengaluru: 'bengaluru',
+  delhi: 'delhi',
+  'delhi-ncr': 'delhi',
+  kolkatta: 'kolkata',
+  kolkata: 'kolkata',
+};
+
+export function getCityHubDetail(slugOrName: string): CityHubDetail | null {
+  const norm = slugOrName.toLowerCase().trim();
+  const canonical = CITY_ALIAS_MAP[norm] || norm;
+
+  for (const state of IndianStates) {
+    const city = state.cities.find(
+      (c) =>
+        c.slug.toLowerCase() === canonical ||
+        c.name.toLowerCase() === canonical ||
+        c.slug.toLowerCase() === norm ||
+        c.name.toLowerCase() === norm
+    );
+    if (city) {
+      const hubData = REGIONAL_HUBS_DATA.find(
+        (h) => h.slug.toLowerCase() === norm || h.city.toLowerCase() === city.name.toLowerCase()
+      );
+
+      const areas: HubArea[] = city.areas.map((a) => ({
+        name: a.name,
+        slug: a.slug,
+        landingUrl: `/services/physiotherapy/${city.slug}/${a.slug}`,
+        subAreas: (a.subAreas || []).map((sa) => ({
+          name: sa.name,
+          slug: sa.slug,
+          landingUrl: `/services/physiotherapy/${city.slug}/${sa.slug}`,
+        })),
+      }));
+
+      const totalSubAreas = areas.reduce((acc, a) => acc + a.subAreas.length, 0);
+
+      return {
+        city: city.name,
+        citySlug: norm,
+        canonicalCitySlug: city.slug,
+        state: state.name,
+        hubCount: hubData?.hubCount || `${areas.length} Operational Zones`,
+        landingPageUrl: `/locations/${norm}`,
+        totalAreasCount: areas.length,
+        totalSubAreasCount: totalSubAreas,
+        areas,
+      };
+    }
+  }
+  return null;
+}
+
