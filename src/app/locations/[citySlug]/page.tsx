@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Phone, Star, Clock, ArrowRight, ShieldCheck, Building2, ChevronRight } from 'lucide-react';
 import BookAppointmentButton from '@/components/book-appointment-button';
+import PricingPackagesSection from '@/components/landing/pricing-packages-section';
 
 interface PageProps {
   params: Promise<{ citySlug: string }>;
@@ -156,6 +157,15 @@ export default async function CityLocationHubPage({ params }: PageProps) {
           </div>
         </section>
       )}
+
+      {/* Package Pricing for this City */}
+      <PricingPackagesSection
+        initialLocationName={cityName}
+        title={<>Physiotherapy Packages in <span className="premium-gradient-text">{cityName}</span></>}
+        subtitle={`Standardized, hospital-grade in-home physical therapy packages across all neighborhoods of ${cityName}. Verified BPT/MPT specialists with electrotherapy modalities included.`}
+        badgeText={`${cityName} Package Pricing`}
+        className="border-t border-border/40"
+      />
 
       <Footer />
     </main>

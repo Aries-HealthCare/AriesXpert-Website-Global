@@ -9,6 +9,7 @@ import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useRequestCallback } from '@/components/request-callback-provider';
 import BookAppointmentButton from '@/components/book-appointment-button';
 import LocalizedFaqSection from '@/components/localized-faq-section';
+import PricingPackagesSection from '@/components/landing/pricing-packages-section';
 import Image from 'next/image';
 
 interface ServiceDetailClientProps {
@@ -164,6 +165,14 @@ export default function ServiceDetailClient({ serviceSlug }: ServiceDetailClient
                     </div>
                 </div>
             </section>
+
+            {/* PRICING & PACKAGES SECTION (AUTO-DETECTED TO VIEWER LOCATION) */}
+            <PricingPackagesSection
+                serviceSlug={service.slug}
+                title={<>{service.name} <span className="premium-gradient-text">Care Packages</span></>}
+                subtitle={`Transparent, multi-session packages for in-home ${service.name.toLowerCase()} sessions. Certified specialists, daily clinical monitoring, and portable modalities included.`}
+                badgeText={`${service.name} Package Rates`}
+            />
 
             <LocalizedFaqSection geo={null} title={`${service.name} Support & FAQs`} />
 

@@ -22,6 +22,7 @@ import {
   Stethoscope
 } from 'lucide-react';
 import BookAppointmentButton from '@/components/book-appointment-button';
+import PricingPackagesSection from '@/components/landing/pricing-packages-section';
 
 interface PageProps {
   params: Promise<{
@@ -384,6 +385,15 @@ export default async function ConditionDetailPage({ params }: PageProps) {
           </div>
         </div>
       </div>
+
+      {/* Condition Recovery & Rehabilitation Packages */}
+      <PricingPackagesSection
+        conditionSlug={condition.slug}
+        title={<>{condition.title} <span className="premium-gradient-text">Recovery Packages</span></>}
+        subtitle={`Personalized multi-session in-home physiotherapy programs engineered for ${condition.title}. Decreasing per-day charges, dedicated clinical specialists, and portable electrotherapy equipment included.`}
+        badgeText={`${condition.title} Care Plans`}
+        className="border-t border-border/40"
+      />
 
       <Footer />
     </main>

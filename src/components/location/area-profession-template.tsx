@@ -14,6 +14,7 @@ import { TherapistCard } from '@/hooks/use-therapists';
 import { getLocalBusinessSchema, getBreadcrumbSchema, getHealthcareServiceSchema, getFAQSchema } from '@/lib/seo-schemas';
 import TherapistCarousel from '@/components/therapist/therapist-carousel';
 import WhyChooseCardsSection from './why-choose-cards-section';
+import PricingPackagesSection from '@/components/landing/pricing-packages-section';
 
 interface AreaProfessionTemplateProps {
     profession: string;
@@ -304,6 +305,14 @@ export default function AreaProfessionTemplate({
                     limit={10}
                 />
             </div>
+
+            {/* LOCALIZED PACKAGE PRICING SECTION */}
+            <PricingPackagesSection
+                initialLocationName={areaName}
+                title={<>{profession} Packages in <span className="premium-gradient-text">{areaName}</span></>}
+                subtitle={`Transparent pricing for in-home ${profession.toLowerCase()} sessions across ${areaName}. Multi-session packages with dedicated certified specialists and portable equipment included.`}
+                badgeText={`${areaName} Package Rates`}
+            />
 
             {/* CTA Section */}
             <section className="py-20 bg-primary relative overflow-hidden">

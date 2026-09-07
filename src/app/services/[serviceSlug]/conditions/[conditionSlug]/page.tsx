@@ -21,6 +21,7 @@ import {
 import BookAppointmentButton from '@/components/book-appointment-button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import LocalizedFaqSection from '@/components/localized-faq-section';
+import PricingPackagesSection from '@/components/landing/pricing-packages-section';
 
 const contents = [
   { id: 'introduction', title: 'Introduction' },
@@ -326,6 +327,16 @@ export default function ConditionDetailPage() {
             </div>
           </section>
         )}
+
+        {/* Condition-specific In-Home Packages */}
+        <PricingPackagesSection
+          serviceSlug={service.slug}
+          conditionSlug={condition.slug}
+          title={<>{condition.name} <span className="premium-gradient-text">Care Packages</span></>}
+          subtitle={`Multi-session rehabilitation packages specifically structured for ${condition.name} by certified ${service.name.toLowerCase()} specialists. Decreasing per-day rates and bedside electrotherapy included.`}
+          badgeText={`${condition.name} Package Rates`}
+          className="my-10"
+        />
 
         {/* Final Global CTA */}
         <section className="py-16 text-center">

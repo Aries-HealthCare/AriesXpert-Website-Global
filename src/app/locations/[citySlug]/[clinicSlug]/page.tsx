@@ -37,6 +37,7 @@ import BookAppointmentButton from '@/components/book-appointment-button';
 import { getMedicalClinicSchema, getBreadcrumbSchema } from '@/lib/seo-schemas';
 import Header from '@/components/landing/header';
 import Footer from '@/components/landing/footer';
+import PricingPackagesSection from '@/components/landing/pricing-packages-section';
 import { cn } from '@/lib/utils';
 
 interface ClinicPageProps {
@@ -290,6 +291,15 @@ export default async function PhysicalClinicPage({ params }: ClinicPageProps) {
           </Card>
         </div>
       </div>
+
+      {/* Localized In-Home & Center Packages */}
+      <PricingPackagesSection
+        initialLocationName={`${clinic.subArea}, ${clinic.city}`}
+        title={<>Home Care Packages in <span className="premium-gradient-text">{clinic.subArea}</span></>}
+        subtitle={`In addition to walk-in consultations at our ${clinic.name}, our verified specialists deliver hospital-grade physiotherapy sessions directly to homes across ${clinic.subArea} and ${clinic.city}.`}
+        badgeText={`${clinic.subArea} Care Packages`}
+        className="border-t border-border/40"
+      />
 
       <Footer />
     </main>

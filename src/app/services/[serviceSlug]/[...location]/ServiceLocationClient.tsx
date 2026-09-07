@@ -50,6 +50,7 @@ import { Label } from '@/components/ui/label';
 import { getTherapistsClient } from '@/lib/api';
 import SchemaMarkup from '@/components/seo/schema-markup';
 import WhyChooseCardsSection from '@/components/location/why-choose-cards-section';
+import PricingPackagesSection from '@/components/landing/pricing-packages-section';
 
 const leadSchema = z.object({
     fullName: z.string().min(1, 'Full name is required'),
@@ -702,6 +703,15 @@ export default function ServiceLocationClient({ serviceSlug, location }: Service
                 description={`${areaContext.lifestyle} Residents of ${capitalizedArea} often face challenges with ${areaContext.painPoints}. Aries PhysioCare brings hospital-grade clinical excellence near landmarks like ${areaContext.landmarks[0]}.`}
                 landmark={areaContext.landmarks[0]}
                 showTrustStrip={true}
+            />
+
+            {/* LOCALIZED TREATMENT PACKAGES ACCORDING TO AREA TIER */}
+            <PricingPackagesSection
+                initialLocationName={locationDisplay}
+                serviceSlug={serviceSlug}
+                title={<>{serviceName} Packages in <span className="premium-gradient-text">{capitalizedArea}</span></>}
+                subtitle={`Transparent, hospital-grade in-home ${serviceName.toLowerCase()} sessions across ${locationDisplay}. Multi-session packages with certified therapists and portable electrotherapy gear included.`}
+                badgeText={`${capitalizedArea} Treatment Pricing`}
             />
 
             {/* VETTED EXPERTS FOR AREA */}

@@ -36,6 +36,11 @@ import { fadeUp, cardReveal, viewportConfig } from '@/hooks/use-scroll-animation
 interface PricingPackagesSectionProps {
   initialLocationName?: string;
   className?: string;
+  title?: React.ReactNode;
+  subtitle?: React.ReactNode;
+  badgeText?: React.ReactNode;
+  serviceSlug?: string;
+  conditionSlug?: string;
 }
 
 const POPULAR_LOCALITIES = [
@@ -52,7 +57,12 @@ const POPULAR_LOCALITIES = [
 
 export default function PricingPackagesSection({ 
   initialLocationName, 
-  className 
+  className,
+  title,
+  subtitle,
+  badgeText,
+  serviceSlug,
+  conditionSlug,
 }: PricingPackagesSectionProps) {
   // Default to Economy tier (₹1,000/session) if location is not detected
   const [activeTierKey, setActiveTierKey] = useState<string>(() => {
@@ -64,69 +74,110 @@ export default function PricingPackagesSection({
   const [localitySearch, setLocalitySearch] = useState<string>('');
   const [selectedLocality, setSelectedLocality] = useState<LocalityPricingRecord | null>(null);
   const [isDetectingLocation, setIsDetectingLocation] = useState<boolean>(false);
-  const [detectionSource, setDetectionSource] = useState<'default' | 'ip' | 'gps' | 'search'>('default');
+  const [detectionSource, setDetectionSource] = useState<'default' | 'page' | 'saved' | 'ip' | 'gps' | 'search'>(
+    initialLocationName ? 'page' : 'default'
+  );
 
   const currentTier: PricingTier = STANDARD_PRICING_TIERS[activeTierKey] || STANDARD_PRICING_TIERS.economy;
   const packages = currentTier.packages;
 
   // ── AUTO-DETECT USER LOCATION ON PAGE MOUNT ──
   useEffect(() => {
-    // 1. If an initial location was passed via props, use it
+    // 1. If an initial location was passed via props (e.g. on landing pages), keep it locked
     if (initialLocationName) {
       const tier = detectTierFromLocation(initialLocationName);
       setActiveTierKey(tier);
       setActiveLocationLabel(initialLocationName);
-      setDetectionSource('default');
+      setDetectionSource('page');
       return;
     }
 
     // 2. Check localStorage if user previously selected/detected location
+    let hadSaved = false;
     try {
       const savedCity = localStorage.getItem('user_city');
       if (savedCity && savedCity.trim().length > 0) {
+        hadSaved = true;
         const tier = detectTierFromLocation(savedCity);
         setActiveTierKey(tier);
         setActiveLocationLabel(savedCity);
-        setDetectionSource('default');
-        return;
+        setDetectionSource('saved');
       }
     } catch {
       // Ignore localStorage read errors
     }
 
-    // 3. Non-intrusive IP-based Geolocation Auto-Detection
+    // 3. Resilient Multi-Stage Auto-Detection for Home Page viewers
     let isCancelled = false;
-    const autoDetectByIP = async () => {
+    const autoDetectViewerLocation = async () => {
       try {
+        // Stage A: Internal Fast Next.js Edge/Server Route
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
 
-        const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+        const res = await fetch('/api/detect-location', { signal: controller.signal });
         clearTimeout(timeoutId);
-        if (!res.ok) return;
 
-        const data = await res.json();
-        if (isCancelled || !data) return;
+        if (res.ok) {
+          const data = await res.json();
+          if (isCancelled) return;
 
-        const city = data.city || '';
-        const region = data.region || '';
-        const postal = data.postal || '';
+          if (data && data.city) {
+            const locString = `${data.postal || ''} ${data.city} ${data.region || ''}`.trim();
+            const detectedTier = detectTierFromLocation(locString);
+            const label = `${data.city}${data.region ? `, ${data.region}` : ''}`;
+            
+            setActiveTierKey(detectedTier);
+            setActiveLocationLabel(label);
+            setDetectionSource('ip');
 
-        if (city || region || postal) {
-          const locString = `${postal} ${city} ${region}`.trim();
-          const detectedTier = detectTierFromLocation(locString);
-          const label = city ? `${city}${region ? `, ${region}` : ''}${postal ? ` (${postal})` : ''}` : locString;
-          
-          setActiveTierKey(detectedTier);
-          setActiveLocationLabel(label);
-          setDetectionSource('ip');
+            try {
+              localStorage.setItem('user_city', label);
+            } catch {}
+            return;
+          }
         }
       } catch {
-        // If IP detection fails or times out, keep clean default (₹1,000 / session)
+        // Fall through to Client-side backup
+      }
+
+      // Stage B: Direct Client-Side Fallback (ipwho.is)
+      try {
+        if (isCancelled) return;
+        const controller2 = new AbortController();
+        const timeoutId2 = setTimeout(() => controller2.abort(), 3000);
+
+        const res2 = await fetch('https://ipwho.is/', { signal: controller2.signal });
+        clearTimeout(timeoutId2);
+
+        if (res2.ok) {
+          const data2 = await res2.json();
+          if (isCancelled) return;
+
+          if (data2 && data2.city) {
+            const locString = `${data2.postal || ''} ${data2.city} ${data2.region || ''}`.trim();
+            const detectedTier = detectTierFromLocation(locString);
+            const label = `${data2.city}${data2.region ? `, ${data2.region}` : ''}`;
+
+            setActiveTierKey(detectedTier);
+            setActiveLocationLabel(label);
+            setDetectionSource('ip');
+
+            try {
+              localStorage.setItem('user_city', label);
+            } catch {}
+            return;
+          }
+        }
+      } catch {
+        // Fall through to keep saved or clean base default
       }
     };
 
-    autoDetectByIP();
+    // If no saved location, auto-detect; if saved exists, verify in background
+    if (!hadSaved) {
+      autoDetectViewerLocation();
+    }
 
     return () => {
       isCancelled = true;
@@ -316,15 +367,19 @@ export default function PricingPackagesSection({
         >
           <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-[0.2em] shadow-sm backdrop-blur-md">
             <Sparkles className="w-3.5 h-3.5" />
-            Transparent Home Care Pricing
+            {badgeText || 'Transparent Home Care Pricing'}
           </div>
           
           <h2 className="font-headline text-3xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15]">
-            Aries PhysioCare <span className="premium-gradient-text">Treatment Packages</span>
+            {title ? (
+              title
+            ) : (
+              <>Aries PhysioCare <span className="premium-gradient-text">Treatment Packages</span></>
+            )}
           </h2>
           
           <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
-            Hospital-grade home physiotherapy delivered by certified BPT/MPT specialists with advanced electrotherapy modalities. Transparent single visit rates and guaranteed decreasing per-day charges on all multi-day packages.
+            {subtitle || 'Hospital-grade home physiotherapy delivered by certified BPT/MPT specialists with advanced electrotherapy modalities. Transparent single visit rates and guaranteed decreasing per-day charges on all multi-day packages.'}
           </p>
         </motion.div>
 
@@ -430,7 +485,13 @@ export default function PricingPackagesSection({
                 <span className="text-xs font-bold text-primary uppercase tracking-wider">
                   {detectionSource === 'gps' 
                     ? 'GPS Verified Location:' 
-                    : (detectionSource === 'ip' ? 'Auto-Detected Location:' : 'Active Location Rates:')}
+                    : (detectionSource === 'ip' 
+                      ? 'Auto-Detected For Your Area:' 
+                      : (detectionSource === 'page'
+                        ? 'Rates for Landing Page Area:'
+                        : (detectionSource === 'saved'
+                          ? 'Saved Selected Area:'
+                          : 'Active Location Rates:')))}
                 </span>
                 <Badge className="bg-primary/10 text-primary border-primary/20 text-xs font-bold font-sans">
                   {activeLocationLabel}
@@ -546,7 +607,7 @@ export default function PricingPackagesSection({
                       : 'bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/20 hover:border-primary'
                   )}
                 >
-                  <Link href={`/book-appointment?location=${encodeURIComponent(activeLocationLabel)}&package=${pkg.days}`}>
+                  <Link href={`/book-appointment?location=${encodeURIComponent(activeLocationLabel)}&package=${pkg.days}${serviceSlug ? `&service=${encodeURIComponent(serviceSlug)}` : ''}${conditionSlug ? `&condition=${encodeURIComponent(conditionSlug)}` : ''}`}>
                     Book {pkg.days}-Day Plan
                     <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                   </Link>
@@ -586,7 +647,7 @@ export default function PricingPackagesSection({
               </a>
             </Button>
             <Button asChild className="h-12 px-8 bg-gradient-to-r from-primary to-rose-600 hover:from-primary/90 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20">
-              <Link href={`/book-appointment?location=${encodeURIComponent(activeLocationLabel)}`}>
+              <Link href={`/book-appointment?location=${encodeURIComponent(activeLocationLabel)}${serviceSlug ? `&service=${encodeURIComponent(serviceSlug)}` : ''}${conditionSlug ? `&condition=${encodeURIComponent(conditionSlug)}` : ''}`}>
                 Book Home Assessment
               </Link>
             </Button>
