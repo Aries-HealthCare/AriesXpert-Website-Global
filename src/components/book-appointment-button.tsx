@@ -1,9 +1,9 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React from 'react';
 import { usePathname } from 'next/navigation';
 import { Button, ButtonProps } from '@/components/ui/button';
-import BookAppointmentButtonContent from './book-appointment-button-content';
+import { useRequestCallback } from '@/components/request-callback-provider';
 
 interface BookAppointmentButtonProps extends ButtonProps {
   serviceSlug?: string;
@@ -17,27 +17,29 @@ export default function BookAppointmentButton({
   conditionSlug,
   therapistId,
   children,
+  onClick,
   ...props
 }: BookAppointmentButtonProps) {
   const pathname = usePathname();
+  const { openBookingModal } = useRequestCallback();
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (onClick) {
+      onClick(e);
+    }
+    const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    openBookingModal({
+      service: serviceSlug || searchParams?.get('service') || '',
+      condition: conditionSlug || searchParams?.get('condition') || '',
+      therapist: therapistId || searchParams?.get('therapist') || '',
+      sourcePath: pathname || '',
+    });
+  };
 
   return (
-    <Suspense
-      fallback={
-        <Button {...props}>
-          {children}
-        </Button>
-      }
-    >
-      <BookAppointmentButtonContent
-        serviceSlug={serviceSlug}
-        conditionSlug={conditionSlug}
-        therapistId={therapistId}
-        pathname={pathname}
-        {...props}
-      >
-        {children}
-      </BookAppointmentButtonContent>
-    </Suspense>
+    <Button onClick={handleClick} {...props}>
+      {children}
+    </Button>
   );
 }
