@@ -43,8 +43,8 @@ export default function MobileCtaFooter() {
 
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 glassmorphic border-t border-t-primary/30 shadow-[0_-4px_16px_rgba(0,128,128,0.1)] rounded-t-2xl p-2 pb-safe-offset-4 bg-background/80">
-      <div className="container mx-auto px-2">
-        <div className="grid grid-cols-3 gap-2">
+      <div className="w-full max-w-lg mx-auto px-1 sm:px-2">
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
           <Button asChild variant="outline" className="flex flex-col h-16 items-center justify-center gap-1 text-xs border-green-500/50 bg-green-500/10 text-green-500 hover:bg-green-500/20 hover:text-green-400">
             <Link href={`https://wa.me/${whatsAppNumber}?text=${encodeURIComponent(prefilledMessage)}`} target="_blank">
               <WhatsAppIcon className="h-5 w-5 mb-1" />

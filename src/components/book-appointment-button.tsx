@@ -1,9 +1,9 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import { useRequestCallback } from '@/components/request-callback-provider';
-import { Button, ButtonProps } from '@/components/ui/button';
+import React, { Suspense } from 'react';
 import { usePathname } from 'next/navigation';
+import { Button, ButtonProps } from '@/components/ui/button';
+import BookAppointmentButtonContent from './book-appointment-button-content';
 
 interface BookAppointmentButtonProps extends ButtonProps {
   serviceSlug?: string;
@@ -11,12 +11,6 @@ interface BookAppointmentButtonProps extends ButtonProps {
   therapistId?: string;
   children: React.ReactNode;
 }
-
-// Use dynamic import to avoid useSearchParams issues during static generation
-const BookAppointmentButtonContent = dynamic(
-  () => import('./book-appointment-button-content'),
-  { ssr: false }
-);
 
 export default function BookAppointmentButton({
   serviceSlug,
@@ -28,14 +22,22 @@ export default function BookAppointmentButton({
   const pathname = usePathname();
 
   return (
-    <BookAppointmentButtonContent
-      serviceSlug={serviceSlug}
-      conditionSlug={conditionSlug}
-      therapistId={therapistId}
-      pathname={pathname}
-      {...props}
+    <Suspense
+      fallback={
+        <Button {...props}>
+          {children}
+        </Button>
+      }
     >
-      {children}
-    </BookAppointmentButtonContent>
+      <BookAppointmentButtonContent
+        serviceSlug={serviceSlug}
+        conditionSlug={conditionSlug}
+        therapistId={therapistId}
+        pathname={pathname}
+        {...props}
+      >
+        {children}
+      </BookAppointmentButtonContent>
+    </Suspense>
   );
 }
