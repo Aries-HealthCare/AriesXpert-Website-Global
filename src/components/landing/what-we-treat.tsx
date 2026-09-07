@@ -77,6 +77,10 @@ interface TreatmentCategory {
   viewAllText: string;
   image: string;
   imageAlt: string;
+  topBadgeTitle?: string;
+  topBadgeSubtitle?: string;
+  bottomBadgeTitle?: string;
+  bottomBadgeSubtitle?: string;
   icon: React.ReactNode;
   iconBg: string;
   arrowBg: string;
@@ -94,6 +98,10 @@ const treatmentCategories: TreatmentCategory[] = [
     viewAllText: "View All Conditions",
     image: "/images/what-we-treat/conditions-spine.webp",
     imageAlt: "Targeted Care and Lasting Relief for Spine Conditions",
+    topBadgeTitle: "Targeted Care",
+    topBadgeSubtitle: "Lasting Relief",
+    bottomBadgeTitle: "Stronger Spines",
+    bottomBadgeSubtitle: "Brighter Lives",
     icon: <SpineIcon className="w-6 h-6 text-[#7c3aed]" />,
     iconBg: "bg-purple-100 dark:bg-purple-950/60 text-[#7c3aed]",
     arrowBg: "bg-[#7c3aed] text-white hover:bg-purple-700",
@@ -147,6 +155,10 @@ const treatmentCategories: TreatmentCategory[] = [
     viewAllText: "View All Symptoms",
     image: "/images/what-we-treat/symptoms-knee.webp",
     imageAlt: "Relief Today and A More Active Tomorrow for Joint and Muscle Pain",
+    topBadgeTitle: "Relief Today",
+    topBadgeSubtitle: "A More Active Tomorrow",
+    bottomBadgeTitle: "Move Freely",
+    bottomBadgeSubtitle: "Live Pain Free",
     icon: <SymptomsIcon className="w-6 h-6 text-[#db2777]" />,
     iconBg: "bg-pink-100 dark:bg-pink-950/60 text-[#db2777]",
     arrowBg: "bg-[#db2777] text-white hover:bg-pink-700",
@@ -183,6 +195,10 @@ const treatmentCategories: TreatmentCategory[] = [
     viewAllText: "View All Therapies",
     image: "/images/what-we-treat/therapies-kneecare.webp",
     imageAlt: "Modern Therapies with Real Results by Aries PhysioCare Specialist",
+    topBadgeTitle: "Modern Therapies.",
+    topBadgeSubtitle: "Real Results.",
+    bottomBadgeTitle: "Hands On Care",
+    bottomBadgeSubtitle: "Real Progress",
     icon: <TherapiesIcon className="w-6 h-6 text-[#0284c7]" />,
     iconBg: "bg-sky-100 dark:bg-sky-950/60 text-[#0284c7]",
     arrowBg: "bg-[#0284c7] text-white hover:bg-sky-700",
@@ -225,6 +241,10 @@ const treatmentCategories: TreatmentCategory[] = [
     viewAllText: "View All Services",
     image: "/images/what-we-treat/services-rehab.webp",
     imageAlt: "Care at Home and Care Beyond Boundaries with Aries PhysioCare",
+    topBadgeTitle: "Care at Home",
+    topBadgeSubtitle: "Comfort Always",
+    bottomBadgeTitle: "Care Beyond",
+    bottomBadgeSubtitle: "Boundaries",
     icon: <Home className="w-6 h-6 text-[#d97706]" />,
     iconBg: "bg-amber-100 dark:bg-amber-950/60 text-[#d97706]",
     arrowBg: "bg-[#d97706] text-white hover:bg-amber-700",
@@ -397,6 +417,38 @@ export default function WhatWeTreat() {
                     sizes="(max-width: 640px) 100vw, 200px"
                     className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
                   />
+
+                  {/* Top Glass Badge */}
+                  {area.topBadgeTitle && (
+                    <div className="absolute top-2.5 inset-x-2 z-10 flex justify-center pointer-events-none">
+                      <div className="px-3 py-1.5 rounded-xl backdrop-blur-md bg-white/85 dark:bg-[#0B0817]/85 border border-white/80 dark:border-white/15 shadow-sm text-center max-w-[90%]">
+                        <div className="text-[11px] font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
+                          {area.topBadgeTitle}
+                        </div>
+                        {area.topBadgeSubtitle && (
+                          <div className="text-[9.5px] font-semibold text-slate-600 dark:text-slate-300 leading-tight mt-0.5">
+                            {area.topBadgeSubtitle}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Bottom Glass Badge */}
+                  {area.bottomBadgeTitle && (
+                    <div className="absolute bottom-2.5 inset-x-2 z-10 flex justify-center pointer-events-none">
+                      <div className="px-3 py-1.5 rounded-xl backdrop-blur-md bg-white/85 dark:bg-[#0B0817]/85 border border-white/80 dark:border-white/15 shadow-sm text-center max-w-[90%]">
+                        <div className="text-[11px] font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
+                          {area.bottomBadgeTitle}
+                        </div>
+                        {area.bottomBadgeSubtitle && (
+                          <div className="text-[9.5px] font-semibold text-slate-600 dark:text-slate-300 leading-tight mt-0.5">
+                            {area.bottomBadgeSubtitle}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
