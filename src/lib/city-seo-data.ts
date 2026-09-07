@@ -397,5 +397,5 @@ export const citySeoPages: CitySeoData[] = [
 ];
 
 export const getCityData = (pageSlug: string): CitySeoData | undefined => {
-    return citySeoPages.find(c => c.pageSlug === pageSlug);
+    return citySeoPages.find(c => c.pageSlug === pageSlug || c.citySlug === pageSlug);
 };

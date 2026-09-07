@@ -159,6 +159,19 @@ function getLocationMap(): Map<string, LocationPageData> {
             if (!_locationMap.has(page.pageSlug)) {
                 _locationMap.set(page.pageSlug, page);
             }
+            // Also index short area slugs (e.g. 'kandivali-west', 'borivali-west', 'thane-west', etc.)
+            if (!_locationMap.has(page.locationSlug)) {
+                _locationMap.set(page.locationSlug, page);
+            }
+            // Support without '-west' / '-east' if single token (e.g. 'kandivali', 'borivali', 'thane')
+            const baseSlug = page.locationSlug.replace(/-(west|east|north|south|central)$/, '');
+            if (baseSlug && !_locationMap.has(baseSlug)) {
+                _locationMap.set(baseSlug, page);
+            }
+            const basePageSlug = page.pageSlug.replace(/-(west|east|north|south|central)$/, '');
+            if (basePageSlug && !_locationMap.has(basePageSlug)) {
+                _locationMap.set(basePageSlug, page);
+            }
         }
     }
     return _locationMap;

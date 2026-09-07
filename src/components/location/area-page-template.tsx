@@ -16,6 +16,7 @@ import { services } from '@/lib/placeholder-data';
 import { citySeoPages } from '@/lib/city-seo-data';
 import VettedExperts from '@/components/landing/vetted-experts';
 import PricingPackagesSection from '@/components/landing/pricing-packages-section';
+import WhyChooseCardsSection from '@/components/location/why-choose-cards-section';
 
 interface AreaLandingPageTemplateProps {
     location: LocationPageData;
@@ -202,91 +203,13 @@ export default function AreaLandingPageTemplate({ location }: AreaLandingPageTem
                     </div>
                 </section>
 
-                {/* ── TRUST STRIP ───────────────────────────────────── */}
-                <section className="py-7 bg-secondary/30 border-b">
-                    <div className="container mx-auto px-4 md:px-6">
-                        <div className="flex flex-wrap justify-center gap-6 md:gap-10">
-                            {TRUST_ITEMS.map((item, i) => (
-                                <div key={i} className="flex items-center gap-2.5 text-sm font-semibold text-muted-foreground">
-                                    <item.icon className="w-4 h-4 text-primary flex-shrink-0" />
-                                    {item.text}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── WHY CHOOSE US ─────────────────────────────────── */}
-                <section className="py-16 md:py-20 bg-background">
-                    <div className="container mx-auto px-4 md:px-6">
-                        <div className="grid lg:grid-cols-2 gap-12 items-center">
-                            <div className="space-y-6">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest">
-                                    <HeartPulse className="w-3.5 h-3.5" /> Home Physiotherapy in {location.locationName}
-                                </div>
-                                <h2 className="font-headline text-3xl md:text-4xl font-extrabold leading-tight">
-                                    Why Residents of <span className="text-primary">{location.locationName}</span> Choose Aries PhysioCare
-                                </h2>
-                                <p className="text-muted-foreground leading-relaxed">
-                                    Getting physiotherapy treatment in {location.locationName}, {location.cityName} no longer means long commutes to clinics. Aries PhysioCare's certified therapists bring clinical-grade care directly to your home — with the same quality you'd expect from top hospitals in {location.cityName}.
-                                </p>
-                                <p className="text-muted-foreground leading-relaxed">
-                                    Whether you're recovering from surgery, managing chronic pain, or rehabilitating a sports injury, our {location.locationName} team is equipped with advanced portable physiotherapy equipment — including IFT, Ultrasound Therapy, TENS, and Laser — to deliver effective results at your doorstep.
-                                </p>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    {[
-                                        `Home visits across ${location.locationName}`,
-                                        'Certified BPT/MPT therapists',
-                                        'IFT, US, TENS, Laser equipment',
-                                        'Same-day appointments',
-                                        'Clinical progress tracking',
-                                        'Post-surgery specialists',
-                                        'Elderly care specialists',
-                                        'Sports injury experts',
-                                    ].map((point, i) => (
-                                        <div key={i} className="flex items-start gap-2.5">
-                                            <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
-                                            <span className="text-sm text-muted-foreground">{point}</span>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                                    <BookAppointmentButton size="lg" className="h-12 px-8 font-bold">
-                                        Book in {location.locationName}
-                                    </BookAppointmentButton>
-                                    <Button asChild size="lg" variant="outline" className="h-12 px-8 font-bold">
-                                        <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#25D366]">
-                                            <MessageCircle className="w-4 h-4" /> WhatsApp Us
-                                        </a>
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <div className="relative">
-                                <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl shadow-primary/10 border border-primary/10">
-                                    <Image
-                                        src="/images/hero-city-recovery.jpg"
-                                        alt={`Home physiotherapy in ${location.locationName}, ${location.cityName} by Aries PhysioCare`}
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 1024px) 100vw, 50vw"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
-                                </div>
-                                {/* Floating card */}
-                                <div className="absolute -bottom-4 -right-4 bg-background border shadow-xl rounded-2xl p-4 max-w-[200px]">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                                        <span className="font-black text-sm">4.8 / 5.0</span>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">Avg rating for {location.cityName} sessions</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                {/* ── WHY CHOOSE US & TRUST STATS (6 CONTENT CARDS) ── */}
+                <WhyChooseCardsSection
+                    locationName={location.locationName}
+                    cityName={location.cityName}
+                    description={`Getting physiotherapy treatment in ${location.locationName}, ${location.cityName} no longer means long commutes to clinics. Aries PhysioCare's certified therapists bring clinical-grade care directly to your home — with the same quality you'd expect from top hospitals in ${location.cityName}. Whether you're recovering from surgery, managing chronic pain, or rehabilitating a sports injury, our ${location.locationName} team delivers effective results at your doorstep.`}
+                    showTrustStrip={true}
+                />
 
                 <VettedExperts
                     locationName={location.locationName}

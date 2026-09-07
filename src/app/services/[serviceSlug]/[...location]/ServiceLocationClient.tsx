@@ -49,6 +49,7 @@ import VettedExperts from '@/components/landing/vetted-experts';
 import { Label } from '@/components/ui/label';
 import { getTherapistsClient } from '@/lib/api';
 import SchemaMarkup from '@/components/seo/schema-markup';
+import WhyChooseCardsSection from '@/components/location/why-choose-cards-section';
 
 const leadSchema = z.object({
     fullName: z.string().min(1, 'Full name is required'),
@@ -693,15 +694,15 @@ export default function ServiceLocationClient({ serviceSlug, location }: Service
             {/* REVIEWS SECTION */}
             <GoogleReviews locationName={capitalizedArea} className="bg-secondary/30" />
 
-            {/* Why Choose Section */}
-            <section className="py-20 bg-background">
-                <div className="container mx-auto px-4 text-center mb-16 space-y-6">
-                    <h2 className="font-headline text-3xl md:text-5xl font-bold tracking-tight">Why Choose Home {serviceName} in {capitalizedArea}?</h2>
-                    <p className="text-lg text-muted-foreground leading-relaxed font-medium max-w-4xl mx-auto">
-                        {areaContext.lifestyle} Residents of {capitalizedArea} often face challenges with {areaContext.painPoints}. Aries PhysioCare brings hospital-grade clinical excellence near landmarks like {areaContext.landmarks[0]}.
-                    </p>
-                </div>
-            </section>
+            {/* Why Choose Section & 6 Content Cards */}
+            <WhyChooseCardsSection
+                locationName={capitalizedArea}
+                cityName={capitalizedCity}
+                serviceName={serviceName}
+                description={`${areaContext.lifestyle} Residents of ${capitalizedArea} often face challenges with ${areaContext.painPoints}. Aries PhysioCare brings hospital-grade clinical excellence near landmarks like ${areaContext.landmarks[0]}.`}
+                landmark={areaContext.landmarks[0]}
+                showTrustStrip={true}
+            />
 
             {/* VETTED EXPERTS FOR AREA */}
             <VettedExperts 

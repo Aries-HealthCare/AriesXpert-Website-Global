@@ -14,6 +14,7 @@ import { getLocalBusinessSchema, getBreadcrumbSchema, getFAQSchema, getHealthcar
 import { services } from '@/lib/placeholder-data';
 import VettedExperts from '@/components/landing/vetted-experts';
 import PricingPackagesSection from '@/components/landing/pricing-packages-section';
+import WhyChooseCardsSection from '@/components/location/why-choose-cards-section';
 
 interface CityLandingPageTemplateProps {
     city: CitySeoData;
@@ -104,92 +105,13 @@ export default function CityLandingPageTemplate({ city }: CityLandingPageTemplat
                     </div>
                 </section>
 
-                {/* ── TRUST STRIP ───────────────────────────────────── */}
-                <section className="py-8 bg-secondary/30 border-b">
-                    <div className="container mx-auto px-4 md:px-6">
-                        <div className="flex flex-wrap justify-center gap-6 md:gap-10">
-                            {[
-                                { icon: Shield, text: 'BPT/MPT Verified Therapists' },
-                                { icon: Clock, text: 'Same-Day Appointments' },
-                                { icon: HeartPulse, text: 'Advanced Portable Equipment' },
-                                { icon: Star, text: `4.8★ Rated in ${city.cityName}` },
-                                { icon: Award, text: '5+ Years Clinical Experience' },
-                            ].map((item, i) => (
-                                <div key={i} className="flex items-center gap-2.5 text-sm font-semibold text-muted-foreground">
-                                    <item.icon className="w-4 h-4 text-primary flex-shrink-0" />
-                                    {item.text}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── ABOUT / WHY ───────────────────────────────────── */}
-                <section className="py-16 md:py-20 bg-background">
-                    <div className="container mx-auto px-4 md:px-6">
-                        <div className="grid lg:grid-cols-2 gap-12 items-center">
-                            <div className="space-y-6">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest">
-                                    <HeartPulse className="w-3.5 h-3.5" /> Home Physiotherapy in {city.cityName}
-                                </div>
-                                <h2 className="font-headline text-3xl md:text-4xl font-extrabold leading-tight">
-                                    Why {city.cityName} Residents Choose <span className="text-primary">Aries PhysioCare</span>
-                                </h2>
-                                <p className="text-muted-foreground leading-relaxed">{city.localIntro}</p>
-                                <p className="text-muted-foreground leading-relaxed">{city.whySection}</p>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                                    {[
-                                        `Door-to-door service across ${city.cityName}`,
-                                        'Certified BPT/MPT therapists',
-                                        'Advanced portable equipment',
-                                        'Same-day appointments available',
-                                        'Digital clinical progress tracking',
-                                        'Post-surgery rehab specialists',
-                                    ].map((point, i) => (
-                                        <div key={i} className="flex items-start gap-2.5">
-                                            <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
-                                            <span className="text-sm text-muted-foreground">{point}</span>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                                    <BookAppointmentButton size="lg" className="h-12 px-8 font-bold">
-                                        Book in {city.cityName}
-                                    </BookAppointmentButton>
-                                    <Button asChild size="lg" variant="outline" className="h-12 px-8 font-bold">
-                                        <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#25D366]">
-                                            <MessageCircle className="w-4 h-4" /> WhatsApp Us
-                                        </a>
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <div className="relative">
-                                <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl shadow-primary/10 border border-primary/10">
-                                    <Image
-                                        src="/images/hero-city-recovery.jpg"
-                                        alt={`Home physiotherapy in ${city.cityName} by Aries PhysioCare`}
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 1024px) 100vw, 50vw"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
-                                </div>
-                                <div className="absolute -bottom-4 -left-4 bg-background border shadow-xl rounded-2xl p-4 flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                        <Users className="w-5 h-5 text-primary" />
-                                    </div>
-                                    <div>
-                                        <div className="font-bold text-sm">{city.stats[0].value}</div>
-                                        <div className="text-xs text-muted-foreground">{city.stats[0].label}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                {/* ── WHY CHOOSE US & TRUST STATS (6 CONTENT CARDS) ── */}
+                <WhyChooseCardsSection
+                    locationName={city.cityName}
+                    cityName={city.cityName}
+                    description={`${city.localIntro} ${city.whySection}`}
+                    showTrustStrip={true}
+                />
 
                 <VettedExperts
                     locationName={city.cityName}

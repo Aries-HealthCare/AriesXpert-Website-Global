@@ -13,6 +13,7 @@ import BookAppointmentButton from '@/components/book-appointment-button';
 import { TherapistCard } from '@/hooks/use-therapists';
 import { getLocalBusinessSchema, getBreadcrumbSchema, getHealthcareServiceSchema, getFAQSchema } from '@/lib/seo-schemas';
 import TherapistCarousel from '@/components/therapist/therapist-carousel';
+import WhyChooseCardsSection from './why-choose-cards-section';
 
 interface AreaProfessionTemplateProps {
     profession: string;
@@ -140,6 +141,13 @@ export default function AreaProfessionTemplate({
                     </div>
                 </div>
             </section>
+
+            {/* ── WHY CHOOSE US & TRUST STATS (6 CONTENT CARDS) ── */}
+            <WhyChooseCardsSection
+                locationName={areaName}
+                cityName={therapists[0]?.city || 'Mumbai'}
+                serviceName={profession}
+            />
 
             {/* Therapist List */}
             <section className="py-20 bg-background">
