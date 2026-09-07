@@ -98,6 +98,15 @@ export async function GET(req: NextRequest) {
       const list: any[] = Array.isArray(data?.therapists) ? data.therapists : [];
       if (list.length > 0) {
         liveList = list.map(normalise).filter((t) => t.id && t.name);
+        if (slug) {
+          const target = slug.toLowerCase().trim();
+          liveList = liveList.filter(
+            (t) =>
+              t.slug === target ||
+              t.id.toLowerCase() === target ||
+              slugify(t.name) === target
+          );
+        }
         fetchedSuccessfully = liveList.length > 0;
       }
     }
@@ -173,6 +182,10 @@ function normalise(therapist: any): TherapistCard {
     imageUrl = defaultAvatar;
   }
 
+  if (imageUrl.startsWith('/uploads/')) {
+    imageUrl = `https://api.ariesxpert.com${imageUrl}`;
+  }
+
   const rawAreas = [
     ...(Array.isArray(therapist.serviceAreas) ? therapist.serviceAreas : []),
     ...(Array.isArray(therapist.areas) ? therapist.areas : []),
@@ -183,9 +196,13 @@ function normalise(therapist: any): TherapistCard {
   const uniqueAreas = Array.from(new Set(rawAreas));
   const finalAreas = uniqueAreas.length > 0 ? uniqueAreas : ['City Wide'];
 
+  const finalSlug = therapist.slug && typeof therapist.slug === 'string' && therapist.slug.trim()
+    ? therapist.slug.trim()
+    : slugify(name);
+
   return {
-    id: typeof therapist.id === 'string' ? therapist.id : String(therapist._id || `th-${slugify(name)}`),
-    slug: slugify(name),
+    id: typeof therapist.id === 'string' ? therapist.id : String(therapist._id || `th-${finalSlug}`),
+    slug: finalSlug,
     name,
     qualification: typeof therapist.qualification === 'string' && therapist.qualification 
       ? therapist.qualification 

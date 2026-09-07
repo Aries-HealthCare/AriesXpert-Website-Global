@@ -10,7 +10,7 @@ export async function fetchTherapistsServer(params: {
   slug?: string;
   limit?: number;
 } = {}): Promise<TherapistCard[]> {
-  const query = new URLSearchParams({ limit: String(params.limit || 100) });
+  const query = new URLSearchParams({ limit: String(params.limit || 1000) });
   if (params.city) query.set('city', params.city);
   if (params.state) query.set('state', params.state);
   if (params.area) query.set('area', params.area);
@@ -32,9 +32,20 @@ export async function fetchTherapistsServer(params: {
           .map(normalise)
           .filter((therapist: TherapistCard) => therapist.id && therapist.name);
         if (therapists.length > 0) {
-          return params.slug
-            ? therapists.filter((therapist: TherapistCard) => therapist.slug === params.slug || therapist.id === params.slug)
-            : therapists;
+          if (params.slug) {
+            const target = params.slug.toLowerCase().trim();
+            const matched = therapists.filter(
+              (therapist: TherapistCard) =>
+                therapist.slug === target ||
+                therapist.id.toLowerCase() === target ||
+                slugify(therapist.name) === target
+            );
+            if (matched.length > 0) {
+              return matched;
+            }
+          } else {
+            return params.limit ? therapists.slice(0, params.limit) : therapists;
+          }
         }
       }
     }
@@ -132,6 +143,10 @@ function normalise(therapist: any): TherapistCard {
     imageUrl = defaultAvatar;
   }
 
+  if (imageUrl.startsWith('/uploads/')) {
+    imageUrl = `https://api.ariesxpert.com${imageUrl}`;
+  }
+
   const rawAreas = [
     ...(Array.isArray(therapist.serviceAreas) ? therapist.serviceAreas : []),
     ...(Array.isArray(therapist.areas) ? therapist.areas : []),
@@ -142,9 +157,13 @@ function normalise(therapist: any): TherapistCard {
   const uniqueAreas = Array.from(new Set(rawAreas));
   const finalAreas = uniqueAreas.length > 0 ? uniqueAreas : ['City Wide'];
 
+  const finalSlug = therapist.slug && typeof therapist.slug === 'string' && therapist.slug.trim()
+    ? therapist.slug.trim()
+    : slugify(name);
+
   return {
-    id: typeof therapist.id === 'string' ? therapist.id : String(therapist._id || `th-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`),
-    slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+    id: typeof therapist.id === 'string' ? therapist.id : String(therapist._id || `th-${finalSlug}`),
+    slug: finalSlug,
     name,
     qualification: typeof therapist.qualification === 'string' && therapist.qualification 
       ? therapist.qualification 
@@ -167,4 +186,8 @@ function normalise(therapist: any): TherapistCard {
     education: therapist.qualification ? [therapist.qualification] : ['Bachelor of Physiotherapy (BPT)'],
     feedback: Array.isArray(therapist.feedback) ? therapist.feedback : [],
   };
+}
+
+function slugify(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }

@@ -105,6 +105,10 @@ const nextConfig: NextConfig = {
         source: '/api/v1/:path*',
         destination: `${backendUrl}/api/v1/:path*`,
       },
+      {
+        source: '/uploads/:path*',
+        destination: `${backendUrl}/uploads/:path*`,
+      },
     ];
   },
 
@@ -262,6 +266,18 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: '*.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.ariesxpert.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.ariesxpert.com',
         port: '',
         pathname: '/**',
       },

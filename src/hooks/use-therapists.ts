@@ -75,7 +75,7 @@ export function useTherapists(params: UseTherapistsParams = {}): UseTherapistsRe
             });
 
         return () => { cancelled = true; };
-    }, [city, state, area, specialization, limit, enabled, tick]);
+    }, [city, state, area, specialization, params.slug, limit, enabled, tick]);
 
     return { therapists, total, isLoading, isError, source, refetch };
 }
