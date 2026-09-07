@@ -9,7 +9,6 @@ import WhatWeTreat from "@/components/landing/what-we-treat";
 import BlogSection from "@/components/landing/blog-section";
 import FaqSection from "@/components/landing/faq-section";
 import GoogleReviews from "@/components/google-reviews";
-import FreeConsultationBlock from "@/components/landing/free-consultation-block";
 import SchemaMarkup from "@/components/seo/schema-markup";
 import PricingPackagesSection from "@/components/landing/pricing-packages-section";
 
@@ -82,9 +81,6 @@ export default function Home() {
       </div>
       <div className="content-auto">
         <AiPrecisionRecovery />
-      </div>
-      <div className="content-auto">
-        <FreeConsultationBlock />
       </div>
       <div className="content-auto">
         <Specialities />
