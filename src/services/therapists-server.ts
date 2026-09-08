@@ -128,18 +128,20 @@ function normalise(therapist: any): TherapistCard {
   let imageUrl = typeof therapist.imageUrl === 'string' && therapist.imageUrl.trim() 
     ? therapist.imageUrl.trim() 
     : (typeof therapist.profilePhoto === 'string' && therapist.profilePhoto.trim() ? therapist.profilePhoto.trim() : defaultAvatar);
-  if (
-    imageUrl.includes('unsplash.com') ||
-    imageUrl.includes('placehold.co') ||
-    imageUrl.includes('_healed_') ||
-    imageUrl.includes('therapist_ai_pose') ||
-    imageUrl.includes('therapist_portrait_') ||
-    imageUrl.includes('BrandLogo') ||
-    imageUrl.includes('673752dcb05308c0ae620a24') ||
-    imageUrl.toLowerCase().includes('wallpaper') ||
-    imageUrl.toLowerCase().includes('screenshot') ||
-    !imageUrl
-  ) {
+  const isProtectedRealPhoto = therapist.hasRealPhoto === true;
+  if (!isProtectedRealPhoto) {
+    if (
+      imageUrl.includes('unsplash.com') ||
+      imageUrl.includes('placehold.co') ||
+      imageUrl.includes('BrandLogo') ||
+      imageUrl.includes('673752dcb05308c0ae620a24') ||
+      imageUrl.toLowerCase().includes('wallpaper') ||
+      imageUrl.toLowerCase().includes('screenshot') ||
+      !imageUrl
+    ) {
+      imageUrl = defaultAvatar;
+    }
+  } else if (!imageUrl) {
     imageUrl = defaultAvatar;
   }
 
