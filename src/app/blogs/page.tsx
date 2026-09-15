@@ -29,8 +29,11 @@ function getBlogCover(topic?: string, territory?: string, title?: string) {
   if (query.includes('neck') || query.includes('postur') || query.includes('desk') || query.includes('ergo')) {
     return 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&q=85&w=1600';
   }
-  if (query.includes('neuro') || query.includes('stroke') || query.includes('brain') || query.includes('paralysis')) {
-    return 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=85&w=1600';
+  if (query.includes('brain') || query.includes('neuroplasticity')) {
+    return '/images/blog/neuroplasticity-brain.jpg';
+  }
+  if (query.includes('neuro') || query.includes('stroke') || query.includes('paralysis')) {
+    return '/images/blog/stroke-rehab-hero.jpg';
   }
   if (query.includes('diet') || query.includes('nutrit') || query.includes('food') || query.includes('diabetes')) {
     return 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=85&w=1600';
