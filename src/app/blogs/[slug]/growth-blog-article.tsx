@@ -953,14 +953,14 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
           
           {/* ────────────────────────────────────────────────────────────────
-              LEFT COLUMN: FROZEN STICKY SIDEBAR (In This Article & Guide)
+              LEFT COLUMN: FROZEN STICKY SIDEBAR (Article Highlights & Guide)
              ──────────────────────────────────────────────────────────────── */}
-          <aside className="lg:col-span-3 space-y-6 lg:sticky lg:top-24 self-start order-2 lg:order-1">
+          <aside className="lg:col-span-3 space-y-6 lg:sticky lg:top-24 self-start order-2 lg:order-1 max-h-[calc(100vh-7rem)] overflow-y-auto no-scrollbar">
             
-            {/* 1. In This Article (Table of Contents) */}
+            {/* 1. Article Highlights (Table of Contents) */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-purple-100 dark:border-purple-900/40 shadow-xs">
               <h3 className="font-bold text-base text-slate-900 dark:text-white pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
-                In This Article
+                Article Highlights
               </h3>
 
               <nav className="space-y-2">
@@ -1186,7 +1186,7 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
           {/* ────────────────────────────────────────────────────────────────
               RIGHT COLUMN: FROZEN STICKY SIDEBAR (Rehab Includes & Experts)
              ──────────────────────────────────────────────────────────────── */}
-          <aside className="lg:col-span-3 space-y-6 lg:sticky lg:top-24 self-start order-3">
+          <aside className="lg:col-span-3 space-y-6 lg:sticky lg:top-24 self-start order-3 max-h-[calc(100vh-7rem)] overflow-y-auto no-scrollbar">
             
             {/* 1. What This Rehab Includes Card */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-purple-100 dark:border-purple-900/40 shadow-xs">
