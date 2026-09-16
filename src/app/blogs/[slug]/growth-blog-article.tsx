@@ -24,11 +24,11 @@ import {
   Stethoscope,
   ChevronRight,
   Printer,
-  ChevronDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRequestCallback } from '@/components/request-callback-provider';
 import type { GrowthBlogPost } from '@/lib/growth-blog-posts';
+import { SPINE_ORTHOPAEDIC_BLOGS } from '@/lib/spine-orthopaedic-blogs';
 
 interface SectionData {
   id: string;
@@ -40,61 +40,477 @@ interface SectionData {
   isTwoColumnBullets?: boolean;
 }
 
-// 6 Structured items for "What This Rehab Includes" matching reference design
-const REHAB_INCLUDES = [
-  {
-    icon: ClipboardCheck,
-    title: 'Personalized Assessment',
-  },
-  {
-    icon: Zap,
-    title: 'Pain-Relief Techniques',
-  },
-  {
-    icon: UserCheck,
-    title: 'Posture & Ergonomic Training',
-  },
-  {
-    icon: Activity,
-    title: 'Strength & Mobility Exercises',
-  },
-  {
-    icon: Home,
-    title: 'Daily Activity Guidance',
-  },
-  {
-    icon: Stethoscope,
-    title: 'Long-Term Spine Health Plan',
-  },
-];
+interface ConditionTheme {
+  isDDD: boolean;
+  badgeText: string;
+  heroBackdropImage?: string;
+  heroRightImage: string;
+  cursiveSlogan: { line1: string; line2: string; line3: string; line4: string };
+  videoTitle: string;
+  pdfGuideTitle: string;
+  centerBannerTag: string;
+  centerBannerTitle: string;
+  centerBannerImage: string;
+  rehabIncludesTitle: string;
+  rehabIncludesItems: Array<{ icon: any; title: string }>;
+  expertConsultTitle: string;
+  expertConsultCategory: string;
+  quoteText: string;
+  ctaTitle: string;
+  ctaSubtitle: string;
+  promoCardTitle: string;
+  promoCardPoints: string[];
+  promoCardImage: string;
+}
 
-// Related Articles matching reference design
-const RELATED_ARTICLES = [
-  {
-    slug: '5-everyday-habits-that-harm-your-spine',
-    title: '5 Everyday Habits That Harm Your Spine',
-    tag: 'SPINE HEALTH',
-    description: 'Small changes can make a big difference in spine health.',
-    readTime: '5 min read',
-    imageUrl: '/images/blog/related_habits_spine.png',
-  },
-  {
-    slug: 'physiotherapy-vs-surgery-for-disc-problems',
-    title: 'Physiotherapy vs. Surgery for Disc Problems',
-    tag: 'TREATMENT',
-    description: 'Understand your options for long-term relief.',
-    readTime: '7 min read',
-    imageUrl: '/images/blog/related_mri_spine.png',
-  },
-  {
-    slug: 'top-7-exercises-for-a-stronger-lower-back',
-    title: 'Top 7 Exercises for a Stronger Lower Back',
-    tag: 'EXERCISE',
-    description: 'Simple and effective moves you can do at home.',
-    readTime: '6 min read',
-    imageUrl: '/images/blog/related_exercises_spine.png',
-  },
-];
+/**
+ * Derives condition-specific visuals, headlines, and clinical highlights
+ * strictly matching the blog topic and clinical condition.
+ */
+function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
+  const slug = (post.slug || '').toLowerCase();
+  const title = (post.title || '').toLowerCase();
+  const topic = (post.topic || '').toLowerCase();
+  const territory = (post.territory || '').toLowerCase();
+
+  const isDDD =
+    slug.includes('degenerative-disc-disease') ||
+    title.includes('degenerative disc disease');
+
+  // 1. Degenerative Disc Disease (Dedicated Reference Layout)
+  if (isDDD) {
+    return {
+      isDDD: true,
+      badgeText: 'SPINE HEALTH',
+      heroBackdropImage: '/images/blog/hero_ddd_clean_panoramic.png',
+      heroRightImage: '/images/blog/hero_right_arch_clean.png',
+      cursiveSlogan: {
+        line1: 'Stronger',
+        line2: 'Spine',
+        line3: 'Brighter',
+        line4: 'Tomorrows 💛',
+      },
+      videoTitle: 'Expert Insights: Degenerative Disc Disease & Active Recovery',
+      pdfGuideTitle: 'Spine Care & Home Exercise Guide',
+      centerBannerTag: 'DISC HEALTH',
+      centerBannerTitle: 'Moves You Forward',
+      centerBannerImage: '/images/blog/disc_health_cross_section.png',
+      rehabIncludesTitle: 'What This Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Personalized Assessment' },
+        { icon: Zap, title: 'Pain-Relief Techniques' },
+        { icon: UserCheck, title: 'Posture & Ergonomic Training' },
+        { icon: Activity, title: 'Strength & Mobility Exercises' },
+        { icon: Home, title: 'Daily Activity Guidance' },
+        { icon: Stethoscope, title: 'Long-Term Spine Health Plan' },
+      ],
+      expertConsultTitle: 'Consult Our Spine Experts',
+      expertConsultCategory: 'Spine Health',
+      quoteText: '“Movement is medicine for a healthier spine.”',
+      ctaTitle: 'Take Control of Your Spine Health Today!',
+      ctaSubtitle:
+        'Book a consultation with our expert physiotherapists and get a personalized care plan for lasting relief.',
+      promoCardTitle: 'Move Better\nLive Stronger',
+      promoCardPoints: ['Less Pain', 'More Mobility', 'Healthier Tomorrow'],
+      promoCardImage: '/images/blog/promo_move_better.png',
+    };
+  }
+
+  // 2. Spinal Stenosis
+  if (slug.includes('stenosis') || title.includes('stenosis')) {
+    const stenosisImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/blog/spinal-stenosis-gait.jpg';
+    return {
+      isDDD: false,
+      badgeText: 'SPINAL STENOSIS',
+      heroRightImage: stenosisImg,
+      cursiveSlogan: {
+        line1: 'Walk',
+        line2: 'Farther',
+        line3: 'Stand',
+        line4: 'Taller 🚶',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Spinal Stenosis Walking & Flexion Guide',
+      centerBannerTag: 'CANAL DECOMPRESSION',
+      centerBannerTitle: 'Pain-Free Walking Distance Restoration',
+      centerBannerImage: '/images/blog/spinal-stenosis-gait.jpg',
+      rehabIncludesTitle: 'What Stenosis Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Claudication Assessment' },
+        { icon: Zap, title: 'Lumbar Flexion & Canal Opening' },
+        { icon: UserCheck, title: 'Pelvic Tilt & Abdominal Retraining' },
+        { icon: Activity, title: 'Progressive Interval Walking' },
+        { icon: Home, title: 'Postural Offloading Strategies' },
+        { icon: Stethoscope, title: 'Long-Term Mobility Plan' },
+      ],
+      expertConsultTitle: 'Consult Our Spine Specialists',
+      expertConsultCategory: 'Spine & Back Care',
+      quoteText: '“Opening the spinal canal through targeted flexion restores walking freedom.”',
+      ctaTitle: 'Take Control of Your Walking Freedom Today!',
+      ctaSubtitle:
+        'Our specialized physical therapy protocols help open the spinal canal and restore walking tolerance.',
+      promoCardTitle: 'Walk Farther\nStand Taller',
+      promoCardPoints: ['Extended Walking Range', 'Reduced Leg Heaviness', 'Independent Living'],
+      promoCardImage: '/images/blog/spinal-stenosis-gait.jpg',
+    };
+  }
+
+  // 3. Sciatica & Radiculopathy
+  if (
+    slug.includes('sciatica') ||
+    title.includes('sciatica') ||
+    slug.includes('radiculopathy') ||
+    title.includes('radiculopathy') ||
+    slug.includes('piriformis')
+  ) {
+    const sciaticaImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/blog/sciatica-nerve-relief.jpg';
+    return {
+      isDDD: false,
+      badgeText: 'SCIATICA CARE',
+      heroRightImage: sciaticaImg,
+      cursiveSlogan: {
+        line1: 'Nerve',
+        line2: 'Relief',
+        line3: 'Active',
+        line4: 'Living ⚡',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Sciatica Relief & Nerve Gliding Guide',
+      centerBannerTag: 'NERVE DECOMPRESSION',
+      centerBannerTitle: 'Centralizing Sciatic Nerve Relief',
+      centerBannerImage: '/images/blog/sciatica-nerve-relief.jpg',
+      rehabIncludesTitle: 'What Sciatica Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Neural Tension Screen' },
+        { icon: Zap, title: 'Sciatic Nerve Flossing' },
+        { icon: UserCheck, title: 'McKenzie Centralization Drills' },
+        { icon: Activity, title: 'Core & Pelvic Decompression' },
+        { icon: Home, title: 'Ergonomic Lumbar Support' },
+        { icon: Stethoscope, title: 'Long-Term Nerve Protection Plan' },
+      ],
+      expertConsultTitle: 'Consult Our Spine & Nerve Specialists',
+      expertConsultCategory: 'Spine & Back Care',
+      quoteText: '“Decompressing the nerve through guided movement restores natural mobility.”',
+      ctaTitle: 'Take Control of Your Sciatica Relief Today!',
+      ctaSubtitle:
+        'Get doorstep physiotherapy to relieve radiating leg pain and restore comfortable walking.',
+      promoCardTitle: 'Relieve Pain\nWalk Freely',
+      promoCardPoints: ['Centralized Sciatic Pain', 'Unblocked Neural Mobility', 'Zero Downtime'],
+      promoCardImage: '/images/blog/sciatica-nerve-relief.jpg',
+    };
+  }
+
+  // 4. Disc Herniation / Prolapse / Bulge / Slipped Disc
+  if (
+    slug.includes('herniat') ||
+    title.includes('herniat') ||
+    slug.includes('slipped') ||
+    title.includes('slipped') ||
+    slug.includes('prolapse') ||
+    title.includes('prolapse') ||
+    slug.includes('bulge')
+  ) {
+    const discImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/blog/disc-herniation-rehab.jpg';
+    return {
+      isDDD: false,
+      badgeText: 'DISC CARE',
+      heroRightImage: discImg,
+      cursiveSlogan: {
+        line1: 'Stronger',
+        line2: 'Spine',
+        line3: 'Brighter',
+        line4: 'Tomorrows 💛',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Herniated & Bulging Disc Recovery Guide',
+      centerBannerTag: 'DISC CENTRALIZATION',
+      centerBannerTitle: 'Non-Surgical Disc Healing Protocols',
+      centerBannerImage: '/images/blog/disc_health_cross_section.png',
+      rehabIncludesTitle: 'What Disc Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Directional Preference Screen' },
+        { icon: Zap, title: 'Prone Extension Centralization' },
+        { icon: UserCheck, title: 'Deep Core Muscle Armor (TVA)' },
+        { icon: Activity, title: 'Gentle Spinal Traction Drills' },
+        { icon: Home, title: 'Safe Hip Hinging Retraining' },
+        { icon: Stethoscope, title: 'Long-Term Spine Protection' },
+      ],
+      expertConsultTitle: 'Consult Our Spine Experts',
+      expertConsultCategory: 'Spine & Back Care',
+      quoteText: '“Targeted directional movement promotes natural disc centralization and healing.”',
+      ctaTitle: 'Take Control of Your Disc Health Today!',
+      ctaSubtitle:
+        'Evidence-based physical therapy accelerates natural disc recovery without surgery.',
+      promoCardTitle: 'Heal Discs\nStay Active',
+      promoCardPoints: ['Centralized Disc Strain', 'Core Muscle Armor', 'Faster Return to Activity'],
+      promoCardImage: '/images/blog/disc-herniation-rehab.jpg',
+    };
+  }
+
+  // 5. Knee & Joint Osteoarthritis / Orthopaedics
+  if (
+    slug.includes('knee') ||
+    title.includes('knee') ||
+    slug.includes('osteoarthritis') ||
+    title.includes('osteoarthritis') ||
+    slug.includes('joint') ||
+    title.includes('joint') ||
+    slug.includes('arthritis') ||
+    title.includes('arthritis')
+  ) {
+    const kneeImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/physiotherapy/physio-knee-treatment.jpg';
+    return {
+      isDDD: false,
+      badgeText: 'JOINT PRESERVATION',
+      heroRightImage: kneeImg,
+      cursiveSlogan: {
+        line1: 'Preserve',
+        line2: 'Joints',
+        line3: 'Protect',
+        line4: 'Freedom ⚡',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Knee Osteoarthritis Home Preservation Guide',
+      centerBannerTag: 'JOINT PRESERVATION',
+      centerBannerTitle: 'Protecting Mobility & Joint Cartilage',
+      centerBannerImage: '/images/physiotherapy/program-knee.jpg',
+      rehabIncludesTitle: 'What Joint Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Joint Biomechanical Assessment' },
+        { icon: Zap, title: 'Pain-Free Range of Motion' },
+        { icon: UserCheck, title: 'Quadriceps & Gluteal Conditioning' },
+        { icon: Activity, title: 'Joint Offloading Techniques' },
+        { icon: Home, title: 'Safe Daily Walking & Stair Drills' },
+        { icon: Stethoscope, title: 'Long-Term Joint Health Plan' },
+      ],
+      expertConsultTitle: 'Consult Our Joint Specialists',
+      expertConsultCategory: 'Orthopaedic Rehabilitation',
+      quoteText: '“Strong supporting muscles protect aging joints from wear and tear.”',
+      ctaTitle: 'Take Control of Your Joint Mobility Today!',
+      ctaSubtitle:
+        'Book a consultation with our orthopaedic physiotherapists for lasting joint preservation.',
+      promoCardTitle: 'Preserve Joints\nMove Free',
+      promoCardPoints: ['Relieved Joint Pressure', 'Restored Walking Distance', 'Active Pain-Free Life'],
+      promoCardImage: '/images/physiotherapy/physio-knee-treatment.jpg',
+    };
+  }
+
+  // 6. Cervical Spondylosis & Neck Pain
+  if (
+    slug.includes('cervical') ||
+    title.includes('cervical') ||
+    slug.includes('neck') ||
+    title.includes('neck')
+  ) {
+    const cervicalImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/physiotherapy/program-cervical.jpg';
+    return {
+      isDDD: false,
+      badgeText: 'CERVICAL & NECK CARE',
+      heroRightImage: cervicalImg,
+      cursiveSlogan: {
+        line1: 'Effortless',
+        line2: 'Posture',
+        line3: 'Pain-Free',
+        line4: 'Focus 🌿',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Cervical Spine & Ergonomic Desk Health Guide',
+      centerBannerTag: 'CERVICAL SPINE',
+      centerBannerTitle: 'Ergonomic Alignment & Neck Pain Relief',
+      centerBannerImage: cervicalImg,
+      rehabIncludesTitle: 'What Neck Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Cervical Kinematic Screen' },
+        { icon: Zap, title: 'Deep Neck Flexor Retraining' },
+        { icon: UserCheck, title: 'Scapular Stabilizer Conditioning' },
+        { icon: Activity, title: 'Ergonomic Posture Correction' },
+        { icon: Home, title: 'Segmental Joint Mobilization' },
+        { icon: Stethoscope, title: 'Long-Term Cervical Protection' },
+      ],
+      expertConsultTitle: 'Consult Our Cervical Specialists',
+      expertConsultCategory: 'Spine & Back Care',
+      quoteText: '“Neutral cervical alignment and deep neck flexor strength protect your spine all day.”',
+      ctaTitle: 'Take Control of Your Neck Health Today!',
+      ctaSubtitle:
+        'Eliminate stiff neck, postural fatigue, and radiating arm pain with expert home physiotherapy.',
+      promoCardTitle: 'Pain-Free Neck\nClear Focus',
+      promoCardPoints: ['Relieved Tension Headaches', 'Restored Neck Turning', 'Ergonomic Comfort'],
+      promoCardImage: cervicalImg,
+    };
+  }
+
+  // 7. Stroke & Neurological Rehabilitation
+  if (
+    slug.includes('stroke') ||
+    title.includes('stroke') ||
+    slug.includes('neuroplasticity') ||
+    title.includes('neuroplasticity') ||
+    slug.includes('hemiplegia') ||
+    slug.includes('paralysis') ||
+    slug.includes('brain') ||
+    topic.includes('stroke') ||
+    (territory.includes('neuro') && !slug.includes('stenosis'))
+  ) {
+    const neuroImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/blog/stroke-rehab-hero.jpg';
+    return {
+      isDDD: false,
+      badgeText: 'STROKE & NEURO REHAB',
+      heroRightImage: neuroImg,
+      cursiveSlogan: {
+        line1: 'Rewiring',
+        line2: 'Movement',
+        line3: 'Rebuilding',
+        line4: 'Hope 🌟',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Post-Stroke Home Recovery & Exercise Guide',
+      centerBannerTag: 'NEUROLOGICAL CARE',
+      centerBannerTitle: 'Activating Neuroplasticity Every Single Day',
+      centerBannerImage: '/images/blog/neuroplasticity-brain.jpg',
+      rehabIncludesTitle: 'What Neuro Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Neurological Motor Screen' },
+        { icon: Zap, title: 'Motor Re-Education Protocols' },
+        { icon: UserCheck, title: 'Balance & Fall Prevention' },
+        { icon: Activity, title: 'Task-Oriented Functional Drills' },
+        { icon: Home, title: 'Caregiver & Transfer Guidance' },
+        { icon: Stethoscope, title: 'Long-Term Neuroplasticity Plan' },
+      ],
+      expertConsultTitle: 'Consult Our Neuro Specialists',
+      expertConsultCategory: 'Neurological Care',
+      quoteText: '“Neuroplasticity thrives on consistent, purposeful daily movement.”',
+      ctaTitle: 'Take Control of Your Stroke Recovery Today!',
+      ctaSubtitle:
+        'Book a consultation with our neurological physiotherapists for milestone-driven in-home recovery.',
+      promoCardTitle: 'Rewire Faster\nRecover Stronger',
+      promoCardPoints: ['Restored Motor Control', 'Greater Independence', 'Safe Home Recovery'],
+      promoCardImage: '/images/blog/stroke-rehab-hero.jpg',
+    };
+  }
+
+  // 8. General Spine & Low Back Pain
+  if (
+    slug.includes('back') ||
+    title.includes('back') ||
+    slug.includes('spine') ||
+    topic.includes('spine')
+  ) {
+    const spineImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/blog/lumbar-spine-rehab.jpg';
+    return {
+      isDDD: false,
+      badgeText: (post.topic || 'SPINE & BACK CARE').toUpperCase(),
+      heroRightImage: spineImg,
+      cursiveSlogan: {
+        line1: 'Stronger',
+        line2: 'Spine',
+        line3: 'Brighter',
+        line4: 'Tomorrows 💛',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Spine Care & Home Exercise Guide',
+      centerBannerTag: 'SPINE RECOVERY',
+      centerBannerTitle: 'Evidence-Based Spine Conditioning at Home',
+      centerBannerImage: '/images/blog/disc_health_cross_section.png',
+      rehabIncludesTitle: 'What Spine Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Personalized Assessment' },
+        { icon: Zap, title: 'Pain-Relief Techniques' },
+        { icon: UserCheck, title: 'Posture & Ergonomic Training' },
+        { icon: Activity, title: 'Strength & Mobility Exercises' },
+        { icon: Home, title: 'Daily Activity Guidance' },
+        { icon: Stethoscope, title: 'Long-Term Spine Health Plan' },
+      ],
+      expertConsultTitle: 'Consult Our Spine Experts',
+      expertConsultCategory: 'Spine & Back Care',
+      quoteText: '“Movement is medicine for a healthier spine.”',
+      ctaTitle: 'Take Control of Your Spine Health Today!',
+      ctaSubtitle:
+        'Book a consultation with our expert physiotherapists and get a personalized care plan for lasting relief.',
+      promoCardTitle: 'Move Better\nLive Stronger',
+      promoCardPoints: ['Less Pain', 'More Mobility', 'Healthier Tomorrow'],
+      promoCardImage: '/images/blog/promo_move_better.png',
+    };
+  }
+
+  // 9. Default Clinical Physiotherapy
+  const defaultImg =
+    post.imageUrl && !post.imageUrl.includes('unsplash.com')
+      ? post.imageUrl
+      : '/images/physiotherapy/physio-understanding-treatment.jpg';
+  return {
+    isDDD: false,
+    badgeText: (post.topic || post.territory || 'CLINICAL CARE').toUpperCase(),
+    heroRightImage: defaultImg,
+    cursiveSlogan: {
+      line1: 'Targeted',
+      line2: 'Care',
+      line3: 'Lasting',
+      line4: 'Recovery 🌟',
+    },
+    videoTitle: `Expert Insights: ${post.title}`,
+    pdfGuideTitle: 'Clinical Physiotherapy & Home Recovery Guide',
+    centerBannerTag: 'CLINICAL RECOVERY',
+    centerBannerTitle: 'Evidence-Based Care That Moves You Forward',
+    centerBannerImage: defaultImg,
+    rehabIncludesTitle: 'What This Rehab Includes',
+    rehabIncludesItems: [
+      { icon: ClipboardCheck, title: 'Personalized Clinical Assessment' },
+      { icon: Zap, title: 'Evidence-Based Pain Relief' },
+      { icon: UserCheck, title: 'Posture & Biomechanical Retraining' },
+      { icon: Activity, title: 'Therapeutic Exercise Progression' },
+      { icon: Home, title: 'Home Activity & Lifestyle Advice' },
+      { icon: Stethoscope, title: 'Long-Term Health Maintenance Plan' },
+    ],
+    expertConsultTitle: 'Consult Our Clinical Specialists',
+    expertConsultCategory: post.territory || 'Physiotherapy',
+    quoteText: '“Movement is medicine for a healthier body and mind.”',
+    ctaTitle: 'Take Control of Your Recovery Today!',
+    ctaSubtitle:
+      'Book a consultation with our clinical physiotherapists and start your personalized recovery journey.',
+    promoCardTitle: 'Move Better\nLive Stronger',
+    promoCardPoints: ['Less Pain', 'More Mobility', 'Healthier Tomorrow'],
+    promoCardImage: defaultImg,
+  };
+}
+
+/**
+ * Renders markdown bold text (**text**) as bold elements
+ */
+function renderFormattedText(text: string) {
+  if (!text) return null;
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+      return (
+        <strong key={index} className="font-bold text-slate-900 dark:text-white">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return part;
+  });
+}
 
 export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
   const { openBookingModal, openModal } = useRequestCallback();
@@ -102,13 +518,43 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
+  // Condition Theme Engine
+  const conditionTheme = useMemo(() => getConditionTheme(post), [post]);
+
+  // Two-tone title formatting
+  const { titlePrefix, titleSuffix } = useMemo(() => {
+    const raw = post.title || '';
+    const colonIndex = raw.indexOf(':');
+    if (colonIndex !== -1) {
+      return {
+        titlePrefix: raw.slice(0, colonIndex + 1),
+        titleSuffix: raw.slice(colonIndex + 1).trim(),
+      };
+    }
+    return {
+      titlePrefix: raw,
+      titleSuffix: '',
+    };
+  }, [post.title]);
+
   // Dynamic reading time estimate
   const readTime = useMemo(() => {
     const wordCount = (post.content || '').split(/\s+/).length;
-    return `${Math.max(8, Math.min(15, Math.ceil(wordCount / 180)))} min read`;
+    return `${Math.max(6, Math.min(15, Math.ceil(wordCount / 180)))} min read`;
   }, [post.content]);
 
-  // Parse structured markdown sections matching the design
+  // Dynamic date formatting
+  const formattedDate = useMemo(() => {
+    if (!post.publishedAt) return '5 Feb 2026';
+    try {
+      const d = new Date(post.publishedAt);
+      return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch {
+      return '5 Feb 2026';
+    }
+  }, [post.publishedAt]);
+
+  // Parse structured markdown sections strictly from this post's content
   const sections: SectionData[] = useMemo(() => {
     const rawContent = post.content || '';
     const lines = rawContent.split('\n');
@@ -118,34 +564,25 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
-      const h2Match = line.match(/^##\s+(?:(\d+)[\.\s]+)?(.*)$/);
 
-      if (h2Match) {
+      // Skip the very first H1 if it repeats the article title
+      if (line.startsWith('# ') && i < 5) {
+        continue;
+      }
+
+      // Match ## or ### headings
+      const headingMatch = line.match(/^#{2,3}\s+(?:(\d+)[\.\s]+)?(.*)$/);
+
+      if (headingMatch) {
         if (currentSection && currentSection.title) {
           parsed.push(currentSection as SectionData);
         }
-        const num = h2Match[1] ? parseInt(h2Match[1], 10) : secCounter++;
-        const fullTitle = h2Match[2].trim();
-        
+        const num = headingMatch[1] ? parseInt(headingMatch[1], 10) : secCounter++;
+        const fullTitle = headingMatch[2].trim();
+
         let shortTitle = fullTitle.split(':')[0].replace(/^(Understanding|The|About)\s+/i, '');
-        if (fullTitle.toLowerCase().includes('what is')) {
-          shortTitle = 'What is DDD?';
-        } else if (fullTitle.toLowerCase().includes('introduction')) {
-          shortTitle = 'Introduction';
-        } else if (fullTitle.toLowerCase().includes('cause')) {
-          shortTitle = 'Causes & Risk Factors';
-        } else if (fullTitle.toLowerCase().includes('symptom')) {
-          shortTitle = 'Symptoms';
-        } else if (fullTitle.toLowerCase().includes('diagnos')) {
-          shortTitle = 'Diagnosis';
-        } else if (fullTitle.toLowerCase().includes('how physiotherapy')) {
-          shortTitle = 'How Physiotherapy Helps';
-        } else if (fullTitle.toLowerCase().includes('rehabilitation')) {
-          shortTitle = 'Rehabilitation Protocols';
-        } else if (fullTitle.toLowerCase().includes('recovery')) {
-          shortTitle = 'Recovery & Outlook';
-        } else if (fullTitle.toLowerCase().includes('when to contact')) {
-          shortTitle = 'When to Contact Us';
+        if (shortTitle.length > 28) {
+          shortTitle = shortTitle.slice(0, 25) + '...';
         }
 
         const id = `sec-${num}`;
@@ -177,122 +614,41 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
       parsed.push(currentSection as SectionData);
     }
 
-    // Curated 9-section clinical structure from reference design if fewer sections
-    if (parsed.length < 5) {
-      return [
-        {
+    // If no ## headings exist, structure raw paragraphs cleanly
+    if (parsed.length === 0) {
+      const paras = lines.filter((l) => l.trim().length > 0 && !l.trim().startsWith('#'));
+      if (paras.length > 0) {
+        parsed.push({
           id: 'sec-1',
           number: 1,
-          title: 'Introduction: Understanding Degenerative Disc Disease',
-          shortTitle: 'Introduction',
-          paragraphs: [
-            "Degenerative Disc Disease (DDD) is a common, age-related condition that affects the spinal discs — the cushions between the vertebrae. Over time, these discs lose hydration, elasticity, and height, which can lead to pain, stiffness, and reduced mobility. While it's a natural part of aging, the right physiotherapy approach can significantly reduce discomfort and help you stay active.",
-          ],
-        },
-        {
-          id: 'sec-2',
-          number: 2,
-          title: 'What is Degenerative Disc Disease?',
-          shortTitle: 'What is DDD?',
-          paragraphs: [
-            'DDD refers to the gradual breakdown of intervertebral discs, which act as shock absorbers in the spine. It most commonly affects the cervical (neck) and lumbar (lower back) regions and can lead to nerve compression, pain, and functional limitations.',
-          ],
-        },
-        {
-          id: 'sec-3',
-          number: 3,
-          title: 'Causes & Risk Factors',
-          shortTitle: 'Causes & Risk Factors',
-          paragraphs: [],
-          isTwoColumnBullets: true,
-          bullets: [
-            'Natural aging and wear & tear',
-            'Poor posture and prolonged sitting',
-            'Repetitive strain or heavy lifting',
-            'Previous spine injuries',
-            'Obesity and lack of physical activity',
-            'Genetic predisposition',
-          ],
-        },
-        {
-          id: 'sec-4',
-          number: 4,
-          title: 'Common Symptoms',
-          shortTitle: 'Symptoms',
-          paragraphs: [],
-          isTwoColumnBullets: true,
-          bullets: [
-            'Persistent neck or lower back pain',
-            'Stiffness, especially in the morning',
-            'Reduced range of motion',
-            'Pain radiating to arms or legs',
-            'Numbness or tingling (if nerves are involved)',
-            'Difficulty with prolonged sitting or standing',
-          ],
-        },
-        {
-          id: 'sec-5',
-          number: 5,
-          title: 'Diagnosis',
-          shortTitle: 'Diagnosis',
-          paragraphs: [
-            'Diagnosis typically involves a physical examination, medical history review, and imaging tests such as X-rays or MRI. At Aries PhysioCare, we combine clinical assessment with functional movement analysis to create a personalized treatment plan.',
-          ],
-        },
-        {
-          id: 'sec-6',
-          number: 6,
-          title: 'How Physiotherapy Helps',
-          shortTitle: 'How Physiotherapy Helps',
-          paragraphs: [
-            'Physiotherapy focuses on reducing pain, improving mobility, strengthening supporting muscles, and preventing further degeneration. Evidence-based techniques such as manual therapy, therapeutic exercises, posture correction, and core stabilization play a key role in managing DDD.',
-          ],
-        },
-        {
-          id: 'sec-7',
-          number: 7,
-          title: 'Rehabilitation Protocols',
-          shortTitle: 'Rehabilitation Protocols',
-          paragraphs: [],
-          isTwoColumnBullets: true,
-          bullets: [
-            'Pain management and inflammation control',
-            'Gentle mobility and stretching exercises',
-            'Core and back muscle strengthening',
-            'Posture and ergonomic training',
-            'Activity modification and lifestyle advice (stress)',
-            'Gradual return to daily and sports activities',
-          ],
-        },
-        {
-          id: 'sec-8',
-          number: 8,
-          title: 'Recovery & Outlook',
-          shortTitle: 'Recovery & Outlook',
-          paragraphs: [
-            'While DDD cannot be reversed, the right physiotherapy program can help you manage symptoms effectively, improve function, and maintain an active, pain-free lifestyle for years to come.',
-          ],
-        },
-        {
-          id: 'sec-9',
-          number: 9,
-          title: 'When to Contact Us',
-          shortTitle: 'When to Contact Us',
-          paragraphs: [
-            "If you're experiencing persistent back or neck pain, stiffness, or difficulty with daily activities, our expert physiotherapists at Aries PhysioCare are here to help. Early intervention can prevent further complications and get you back to doing what you love.",
-          ],
-        },
-      ];
+          title: 'Clinical Overview & Pathomechanics',
+          shortTitle: 'Clinical Overview',
+          paragraphs: paras.slice(0, 2),
+        });
+        if (paras.length > 2) {
+          parsed.push({
+            id: 'sec-2',
+            number: 2,
+            title: 'Evidence-Based Rehabilitation Protocols',
+            shortTitle: 'Rehab Protocols',
+            paragraphs: paras.slice(2, 4),
+          });
+        }
+        if (paras.length > 4) {
+          parsed.push({
+            id: 'sec-3',
+            number: 3,
+            title: 'Recovery Outlook & Long-Term Management',
+            shortTitle: 'Recovery & Care',
+            paragraphs: paras.slice(4),
+          });
+        }
+      }
     }
 
     // Apply 2-column bullets to multi-item bullet sections
     return parsed.map((sec) => {
-      const isBulletSection =
-        sec.title.toLowerCase().includes('cause') ||
-        sec.title.toLowerCase().includes('symptom') ||
-        sec.title.toLowerCase().includes('protocol') ||
-        sec.title.toLowerCase().includes('risk');
-      if (isBulletSection && (sec.bullets?.length || 0) >= 4) {
+      if ((sec.bullets?.length || 0) >= 4) {
         return { ...sec, isTwoColumnBullets: true };
       }
       return sec;
@@ -337,28 +693,87 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
 
   const handleWhatsAppClick = () => {
     const text = encodeURIComponent(
-      `Hello Aries PhysioCare, I am reading about Degenerative Disc Disease (DDD) on your website and would like to consult an expert spine physiotherapist.`
+      `Hello Aries PhysioCare, I am reading about ${post.title} on your website and would like to consult an expert physiotherapist.`
     );
     window.open(`https://wa.me/919372661410?text=${text}`, '_blank');
   };
 
+  // Dynamic related articles matched to condition/topic
+  const relatedArticles = useMemo(() => {
+    if (conditionTheme.isDDD) {
+      return [
+        {
+          slug: '5-everyday-habits-that-harm-your-spine',
+          title: '5 Everyday Habits That Harm Your Spine',
+          tag: 'SPINE HEALTH',
+          description: 'Small changes can make a big difference in spine health.',
+          readTime: '5 min read',
+          imageUrl: '/images/blog/related_habits_spine.png',
+        },
+        {
+          slug: 'physiotherapy-vs-surgery-for-disc-problems',
+          title: 'Physiotherapy vs. Surgery for Disc Problems',
+          tag: 'TREATMENT',
+          description: 'Understand your options for long-term relief.',
+          readTime: '7 min read',
+          imageUrl: '/images/blog/related_mri_spine.png',
+        },
+        {
+          slug: 'top-7-exercises-for-a-stronger-lower-back',
+          title: 'Top 7 Exercises for a Stronger Lower Back',
+          tag: 'EXERCISE',
+          description: 'Simple and effective moves you can do at home.',
+          readTime: '6 min read',
+          imageUrl: '/images/blog/related_exercises_spine.png',
+        },
+      ];
+    }
+
+    const allPosts = SPINE_ORTHOPAEDIC_BLOGS;
+    const pool = allPosts.filter((p) => p.slug !== post.slug);
+
+    // Filter by same topic or territory
+    const sameCategory = pool.filter(
+      (p) =>
+        (p.topic && post.topic && p.topic.toLowerCase() === post.topic.toLowerCase()) ||
+        (p.territory && post.territory && p.territory.toLowerCase() === post.territory.toLowerCase())
+    );
+
+    const candidates = sameCategory.length >= 3 ? sameCategory : pool;
+    const selected = candidates.slice(0, 3);
+
+    return selected.map((p) => {
+      const theme = getConditionTheme(p);
+      return {
+        slug: p.slug,
+        title: p.title,
+        tag: (p.topic || p.territory || 'CLINICAL CARE').toUpperCase(),
+        description: p.summary,
+        readTime: '6 min read',
+        imageUrl: p.imageUrl || theme.heroRightImage,
+      };
+    });
+  }, [post.slug, post.topic, post.territory, conditionTheme.isDDD]);
+
   return (
     <div className="min-h-screen bg-[#F8F9FD] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans selection:bg-[#7C3AED]/20 pb-16">
       
-      {/* ── 1. HERO SECTION WITH EXACT REFERENCE LAYOUT ───────────────────── */}
+      {/* ── 1. HERO SECTION WITH CONDITION-SPECIFIC VISUALS ────────────────── */}
       <section className="relative overflow-hidden bg-gradient-to-r from-[#F8F5FE] via-[#F4EFFB] to-[#EFE8F9] dark:from-[#17122a] dark:via-[#1c1633] dark:to-background border-b border-purple-200/50 dark:border-purple-950/40">
         
-        {/* Full panoramic backdrop image on desktop (sharp patient & spine on right, smooth blur on left) */}
-        <div className="absolute inset-0 hidden lg:block z-0 pointer-events-none select-none">
-          <Image
-            src="/images/blog/hero_ddd_clean_panoramic.png"
-            alt="Degenerative Disc Disease Hero Backdrop"
-            fill
-            priority
-            quality={95}
-            className="object-cover object-right xl:object-center"
-          />
-        </div>
+        {/* For DDD: Display custom seamless panoramic hero backdrop */}
+        {conditionTheme.isDDD && (
+          <div className="absolute inset-0 hidden lg:block z-0 pointer-events-none select-none">
+            <Image
+              src={conditionTheme.heroBackdropImage!}
+              alt={post.title}
+              fill
+              priority
+              quality={95}
+              className="object-cover object-right xl:object-center"
+            />
+          </div>
+        )}
 
         <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 pt-4 pb-8 lg:pt-6 lg:pb-12 relative z-10">
           
@@ -368,7 +783,9 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
             <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
             <Link href="/blogs" className="hover:text-[#7C3AED] transition-colors">Blog</Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-slate-800 dark:text-slate-200 font-medium">Degenerative Disc Disease</span>
+            <span className="text-slate-800 dark:text-slate-200 font-medium line-clamp-1 max-w-xs sm:max-w-md">
+              {post.title}
+            </span>
           </nav>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center min-h-[340px] lg:min-h-[400px]">
@@ -379,23 +796,25 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
               {/* Category Pill */}
               <div>
                 <span className="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-[#5B21B6] text-white shadow-xs">
-                  SPINE HEALTH
+                  {conditionTheme.badgeText}
                 </span>
               </div>
 
-              {/* Main Headline matching reference design */}
-              <h1 className="text-3xl sm:text-4xl lg:text-[40px] xl:text-[44px] font-black tracking-tight leading-[1.14]">
+              {/* Dynamic Headline */}
+              <h1 className="text-3xl sm:text-4xl lg:text-[38px] xl:text-[42px] font-black tracking-tight leading-[1.15]">
                 <span className="text-[#5B21B6] dark:text-[#A78BFA] block">
-                  Degenerative Disc Disease (DDD):
+                  {titlePrefix}
                 </span>
-                <span className="text-[#3B1270] dark:text-purple-200 block font-bold">
-                  Pathomechanics, Pain Relief &amp; Active Spine Conditioning
-                </span>
+                {titleSuffix && (
+                  <span className="text-[#3B1270] dark:text-purple-200 block font-bold mt-1">
+                    {titleSuffix}
+                  </span>
+                )}
               </h1>
 
-              {/* Excerpt */}
+              {/* Dynamic Excerpt */}
               <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-[15px] leading-relaxed font-normal">
-                A complete guide to understanding Degenerative Disc Disease and how physiotherapy can help you move better, live pain-free, and stay active — at home.
+                {post.summary}
               </p>
 
               {/* Author & Meta Row */}
@@ -419,13 +838,13 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
                 {/* Date */}
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4 text-[#7C3AED]" />
-                  <span>5 Feb 2026</span>
+                  <span>{formattedDate}</span>
                 </div>
 
                 {/* Reading time */}
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-[#7C3AED]" />
-                  <span>12 min read</span>
+                  <span>{readTime}</span>
                 </div>
 
                 {/* Views */}
@@ -437,42 +856,88 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
 
             </div>
 
-            {/* Right Column: Mobile image or desktop interactive click target */}
+            {/* Right Column: Hero Visual Tailored to Condition */}
             <div className="lg:col-span-5 relative flex items-center justify-end h-full">
               
-              {/* Mobile version shown when backdrop is hidden */}
-              <div className="block lg:hidden relative w-full h-[300px] rounded-2xl overflow-hidden shadow-md">
-                <Image
-                  src="/images/blog/hero_right_arch_clean.png"
-                  alt="Degenerative Disc Disease Spine Rehabilitation"
-                  fill
-                  className="object-cover object-center"
-                />
-                <button
-                  onClick={() => setIsVideoModalOpen(true)}
-                  className="absolute bottom-4 right-4 flex items-center gap-2 bg-amber-500/90 text-white px-3.5 py-2 rounded-full font-bold text-xs shadow-lg backdrop-blur-xs cursor-pointer"
-                >
-                  <Play className="w-4 h-4 fill-white" />
-                  <span>Watch Expert Insights</span>
-                </button>
-              </div>
-
-              {/* Desktop interactive button positioned over Watch Expert Insights */}
-              <div className="hidden lg:block relative w-full h-[360px]">
-                <button
-                  onClick={() => setIsVideoModalOpen(true)}
-                  aria-label="Watch Expert Insights Video"
-                  title="Watch Expert Insights Video"
-                  className="absolute bottom-6 right-2 xl:right-6 flex items-center gap-3 py-2 px-4 rounded-full bg-amber-500/10 hover:bg-amber-500/20 active:scale-95 transition-all cursor-pointer group border border-amber-400/40 shadow-sm"
-                >
-                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
-                    <Play className="w-5 h-5 fill-white ml-0.5" />
+              {conditionTheme.isDDD ? (
+                <>
+                  {/* Mobile version for DDD */}
+                  <div className="block lg:hidden relative w-full h-[300px] rounded-2xl overflow-hidden shadow-md">
+                    <Image
+                      src={conditionTheme.heroRightImage}
+                      alt={post.title}
+                      fill
+                      className="object-cover object-center"
+                    />
+                    <button
+                      onClick={() => setIsVideoModalOpen(true)}
+                      className="absolute bottom-4 right-4 flex items-center gap-2 bg-amber-500/90 text-white px-3.5 py-2 rounded-full font-bold text-xs shadow-lg backdrop-blur-xs cursor-pointer"
+                    >
+                      <Play className="w-4 h-4 fill-white" />
+                      <span>Watch Expert Insights</span>
+                    </button>
                   </div>
-                  <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm group-hover:text-[#7C3AED] transition-colors">
-                    Watch Expert Insights
-                  </span>
-                </button>
-              </div>
+
+                  {/* Desktop interactive button positioned over Watch Expert Insights in backdrop */}
+                  <div className="hidden lg:block relative w-full h-[360px]">
+                    <button
+                      onClick={() => setIsVideoModalOpen(true)}
+                      aria-label="Watch Expert Insights Video"
+                      title="Watch Expert Insights Video"
+                      className="absolute bottom-10 right-4 xl:right-10 flex items-center gap-3 py-2 px-4 rounded-full bg-white/70 dark:bg-slate-900/70 hover:bg-white dark:hover:bg-slate-900 active:scale-95 transition-all cursor-pointer group border border-purple-200/50 shadow-sm backdrop-blur-xs"
+                    >
+                      <div className="w-11 h-11 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                        <Play className="w-5 h-5 fill-white ml-0.5" />
+                      </div>
+                      <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm group-hover:text-[#7C3AED] transition-colors">
+                        Watch Expert Insights
+                      </span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                /* Condition-specific Sweeping Arched Graphic for All Other Articles */
+                <div className="relative w-full max-w-[480px] h-[340px] sm:h-[400px] lg:h-[430px]">
+                  
+                  {/* Sweeping Arched Frame with Soft Lavender Border */}
+                  <div className="relative w-full h-full rounded-[2.5rem] lg:rounded-l-[4rem] lg:rounded-r-[2.5rem] overflow-hidden shadow-xl border-4 border-white/80 dark:border-purple-900/40 bg-purple-100 dark:bg-purple-950/40">
+                    <Image
+                      src={conditionTheme.heroRightImage}
+                      alt={post.title}
+                      fill
+                      priority
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 480px"
+                      className="object-cover object-center"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
+                  </div>
+
+                  {/* Floating Top-Right Cursive Badge */}
+                  <div className="absolute top-4 right-4 sm:right-6 text-right select-none pointer-events-none drop-shadow-sm bg-white/80 dark:bg-black/50 backdrop-blur-xs py-1.5 px-3 rounded-2xl border border-white/60">
+                    <p className="font-serif italic font-bold text-slate-800 dark:text-slate-100 text-xs sm:text-sm leading-tight">
+                      {conditionTheme.cursiveSlogan.line1}<br />
+                      {conditionTheme.cursiveSlogan.line2}<br />
+                      <span className="text-[#6D28D9] dark:text-[#C4B5FD]">{conditionTheme.cursiveSlogan.line3}</span><br />
+                      {conditionTheme.cursiveSlogan.line4}
+                    </p>
+                  </div>
+
+                  {/* Floating Bottom-Right Play Button */}
+                  <button
+                    onClick={() => setIsVideoModalOpen(true)}
+                    aria-label={`Watch Expert Insights on ${post.title}`}
+                    className="absolute bottom-4 right-4 sm:right-6 flex items-center gap-2.5 py-2 px-4 rounded-full bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-900 active:scale-95 transition-all cursor-pointer group border border-purple-200/50 shadow-lg backdrop-blur-xs"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      <Play className="w-4 h-4 fill-white ml-0.5" />
+                    </div>
+                    <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm group-hover:text-[#7C3AED] transition-colors">
+                      Watch Expert Insights
+                    </span>
+                  </button>
+
+                </div>
+              )}
 
             </div>
 
@@ -483,12 +948,12 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
       </section>
 
 
-      {/* ── 2. THREE-COLUMN BODY LAYOUT WITH FREEZING/STICKY SIDEBARS ──────── */}
+      {/* ── 2. THREE-COLUMN BODY LAYOUT WITH FROZEN STICKY SIDEBARS ────────── */}
       <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 pt-8 lg:pt-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
           
           {/* ────────────────────────────────────────────────────────────────
-              LEFT COLUMN: FROZEN STICKY SIDEBAR (Article Highlights / Guide)
+              LEFT COLUMN: FROZEN STICKY SIDEBAR (In This Article & Guide)
              ──────────────────────────────────────────────────────────────── */}
           <aside className="lg:col-span-3 space-y-6 lg:sticky lg:top-24 self-start order-2 lg:order-1">
             
@@ -522,14 +987,14 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
                         {isActive && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                       </div>
 
-                      <span className="text-xs leading-snug">
-                        {sec.shortTitle || sec.title}
+                      <span className="text-xs sm:text-[13px] leading-snug line-clamp-1">
+                        {sec.shortTitle}
                       </span>
                     </button>
                   );
                 })}
 
-                {/* Related Articles link */}
+                {/* Related Articles TOC anchor */}
                 <button
                   onClick={() => scrollToSection('sec-related')}
                   className={`w-full flex items-center gap-3 text-left py-1.5 px-2 rounded-lg transition-colors group cursor-pointer ${
@@ -545,23 +1010,29 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
                         : 'border-2 border-slate-300 dark:border-slate-700 group-hover:border-[#7C3AED]'
                     }`}
                   >
-                    {activeSection === 'sec-related' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    {activeSection === 'sec-related' && (
+                      <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                    )}
                   </div>
-                  <span className="text-xs leading-snug">Related Articles</span>
+                  <span className="text-xs sm:text-[13px] leading-snug">
+                    Related Articles
+                  </span>
                 </button>
               </nav>
             </div>
 
             {/* 2. Download Guide Card */}
-            <div className="bg-[#F6F1FD] dark:bg-purple-950/30 rounded-2xl p-5 border border-purple-200/70 dark:border-purple-900/40 space-y-3.5">
+            <div className="bg-[#F8F5FE] dark:bg-purple-950/20 rounded-2xl p-5 border border-purple-100 dark:border-purple-900/40 shadow-xs space-y-3">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-200/60 dark:bg-purple-900/50 text-[#7C3AED] dark:text-purple-300 flex items-center justify-center shrink-0 shadow-xs">
-                  <FileText className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-900/60 text-[#7C3AED] dark:text-purple-300 flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-slate-900 dark:text-white">Download Guide</h4>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mt-0.5">
-                    Get our free spine care and home exercise guide.
+                  <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight">
+                    Download Guide
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                    Get our clinical recovery and home exercise guide.
                   </p>
                 </div>
               </div>
@@ -569,17 +1040,17 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
               <Button
                 onClick={() => setIsPdfModalOpen(true)}
                 variant="outline"
-                className="w-full bg-white dark:bg-slate-900 hover:bg-purple-50 dark:hover:bg-purple-950/50 text-[#7C3AED] dark:text-purple-300 border border-purple-300 dark:border-purple-800 font-semibold text-xs py-2.5 h-auto rounded-xl shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full bg-white dark:bg-slate-900 hover:bg-purple-50 dark:hover:bg-purple-950/50 text-[#7C3AED] dark:text-purple-300 border-purple-200 dark:border-purple-800 font-semibold text-xs py-2.5 h-auto rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <span>Download PDF</span>
                 <Download className="w-3.5 h-3.5" />
               </Button>
             </div>
 
-            {/* 3. Quote Callout Box */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border-l-4 border-amber-500 border-y border-r border-purple-100/60 dark:border-slate-800 shadow-xs">
-              <p className="font-serif italic text-base sm:text-lg text-slate-800 dark:text-slate-200 leading-snug">
-                “Movement is medicine for a healthier spine.”
+            {/* 3. Movement Quote Card */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border-l-4 border-amber-400 border-y border-r border-slate-100 dark:border-slate-800 shadow-xs">
+              <p className="font-serif italic text-slate-800 dark:text-slate-200 text-sm sm:text-base leading-relaxed">
+                {conditionTheme.quoteText}
               </p>
             </div>
 
@@ -587,79 +1058,78 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
 
 
           {/* ────────────────────────────────────────────────────────────────
-              CENTER COLUMN: MAIN ARTICLE CONTENT (9 Sections + CTA Banner)
+              CENTER COLUMN: MAIN CLINICAL CONTENT
              ──────────────────────────────────────────────────────────────── */}
           <main className="lg:col-span-6 space-y-6 order-1 lg:order-2">
             
-            {/* Top Navy Banner: Disc Health Moves You Forward */}
-            <div className="bg-[#1C2438] dark:bg-slate-900 rounded-2xl p-5 sm:p-6 text-white flex items-center justify-between gap-4 overflow-hidden relative shadow-md">
-              <div className="space-y-1.5 z-10">
-                <p className="text-amber-400 text-xs sm:text-sm font-bold uppercase tracking-wider">
-                  Disc Health
-                </p>
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight leading-tight">
-                  Moves You<br />Forward
-                </h2>
-                <div className="w-12 h-1 bg-amber-400 rounded-full mt-2" />
+            {/* Condition-Specific Featured Center Banner */}
+            <div className="bg-[#1E2439] rounded-2xl overflow-hidden p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between text-white border border-slate-800/20 shadow-sm">
+              <div className="space-y-1 text-center md:text-left">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                  {conditionTheme.centerBannerTag}
+                </span>
+                <h3 className="text-xl sm:text-2xl font-bold mt-1 leading-snug">
+                  {conditionTheme.centerBannerTitle}
+                </h3>
+                <div className="w-12 h-1 bg-amber-400 rounded-full mt-2 mx-auto md:mx-0" />
               </div>
 
-              {/* Lumbar Spine Vertebra Disc Visual */}
-              <div className="relative w-44 sm:w-56 h-28 sm:h-32 shrink-0 rounded-xl overflow-hidden">
+              <div className="relative w-40 h-28 sm:w-48 sm:h-32 mt-4 md:mt-0 shrink-0 rounded-xl overflow-hidden">
                 <Image
-                  src="/images/blog/disc_health_cross_section.png"
-                  alt="Lumbar Spine Disc Cross Section"
+                  src={conditionTheme.centerBannerImage}
+                  alt={conditionTheme.centerBannerTitle}
                   fill
-                  className="object-contain object-right"
+                  className="object-cover"
                 />
               </div>
             </div>
 
-            {/* 9 Numbered Content Sections */}
-            <article className="space-y-5">
-              {sections.map((sec) => (
+            {/* Numbered Clinical Sections from Post Content */}
+            <article className="space-y-4">
+              {sections.map((section) => (
                 <section
-                  key={sec.id}
-                  id={sec.id}
-                  className="scroll-mt-28 space-y-3 bg-white dark:bg-slate-900/80 p-5 sm:p-6 rounded-2xl border border-purple-100/70 dark:border-slate-800/80 shadow-xs"
+                  key={section.id}
+                  id={section.id}
+                  className="scroll-mt-24 bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 border border-slate-100 dark:border-slate-800/60 shadow-[0_2px_8px_rgba(0,0,0,0.03)] space-y-3.5 transition-all"
                 >
-                  {/* Section Title with Purple Circular Number */}
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-full bg-[#7C3AED] text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-xs">
-                      {sec.number}
+                  {/* Header: Purple Circle Badge + Title */}
+                  <div className="flex items-start gap-3 sm:gap-3.5">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#6D28D9] text-white flex items-center justify-center font-bold text-xs sm:text-sm shrink-0 shadow-sm mt-0.5">
+                      {section.number}
                     </div>
-                    <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight leading-snug">
-                      {sec.title}
+
+                    <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug pt-0.5">
+                      {section.title}
                     </h2>
                   </div>
 
-                  {/* Body Paragraphs */}
-                  {sec.paragraphs.map((p, idx) => (
-                    <p
-                      key={idx}
-                      className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal"
-                    >
-                      {p}
-                    </p>
-                  ))}
+                  {/* Paragraphs */}
+                  {section.paragraphs && section.paragraphs.length > 0 && (
+                    <div className="space-y-2.5 pl-10 sm:pl-11 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                      {section.paragraphs.map((p, pIdx) => (
+                        <p key={pIdx}>{renderFormattedText(p)}</p>
+                      ))}
+                    </div>
+                  )}
 
-                  {/* Two-Column or Standard Bullets */}
-                  {sec.bullets && sec.bullets.length > 0 && (
-                    <div className="pt-1">
-                      {sec.isTwoColumnBullets ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 pt-1">
-                          {sec.bullets.map((bullet, idx) => (
-                            <div key={idx} className="flex items-start gap-2 text-xs sm:text-[13px] text-slate-600 dark:text-slate-300">
-                              <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED] shrink-0 mt-1.5" />
-                              <span className="leading-snug">{bullet}</span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <ul className="space-y-2 pt-1">
-                          {sec.bullets.map((bullet, idx) => (
+                  {/* Bullets (2-column layout matching design for multi-item lists) */}
+                  {section.bullets && section.bullets.length > 0 && (
+                    <div className="pl-10 sm:pl-11 pt-1">
+                      {section.isTwoColumnBullets ? (
+                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5">
+                          {section.bullets.map((bullet, idx) => (
                             <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
                               <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED] shrink-0 mt-1.5" />
-                              <span className="leading-relaxed">{bullet}</span>
+                              <span className="leading-relaxed">{renderFormattedText(bullet)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <ul className="space-y-2">
+                          {section.bullets.map((bullet, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED] shrink-0 mt-1.5" />
+                              <span className="leading-relaxed">{renderFormattedText(bullet)}</span>
                             </li>
                           ))}
                         </ul>
@@ -670,7 +1140,7 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
               ))}
             </article>
 
-            {/* Bottom Purple CTA Banner: Take Control of Your Spine Health Today! */}
+            {/* Bottom Purple CTA Banner Tailored to Condition */}
             <div className="bg-gradient-to-r from-[#6D28D9] to-[#7C3AED] rounded-2xl p-5 sm:p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-5 shadow-lg">
               <div className="flex items-center gap-4 text-center sm:text-left flex-col sm:flex-row">
                 <div className="w-12 h-12 rounded-full bg-white text-[#7C3AED] flex items-center justify-center shrink-0 shadow-md">
@@ -678,17 +1148,22 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
                 </div>
                 <div>
                   <h3 className="font-bold text-base sm:text-lg text-white leading-snug">
-                    Take Control of Your Spine Health Today!
+                    {conditionTheme.ctaTitle}
                   </h3>
                   <p className="text-xs text-purple-100 mt-1 leading-relaxed max-w-md">
-                    Book a consultation with our expert physiotherapists and get a personalized care plan for lasting relief.
+                    {conditionTheme.ctaSubtitle}
                   </p>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-2.5 shrink-0 w-full sm:w-auto justify-center">
                 <Button
-                  onClick={() => openBookingModal({ topic: 'Degenerative Disc Disease', territory: 'Spine Health' })}
+                  onClick={() =>
+                    openBookingModal({
+                      topic: post.title,
+                      territory: conditionTheme.expertConsultCategory,
+                    })
+                  }
                   className="bg-white hover:bg-slate-100 text-[#6D28D9] font-bold text-xs px-5 py-2.5 h-auto rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>Book Appointment</span>
@@ -709,7 +1184,7 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
 
 
           {/* ────────────────────────────────────────────────────────────────
-              RIGHT COLUMN: FROZEN STICKY SIDEBAR (What This Rehab Includes)
+              RIGHT COLUMN: FROZEN STICKY SIDEBAR (Rehab Includes & Experts)
              ──────────────────────────────────────────────────────────────── */}
           <aside className="lg:col-span-3 space-y-6 lg:sticky lg:top-24 self-start order-3">
             
@@ -719,13 +1194,13 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
               <div className="bg-[#3B1270] text-white px-4 py-3 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-300" />
                 <h3 className="font-bold text-xs sm:text-sm text-white tracking-wide">
-                  What This Rehab Includes
+                  {conditionTheme.rehabIncludesTitle}
                 </h3>
               </div>
 
               {/* 6 Structured Items */}
               <div className="p-4 space-y-2.5">
-                {REHAB_INCLUDES.map((item, idx) => {
+                {conditionTheme.rehabIncludesItems.map((item, idx) => {
                   const IconComp = item.icon;
                   return (
                     <div
@@ -744,7 +1219,7 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
               </div>
             </div>
 
-            {/* 2. Consult Our Spine Experts Card with Official Logo */}
+            {/* 2. Consult Our Experts Card with Official Logo */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-purple-100 dark:border-purple-900/40 shadow-xs text-center space-y-3.5">
               {/* Official Round Aries PhysioCare Emblem */}
               <div className="relative w-14 h-14 mx-auto rounded-full overflow-hidden shadow-xs border border-purple-100 dark:border-purple-800">
@@ -758,7 +1233,7 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
 
               <div>
                 <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
-                  Consult Our Spine Experts
+                  {conditionTheme.expertConsultTitle}
                 </h4>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                   Get a personalized assessment and start your recovery journey today.
@@ -768,7 +1243,12 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
               {/* Action Buttons */}
               <div className="space-y-2 pt-1">
                 <Button
-                  onClick={() => openBookingModal({ topic: 'Degenerative Disc Disease', territory: 'Spine Health' })}
+                  onClick={() =>
+                    openBookingModal({
+                      topic: post.title,
+                      territory: conditionTheme.expertConsultCategory,
+                    })
+                  }
                   className="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-semibold text-xs py-2.5 h-auto rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <span>Book Appointment</span>
@@ -776,7 +1256,12 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
                 </Button>
 
                 <Button
-                  onClick={() => openModal({ topic: 'Degenerative Disc Disease', territory: 'Spine Health' })}
+                  onClick={() =>
+                    openModal({
+                      topic: post.title,
+                      territory: conditionTheme.expertConsultCategory,
+                    })
+                  }
                   variant="outline"
                   className="w-full bg-purple-50/70 hover:bg-purple-100/80 dark:bg-purple-950/40 text-[#7C3AED] dark:text-purple-300 border border-purple-200/80 dark:border-purple-800 font-semibold text-xs py-2.5 h-auto rounded-xl transition-all flex items-center justify-center cursor-pointer"
                 >
@@ -804,39 +1289,27 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
             {/* 3. Move Better Live Stronger Card */}
             <div className="relative rounded-2xl overflow-hidden bg-[#1E293B] dark:bg-slate-950 text-white p-5 shadow-sm border border-slate-700/50">
               <div className="relative z-10 space-y-2.5 max-w-[190px]">
-                <h4 className="font-black text-base text-white leading-tight">
-                  Move Better<br />Live Stronger
+                <h4 className="font-black text-base text-white leading-tight whitespace-pre-line">
+                  {conditionTheme.promoCardTitle}
                 </h4>
 
                 <div className="space-y-1.5 text-xs">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shrink-0">
-                      <Check className="w-2.5 h-2.5 stroke-[3]" />
+                  {conditionTheme.promoCardPoints.map((point, pIdx) => (
+                    <div key={pIdx} className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shrink-0">
+                        <Check className="w-2.5 h-2.5 stroke-[3]" />
+                      </div>
+                      <span className="font-medium text-slate-200">{point}</span>
                     </div>
-                    <span className="font-medium text-slate-200">Less Pain</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shrink-0">
-                      <Check className="w-2.5 h-2.5 stroke-[3]" />
-                    </div>
-                    <span className="font-medium text-slate-200">More Mobility</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shrink-0">
-                      <Check className="w-2.5 h-2.5 stroke-[3]" />
-                    </div>
-                    <span className="font-medium text-slate-200">Healthier Tomorrow</span>
-                  </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Glowing spine silhouette background image */}
+              {/* Condition Graphic Preview */}
               <div className="absolute right-0 top-0 bottom-0 w-28 opacity-80 pointer-events-none">
                 <Image
-                  src="/images/blog/promo_move_better.png"
-                  alt="Healthy Spine"
+                  src={conditionTheme.promoCardImage}
+                  alt={conditionTheme.promoCardTitle}
                   fill
                   className="object-cover object-right"
                 />
@@ -864,7 +1337,7 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {RELATED_ARTICLES.map((article) => (
+            {relatedArticles.map((article) => (
               <Link
                 key={article.slug}
                 href={`/blogs/${article.slug}`}
@@ -922,8 +1395,8 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/50">
               <div className="flex items-center gap-2">
                 <Play className="w-4 h-4 text-amber-400 fill-amber-400" />
-                <h3 className="font-bold text-sm sm:text-base text-white">
-                  Expert Insights: Degenerative Disc Disease &amp; Active Recovery
+                <h3 className="font-bold text-sm sm:text-base text-white line-clamp-1">
+                  {conditionTheme.videoTitle}
                 </h3>
               </div>
               <button
@@ -937,7 +1410,7 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
             {/* Video Player Container */}
             <div className="relative aspect-video w-full bg-black flex items-center justify-center">
               <Image
-                src="/images/blog/hero_spine_sharp.png"
+                src={conditionTheme.heroRightImage}
                 alt="Expert Insights Video Preview"
                 fill
                 className="object-cover opacity-60"
@@ -948,28 +1421,29 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
                 </div>
                 <div>
                   <h4 className="font-black text-lg text-white">
-                    Non-Surgical Spine Decompression &amp; Lumbar Conditioning
+                    {post.title}
                   </h4>
                   <p className="text-xs text-slate-300 mt-1">
                     Presented by Dr. Rhea Sharma, Senior Physiotherapist at Aries PhysioCare
                   </p>
                 </div>
-                <div className="pt-2">
-                  <Button
-                    onClick={() => {
-                      setIsVideoModalOpen(false);
-                      openBookingModal({ topic: 'Degenerative Disc Disease', territory: 'Spine Health' });
-                    }}
-                    className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-bold text-xs px-6 py-2.5 rounded-full shadow-md"
-                  >
-                    Schedule Consultation With Dr. Rhea Sharma
-                  </Button>
-                </div>
+
+                <Button
+                  onClick={() => {
+                    setIsVideoModalOpen(false);
+                    openBookingModal({
+                      topic: post.title,
+                      territory: conditionTheme.expertConsultCategory,
+                    });
+                  }}
+                  className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow-lg cursor-pointer"
+                >
+                  Schedule Consultation With Dr. Rhea Sharma
+                </Button>
               </div>
             </div>
 
-            {/* Modal Footer Note */}
-            <div className="px-6 py-3 bg-slate-950/80 text-[11px] text-slate-400 flex items-center justify-between">
+            <div className="p-4 bg-slate-950 flex items-center justify-between text-xs text-slate-400">
               <span>Aries PhysioCare Clinical Video Series</span>
               <span>Available in Mumbai &amp; Across India</span>
             </div>
@@ -986,8 +1460,8 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-purple-50/50 dark:bg-purple-950/30">
               <div className="flex items-center gap-2.5">
                 <FileText className="w-5 h-5 text-[#7C3AED]" />
-                <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
-                  Spine Care &amp; Home Exercise Guide
+                <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white line-clamp-1">
+                  {conditionTheme.pdfGuideTitle}
                 </h3>
               </div>
               <button
@@ -1011,7 +1485,7 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
                 </div>
                 <div>
                   <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                    Aries PhysioCare: Clinical Spine Care Protocol
+                    Aries PhysioCare: Clinical {conditionTheme.badgeText} Protocol
                   </h4>
                   <p className="text-xs text-slate-500">Official Patient Handout &bull; Issue 2026</p>
                 </div>
@@ -1022,11 +1496,11 @@ export function GrowthBlogArticle({ post }: { post: GrowthBlogPost }) {
                   Key Chapters Included in this PDF Guide:
                 </p>
                 <ul className="space-y-1.5 pl-4 list-disc marker:text-[#7C3AED]">
-                  <li>Biomechanical overview of Degenerative Disc Disease (DDD).</li>
-                  <li>7 Daily spine-safe morning and evening mobility drills.</li>
-                  <li>McKenzie prone extension &amp; neutral pelvic stabilization instructions.</li>
-                  <li>Ergonomic workstation setup checklist for desk professionals.</li>
-                  <li>When to seek doorstep physiotherapist supervision.</li>
+                  <li>Clinical biomechanics and pathophysiology overview of {post.title}.</li>
+                  <li>Daily morning and evening mobility drills with safe alignment.</li>
+                  <li>Targeted muscular strengthening and joint offloading protocols.</li>
+                  <li>Ergonomic workstation setup checklist and daily posture advice.</li>
+                  <li>When to seek certified doorstep physiotherapist supervision.</li>
                 </ul>
               </div>
 
