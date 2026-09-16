@@ -17,11 +17,14 @@ export interface GrowthBlogPost {
   cta?: string;
 }
 
+import { SPINE_ORTHOPAEDIC_BLOGS } from './spine-orthopaedic-blogs';
+
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') ||
   'https://api.ariesxpert.com/api/v1';
 
 const FALLBACK_CLINICAL_ARTICLES: GrowthBlogPost[] = [
+  ...SPINE_ORTHOPAEDIC_BLOGS,
   {
     id: 'post-lower-back-pain-rehab',
     slug: 'evidence-based-lower-back-pain-rehabilitation-at-home',
@@ -49,7 +52,7 @@ With structured, doorstep clinical intervention, over 88% of patients achieve si
     territory: 'Physiotherapy & Spine Care',
     topic: 'Back Pain & Spine',
     publishedAt: '2026-02-15T00:00:00.000Z',
-    imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=85&w=1600',
+    imageUrl: '/images/physiotherapy/physio-hero-panoramic.jpg',
   },
   {
     id: 'post-knee-osteoarthritis-management',
@@ -74,7 +77,7 @@ Our therapists assess foot pronation, pelvic drop (Trendelenburg sign), and stri
     territory: 'Orthopedic Rehabilitation',
     topic: 'Knee & Joint Pain',
     publishedAt: '2026-02-10T00:00:00.000Z',
-    imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600',
+    imageUrl: '/images/physiotherapy/physio-knee-treatment.jpg',
   },
   {
     id: 'post-stroke-neuro-recovery-timeline',
@@ -138,7 +141,7 @@ A consistent, supportive home atmosphere with trained caregivers accelerates mil
     territory: 'Neurological Care',
     topic: 'Stroke & Neuro Rehab',
     publishedAt: '2026-02-01T00:00:00.000Z',
-    imageUrl: '/images/blog/stroke-rehab-hero.jpg',
+    imageUrl: '/images/physiotherapy/program-neuro.jpg',
   },
   {
     id: 'post-understanding-neuroplasticity',
@@ -180,26 +183,77 @@ Transitioning from quad canes or rollator walkers to independent ambulation is g
   }
 ];
 
+let cachedPosts: GrowthBlogPost[] | null = null;
+let lastCacheTime = 0;
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes in-memory cache
+
 export async function fetchGrowthBlogPosts(): Promise<GrowthBlogPost[]> {
+  const now = Date.now();
+  if (cachedPosts && now - lastCacheTime < CACHE_TTL_MS) {
+    return cachedPosts;
+  }
+
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1000); // 1-second max timeout
+
     const res = await fetch(`${API_BASE}/growth-engine/public/website/blogs`, {
-      next: { revalidate: 300 },
+      signal: controller.signal,
+      next: { revalidate: 3600 },
     });
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const json = await res.json();
       if (Array.isArray(json?.data) && json.data.length > 0) {
-        return json.data;
+        const remoteSlugs = new Set(json.data.map((d: GrowthBlogPost) => d.slug));
+        const missingLocal = FALLBACK_CLINICAL_ARTICLES.filter((p) => !remoteSlugs.has(p.slug));
+        cachedPosts = [...json.data, ...missingLocal];
+        lastCacheTime = now;
+        return cachedPosts;
       }
     }
   } catch {
-    // Network or server error — return curated clinical articles
+    // Network, server timeout or abort — use instant curated clinical catalog
   }
+
+  cachedPosts = FALLBACK_CLINICAL_ARTICLES;
+  lastCacheTime = now;
   return FALLBACK_CLINICAL_ARTICLES;
 }
 
 export async function fetchGrowthBlogBySlug(
   slug: string,
 ): Promise<GrowthBlogPost | null> {
+  // 1. FAST PATH: Check local articles immediately with zero network delay (0ms)
+  const directLocal = FALLBACK_CLINICAL_ARTICLES.find((p) => p.slug === slug);
+  if (directLocal) return directLocal;
+
+  const cleanSlug = slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const localAlias = FALLBACK_CLINICAL_ARTICLES.find((p) => {
+    const pClean = p.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return pClean.includes(cleanSlug) || cleanSlug.includes(pClean);
+  });
+  if (localAlias) return localAlias;
+
+  // 2. SLOW/REMOTE PATH: Check full catalog if not in local store
   const posts = await fetchGrowthBlogPosts();
-  return posts.find((p) => p.slug === slug) ?? FALLBACK_CLINICAL_ARTICLES.find((p) => p.slug === slug) ?? null;
+  const directMatch = posts.find((p) => p.slug === slug);
+  if (directMatch) return directMatch;
+
+  const aliasMatch = posts.find((p) => {
+    const pClean = p.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return pClean.includes(cleanSlug) || cleanSlug.includes(pClean);
+  });
+  if (aliasMatch) return aliasMatch;
+
+  // Default to stroke recovery post if stroke is mentioned in slug
+  if (slug.includes('stroke') || slug.includes('neuro')) {
+    return (
+      FALLBACK_CLINICAL_ARTICLES.find((p) => p.slug === 'post-stroke-neurological-rehabilitation-timeline-and-neuroplasticity') ||
+      FALLBACK_CLINICAL_ARTICLES[2]
+    );
+  }
+
+  return null;
 }

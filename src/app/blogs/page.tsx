@@ -9,45 +9,42 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+export const revalidate = 3600;
+
 export const metadata = {
     title: "Health Insights Blog | Aries PhysioCare",
     description: "Expert advice, evidence-based care, and home healthcare guidance from the Aries PhysioCare clinical team. Stay informed on physiotherapy, recovery, and wellness.",
     keywords: "Healthcare Blog, Physiotherapy Tips, Home Care, Wellness, Aries PhysioCare, Recovery Advice"
 };
 
-function getBlogCover(topic?: string, territory?: string, title?: string) {
-  const query = `${topic || ''} ${territory || ''} ${title || ''}`.toLowerCase();
-  if (query.includes('back') || query.includes('spine') || query.includes('sciatica') || query.includes('lumbar')) {
-    return 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=85&w=1600';
-  }
-  if (query.includes('knee') || query.includes('joint') || query.includes('arthritis') || query.includes('ligament')) {
-    return 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=85&w=1600';
-  }
-  if (query.includes('sport') || query.includes('runner') || query.includes('athlet') || query.includes('fitness')) {
-    return 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=85&w=1600';
-  }
-  if (query.includes('neck') || query.includes('postur') || query.includes('desk') || query.includes('ergo')) {
-    return 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&q=85&w=1600';
-  }
-  if (query.includes('brain') || query.includes('neuroplasticity')) {
-    return '/images/blog/neuroplasticity-brain.jpg';
-  }
-  if (query.includes('neuro') || query.includes('stroke') || query.includes('paralysis')) {
-    return '/images/blog/stroke-rehab-hero.jpg';
-  }
-  if (query.includes('diet') || query.includes('nutrit') || query.includes('food') || query.includes('diabetes')) {
-    return 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=85&w=1600';
-  }
-  if (query.includes('senior') || query.includes('elder') || query.includes('geriatric') || query.includes('fall')) {
-    return 'https://images.unsplash.com/photo-1576765608535-5f04c18459e4?auto=format&fit=crop&q=85&w=1600';
-  }
-  if (query.includes('child') || query.includes('pediatric') || query.includes('sensory') || query.includes('baby')) {
-    return 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=85&w=1600';
-  }
-  if (query.includes('nurse') || query.includes('wound') || query.includes('surg') || query.includes('icu')) {
-    return 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=85&w=1600';
-  }
-  return 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=85&w=1600';
+function getBlogCover(topic?: string, territory?: string, title?: string, slug?: string) {
+  const query = `${topic || ''} ${territory || ''} ${title || ''} ${slug || ''}`.toLowerCase();
+
+  if (query.includes('degenerative disc')) return '/images/blog/hero_ddd_clean_panoramic.png';
+  if (query.includes('herniat') || query.includes('slipped disc') || query.includes('disc bulge') || query.includes('prolapse')) return '/images/blog/disc-herniation-rehab.jpg';
+  if (query.includes('sciatica') || query.includes('radiculopathy') || query.includes('piriformis')) return '/images/blog/sciatica-nerve-relief.jpg';
+  if (query.includes('stenosis') || query.includes('claudication')) return '/images/blog/spinal-stenosis-gait.jpg';
+  if (query.includes('ergo') || query.includes('workstation') || query.includes('desk')) return '/images/occupational-therapy/ot-proto-ergo.jpg';
+  if (query.includes('postur') || query.includes('tech neck') || query.includes('swayback')) return '/images/physiotherapy/physio-understanding-treatment.jpg';
+  if (query.includes('core') || query.includes('exercise') || query.includes('mcgill') || query.includes('top-7')) return '/images/blog/related_exercises_spine.png';
+  if (query.includes('mri') || query.includes('scan') || query.includes('imaging') || query.includes('report')) return '/images/blog/related_mri_spine.png';
+  if (query.includes('sleep') || query.includes('mattress') || query.includes('pillow')) return '/images/why-choose/card1_care_at_home.jpg';
+  if (query.includes('walk') || query.includes('habit') || query.includes('step') || query.includes('everyday')) return '/images/blog/related_habits_spine.png';
+  if (query.includes('spondyl') || query.includes('facet')) return '/images/physiotherapy/program-arthritis.jpg';
+  if (query.includes('thoracic') || query.includes('rib') || query.includes('upper back')) return '/images/physiotherapy/program-lumbar.jpg';
+  if (query.includes('sacroiliac') || query.includes('si joint') || query.includes('tailbone') || query.includes('coccy')) return '/images/precision-recovery/stage2-plan.webp';
+  if (query.includes('surg') || query.includes('fusion') || query.includes('laminectomy') || query.includes('fbss')) return '/images/home-nursing/nursing-service-post-surgical.jpg';
+  if (query.includes('modality') || query.includes('tens') || query.includes('ift') || query.includes('laser') || query.includes('spasm')) return '/images/clinics/flagship-spinal-4.png';
+  if (query.includes('knee') || query.includes('joint') || query.includes('osteoarthritis')) return '/images/physiotherapy/physio-knee-treatment.jpg';
+  if (query.includes('neck') || query.includes('cervical')) return '/images/physiotherapy/program-cervical.jpg';
+  if (query.includes('stroke') || query.includes('paralysis') || query.includes('hemiplegia')) return '/images/blog/stroke-rehab-hero.jpg';
+  if (query.includes('brain') || query.includes('neuroplasticity')) return '/images/blog/neuroplasticity-brain.jpg';
+  if (query.includes('sport') || query.includes('runner') || query.includes('athlet') || query.includes('fitness')) return '/images/physiotherapy/program-sports.jpg';
+  if (query.includes('senior') || query.includes('elder') || query.includes('geriatric') || query.includes('over 50') || query.includes('fall')) return '/images/physiotherapy/program-elderly.jpg';
+  if (query.includes('child') || query.includes('pediatric') || query.includes('scheuermann')) return '/images/occupational-therapy/ot-proto-pediatric.jpg';
+  if (query.includes('back') || query.includes('spine') || query.includes('lumbar')) return '/images/blog/lumbar-spine-rehab.jpg';
+
+  return '/images/what-we-treat/conditions-spine.webp';
 }
 
 export default async function BlogsPage() {
@@ -65,7 +62,7 @@ export default async function BlogsPage() {
       ? new Date(p.publishedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })
       : 'Recently',
     author: 'Aries Clinical Board',
-    imageUrl: p.imageUrl || getBlogCover(p.topic, p.territory, p.title),
+    imageUrl: p.imageUrl || getBlogCover(p.topic, p.territory, p.title, p.slug),
     imageHint: `${p.topic || 'medical'} healthcare blog cover`,
     isGrowth: true,
   }));

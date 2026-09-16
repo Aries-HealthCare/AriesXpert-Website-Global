@@ -116,8 +116,8 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
     };
   }
 
-  // 2. Spinal Stenosis
-  if (slug.includes('stenosis') || title.includes('stenosis')) {
+  // 2. Spinal Stenosis & Neurogenic Claudication
+  if (slug.includes('stenosis') || title.includes('stenosis') || slug.includes('claudication')) {
     const stenosisImg =
       post.imageUrl && !post.imageUrl.includes('unsplash.com')
         ? post.imageUrl
@@ -136,7 +136,7 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
       pdfGuideTitle: 'Spinal Stenosis Walking & Flexion Guide',
       centerBannerTag: 'CANAL DECOMPRESSION',
       centerBannerTitle: 'Pain-Free Walking Distance Restoration',
-      centerBannerImage: '/images/blog/spinal-stenosis-gait.jpg',
+      centerBannerImage: '/images/blog/balance-cane-walk.jpg',
       rehabIncludesTitle: 'What Stenosis Rehab Includes',
       rehabIncludesItems: [
         { icon: ClipboardCheck, title: 'Claudication Assessment' },
@@ -154,11 +154,11 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
         'Our specialized physical therapy protocols help open the spinal canal and restore walking tolerance.',
       promoCardTitle: 'Walk Farther\nStand Taller',
       promoCardPoints: ['Extended Walking Range', 'Reduced Leg Heaviness', 'Independent Living'],
-      promoCardImage: '/images/blog/spinal-stenosis-gait.jpg',
+      promoCardImage: '/images/care-taker/care-proto-mobility.jpg',
     };
   }
 
-  // 3. Sciatica & Radiculopathy
+  // 3. Sciatica & Radiculopathy / Piriformis Syndrome
   if (
     slug.includes('sciatica') ||
     title.includes('sciatica') ||
@@ -172,7 +172,7 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
         : '/images/blog/sciatica-nerve-relief.jpg';
     return {
       isDDD: false,
-      badgeText: 'SCIATICA CARE',
+      badgeText: 'SCIATICA & NERVE CARE',
       heroRightImage: sciaticaImg,
       cursiveSlogan: {
         line1: 'Nerve',
@@ -184,7 +184,7 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
       pdfGuideTitle: 'Sciatica Relief & Nerve Gliding Guide',
       centerBannerTag: 'NERVE DECOMPRESSION',
       centerBannerTitle: 'Centralizing Sciatic Nerve Relief',
-      centerBannerImage: '/images/blog/sciatica-nerve-relief.jpg',
+      centerBannerImage: '/images/why-choose/card4_personalized_plans.jpg',
       rehabIncludesTitle: 'What Sciatica Rehab Includes',
       rehabIncludesItems: [
         { icon: ClipboardCheck, title: 'Neural Tension Screen' },
@@ -206,7 +206,7 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
     };
   }
 
-  // 4. Disc Herniation / Prolapse / Bulge / Slipped Disc
+  // 4. Disc Herniation / Bulge / Slipped Disc / Prolapse
   if (
     slug.includes('herniat') ||
     title.includes('herniat') ||
@@ -222,13 +222,13 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
         : '/images/blog/disc-herniation-rehab.jpg';
     return {
       isDDD: false,
-      badgeText: 'DISC CARE',
+      badgeText: 'DISC RECOVERY',
       heroRightImage: discImg,
       cursiveSlogan: {
-        line1: 'Stronger',
-        line2: 'Spine',
-        line3: 'Brighter',
-        line4: 'Tomorrows 💛',
+        line1: 'Centralize',
+        line2: 'Heal',
+        line3: 'Stay',
+        line4: 'Active 🌿',
       },
       videoTitle: `Expert Insights: ${post.title}`,
       pdfGuideTitle: 'Herniated & Bulging Disc Recovery Guide',
@@ -252,11 +252,542 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
         'Evidence-based physical therapy accelerates natural disc recovery without surgery.',
       promoCardTitle: 'Heal Discs\nStay Active',
       promoCardPoints: ['Centralized Disc Strain', 'Core Muscle Armor', 'Faster Return to Activity'],
-      promoCardImage: '/images/blog/disc-herniation-rehab.jpg',
+      promoCardImage: '/images/blog/promo_move_better.png',
     };
   }
 
-  // 5. Knee & Joint Osteoarthritis / Orthopaedics
+  // 5. Ergonomics, Workstation & Computer Desk Posture
+  if (
+    slug.includes('ergo') ||
+    title.includes('ergo') ||
+    slug.includes('workstation') ||
+    title.includes('workstation') ||
+    slug.includes('desk') ||
+    title.includes('desk')
+  ) {
+    const ergoImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/occupational-therapy/ot-proto-ergo.jpg';
+    return {
+      isDDD: false,
+      badgeText: 'WORKPLACE ERGONOMICS',
+      heroRightImage: ergoImg,
+      cursiveSlogan: {
+        line1: 'Align',
+        line2: 'Posture',
+        line3: 'Work',
+        line4: 'Pain-Free 💻',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Ergonomic Workstation & Posture Setup Guide',
+      centerBannerTag: 'DESK HEALTH',
+      centerBannerTitle: 'Preventing Desk-Induced Spinal Micro-Trauma',
+      centerBannerImage: '/images/occupational-therapy/ot-proto-ergo.jpg',
+      rehabIncludesTitle: 'What Ergonomic Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Workstation Setup Audit' },
+        { icon: Zap, title: 'Lumbar Lordosis Support Calibration' },
+        { icon: UserCheck, title: 'Scapular & Chest Muscle Reset' },
+        { icon: Activity, title: 'Hourly Micro-Break Protocols' },
+        { icon: Home, title: 'Eye-Level Monitor Alignment' },
+        { icon: Stethoscope, title: 'Long-Term Ergonomic Health Plan' },
+      ],
+      expertConsultTitle: 'Consult Our Ergonomic Physiotherapists',
+      expertConsultCategory: 'Ergonomics & Posture',
+      quoteText: '“Proper ergonomic alignment prevents cumulative spinal strain during long work hours.”',
+      ctaTitle: 'Work Pain-Free and Protect Your Spine!',
+      ctaSubtitle:
+        'Get a personalized ergonomic assessment and desk-exercise prescription from our senior physiotherapists.',
+      promoCardTitle: 'Work Pain-Free\nStay Focused',
+      promoCardPoints: ['Zero Neck Fatigue', 'Optimized Lumbar Support', 'Higher Productivity'],
+      promoCardImage: '/images/occupational-therapy/ot-proto-ergo.jpg',
+    };
+  }
+
+  // 6. Posture Alignment, Tech Neck & Crossed Syndromes
+  if (
+    slug.includes('postur') ||
+    title.includes('postur') ||
+    slug.includes('tech-neck') ||
+    title.includes('tech neck') ||
+    slug.includes('swayback') ||
+    slug.includes('rounded-shoulders') ||
+    slug.includes('kyphosis') ||
+    slug.includes('hyperlordosis') ||
+    slug.includes('scoliosis')
+  ) {
+    const postureImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/physiotherapy/physio-understanding-treatment.jpg';
+    return {
+      isDDD: false,
+      badgeText: 'POSTURE & ALIGNMENT',
+      heroRightImage: postureImg,
+      cursiveSlogan: {
+        line1: 'Stand',
+        line2: 'Tall',
+        line3: 'Align',
+        line4: 'Natural ✨',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Spinal Posture Realignment & Tech Neck Guide',
+      centerBannerTag: 'POSTURE CORRECTION',
+      centerBannerTitle: 'Rebuilding Balanced Spinal Kinematics',
+      centerBannerImage: '/images/occupational-therapy/ot-approach-hands.jpg',
+      rehabIncludesTitle: 'What Posture Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Postural Plumb-Line Assessment' },
+        { icon: Zap, title: 'Deep Neck Flexor Retraining' },
+        { icon: UserCheck, title: 'Thoracic Extension Mobilization' },
+        { icon: Activity, title: 'Pelvic Tilt Realignment' },
+        { icon: Home, title: 'Scapular Retraction Drills' },
+        { icon: Stethoscope, title: 'Daily Posture Habit System' },
+      ],
+      expertConsultTitle: 'Consult Our Posture Specialists',
+      expertConsultCategory: 'Spine & Posture Care',
+      quoteText: '“Aligned posture distributes body weight effortlessly across healthy spinal joints.”',
+      ctaTitle: 'Stand Taller with Pain-Free Posture!',
+      ctaSubtitle:
+        'Transform slouched posture, tech neck, and muscle imbalances with clinical home physiotherapy.',
+      promoCardTitle: 'Stand Tall\nBreathe Free',
+      promoCardPoints: ['Relieved Shoulder Strain', 'Natural Spine Alignment', 'Confident Upright Stance'],
+      promoCardImage: '/images/physiotherapy/physio-understanding-treatment.jpg',
+    };
+  }
+
+  // 7. Core Strengthening, McGill Big 3 & Spine Stability
+  if (
+    slug.includes('core') ||
+    title.includes('core') ||
+    slug.includes('stability') ||
+    title.includes('stability') ||
+    slug.includes('top-7-exercises')
+  ) {
+    const coreImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/blog/related_exercises_spine.png';
+    return {
+      isDDD: false,
+      badgeText: 'CORE STABILITY',
+      heroRightImage: coreImg,
+      cursiveSlogan: {
+        line1: 'Iron',
+        line2: 'Core',
+        line3: 'Strong',
+        line4: 'Spine 💪',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'McGill Big 3 & Core Stability Blueprint',
+      centerBannerTag: 'CORE ARMOR',
+      centerBannerTitle: 'Building Dynamic Lumbo-Pelvic Protection',
+      centerBannerImage: '/images/blog/related_exercises_spine.png',
+      rehabIncludesTitle: 'What Core Stability Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Transversus Abdominis Screen' },
+        { icon: Zap, title: 'McGill Curl-Up Progression' },
+        { icon: UserCheck, title: 'Bird-Dog Cross-Loading' },
+        { icon: Activity, title: 'Side-Plank Gluteal Retraining' },
+        { icon: Home, title: 'Spine-Sparing Hip Hinging' },
+        { icon: Stethoscope, title: 'Progressive Endurance Protocol' },
+      ],
+      expertConsultTitle: 'Consult Our Spine Conditioning Specialists',
+      expertConsultCategory: 'Spine Health & Conditioning',
+      quoteText: '“Deep core endurance, not raw strength, is the true guardian of the human spine.”',
+      ctaTitle: 'Build Unbreakable Core Armor Today!',
+      ctaSubtitle:
+        'Learn the evidence-based McGill method to stabilize your lumbar spine and prevent flare-ups.',
+      promoCardTitle: 'Iron Core\nStrong Spine',
+      promoCardPoints: ['Stabilized Vertebrae', 'Endurance for Daily Tasks', 'Zero Spine Compression'],
+      promoCardImage: '/images/blog/related_exercises_spine.png',
+    };
+  }
+
+  // 8. Safe Sleeping Positions & Mattress Ergonomics
+  if (
+    slug.includes('sleep') ||
+    title.includes('sleep') ||
+    slug.includes('mattress') ||
+    slug.includes('pillow')
+  ) {
+    const sleepImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/why-choose/card1_care_at_home.jpg';
+    return {
+      isDDD: false,
+      badgeText: 'SLEEP BIOMECHANICS',
+      heroRightImage: sleepImg,
+      cursiveSlogan: {
+        line1: 'Rest',
+        line2: 'Deeper',
+        line3: 'Wake',
+        line4: 'Pain-Free 🌙',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Spinal Alignment & Sleep Ergonomics Guide',
+      centerBannerTag: 'RESTFUL RECOVERY',
+      centerBannerTitle: 'Supporting Your Spine Throughout the Night',
+      centerBannerImage: '/images/why-choose/card1_care_at_home.jpg',
+      rehabIncludesTitle: 'What Sleep Ergonomics Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Spinal Sleep Curvature Assessment' },
+        { icon: Zap, title: 'Cervical Contour Pillow Selection' },
+        { icon: UserCheck, title: 'Side-Sleeper Knee Support Setup' },
+        { icon: Activity, title: 'Supine Lumbar Decompression' },
+        { icon: Home, title: 'Mattress Density Guidance' },
+        { icon: Stethoscope, title: 'Morning Gentle Unlocking Routine' },
+      ],
+      expertConsultTitle: 'Consult Our Sleep & Spine Experts',
+      expertConsultCategory: 'Spine Care',
+      quoteText: '“Eight hours of supported spinal alignment allows intervertebral discs to fully rehydrate.”',
+      ctaTitle: 'Wake Up Pain-Free and Energized!',
+      ctaSubtitle:
+        'Optimize your sleep posture, pillows, and mattress setup with clinical guidance from our therapists.',
+      promoCardTitle: 'Sleep Deep\nWake Fresh',
+      promoCardPoints: ['Neutral Neck & Spine', 'No Morning Stiffness', 'Deep Regenerative Rest'],
+      promoCardImage: '/images/why-choose/card1_care_at_home.jpg',
+    };
+  }
+
+  // 9. Daily Habits, Walking & Disc Hydration
+  if (
+    slug.includes('walk') ||
+    title.includes('walk') ||
+    slug.includes('habit') ||
+    title.includes('habit') ||
+    slug.includes('everyday')
+  ) {
+    const habitImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/blog/related_habits_spine.png';
+    return {
+      isDDD: false,
+      badgeText: 'SPINE HABITS & GAIT',
+      heroRightImage: habitImg,
+      cursiveSlogan: {
+        line1: 'Daily',
+        line2: 'Steps',
+        line3: 'Hydrated',
+        line4: 'Discs 👟',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Daily Habits for Long-Term Spine Health',
+      centerBannerTag: 'DISC HYDRATION',
+      centerBannerTitle: 'Nourishing Spinal Discs Through Daily Movement',
+      centerBannerImage: '/images/blog/balance-cane-walk.jpg',
+      rehabIncludesTitle: 'What Healthy Habits Include',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Daily Movement Audit' },
+        { icon: Zap, title: 'Disc Imbibition Walking Protocol' },
+        { icon: UserCheck, title: 'Safe Lifting & Bending Biomechanics' },
+        { icon: Activity, title: 'Postural Reset Micro-Drills' },
+        { icon: Home, title: 'Hydration & Nutrition Guidance' },
+        { icon: Stethoscope, title: 'Lifelong Spine Preservation Plan' },
+      ],
+      expertConsultTitle: 'Consult Our Lifestyle Physiotherapists',
+      expertConsultCategory: 'Preventative Spine Care',
+      quoteText: '“Spinal discs have no blood supply; they depend entirely on rhythmic movement to stay hydrated.”',
+      ctaTitle: 'Transform Your Daily Habits for a Pain-Free Spine!',
+      ctaSubtitle:
+        'Small, evidence-based adjustments in your daily routine protect your back for decades to come.',
+      promoCardTitle: 'Move Daily\nLive Fully',
+      promoCardPoints: ['Hydrated Spinal Discs', 'Fluid Joint Motion', 'Zero Downtime'],
+      promoCardImage: '/images/blog/related_habits_spine.png',
+    };
+  }
+
+  // 10. Post-Spinal Surgery Rehabilitation & FBSS
+  if (
+    slug.includes('post-spinal-surgery') ||
+    title.includes('surgery') ||
+    slug.includes('surgical') ||
+    slug.includes('failed-back') ||
+    slug.includes('fracture')
+  ) {
+    const surgImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/home-nursing/nursing-service-post-surgical.jpg';
+    return {
+      isDDD: false,
+      badgeText: 'POST-SURGICAL RECOVERY',
+      heroRightImage: surgImg,
+      cursiveSlogan: {
+        line1: 'Safe',
+        line2: 'Healing',
+        line3: 'Restored',
+        line4: 'Strength 🛡️',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Post-Spinal Surgery Recovery & Milestones Guide',
+      centerBannerTag: 'POST-OP REHAB',
+      centerBannerTitle: 'Milestone-Driven Post-Surgical Healing at Home',
+      centerBannerImage: '/images/physiotherapy/program-post-surgical.jpg',
+      rehabIncludesTitle: 'What Surgical Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Surgical Precaution Adherence' },
+        { icon: Zap, title: 'Incision & Scar Desensitization' },
+        { icon: UserCheck, title: 'Gentle Neural Gliding Protocols' },
+        { icon: Activity, title: 'Safe Bed Transfers & Log-Rolling' },
+        { icon: Home, title: 'Progressive Walking Tolerance' },
+        { icon: Stethoscope, title: 'Long-Term Functional Independence' },
+      ],
+      expertConsultTitle: 'Consult Our Post-Surgical Specialists',
+      expertConsultCategory: 'Post-Surgical Care',
+      quoteText: '“Guided post-surgical physical therapy ensures safe tissue healing and prevents recurrent weakness.”',
+      ctaTitle: 'Fast-Track Your Post-Surgery Recovery Safely!',
+      ctaSubtitle:
+        'Our experienced visiting therapists coordinate with your surgical team for seamless home recovery.',
+      promoCardTitle: 'Safe Healing\nNew Strength',
+      promoCardPoints: ['Protected Surgical Sites', 'Restored Confidence', 'Caregiver Peace of Mind'],
+      promoCardImage: '/images/home-nursing/nursing-service-post-surgical.jpg',
+    };
+  }
+
+  // 11. Clinical Modalities, Spasms, Heat vs Cold & Electrotherapy
+  if (
+    slug.includes('modalit') ||
+    title.includes('modalit') ||
+    slug.includes('spasm') ||
+    title.includes('spasm') ||
+    slug.includes('heat-vs-cold') ||
+    title.includes('heat vs cold') ||
+    slug.includes('facet-joint')
+  ) {
+    const modalImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/clinics/flagship-spinal-4.png';
+    return {
+      isDDD: false,
+      badgeText: 'CLINICAL MODALITIES',
+      heroRightImage: modalImg,
+      cursiveSlogan: {
+        line1: 'Targeted',
+        line2: 'Relief',
+        line3: 'Deep',
+        line4: 'Healing ⚡',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Clinical Modalities & Muscle Spasm Relief Guide',
+      centerBannerTag: 'ELECTROTHERAPY & HEAT',
+      centerBannerTitle: 'Advanced Pain Interference & Deep Tissue Relief',
+      centerBannerImage: '/images/clinics/flagship-treatment-2.png',
+      rehabIncludesTitle: 'What Modality Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Acute Spasm & Trigger Point Map' },
+        { icon: Zap, title: 'Calibrated IFT & TENS Application' },
+        { icon: UserCheck, title: 'Thermal Contrast Protocols' },
+        { icon: Activity, title: 'High-Frequency Ultrasound Therapy' },
+        { icon: Home, title: 'Gentle Myofascial Release' },
+        { icon: Stethoscope, title: 'Spasm Recurrence Prevention' },
+      ],
+      expertConsultTitle: 'Consult Our Modality Specialists',
+      expertConsultCategory: 'Clinical Physiotherapy',
+      quoteText: '“Calibrated electrotherapy downregulates irritable pain pathways to allow gentle movement.”',
+      ctaTitle: 'Get Immediate Relief from Acute Back Spasms!',
+      ctaSubtitle:
+        'Experience advanced electrotherapy and pain desensitization delivered directly in your living room.',
+      promoCardTitle: 'Break Spasms\nFeel Relief',
+      promoCardPoints: ['Rapid Pain Relief', 'Relaxed Muscles', 'Restored Range of Motion'],
+      promoCardImage: '/images/clinics/flagship-spinal-4.png',
+    };
+  }
+
+  // 12. MRI & Diagnostic Spine Reports
+  if (
+    slug.includes('mri') ||
+    title.includes('mri') ||
+    slug.includes('report') ||
+    slug.includes('vs-surgery')
+  ) {
+    const mriImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/blog/related_mri_spine.png';
+    return {
+      isDDD: false,
+      badgeText: 'DIAGNOSTIC INSIGHTS',
+      heroRightImage: mriImg,
+      cursiveSlogan: {
+        line1: 'Clinical',
+        line2: 'Clarity',
+        line3: 'Confident',
+        line4: 'Care 🔬',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Understanding Your Spine MRI & Clinical Options',
+      centerBannerTag: 'IMAGING CORRELATION',
+      centerBannerTitle: 'Matching MRI Findings with Real Physical Function',
+      centerBannerImage: '/images/blog/related_mri_spine.png',
+      rehabIncludesTitle: 'What MRI Correlation Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Radiological & Functional Correlation' },
+        { icon: Zap, title: 'Disc Height & Annular Integrity Check' },
+        { icon: UserCheck, title: 'Neural Foramen Clearance Screen' },
+        { icon: Activity, title: 'Clinical Directional Preference Test' },
+        { icon: Home, title: 'Conservative Care Roadmap' },
+        { icon: Stethoscope, title: 'Second Opinion Surgical Triage' },
+      ],
+      expertConsultTitle: 'Consult Our Senior Spine Diagnosticians',
+      expertConsultCategory: 'Diagnostic Spine Care',
+      quoteText: '“Treat the patient, not just the MRI report: over 80% of disc findings heal without surgery.”',
+      ctaTitle: 'Get Clarity on Your MRI and Next Steps!',
+      ctaSubtitle:
+        'Have a senior physical therapist review your imaging and examine your functional movement today.',
+      promoCardTitle: 'Clear Facts\nReal Healing',
+      promoCardPoints: ['No Unnecessary Fear', 'Clear Clinical Plan', 'Non-Surgical Solutions'],
+      promoCardImage: '/images/blog/related_mri_spine.png',
+    };
+  }
+
+  // 13. Spondylosis, Spondylolisthesis & Ankylosing Spondylitis
+  if (
+    slug.includes('spondyl') ||
+    title.includes('spondyl') ||
+    slug.includes('ankylosing') ||
+    slug.includes('slippage')
+  ) {
+    const spondylImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/physiotherapy/program-arthritis.jpg';
+    return {
+      isDDD: false,
+      badgeText: 'SPONDYLOSIS & STABILITY',
+      heroRightImage: spondylImg,
+      cursiveSlogan: {
+        line1: 'Spinal',
+        line2: 'Stability',
+        line3: 'Active',
+        line4: 'Freedom 🌿',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Spondylosis & Spinal Stability Recovery Guide',
+      centerBannerTag: 'SEGMENTAL STABILITY',
+      centerBannerTitle: 'Controlling Segmental Wear & Vertebral Slippage',
+      centerBannerImage: '/images/precision-recovery/stage1-assess.webp',
+      rehabIncludesTitle: 'What Stability Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Vertebral Slippage Grading & Screen' },
+        { icon: Zap, title: 'Flexion-Biased Directional Therapy' },
+        { icon: UserCheck, title: 'Deep Pelvic Stabilizer Conditioning' },
+        { icon: Activity, title: 'Extension Sparing & Facet Offloading' },
+        { icon: Home, title: 'Safe Functional Mobility Patterns' },
+        { icon: Stethoscope, title: 'Long-Term Joint Protection Plan' },
+      ],
+      expertConsultTitle: 'Consult Our Spine Stabilization Specialists',
+      expertConsultCategory: 'Spine & Joint Health',
+      quoteText: '“Dynamic muscular stability compensates effectively for structural joint laxity.”',
+      ctaTitle: 'Stabilize Your Spine and Regain Confidence!',
+      ctaSubtitle:
+        'Evidence-based core armor and flexion-biased protocols protect against progression.',
+      promoCardTitle: 'Stable Spine\nActive Life',
+      promoCardPoints: ['Stabilized Vertebrae', 'Pain-Free Standing', 'Protected Facet Joints'],
+      promoCardImage: '/images/physiotherapy/program-arthritis.jpg',
+    };
+  }
+
+  // 14. Thoracic Spine & Ribs (Mid-Back)
+  if (
+    slug.includes('thoracic') ||
+    title.includes('thoracic') ||
+    slug.includes('mid-back') ||
+    slug.includes('scheuermann')
+  ) {
+    const thoracicImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/physiotherapy/program-lumbar.jpg';
+    return {
+      isDDD: false,
+      badgeText: 'THORACIC MOBILITY',
+      heroRightImage: thoracicImg,
+      cursiveSlogan: {
+        line1: 'Breathe',
+        line2: 'Deep',
+        line3: 'Move',
+        line4: 'Free 🕊️',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'Thoracic Mobility & Rib Expansion Guide',
+      centerBannerTag: 'THORACIC EXPANSION',
+      centerBannerTitle: 'Relieving Rib Cage Stiffness & Mid-Back Strain',
+      centerBannerImage: '/images/what-we-treat/conditions-spine.webp',
+      rehabIncludesTitle: 'What Thoracic Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Costovertebral Joint Mobility Audit' },
+        { icon: Zap, title: 'Thoracic Foam Roller Extensions' },
+        { icon: UserCheck, title: 'Diaphragmatic Breath Retraining' },
+        { icon: Activity, title: 'Rotational Spinal Mobilization' },
+        { icon: Home, title: 'Desk Worker Postural Unlocking' },
+        { icon: Stethoscope, title: 'Long-Term Thoracic Health Plan' },
+      ],
+      expertConsultTitle: 'Consult Our Thoracic Specialists',
+      expertConsultCategory: 'Spine Care',
+      quoteText: '“Restoring thoracic mobility removes excessive compensatory strain from the neck and lower back.”',
+      ctaTitle: 'Unlock Your Mid-Back and Breathe Easier!',
+      ctaSubtitle:
+        'Targeted thoracic joint mobilization relieves deep rib catches and postural stiffness.',
+      promoCardTitle: 'Open Ribs\nMove Free',
+      promoCardPoints: ['Easy Deep Breathing', 'No Mid-Back Catching', 'Upright Fluid Posture'],
+      promoCardImage: '/images/physiotherapy/program-lumbar.jpg',
+    };
+  }
+
+  // 15. Sacroiliac (SI) Joint & Tailbone (Coccydynia)
+  if (
+    slug.includes('sacroiliac') ||
+    title.includes('sacroiliac') ||
+    slug.includes('coccydynia') ||
+    title.includes('tailbone') ||
+    slug.includes('si-joint')
+  ) {
+    const siImg =
+      post.imageUrl && !post.imageUrl.includes('unsplash.com')
+        ? post.imageUrl
+        : '/images/precision-recovery/stage2-plan.webp';
+    return {
+      isDDD: false,
+      badgeText: 'PELVIC & SI JOINT CARE',
+      heroRightImage: siImg,
+      cursiveSlogan: {
+        line1: 'Balanced',
+        line2: 'Pelvis',
+        line3: 'Pain-Free',
+        line4: 'Sitting ⚖️',
+      },
+      videoTitle: `Expert Insights: ${post.title}`,
+      pdfGuideTitle: 'SI Joint & Pelvic Alignment Home Protocol',
+      centerBannerTag: 'PELVIC SYMMETRY',
+      centerBannerTitle: 'Restoring Sacroiliac & Coccyx Stability',
+      centerBannerImage: '/images/precision-recovery/bodymap-insight.webp',
+      rehabIncludesTitle: 'What Pelvic Rehab Includes',
+      rehabIncludesItems: [
+        { icon: ClipboardCheck, title: 'Pelvic Torsion & Symmetry Test' },
+        { icon: Zap, title: 'SI Joint Mobilization & Offloading' },
+        { icon: UserCheck, title: 'Gluteus Medius & Piriformis Reset' },
+        { icon: Activity, title: 'Ergonomic Coccyx Cushion Guidance' },
+        { icon: Home, title: 'Pelvic Floor Coordination Drills' },
+        { icon: Stethoscope, title: 'Long-Term Pelvic Base Plan' },
+      ],
+      expertConsultTitle: 'Consult Our Pelvic & Spine Specialists',
+      expertConsultCategory: 'Pelvic & Spine Health',
+      quoteText: '“A balanced pelvic foundation allows the entire spine to move without asymmetric shearing.”',
+      ctaTitle: 'Relieve SI Joint and Tailbone Pain Today!',
+      ctaSubtitle:
+        'Specialized manual physical therapy realigns pelvic torsion and restores pain-free sitting.',
+      promoCardTitle: 'Balanced Base\nSit in Peace',
+      promoCardPoints: ['Comfortable Sitting', 'Symmetric Pelvic Loading', 'Relieved Buttock Aches'],
+      promoCardImage: '/images/precision-recovery/stage2-plan.webp',
+    };
+  }
+
+  // 16. Knee & Joint Osteoarthritis / Orthopaedics
   if (
     slug.includes('knee') ||
     title.includes('knee') ||
@@ -307,7 +838,7 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
     };
   }
 
-  // 6. Cervical Spondylosis & Neck Pain
+  // 17. Cervical Spondylosis & Neck Pain
   if (
     slug.includes('cervical') ||
     title.includes('cervical') ||
@@ -332,7 +863,7 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
       pdfGuideTitle: 'Cervical Spine & Ergonomic Desk Health Guide',
       centerBannerTag: 'CERVICAL SPINE',
       centerBannerTitle: 'Ergonomic Alignment & Neck Pain Relief',
-      centerBannerImage: cervicalImg,
+      centerBannerImage: '/images/physiotherapy/physio-understanding-treatment.jpg',
       rehabIncludesTitle: 'What Neck Rehab Includes',
       rehabIncludesItems: [
         { icon: ClipboardCheck, title: 'Cervical Kinematic Screen' },
@@ -350,11 +881,11 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
         'Eliminate stiff neck, postural fatigue, and radiating arm pain with expert home physiotherapy.',
       promoCardTitle: 'Pain-Free Neck\nClear Focus',
       promoCardPoints: ['Relieved Tension Headaches', 'Restored Neck Turning', 'Ergonomic Comfort'],
-      promoCardImage: cervicalImg,
+      promoCardImage: '/images/physiotherapy/program-cervical.jpg',
     };
   }
 
-  // 7. Stroke & Neurological Rehabilitation
+  // 18. Stroke & Neurological Rehabilitation
   if (
     slug.includes('stroke') ||
     title.includes('stroke') ||
@@ -406,7 +937,7 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
     };
   }
 
-  // 8. General Spine & Low Back Pain
+  // 19. General Spine & Low Back Pain
   if (
     slug.includes('back') ||
     title.includes('back') ||
@@ -431,7 +962,7 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
       pdfGuideTitle: 'Spine Care & Home Exercise Guide',
       centerBannerTag: 'SPINE RECOVERY',
       centerBannerTitle: 'Evidence-Based Spine Conditioning at Home',
-      centerBannerImage: '/images/blog/disc_health_cross_section.png',
+      centerBannerImage: '/images/why-choose/card5_better_mobility.jpg',
       rehabIncludesTitle: 'What Spine Rehab Includes',
       rehabIncludesItems: [
         { icon: ClipboardCheck, title: 'Personalized Assessment' },
@@ -449,7 +980,7 @@ function getConditionTheme(post: GrowthBlogPost): ConditionTheme {
         'Book a consultation with our expert physiotherapists and get a personalized care plan for lasting relief.',
       promoCardTitle: 'Move Better\nLive Stronger',
       promoCardPoints: ['Less Pain', 'More Mobility', 'Healthier Tomorrow'],
-      promoCardImage: '/images/blog/promo_move_better.png',
+      promoCardImage: '/images/blog/lumbar-spine-rehab.jpg',
     };
   }
 
