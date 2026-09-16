@@ -20,31 +20,32 @@ export const metadata = {
 function getBlogCover(topic?: string, territory?: string, title?: string, slug?: string) {
   const query = `${topic || ''} ${territory || ''} ${title || ''} ${slug || ''}`.toLowerCase();
 
-  if (query.includes('degenerative disc')) return '/images/blog/hero_ddd_clean_panoramic.png';
-  if (query.includes('herniat') || query.includes('slipped disc') || query.includes('disc bulge') || query.includes('prolapse')) return '/images/blog/disc-herniation-rehab.jpg';
-  if (query.includes('sciatica') || query.includes('radiculopathy') || query.includes('piriformis')) return '/images/blog/sciatica-nerve-relief.jpg';
-  if (query.includes('stenosis') || query.includes('claudication')) return '/images/blog/spinal-stenosis-gait.jpg';
-  if (query.includes('ergo') || query.includes('workstation') || query.includes('desk')) return '/images/occupational-therapy/ot-proto-ergo.jpg';
-  if (query.includes('postur') || query.includes('tech neck') || query.includes('swayback')) return '/images/physiotherapy/physio-understanding-treatment.jpg';
-  if (query.includes('core') || query.includes('exercise') || query.includes('mcgill') || query.includes('top-7')) return '/images/blog/related_exercises_spine.png';
-  if (query.includes('mri') || query.includes('scan') || query.includes('imaging') || query.includes('report')) return '/images/blog/related_mri_spine.png';
-  if (query.includes('sleep') || query.includes('mattress') || query.includes('pillow')) return '/images/why-choose/card1_care_at_home.jpg';
-  if (query.includes('walk') || query.includes('habit') || query.includes('step') || query.includes('everyday')) return '/images/blog/related_habits_spine.png';
-  if (query.includes('spondyl') || query.includes('facet')) return '/images/physiotherapy/program-arthritis.jpg';
-  if (query.includes('thoracic') || query.includes('rib') || query.includes('upper back')) return '/images/physiotherapy/program-lumbar.jpg';
-  if (query.includes('sacroiliac') || query.includes('si joint') || query.includes('tailbone') || query.includes('coccy')) return '/images/precision-recovery/stage2-plan.webp';
-  if (query.includes('surg') || query.includes('fusion') || query.includes('laminectomy') || query.includes('fbss')) return '/images/home-nursing/nursing-service-post-surgical.jpg';
-  if (query.includes('modality') || query.includes('tens') || query.includes('ift') || query.includes('laser') || query.includes('spasm')) return '/images/clinics/flagship-spinal-4.png';
-  if (query.includes('knee') || query.includes('joint') || query.includes('osteoarthritis')) return '/images/physiotherapy/physio-knee-treatment.jpg';
-  if (query.includes('neck') || query.includes('cervical')) return '/images/physiotherapy/program-cervical.jpg';
-  if (query.includes('stroke') || query.includes('paralysis') || query.includes('hemiplegia')) return '/images/blog/stroke-rehab-hero.jpg';
-  if (query.includes('brain') || query.includes('neuroplasticity')) return '/images/blog/neuroplasticity-brain.jpg';
-  if (query.includes('sport') || query.includes('runner') || query.includes('athlet') || query.includes('fitness')) return '/images/physiotherapy/program-sports.jpg';
-  if (query.includes('senior') || query.includes('elder') || query.includes('geriatric') || query.includes('over 50') || query.includes('fall')) return '/images/physiotherapy/program-elderly.jpg';
-  if (query.includes('child') || query.includes('pediatric') || query.includes('scheuermann')) return '/images/occupational-therapy/ot-proto-pediatric.jpg';
-  if (query.includes('back') || query.includes('spine') || query.includes('lumbar')) return '/images/blog/lumbar-spine-rehab.jpg';
+  if (query.includes('shoulder') || query.includes('rotator') || query.includes('capsulitis') || query.includes('bicep') || query.includes('labr')) {
+    return '/images/blog/shoulder/rotator-cuff-injury-clinical-rehab-guide-aries-physiocare.webp';
+  }
+  if (query.includes('neck') || query.includes('cervical') || query.includes('whiplash') || query.includes('torticollis') || query.includes('headache')) {
+    return '/images/blog/neck/cervical-spondylosis-neck-arthritis-care-aries-physiocare.webp';
+  }
+  if (query.includes('knee') || query.includes('joint') || query.includes('osteoarthritis')) {
+    return '/images/blog/general/managing-knee-osteoarthritis-quadriceps-strengthening-home-care-aries-physiocare.webp';
+  }
+  if (query.includes('stroke') || query.includes('paralysis') || query.includes('hemiplegia') || query.includes('neuro') || query.includes('gait')) {
+    return '/images/blog/general/stroke-rehabilitation-at-home-a-complete-guide-aries-physiocare.webp';
+  }
+  if (query.includes('ergo') || query.includes('workstation') || query.includes('desk') || query.includes('postur')) {
+    return '/images/blog/spine/postural-back-pain-desk-workers-ergonomics-aries-physiocare.webp';
+  }
+  if (query.includes('scoliosis') || query.includes('kyphosis') || query.includes('lordosis')) {
+    return '/images/blog/spine/scoliosis-non-surgical-physiotherapy-schroth-aries-physiocare.webp';
+  }
+  if (query.includes('sciatica') || query.includes('radiculopathy') || query.includes('piriformis')) {
+    return '/images/blog/spine/sciatica-nerve-pain-relief-exercises-aries-physiocare.webp';
+  }
+  if (query.includes('surg') || query.includes('fusion') || query.includes('fracture')) {
+    return '/images/blog/spine/post-spinal-surgery-rehabilitation-timeline-aries-physiocare.webp';
+  }
 
-  return '/images/what-we-treat/conditions-spine.webp';
+  return '/images/blog/spine/spine-and-back-conditions-guide-aries-physiocare.webp';
 }
 
 export default async function BlogsPage() {
@@ -63,6 +64,7 @@ export default async function BlogsPage() {
       : 'Recently',
     author: 'Aries Clinical Board',
     imageUrl: p.imageUrl || getBlogCover(p.topic, p.territory, p.title, p.slug),
+    imageAlt: p.imageAlt || `${p.title} | Aries PhysioCare Clinical Rehabilitation`,
     imageHint: `${p.topic || 'medical'} healthcare blog cover`,
     isGrowth: true,
   }));
@@ -142,7 +144,7 @@ export default async function BlogsPage() {
                   <Link href={`/blogs/${post.slug}`} className="block relative aspect-[16/10] w-full rounded-2xl overflow-hidden shadow-md">
                     <Image
                       src={post.imageUrl}
-                      alt={post.title}
+                      alt={post.imageAlt || post.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover transition-transform duration-700 group-hover:scale-105"

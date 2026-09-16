@@ -10,7 +10,8 @@ export const SPINE_ORTHOPAEDIC_BLOGS: GrowthBlogPost[] = [
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-18T00:00:00.000Z',
-    imageUrl: '/images/what-we-treat/conditions-spine.webp',
+    imageUrl: '/images/blog/spine/spine-and-back-conditions-guide-aries-physiocare.webp',
+    imageAlt: 'Aries PhysioCare physiotherapist conducting comprehensive spinal mobility and mechanical diagnosis on an adult patient.',
     content: `# Spine & Back Conditions: Anatomy, Clinical Disorders & Modern Physiotherapy Rehabilitation
 
 ## 1. Introduction: Understanding Spinal Health
@@ -62,7 +63,8 @@ If back pain persists beyond 7–10 days, interferes with sleep, or radiates dow
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-17T00:00:00.000Z',
-    imageUrl: '/images/blog/lumbar-spine-rehab.jpg',
+    imageUrl: '/images/blog/spine/low-back-pain-causes-symptoms-treatment-aries-physiocare.webp',
+    imageAlt: 'Targeted lower back pain assessment and gentle segmental mobilization administered by an Aries PhysioCare clinician.',
     content: `# Low Back Pain: Causes, Clinical Symptoms & Advanced Physiotherapy Treatment at Home
 
 ## 1. Introduction: Understanding Lower Back Pain
@@ -83,7 +85,7 @@ Most low back pain is classified as non-specific mechanical lumbago, driven by:
 - Muscular strain from sudden unaccustomed exertion
 - Weak abdominal wall and gluteal amnesia failing to support the lumbar spine
 - Sedentary lifestyle causing shortening of the psoas and hamstrings
-- Our senior physiotherapists evaluate spinal directional preference, pelvic tilt angles, and joint mobility to pinpoint the underlying functional deficit.
+- Our senior physiotherapists evaluate spinal directional preference, lumbopelvic alignment, and joint mobility to pinpoint the underlying functional deficit.
 
 ## 4. Pathophysiology & Biomechanical Impact
 In mechanical back pain, repetitive flexion or axial compression increases stress on posterior disc fibers and facet capsules. The surrounding muscular sling reacts by entering a protective spasm cycle, decreasing localized blood flow and perpetuating tissue irritability.
@@ -97,7 +99,7 @@ In mechanical back pain, repetitive flexion or axial compression increases stres
 ## 6. Home Care & Ergonomic Strategies
 - Avoid bed rest beyond 24 hours; gentle walking promotes recovery
 - Adjust workstation chair height to keep knees level with or slightly lower than hips
-- Incorporate gentle knee-to-chest and cat-camel mobilizations daily
+- Incorporate gentle therapist-guided spinal unweighting and micro-mobility breaks daily
 - Sleep on a medium-firm orthopedic mattress with a pillow between knees when side-sleeping
 
 ## 7. When to Contact Us
@@ -113,7 +115,8 @@ Do not ignore back pain that restricts your daily mobility. Contact Aries Physio
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-16T00:00:00.000Z',
-    imageUrl: '/images/precision-recovery/stage3-track.webp',
+    imageUrl: '/images/blog/spine/chronic-low-back-pain-rehabilitation-aries-physiocare.webp',
+    imageAlt: 'Long-term neuromuscular core retraining and spinal stabilization for chronic back pain at an Aries PhysioCare clinic.',
     content: `# Chronic Low Back Pain: Neuromuscular Re-Education & Long-Term Spine Rehabilitation
 
 ## 1. Introduction: Understanding Chronic Low Back Pain
@@ -141,7 +144,7 @@ With chronic disuse, the deep stabilizing muscles undergo selective atrophy whil
 
 ## 5. Evidence-Based Physiotherapy Protocols
 - Motor control retraining focusing on fine neuromuscular control before heavy loading
-- McGill Big 3 exercises (Modified Curl-Up, Side Plank, Bird-Dog) to build spinal sparing stamina
+- Clinical isometric trunk conditioning and McGill-based spinal sparing motor control protocols
 - Graded exposure therapy to eliminate kinesiophobia (fear of movement)
 - Neuromuscular electrical stimulation (NMES) to re-engage dormant multifidus fibers
 
@@ -164,7 +167,8 @@ Chronic back pain does not mean you must live with permanent limitations. Contac
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-15T00:00:00.000Z',
-    imageUrl: '/images/clinics/flagship-treatment-2.png',
+    imageUrl: '/images/blog/spine/acute-back-pain-first-aid-physiotherapy-aries-physiocare.webp',
+    imageAlt: 'First 72-hour acute back pain relief and safe directional preference positioning with an Aries PhysioCare therapist.',
     content: `# Acute Back Pain: First 72-Hour Protocols, Pain Desensitization & Fast-Track Recovery
 
 ## 1. Introduction: Understanding Acute Back Episodes
@@ -215,7 +219,8 @@ If acute back pain strikes, do not struggle in agony. Contact Aries PhysioCare f
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-14T00:00:00.000Z',
-    imageUrl: '/images/why-choose/card5_better_mobility.jpg',
+    imageUrl: '/images/blog/spine/mechanical-back-pain-causes-exercises-aries-physiocare.webp',
+    imageAlt: 'Movement-based mechanical back pain treatment and lumbopelvic rhythm retraining guided by an Aries PhysioCare specialist.',
     content: `# Mechanical Back Pain: Biomechanical Causes, Postural Triggers & Movement-Based Rehab
 
 ## 1. Introduction: Understanding Mechanical Back Pain
@@ -244,7 +249,7 @@ Continuous static loading stretches posterior ligamentous structures and increas
 ## 5. Evidence-Based Physiotherapy Protocols
 - Correction of mechanical directional intolerance (flexion vs. extension bias)
 - Hip hinge re-training to decouple lumbar spinal movement from pelvic rotation
-- Targeted gluteal activation (bridges, clamshells, monster walks) to offload the spine
+- Supervised clinical gluteal activation and posterior chain motor control to offload the spine
 - Ergonomic postural correction and core stability sequencing
 
 ## 6. Home Care & Ergonomic Strategies
@@ -266,7 +271,8 @@ Solve mechanical back pain at its biomechanical root. Contact Aries PhysioCare t
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-13T00:00:00.000Z',
-    imageUrl: '/images/physiotherapy/program-arthritis.jpg',
+    imageUrl: '/images/blog/spine/lumbar-spondylosis-physiotherapy-management-aries-physiocare.webp',
+    imageAlt: 'Joint preservation therapy and gentle lumbar traction for lumbar spondylosis at Aries PhysioCare.',
     content: `# Lumbar Spondylosis: Joint Preservation, Osteoarthritis Management & Physiotherapy Protocols
 
 ## 1. Introduction: Understanding Lumbar Spondylosis
@@ -295,12 +301,12 @@ Loss of disc height shifts up to 70% of axial load onto the posterior facet join
 ## 5. Evidence-Based Physiotherapy Protocols
 - Grade II & III Maitland joint mobilizations to restore synovial fluid lubrication
 - Low-impact aerobic conditioning (recumbent stationary cycling, gentle walking)
-- Deep core bracing and pelvic tilt progression to decompress facet joints
+- Deep core neuromuscular activation and guided lumbopelvic alignment to decompress facet joints
 - Class IV Laser therapy and localized thermotherapy to alleviate chronic periarticular stiffness
 
 ## 6. Home Care & Ergonomic Strategies
 - Apply warm moist heat to the lower back for 15 minutes upon waking
-- Perform gentle pelvic clocks and knee rolling stretches in bed before standing
+- Perform gentle therapist-guided joint unweighting and warm-up movements before standing
 - Wear cushioned footwear with supportive arch support to absorb walking impact
 - Stay consistently active with low-impact aquatic therapy or daily walks
 
@@ -317,7 +323,8 @@ Maintain a healthy, flexible spine as you age. Contact Aries PhysioCare for comp
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-12T00:00:00.000Z',
-    imageUrl: '/images/home-nursing/nursing-service-chronic.jpg',
+    imageUrl: '/images/blog/spine/lumbar-spondylitis-symptoms-and-care-aries-physiocare.webp',
+    imageAlt: 'Non-impact spinal mobility exercises and pain desensitization for lumbar spondylitis with an Aries PhysioCare expert.',
     content: `# Lumbar Spondylitis: Inflammatory Spine Management, Pain Relief & Rehabilitation
 
 ## 1. Introduction: Understanding Lumbar Spondylitis
@@ -368,7 +375,8 @@ Early clinical management prevents long-term spinal stiffening. Contact Aries Ph
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-11T00:00:00.000Z',
-    imageUrl: '/images/blog/disc-herniation-rehab.jpg',
+    imageUrl: '/images/blog/spine/lumbar-disc-prolapse-non-surgical-recovery-aries-physiocare.webp',
+    imageAlt: 'Non-surgical lumbar disc prolapse centralization and core motor control guided by an Aries PhysioCare physiotherapist.',
     content: `# Lumbar Disc Prolapse: Non-Surgical Recovery, Disc Centralization & Rehabilitation Timeline
 
 ## 1. Introduction: Understanding Lumbar Disc Prolapse
@@ -419,7 +427,8 @@ Avoid unnecessary surgery with structured conservative treatment. Contact Aries 
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-10T00:00:00.000Z',
-    imageUrl: '/images/blog/disc_health_cross_section.png',
+    imageUrl: '/images/blog/spine/slipped-disc-herniated-disc-treatment-aries-physiocare.webp',
+    imageAlt: 'Herniated disc recovery exercises and safe spinal offloading supervised by an Aries PhysioCare spine specialist.',
     content: `# Slipped Disc & Herniated Disc: Complete Guide to Symptoms, Healing Biology & Physio Care
 
 ## 1. Introduction: Understanding Disc Herniation
@@ -470,7 +479,8 @@ If back and leg pain are compromising your work and sleep, get expert home care.
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-09T00:00:00.000Z',
-    imageUrl: '/images/blog/promo_move_better.png',
+    imageUrl: '/images/blog/spine/disc-bulge-causes-reversal-physiotherapy-aries-physiocare.webp',
+    imageAlt: 'Evidence-based disc bulge reversal protocols and deep core engagement practiced with an Aries PhysioCare clinician.',
     content: `# Disc Bulge: Understanding the Early Warning Signs, Reversal Protocols & Spine Protection
 
 ## 1. Introduction: Understanding Disc Bulge
@@ -504,7 +514,7 @@ Under continuous hydrostatic pressure from slouching, the nucleus pulposus migra
 
 ## 6. Home Care & Ergonomic Strategies
 - Set up an ergonomic desk with monitor at eye level and lumbar pillow in place
-- Stand and perform 10 gentle standing back extensions every 60 minutes
+- Take regular standing posture breaks every 45 to 60 minutes to interrupt prolonged flexion loading
 - Avoid heavy deadlifts or forward-bending toe touches until clearance from your physiotherapist
 - Stay hydrated to support intervertebral disc re-imbibition during sleep
 
@@ -521,50 +531,54 @@ Do not let a minor disc bulge turn into an agonizing herniation. Contact Aries P
     territory: 'Spine Health',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-05T00:00:00.000Z',
-    imageUrl: '/images/blog/hero_ddd_clean_panoramic.png',
+    imageUrl: '/images/blog/spine/degenerative-disc-disease-spine-care-aries-physiocare.webp',
+    imageAlt: 'Active spinal conditioning and hydrostatic disc pressure management for degenerative disc disease at Aries PhysioCare.',
     content: `# Degenerative Disc Disease (DDD): Pathomechanics, Pain Relief & Active Spine Conditioning
 
 ## 1. Introduction: Understanding Degenerative Disc Disease
-Degenerative Disc Disease (DDD) is a common, age-related condition that affects the spinal discs — the cushions between the vertebrae. Over time, these discs lose hydration, elasticity, and height, which can lead to pain, stiffness, and reduced mobility. While it's a natural part of aging, the right physiotherapy approach can significantly reduce discomfort and help you stay active.
+Degenerative Disc Disease (DDD) is a prevalent condition affecting the intervertebral fibrocartilaginous cushions that articulate and shock-absorb the spinal column. Over time, progressive cellular dehydration, loss of proteoglycan content, and reduced disc height compromise segmental stability. While age-related cellular desiccation is universal, pain develops when structural disc height loss creates micro-instability, abnormal stress distribution across adjacent facet joints, and neural foraminal narrowing. Modern clinical evidence demonstrates that comprehensive conservative physiotherapy and targeted spinal offloading restore functional mobility and alleviate discomfort without surgical intervention.
 
-## 2. What is Degenerative Disc Disease?
-DDD refers to the gradual breakdown of intervertebral discs, which act as shock absorbers in the spine. It most commonly affects the cervical (neck) and lumbar (lower back) regions and can lead to nerve compression, pain, and functional limitations.
+## 2. Common Symptoms
+Degenerative disc symptoms vary according to the affected spinal segment and neural involvement:
+- Persistent axial aching in the lower back or neck aggravated by sustained sitting
+- Deep morning stiffness that eases gradually with gentle walking and warmth
+- Focal tenderness along the paraspinal muscles with compensatory muscle guarding
+- Radiating discomfort into the buttocks or shoulders during prolonged axial loading
+- Intermittent sharp catches during transition from sitting to standing
+- Temporary symptom relief when lying recumbent or unweighting the spine
+- Reduced spinal rotational flexibility and sensation of spinal fatigue by late afternoon
 
-## 3. Causes & Risk Factors
-- Natural aging and wear & tear
-- Poor posture and prolonged sitting
-- Repetitive strain or heavy lifting
-- Previous spine injuries
-- Obesity and lack of physical activity
-- Genetic predisposition
+## 3. Causes & Clinical Diagnosis
+The pathogenesis of disc degeneration involves multifactorial biomechanical and metabolic stressors:
+- Age-related reduction in disc vascularity and nutrient diffusion through the vertebral endplates
+- Chronic uncorrected sedentary postures placing continuous hydrostatic pressure on the posterior annulus
+- Repetitive occupational torsional strain or heavy lifting with poor lumbopelvic mechanics
+- Genetic predisposition to premature proteoglycan breakdown
+- Clinical diagnosis entails physical examination (range of motion, spinal percussion, Slump test, and dermatomal/myotomal neuro-screens) alongside weight-bearing X-rays and MRI to assess disc hydration and disc-space height.
 
-## 4. Common Symptoms
-- Persistent neck or lower back pain
-- Stiffness, especially in the morning
-- Reduced range of motion
-- Pain radiating to arms or legs
-- Numbness or tingling (if nerves are involved)
-- Difficulty with prolonged sitting or standing
+## 4. Pathophysiology & Biomechanical Impact
+As intervertebral discs lose fluid volume, the nucleus pulposus can no longer distribute axial loads symmetrically across the vertebral endplates. The tough outer annulus fibrosus bears excessive compressive and shear forces, developing circumferential micro-fissures. Consequently, the posterior zygapophyseal (facet) joints undergo compensatory hyper-mobility and hypertrophy, precipitating facet arthropathy, osteophyte development, and narrowing of the intervertebral foramina.
 
-## 5. Diagnosis
-Diagnosis typically involves a physical examination, medical history review, and imaging tests such as X-rays or MRI. At Aries PhysioCare, we combine clinical assessment with functional movement analysis to create a personalized treatment plan.
+## 5. Evidence-Based Physiotherapy Protocols
+At Aries PhysioCare, clinical management focuses on restoration of disc imbibition, joint offloading, and neuromuscular stabilization under physical therapist guidance:
+- Comprehensive Mechanical Diagnosis and Therapy (MDT) to determine individual directional preferences
+- Manual therapy: Gentle grade I-III Maitland mobilizations to restore facet glide and decrease protective spasm
+- Clinical electrotherapy: Calibrated Interferential Therapy (IFT) and Class-IV Deep Tissue Laser to stimulate local microcirculation and relieve deep muscular hypertonicity
+- Specialized spinal traction: Controlled manual axial decompression to momentarily expand the intervertebral foramina
+- Supervised motor control retraining: Activation of the transverse abdominis, lumbar multifidus, and pelvic diaphragm in neutral spinal postures
+- Objective criteria-based progression from gentle unweighted postures to functional daily movement patterns
 
-## 6. How Physiotherapy Helps
-Physiotherapy focuses on reducing pain, improving mobility, strengthening supporting muscles, and preventing further degeneration. Evidence-based techniques such as manual therapy, therapeutic exercises, posture correction, and core stabilization play a key role in managing DDD.
+## 6. Home Care & Ergonomic Strategies
+Sustainable long-term spine health requires proactive daily habit adjustments:
+- Configure ergonomic workstations with lumbar lordotic roll support, elbow rests at 90 degrees, and monitor at eye level
+- Implement active micro-breaks: Alternate between seated and standing positions every 45 minutes
+- Maintain adequate daily hydration to support cellular osmotic balance in vertebral tissues
+- Adopt spine-sparing sleep ergonomics: Supportive orthopedic mattress paired with a pillow between knees (side sleeping) or under knees (supine)
+- Apply thermal contrast modalities: Moist heat for morning paraspinal tightness and localized cold therapy after physical exertion
+- Avoid unsupervised high-impact twisting movements or heavy spinal flexion loading
 
-## 7. Rehabilitation Protocols
-- Pain management and inflammation control
-- Gentle mobility and stretching exercises
-- Core and back muscle strengthening
-- Posture and ergonomic training
-- Activity modification and lifestyle advice (stress)
-- Gradual return to daily and sports activities
-
-## 8. Recovery & Outlook
-While DDD cannot be reversed, the right physiotherapy program can help you manage symptoms effectively, improve function, and maintain an active, pain-free lifestyle for years to come.
-
-## 9. When to Contact Us
-If you're experiencing persistent back or neck pain, stiffness, or difficulty with daily activities, our expert physiotherapists at Aries PhysioCare are here to help. Early intervention can prevent further complications and get you back to doing what you love.`,
+## 7. When to Contact Us
+Do not let chronic spinal stiffness restrict your daily life. Contact Aries PhysioCare to schedule a thorough clinical evaluation at home or in our specialized clinics, and receive a customized, non-surgical disc restoration plan.`,
   },
 
   // 12. Sciatica
@@ -576,7 +590,8 @@ If you're experiencing persistent back or neck pain, stiffness, or difficulty wi
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-07T00:00:00.000Z',
-    imageUrl: '/images/blog/sciatica-nerve-relief.jpg',
+    imageUrl: '/images/blog/spine/sciatica-nerve-pain-relief-exercises-aries-physiocare.webp',
+    imageAlt: 'Sciatic nerve mobilization, straight leg gliding, and root decompression guided by an Aries PhysioCare physiotherapist.',
     content: `# Sciatica Nerve Pain: Root Causes, Dermatomal Radiation & Advanced Physiotherapy Relief
 
 ## 1. Introduction: Understanding Sciatica
@@ -627,7 +642,8 @@ End excruciating sciatic nerve pain with expert clinical care. Contact Aries Phy
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-06T00:00:00.000Z',
-    imageUrl: '/images/precision-recovery/bodymap-insight.webp',
+    imageUrl: '/images/blog/spine/lumbar-radiculopathy-diagnosis-treatment-aries-physiocare.webp',
+    imageAlt: 'Clinical evaluation and neural decompression therapy for lumbar radiculopathy at an Aries PhysioCare center.',
     content: `# Lumbar Radiculopathy: Nerve Root Compression, Neurological Deficits & Rehab Protocols
 
 ## 1. Introduction: Understanding Lumbar Radiculopathy
@@ -678,7 +694,8 @@ Do not ignore weakness or numbness in your leg. Contact Aries PhysioCare for spe
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-05T00:00:00.000Z',
-    imageUrl: '/images/blog/spinal-stenosis-gait.jpg',
+    imageUrl: '/images/blog/spine/spinal-stenosis-neurogenic-claudication-aries-physiocare.webp',
+    imageAlt: 'Flexion-biased gait training and walking endurance conditioning for spinal stenosis with an Aries PhysioCare therapist.',
     content: `# Spinal Stenosis: Neurogenic Claudication, Shopping Cart Sign & Flexion-Biased Physio
 
 ## 1. Introduction: Understanding Spinal Stenosis
@@ -707,7 +724,7 @@ During spinal extension (standing tall, walking), the ligamentum flavum buckles 
 ## 5. Evidence-Based Physiotherapy Protocols
 - Flexion-biased rehabilitation protocols (William's flexion exercises) to expand canal diameter
 - Stationary cycling (flexed lumbar posture) for cardiovascular fitness without neurogenic irritation
-- Hip flexor stretching and pelvic tilt training to decrease resting lumbar lordosis
+- Clinical hip flexor myofascial release and guided lumbopelvic realignment to decrease resting lumbar lordosis
 - Core stabilization focusing on abdominal bracing to prevent involuntary lumbar hyperextension
 
 ## 6. Home Care & Ergonomic Strategies
@@ -729,7 +746,8 @@ Regain your walking independence and vitality. Contact Aries PhysioCare for spec
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-04T00:00:00.000Z',
-    imageUrl: '/images/precision-recovery/stage1-assess.webp',
+    imageUrl: '/images/blog/spine/spondylolisthesis-vertebral-slip-physiotherapy-aries-physiocare.webp',
+    imageAlt: 'Neutral spine stabilization and abdominal wall bracing for spondylolisthesis recovery at Aries PhysioCare.',
     content: `# Spondylolisthesis: Vertebral Slippage Grading, Core Stabilization & Non-Surgical Care
 
 ## 1. Introduction: Understanding Spondylolisthesis
@@ -759,7 +777,7 @@ With loss of bony or ligamentous restraint, anterior shear forces overcome the i
 - Deep core bracing (transversus abdominis and internal obliques) to build a dynamic internal spinal brace
 - Strict avoidance of lumbar hyperextension and aggressive spinal manipulation
 - Hamstring lengthening and hip flexor stretching to restore neutral pelvic balance
-- Lumbo-pelvic stabilization drills (dead bugs, modified bird-dogs in neutral spine)
+- Lumbo-pelvic stabilization drills and progressive neutral spine motor control under therapist supervision
 
 ## 6. Home Care & Ergonomic Strategies
 - Never sleep on your stomach, which pushes the lumbar spine into excessive lordosis
@@ -780,7 +798,8 @@ Stabilize your spine and eliminate pain safely. Contact Aries PhysioCare for exp
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-03T00:00:00.000Z',
-    imageUrl: '/images/physiotherapy/program-cervical.jpg',
+    imageUrl: '/images/blog/spine/ankylosing-spondylitis-spine-mobility-exercises-aries-physiocare.webp',
+    imageAlt: 'Thoracic extension, costovertebral breathing, and spinal mobility exercises for ankylosing spondylitis at Aries PhysioCare.',
     content: `# Ankylosing Spondylitis: Axial Spondyloarthritis, Posture Preservation & Breathing Drills
 
 ## 1. Introduction: Understanding Ankylosing Spondylitis
@@ -830,7 +849,8 @@ Fight spinal stiffness and preserve your upright posture. Contact Aries PhysioCa
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-02T00:00:00.000Z',
-    imageUrl: '/images/precision-recovery/stage2-plan.webp',
+    imageUrl: '/images/blog/spine/sacroiliac-si-joint-dysfunction-rehab-aries-physiocare.webp',
+    imageAlt: 'Sacroiliac SI joint manual realignment and pelvic belt stabilization guided by an Aries PhysioCare specialist.',
     content: `# Sacroiliac (SI) Joint Dysfunction: Pelvic Torsion, Pain Triggers & Stabilization Rehab
 
 ## 1. Introduction: Understanding Sacroiliac Joint Dysfunction
@@ -881,7 +901,8 @@ End frustrating, misdiagnosed pelvic and back pain. Contact Aries PhysioCare for
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-01T00:00:00.000Z',
-    imageUrl: '/images/care-taker/care-proto-mobility.jpg',
+    imageUrl: '/images/blog/spine/coccydynia-tailbone-pain-relief-physiotherapy-aries-physiocare.webp',
+    imageAlt: 'Pelvic floor relaxation and non-surgical tailbone coccydynia relief therapy at an Aries PhysioCare clinic.',
     content: `# Coccyx Pain (Coccydynia): Tailbone Trauma, Pelvic Floor Tension & Non-Surgical Relief
 
 ## 1. Introduction: Understanding Coccydynia
@@ -933,7 +954,8 @@ Do not suffer through painful sitting. Contact Aries PhysioCare for discreet, sp
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-01-31T00:00:00.000Z',
-    imageUrl: '/images/clinics/flagship-spinal-4.png',
+    imageUrl: '/images/blog/spine/facet-joint-syndrome-lumbar-spine-treatment-aries-physiocare.webp',
+    imageAlt: 'Zygapophyseal facet joint offloading and flexion-biased pain relief supervised by an Aries PhysioCare clinician.',
     content: `# Facet Joint Syndrome: Zygapophyseal Arthropathy, Extension Catching & Physio Care
 
 ## 1. Introduction: Understanding Facet Joint Syndrome
@@ -984,7 +1006,8 @@ Free locked facet joints and eliminate back pain. Contact Aries PhysioCare for s
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-01-30T00:00:00.000Z',
-    imageUrl: '/images/physiotherapy/physio-understanding-treatment.jpg',
+    imageUrl: '/images/blog/spine/back-muscle-spasm-causes-quick-relief-aries-physiocare.webp',
+    imageAlt: 'Rapid back muscle spasm relief through gentle myofascial release and heat therapy with an Aries PhysioCare therapist.',
     content: `# Back Muscle Spasms: Acute Guarding, Trigger Points & Fast-Acting Physiotherapy Relief
 
 ## 1. Introduction: Understanding Back Muscle Spasms
@@ -1036,7 +1059,8 @@ Do not suffer in bed trapped by agonizing spasms. Contact Aries PhysioCare for r
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-01-29T00:00:00.000Z',
-    imageUrl: '/images/occupational-therapy/ot-proto-ergo.jpg',
+    imageUrl: '/images/blog/spine/postural-back-pain-desk-workers-ergonomics-aries-physiocare.webp',
+    imageAlt: 'Ergonomic workstation adjustment and postural corrective exercises for desk workers at Aries PhysioCare.',
     content: `# Postural Back Pain: Upper & Lower Crossed Syndromes, Desk Ergonomics & Corrective Rehab
 
 ## 1. Introduction: Understanding Postural Back Pain
@@ -1047,7 +1071,7 @@ Chronic fatigue and postural strain signs:
 - Dull, aching fatigue in the upper neck, mid-back, and lumbosacral region by mid-afternoon
 - Constant desire to crack or pop your back to find temporary relief
 - Rounded shoulders and prominent forward-head posture ("tech neck")
-- Excessive inward arch in the lower back (anterior pelvic tilt) or flat back posture
+- Excessive inward arch in the lower back or slumped flat-back posture
 - Persistent tightness across the trapezius, levator scapulae, and hip flexors
 - Headaches starting at the base of the skull radiating over the forehead
 - Relief experienced when engaging in physical exercise or changing seated positions
@@ -1070,9 +1094,9 @@ Holding a slumped posture places posterior spinal ligaments on continuous stretc
 
 ## 6. Home Care & Ergonomic Strategies
 - Position computer screens so the top third of the monitor sits directly at eye level
-- Use a 20-20-20 rule: every 20 minutes, look 20 feet away and perform 5 chin tucks
+- Practice micro-movement intervals: every 30 minutes, adjust sitting posture and realign head over shoulders
 - Incorporate standing desk intervals (aim for 20 minutes standing per hour)
-- Perform daily chest-opening doorway stretches and glute bridges
+- Incorporate ergonomic workstation postural adjustments and gentle shoulder retractions
 
 ## 7. When to Contact Us
 Eliminate chronic desk fatigue and restore your natural posture. Contact Aries PhysioCare for personalized home ergonomic assessments and corrective postural physiotherapy.`,
@@ -1087,7 +1111,8 @@ Eliminate chronic desk fatigue and restore your natural posture. Contact Aries P
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-01-28T00:00:00.000Z',
-    imageUrl: '/images/physiotherapy/program-lumbar.jpg',
+    imageUrl: '/images/blog/spine/thoracic-spine-pain-mid-back-rehabilitation-aries-physiocare.webp',
+    imageAlt: 'Mid-back thoracic spine mobilization and rib cage expansion exercises guided by an Aries PhysioCare clinician.',
     content: `# Thoracic Spine Pain: Mid-Back Stiffness, Costovertebral Dysfunction & Mobility Rehab
 
 ## 1. Introduction: Understanding Thoracic Spine Pain
@@ -1139,7 +1164,8 @@ Breathe freely and move without mid-back catching. Contact Aries PhysioCare for 
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-01-27T00:00:00.000Z',
-    imageUrl: '/images/occupational-therapy/ot-proto-pediatric.jpg',
+    imageUrl: '/images/blog/spine/scheuermanns-kyphosis-adolescent-spine-rehab-aries-physiocare.webp',
+    imageAlt: 'Structural roundback Scheuermann kyphosis correction and extensor strengthening with an Aries PhysioCare specialist.',
     content: `# Scheuermann’s Kyphosis: Adolescent Structural Roundback, Sorensen Criteria & Physio Care
 
 ## 1. Introduction: Understanding Scheuermann’s Kyphosis
@@ -1167,7 +1193,7 @@ The anterior column of the vertebral bodies experiences delayed growth compared 
 
 ## 5. Evidence-Based Physiotherapy Protocols
 - Schroth Method and 3D spinal elongation techniques to unload the anterior vertebral bodies
-- Aggressive hamstring and pectoral lengthening to reduce secondary pelvic tilt forces
+- Aggressive hamstring and pectoral myofascial lengthening to optimize sagittal pelvic balance
 - Thoracic extensor strengthening in prone and quadruped positions
 - Coordination with orthopedic spine specialists for corrective bracing (Milwaukee or Boston brace) when indicated
 
@@ -1190,7 +1216,8 @@ Early adolescent intervention is vital before skeletal maturity closes growth pl
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-01-26T00:00:00.000Z',
-    imageUrl: '/images/precision-recovery/stage4-advance.webp',
+    imageUrl: '/images/blog/spine/scoliosis-non-surgical-physiotherapy-schroth-aries-physiocare.webp',
+    imageAlt: 'Non-surgical 3D Schroth scoliosis spinal de-rotation and elongation exercises at Aries PhysioCare.',
     content: `# Scoliosis: Cobb Angle Management, Schroth Method & Non-Surgical 3D Spine Rehabilitation
 
 ## 1. Introduction: Understanding Scoliosis
@@ -1241,7 +1268,8 @@ Manage scoliosis proactively with specialized 3D physiotherapy. Contact Aries Ph
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-18T00:00:00.000Z',
-    imageUrl: '/images/occupational-therapy/ot-approach-hands.jpg',
+    imageUrl: '/images/blog/spine/hyperkyphosis-rounded-shoulders-treatment-aries-physiocare.webp',
+    imageAlt: 'Hyperkyphosis correction, Dowager hump reduction, and scapular retraining supervised by an Aries PhysioCare therapist.',
     content: `# Hyperkyphosis: Dowager’s Hump, Postural Roundback & Extensor Muscle Rehabilitation
 
 ## 1. Introduction: Understanding Hyperkyphosis
@@ -1292,7 +1320,8 @@ Stand tall, breathe better, and protect your spine from progressive rounding. Co
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-18T00:00:00.000Z',
-    imageUrl: '/images/why-choose/card1_care_at_home.jpg',
+    imageUrl: '/images/blog/spine/lumbar-hyperlordosis-anterior-pelvic-tilt-aries-physiocare.webp',
+    imageAlt: 'Pelvic resetting and gluteal activation exercises to correct anterior pelvic tilt hyperlordosis at Aries PhysioCare.',
     content: `# Lumbar Hyperlordosis: Anterior Pelvic Tilt, Swayback & Pelvic Resetting Physiotherapy
 
 ## 1. Introduction: Understanding Lumbar Hyperlordosis
@@ -1321,12 +1350,12 @@ The anteriorly tilted pelvis forces the L4-L5 and L5-S1 facet joints into consta
 
 ## 5. Evidence-Based Physiotherapy Protocols
 - Deep myofascial release and active stretching of the iliopsoas, rectus femoris, and tensor fasciae latae (TFL)
-- Posterior pelvic tilt re-education in supine, quadruped, and standing positions
-- High-recruitment gluteal conditioning (deadlifts, hip thrusts, band bridges)
-- Core hollow-body and dead-bug progressions to reinforce neutral pelvic stability
+- Lumbopelvic neutral posture re-education and therapist-guided core co-contraction in functional standing postures
+- Supervised clinical gluteal reactivation and posterior chain facilitation protocols
+- Therapist-monitored neutral spinal core bracing to stabilize the lumbopelvic junction
 
 ## 6. Home Care & Ergonomic Strategies
-- Practice posterior pelvic tilts: while standing against a wall, flatten your lower back completely against it
+- Maintain neutral lumbopelvic alignment habits during seated and standing daily activities
 - Avoid wearing high-heeled shoes, which tip the pelvis forward and exaggerate lumbar lordosis
 - Sleep on your side with a pillow between knees, or on your back with a large pillow under your knees
 - Stand with equal weight distribution, actively engaging your lower abdominals and gluteals
@@ -1344,7 +1373,8 @@ Restore balanced pelvic alignment and relieve chronic lower back fatigue. Contac
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-18T00:00:00.000Z',
-    imageUrl: '/images/home-nursing/nursing-safety-care.jpg',
+    imageUrl: '/images/blog/spine/spinal-fracture-compression-fracture-rehab-aries-physiocare.webp',
+    imageAlt: 'Safe vertebral compression fracture rehabilitation and protected spinal movement with an Aries PhysioCare expert.',
     content: `# Spinal Fracture Rehabilitation: Vertebral Compression, Safe Bracing & Bone Healing Protocols
 
 ## 1. Introduction: Understanding Spinal Compression Fractures
@@ -1395,13 +1425,14 @@ Recover safely from a spinal fracture under expert clinical guidance. Contact Ar
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-18T00:00:00.000Z',
-    imageUrl: '/images/home-nursing/nursing-service-post-surgical.jpg',
+    imageUrl: '/images/blog/spine/post-spinal-surgery-rehabilitation-timeline-aries-physiocare.webp',
+    imageAlt: 'Post-spinal fusion and discectomy recovery protocol guided by an Aries PhysioCare rehabilitation specialist.',
     content: `# Post-Spinal Surgery Rehabilitation: Discectomy, Laminectomy & Fusion Recovery Protocols
 
 ## 1. Introduction: Understanding Post-Surgical Spine Recovery
 Undergoing spinal surgery—whether a microdiscectomy, decompression laminectomy, or multi-level spinal fusion—is a major medical milestone. However, the surgeon's hands in the operating room only accomplish structural decompression or mechanical stabilization; true functional recovery, pain-free mobility, and prevention of recurrent disc herniation depend entirely on structured post-operative physiotherapy. Evidence shows that guided rehabilitation starting in early post-op phases accelerates return to normal activities and eliminates chronic guarding.
 
-## 2. Common Post-Surgical Milestones & Symptoms
+## 2. Common Symptoms
 Phased post-operative recovery indicators:
 - Incisional soreness, swelling, and superficial numbness around the surgical scar
 - Residual neural sensitivity as compressed nerve roots regenerate and de-swell
@@ -1411,7 +1442,7 @@ Phased post-operative recovery indicators:
 - Gait alterations and loss of balance due to prolonged pre-surgical deconditioning
 - Gradual return of sensory perception and motor strength in previously numb extremities
 
-## 3. Surgical Procedures & Precautions
+## 3. Causes & Clinical Diagnosis
 Key surgical procedures:
 - Microdiscectomy: Removal of herniated disc fragment; focus on preventing recurrent re-herniation
 - Laminectomy: Decompression of central stenosis; focus on core stabilization and posture
@@ -1446,7 +1477,8 @@ Ensure the success of your spinal surgery with specialized in-home rehabilitatio
     territory: 'Orthopaedic & Musculoskeletal',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-18T00:00:00.000Z',
-    imageUrl: '/images/physiotherapy/program-post-surgical.jpg',
+    imageUrl: '/images/blog/spine/failed-back-surgery-syndrome-fbss-physio-aries-physiocare.webp',
+    imageAlt: 'Gentle graded rehabilitation and neurogenic desensitization for failed back surgery syndrome at Aries PhysioCare.',
     content: `# Failed Back Surgery Syndrome (FBSS): Neurogenic Pain, Epidural Fibrosis & Graded Rehab
 
 ## 1. Introduction: Understanding Failed Back Surgery Syndrome
@@ -1498,29 +1530,55 @@ You do not have to live in despair after spine surgery. Contact Aries PhysioCare
     territory: 'Spine Health',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-04T00:00:00.000Z',
-    imageUrl: '/images/blog/related_habits_spine.png',
-    content: `# 5 Everyday Habits That Harm Your Spine
+    imageUrl: '/images/blog/spine/5-everyday-habits-that-harm-your-spine-aries-physiocare.webp',
+    imageAlt: 'Physiotherapist demonstrating protective spine ergonomics and daily movement habits at Aries PhysioCare.',
+    content: `# 5 Everyday Habits That Harm Your Spine: Biomechanics, Postural Strain & Prevention
 
 ## 1. Introduction: Everyday Spine Biomechanics
-Most spinal disorders do not stem from catastrophic trauma, but rather from cumulative micro-stress caused by daily habits. By identifying and modifying these common postures, you can protect your intervertebral discs and prevent chronic back pain.
+The human spinal column is engineered to distribute compressive loads and support dynamic movement through balanced cervical, thoracic, and lumbar curvatures. However, the vast majority of chronic spinal complaints do not originate from acute trauma, but rather from cumulative micro-trauma inflicted by repetitive daily habits. From prolonged slumped sitting and unergonomic mobile device usage to asymmetrical load carriage and chronic dehydration, habitual biomechanical errors accelerate intervertebral disc degeneration and paraspinal muscle fatigue. Understanding and correcting these daily patterns is the cornerstone of spinal longevity.
 
-## 2. Habit 1: Prolonged Slouching and Tech-Neck
-Sitting slumped at a desk or looking down at a mobile device multiplies the mechanical load on cervical and lumbar discs up to 500%. Over time, this leads to posterior disc bulging and muscle spasm.
+## 2. Common Symptoms
+Chronic postural and habitual spinal strain manifests through distinct mechanical and muscular signs:
+- Dull, burning ache across the mid-back and between the shoulder blades by mid-day
+- Persistent lower back tightness and stiffness when rising from prolonged seated positions
+- Suboccipital tension headaches and neck stiffness resulting from forward head posture
+- Sensation of spinal fatigue and an inability to maintain an upright posture without slouching
+- Intermittent localized muscle spasms along the lumbar erector spinae
+- Asymmetric pelvic discomfort when standing or walking after seated work
+- Mild morning lumbar stiffness that requires active movement to loosen
 
-## 3. Habit 2: Bending with the Spine Instead of Hinging at the Hips
-Lifting groceries, children, or heavy boxes with a rounded lumbar spine places massive shear forces on L4-S5 discs. Practicing the hip hinge protects your spinal ligaments.
+## 3. Causes & Clinical Diagnosis
+Cumulative spinal stress stems from five primary daily habit patterns evaluated during clinical consultation:
+- Habit 1 (Sustained Slouching & Tech-Neck): Holding the cervical spine in 45-degree flexion multiplies gravitational load on discs up to 500%
+- Habit 2 (Spinal Flexion Bending): Lifting household loads by flexing the lumbar spine rather than hinging at the hips
+- Habit 3 (Inadequate Hydration): Depriving intervertebral discs of daily water intake required for overnight imbibition
+- Habit 4 (Unsupportive Sleep Ergonomics): Worn-out mattresses or improper pillow heights forcing lateral spinal curvature
+- Habit 5 (Static Sedentariness): Remaining seated for continuous hours without interrupting axial disc compression
+- Diagnosis involves digital postural assessment, ergonomic workstation analysis, and clinical spinal mobility testing.
 
-## 4. Habit 3: Inadequate Daily Hydration
-Spinal discs are composed of over 80% water. Dehydration causes discs to flatten prematurely, impairing their shock-absorbing capacity.
+## 4. Pathophysiology & Biomechanical Impact
+When the spine is held in prolonged flexion or asymmetric posture, the anterior disc margin experiences concentrated compressive loading while the posterior annulus is stretched under tensile strain. Over time, proteoglycan synthesis decreases, leading to disc dehydration and reduced shock absorption. Surrounding paraspinal musculature remains in a state of continuous low-grade contraction to prevent spinal collapse, creating ischemic trigger points, connective tissue adhesions, and early facet joint wear.
 
-## 5. Habit 4: Unsupportive Sleep Positions & Mattresses
-Sleeping on overly soft or worn mattresses creates spinal misalignment for 7 to 8 hours every night. 
+## 5. Evidence-Based Physiotherapy Protocols
+At Aries PhysioCare, our clinical team implements targeted interventions to counteract habitual postural breakdown:
+- Postural alignment analysis: Laser and plumb-line assessment of sagittal and coronal spinal deviations
+- Hands-on manual therapy: Soft tissue release of hypertonic pectorals, upper trapezius, and psoas muscles
+- Thoracic spine mobilization: Gentle oscillatory techniques to restore extension and rotational mobility
+- Scapular and deep core motor re-education: Retraining transversus abdominis and lower trapezius firing patterns
+- Guided movement retraining: Teaching the clinical hip-hinge technique to protect lumbar discs during lifting
+- Calibrated electrotherapy: Applying TENS and thermal modalities to rapidly alleviate acute paraspinal fatigue
 
-## 6. Habit 5: Sedentary Lifestyle and Prolonged Sitting
-Discs lack direct blood vessels; they rely on fluid exchange driven by movement. Walking every 45 minutes pumps vital nutrients into your vertebral discs.
+## 6. Home Care & Ergonomic Strategies
+Adopting evidence-based workplace and home habits prevents recurrent spinal micro-trauma:
+- Set up a designated workstation with monitor top at eye level and forearms supported at 90-degree angles
+- Incorporate active postural resets: Change sitting positions or stand for 2 minutes every 30 to 45 minutes
+- Maintain daily hydration of 2.5 to 3 liters to preserve cellular fluid balance in intervertebral discs
+- Optimize sleep biomechanics with a contoured cervical pillow and medium-firm supportive mattress
+- Practice the hip-hinge maneuver for all daily household lifting tasks, keeping loads close to the chest
+- Avoid sustained forward head carriage while reading or using handheld mobile devices
 
 ## 7. When to Contact Us
-Connect with Aries PhysioCare for home-based postural assessment and customized ergonomic advice.`,
+If postural fatigue, neck stiffness, or lower back aching persists despite workstation adjustments, schedule a home or clinic consultation with Aries PhysioCare for a comprehensive ergonomic and spinal assessment.`,
   },
   {
     id: 'post-physio-vs-surgery-disc',
@@ -1530,60 +1588,108 @@ Connect with Aries PhysioCare for home-based postural assessment and customized 
     territory: 'Treatment',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-03T00:00:00.000Z',
-    imageUrl: '/images/blog/related_mri_spine.png',
-    content: `# Physiotherapy vs. Surgery for Disc Problems
+    imageUrl: '/images/blog/spine/physiotherapy-vs-surgery-for-disc-problems-aries-physiocare.webp',
+    imageAlt: 'Evidence-based conservative spine care and disc restoration guided by an Aries PhysioCare physiotherapist.',
+    content: `# Physiotherapy vs. Surgery for Disc Problems: Clinical Evidence, Recovery Timelines & Outcomes
 
 ## 1. Introduction: Non-Surgical vs. Surgical Pathways
-When diagnosed with disc herniation or degenerative disc disease on an MRI, many patients fear that surgery is inevitable. In truth, over 90% of disc herniations resolve successfully with structured, evidence-based physiotherapy.
+When diagnosed with an intervertebral disc herniation, disc extrusion, or degenerative disc disease on an MRI scan, patients frequently confront the stressful dilemma of whether spinal surgery is mandatory. Clinical evidence demonstrates that up to 90% of lumbar disc herniations resolve successfully with structured, non-operative physiotherapy. Surgical discectomy or microdiscectomy is intended primarily for specific structural crises, whereas modern physiotherapy leverages natural biological disc resorption, neural desensitization, and core muscular stabilization to achieve enduring relief without operative risks.
 
-## 2. When Surgery is Necessary (Red Flags)
-Surgical intervention is strictly indicated in emergency scenarios such as progressive motor loss, foot drop, or Cauda Equina Syndrome (loss of bowel/bladder control).
+## 2. Common Symptoms
+Patients navigating disc pathologies experience distinct neuro-mechanical symptom profiles:
+- Sharp, electric, or searing pain radiating down the buttock, thigh, calf, or foot (sciatica)
+- Deep, throbbing axial back pain aggravated by forward bending, coughing, or sneezing
+- Paresthesia, numbness, or "pins-and-needles" sensations across specific dermatomal pathways
+- Subjective weakness in the lower extremity, such as difficulty pushing off during walking
+- Pain exacerbated by prolonged sitting or rising from a low chair
+- Marked spinal antalgic shift (leaning to one side to offload the compressed nerve root)
+- Restricted spinal range of motion with apprehension during lumbar extension or flexion
 
-## 3. The Power of Conservative Physiotherapy
-Targeted spinal decompression, McKenzie mechanical therapy, and core muscular stabilization create an optimal environment for disc resorption and nerve decompression.
+## 3. Causes & Clinical Diagnosis
+Disc herniations occur when the gel-like nucleus pulposus penetrates through fissures in the outer annulus fibrosus:
+- Age-related degenerative disc wear combined with sudden torsional or compressive loading
+- Chronic sedentary occupations placing repetitive hydrostatic pressure on the posterior disc wall
+- Heavy lifting with poor biomechanics and spinal flexion
+- Clinical assessment encompasses detailed neurological screening (deep tendon reflexes, dermatomal sensation, myotomal strength testing) and nerve root provocation maneuvers (Straight Leg Raise, Well-Leg Raise, Slump Test) correlated with lumbar MRI findings.
 
-## 4. Long-Term Clinical Outcomes
-High-level randomized controlled trials reveal that at 1 and 2 years, patients managed with specialized conservative physiotherapy achieve functional recovery and pain relief identical to those who underwent microdiscectomy — without surgical risks or scar tissue.
+## 4. Pathophysiology & Biomechanical Impact
+Herniated disc material causes symptoms through dual mechanisms: mechanical compression of the exiting nerve root and intense chemical radiculitis driven by inflammatory cytokines (TNF-alpha, interleukins) released from the extruded nucleus. Over 6 to 12 weeks, the body's immune system deploys macrophages to naturally phagocytose and resorb the extruded disc fragment. Specialized physical therapy facilitates this biological process by offloading the affected motion segment and restoring neural glide.
 
-## 5. When to Contact Us
-Schedule an in-home evaluation with Aries PhysioCare spine specialists before considering invasive spinal surgery.`,
+## 5. Evidence-Based Physiotherapy Protocols
+Aries PhysioCare provides comprehensive conservative rehabilitation protocols benchmarked against international spinal guidelines:
+- Mechanical Diagnosis and Therapy (MDT / McKenzie Method) to establish directional preference and drive pain centralization
+- Targeted neural mobilization: Gentle nerve flossing and sliding maneuvers to prevent epidural fibrosis and tethering
+- Advanced clinical modalities: Class-IV High-Intensity Laser and Interferential Therapy (IFT) to alleviate severe chemical radiculitis
+- Supervised spinal decompression and gentle manual traction to reduce intradiscal pressure
+- Dynamic core and lumbopelvic stabilization conducted under one-on-one therapist monitoring
+- Phased progression toward functional load tolerance and safe return to daily and vocational activities
+
+## 6. Home Care & Ergonomic Strategies
+Supporting conservative recovery at home requires strict attention to spinal offloading:
+- Maintain short, frequent walking intervals on flat surfaces to encourage disc imbibition and reduce nerve edema
+- Use a high-density lumbar support cushion during all necessary seated intervals
+- Avoid prolonged bed rest beyond 48 hours; gentle active movement accelerates neurological recovery
+- Apply cryotherapy packs to the lower back for 15 minutes post-activity to manage acute inflammatory flare-ups
+- Sleep in a neutral recumbent position: side-lying with a firm pillow between knees or supine with an elevated knee bolster
+- Refrain from unsupervised strenuous bending, twisting, or lifting until cleared by your physiotherapist
+
+## 7. When to Contact Us
+While conservative therapy is extraordinarily successful, immediate emergency medical evaluation is mandatory if you experience Red Flag symptoms: loss of bowel or bladder control, numbness in the groin or saddle area, or progressive bilateral foot weakness (Cauda Equina Syndrome). For all non-emergency disc herniations, contact Aries PhysioCare to initiate structured, evidence-based in-home physiotherapy.`,
   },
   {
     id: 'post-top-7-exercises-lower-back',
     slug: 'top-7-exercises-for-a-stronger-lower-back',
-    title: 'Top 7 Exercises for a Stronger Lower Back',
-    summary: 'Simple and effective moves you can do at home to build core resilience, protect your lumbar spine, and prevent recurrent pain.',
+    title: 'Spine Stability & Core Armor: Evidence-Based Clinical Activation Protocols',
+    summary: 'A clinical guide to deep spinal stabilizing systems: transverse abdominis, multifidus, and posterior chain activation through guided physiotherapy.',
     territory: 'Exercise',
     topic: 'Spine & Back Care',
     publishedAt: '2026-02-02T00:00:00.000Z',
-    imageUrl: '/images/blog/related_exercises_spine.png',
-    content: `# Top 7 Exercises for a Stronger Lower Back
+    imageUrl: '/images/blog/spine/top-7-exercises-for-a-stronger-lower-back-aries-physiocare.webp',
+    imageAlt: 'Core stability and protective spine conditioning exercises coached by an Aries PhysioCare clinician.',
+    content: `# Spine Stability & Core Armor: Evidence-Based Clinical Activation Protocols
 
-## 1. Introduction: Active Muscular Armor
-Your paraspinal and abdominal core muscles form an internal corset that takes over shock absorption from your spinal discs. These 7 evidence-based exercises build lasting lumbar strength.
+## 1. Introduction: Active Muscular Armor & Core Stability
+The lumbar spine relies on an intricate combination of passive osteoligamentous structures and active neuromuscular systems to maintain equilibrium under gravitational load. Rather than relying solely on bony vertebrae and intervertebral discs to bear body weight, a healthy back depends on dynamic muscular armor. When deep stabilizing muscles fail to activate with proper timing, mechanical forces transfer directly to sensitive disc annuli and facet joints. Evidence-based physiotherapy focuses on retraining the neuromuscular timing of these deep stabilizers under clinical supervision, building durable resilience against spinal injury.
 
-## 2. Exercise 1: Pelvic Tilts
-Gentle activation of deep abdominals to mobilize the lumbar spine and restore neutral pelvic alignment.
+## 2. Common Symptoms of Core Muscle Deconditioning
+When the deep muscular stabilizing systems of the lower back become inhibited or fatigued, specific mechanical warning signs emerge:
+- Persistent fatigue and aching across the lower back during prolonged standing or slow walking
+- A sensation that the lower spine is "catching" or "giving out" during minor transitional movements
+- Difficulty maintaining upright sitting posture without slouching or supporting the torso with hands
+- Excessive lumbar extension or exaggerated pelvic forward inclination during standing tasks
+- Chronic tightness in the hamstrings and hip flexors attempting to compensate for inactive deep core muscles
+- Recurrent micro-spasms in the superficial lumbar erector spinae following routine daily chores
+- Sluggish recovery and persistent soreness following normal physical activities
 
-## 3. Exercise 2: Bird-Dog
-A foundational core endurance drill that strengthens the multifidus and gluteus maximus without placing compressive load on the lumbar spine.
+## 3. Causes & Clinical Diagnosis
+Spinal muscular deconditioning develops from a confluence of sedentary modern habits and neuromuscular inhibition:
+- Prolonged static sitting: Sustained compression shuts down reflexive gluteal and abdominal recruitment ("gluteal amnesia")
+- History of acute back injury: Even a minor episode of back pain causes reflexive atrophy of the lumbar multifidus that does not automatically resolve without targeted retraining
+- Lack of multi-planar functional movement in daily routines
+- Clinical diagnosis involves functional movement screening (FMS), prone instability testing, biofeedback pressure unit assessment for transversus abdominis activation, and hip abductor endurance testing.
 
-## 4. Exercise 3: Glute Bridges
-Reactivating the gluteal muscles to prevent lumbar hyperextension during standing and walking.
+## 4. Pathophysiology & Biomechanical Impact
+The stability of each spinal motion segment depends on co-contraction between the local stabilizing system (transversus abdominis, lumbar multifidus, pelvic floor, and diaphragm) and the global mobilizing system. When local stabilizers are delayed or inhibited, the spine experiences micro-instability. The superficial erector spinae and hip flexors over-activate to compensate, generating high compressive and shear loads across L4-S1 facet joints and discs. Over time, this aberrant loading pattern accelerates degenerative joint changes and triggers chronic pain.
 
-## 5. Exercise 4: Prone McKenzie Extensions
-Gentle spinal extension to promote centralization of disc pressure and restore lumbar lordosis.
+## 5. Evidence-Based Physiotherapy Protocols
+At Aries PhysioCare, physical therapists restore deep spinal stability through a structured, clinician-guided activation model:
+- Diagnostic biofeedback: Using ultrasound imaging or pressure biofeedback units to teach patients isolated transversus abdominis recruitment
+- Segmental multifidus facilitation: Therapist-guided palpatory cues to retrain deep segmental paraspinal stabilizing fibers
+- Lumbopelvic motor control retraining: Progressive neuromuscular coordination without spinal compression
+- Posterior chain integration: Guided clinical gluteal activation to restore normal lumbopelvic rhythm during walking and standing
+- Core stiffness conditioning: Isometric stabilization protocols (side bridge and quadruped positioning) supervised for exact neutral alignment
+- Dynamic functional progression: Transitioning from recumbent stabilization to loaded hip-hinging and rotational control under clinical monitoring
 
-## 6. Exercise 5: Side Plank Progression
-Building lateral core stiffness to protect the spine against dangerous rotational shear forces.
+## 6. Home Care & Ergonomic Strategies
+Maintaining active muscular protection requires integrating safe posture habits into everyday routines:
+- Arrange workstations so that hips and knees form comfortable 90-degree angles with lumbar curve fully supported
+- Avoid prolonged static standing: Shift weight evenly or use an ergonomic anti-fatigue mat
+- Practice active diaphragmatic breathing throughout the day to support intra-abdominal pressure regulation
+- Never attempt heavy unsupervised core workouts or sit-ups during an active back pain episode, as flexion crunches dramatically increase intradiscal pressure
+- Use proper body mechanics when lifting: Bend at the hips and knees, brace the abdominal wall gently, and keep objects close to the body
+- Ensure adequate sleep on a medium-firm supportive mattress to allow paraspinal muscle recovery
 
-## 7. Exercise 6: Cat-Camel Spinal Mobilization
-Rhythmic fluid movement through flexion and extension to circulate synovial fluid and relieve morning stiffness.
-
-## 8. Exercise 7: Dead Bug
-Safe anterior core conditioning maintaining a flat, neutral spine against gravity.
-
-## 9. When to Contact Us
-Book a home physiotherapy visit with Aries PhysioCare to master proper exercise form with personalized therapist guidance.`,
+## 7. When to Contact Us
+If you experience recurring lower back fatigue, unstable catches during movement, or difficulty staying upright without discomfort, contact Aries PhysioCare. Our licensed physiotherapists provide comprehensive at-home and in-clinic movement assessments to build your personalized, injury-proof core armor.`,
   },
 ];
