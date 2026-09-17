@@ -32,9 +32,11 @@ next-env.d.ts
 # nested workspaces
 Aries-PhysioCare-Parity-App/
 AriesXpert-Admin-Dashboard/
+AriesXpert-Web-App/
 AriesXpert-Website-Canada/
 AriesXpert-Website-Global/
 AriesXpert-Website-India/
+AriesXpert-Website-UK/
 Duix-Avatar/
 OmniRoute/
 ai-avatar-system/
