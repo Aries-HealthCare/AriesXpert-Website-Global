@@ -68,6 +68,11 @@ export const API_ENDPOINTS = {
   LEADS_CORPORATE: `${API_BASE_URL}/leads/corporate`,
   LEADS_INVESTOR: `${API_BASE_URL}/leads/investor`,
   LEADS_THERAPIST_APPLICATION: `${API_BASE_URL}/leads/therapist-application`,
+  LEADS_HOME_VISIT: `${API_BASE_URL}/leads/home-visit`,
+  LEADS_FREE_CONSULTATION: `${API_BASE_URL}/leads/free-consultation`,
+  LEADS_AI_ANALYSIS: `${API_BASE_URL}/leads/ai-analysis`,
+  LEADS_PHONE_ENQUIRY: `${API_BASE_URL}/leads/phone-enquiry`,
+  LEADS_CAREER: `${API_BASE_URL}/leads/career`,
 
   // Therapists (Public Website Routes)
   THERAPISTS: `${API_BASE_URL}/website/therapists`,

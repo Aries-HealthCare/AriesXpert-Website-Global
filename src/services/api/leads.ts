@@ -311,6 +311,83 @@ class LeadsService {
       throw new Error(handleApiError(error));
     }
   }
+
+  /** Home Visit Booking — triggers home.visit.requested executive alert */
+  async submitHomeVisitLead(data: AppointmentLead) {
+    try {
+      const payload = withAttribution({
+        ...data,
+        leadType: 'home-visit',
+        source: 'website',
+        condition: data.condition || data.service,
+        preferredTherapistId: data.therapistId,
+        location: { country: 'India', state: data.state, city: data.city, area: data.area },
+      }, data.attribution);
+      const response = await fetch(API_ENDPOINTS.LEADS_HOME_VISIT, {
+        method: 'POST', headers: getLeadIngestHeaders(), body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error(`Failed to submit home visit: ${response.statusText}`);
+      return await response.json();
+    } catch (error) { throw new Error(handleApiError(error)); }
+  }
+
+  /** Free Consultation Request — triggers free.consultation.requested executive alert */
+  async submitFreeConsultationLead(data: { fullName: string; phone: string; email?: string; condition?: string; city?: string; attribution?: LeadAttributionPayload }) {
+    try {
+      const payload = withAttribution({
+        ...data, name: data.fullName, leadType: 'free-consultation', source: 'website',
+      }, data.attribution);
+      const response = await fetch(API_ENDPOINTS.LEADS_FREE_CONSULTATION, {
+        method: 'POST', headers: getLeadIngestHeaders(), body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error(`Failed to submit free consultation: ${response.statusText}`);
+      return await response.json();
+    } catch (error) { throw new Error(handleApiError(error)); }
+  }
+
+  /** AI Analysis Form — triggers ai.analysis.submitted executive alert */
+  async submitAiAnalysisLead(data: { fullName: string; phone: string; email?: string; condition?: string; notes?: string; city?: string; attribution?: LeadAttributionPayload }) {
+    try {
+      const payload = withAttribution({
+        ...data, name: data.fullName, leadType: 'ai-analysis', source: 'website',
+      }, data.attribution);
+      const response = await fetch(API_ENDPOINTS.LEADS_AI_ANALYSIS, {
+        method: 'POST', headers: getLeadIngestHeaders(), body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error(`Failed to submit AI analysis request: ${response.statusText}`);
+      return await response.json();
+    } catch (error) { throw new Error(handleApiError(error)); }
+  }
+
+  /** Phone / Click-to-Call Enquiry — triggers phone.enquiry.created executive alert */
+  async submitPhoneEnquiryLead(data: { fullName?: string; phone: string; sourcePage?: string; attribution?: LeadAttributionPayload }) {
+    try {
+      const payload = withAttribution({
+        ...data, name: data.fullName || 'Phone Enquiry', leadType: 'phone-enquiry', source: 'website-click-to-call',
+      }, data.attribution);
+      const response = await fetch(API_ENDPOINTS.LEADS_PHONE_ENQUIRY, {
+        method: 'POST', headers: getLeadIngestHeaders(), body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error(`Failed to submit phone enquiry: ${response.statusText}`);
+      return await response.json();
+    } catch (error) { throw new Error(handleApiError(error)); }
+  }
+
+  /** Career Application — triggers career.application.created executive alert */
+  async submitCareerLead(data: { fullName: string; phone: string; email?: string; practiceArea?: string; city?: string; notes?: string; attribution?: LeadAttributionPayload }) {
+    try {
+      const payload = withAttribution({
+        ...data, name: data.fullName, leadType: 'career', source: 'website',
+        growthEngine: 'BRAND',
+      }, { ...data.attribution, growthEngine: 'BRAND' });
+      const response = await fetch(API_ENDPOINTS.LEADS_CAREER, {
+        method: 'POST', headers: getLeadIngestHeaders(), body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error(`Failed to submit career application: ${response.statusText}`);
+      return await response.json();
+    } catch (error) { throw new Error(handleApiError(error)); }
+  }
 }
 
 export const leadsService = new LeadsService();
+
