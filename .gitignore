@@ -45,3 +45,8 @@ ariesxpert-backend/
 ariesxpertv2/
 goblin-ai/
 scratch/
+
+# ide and tooling
+.cursor/
+.freebuff/
+.kilo/
