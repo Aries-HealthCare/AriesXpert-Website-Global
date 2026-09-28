@@ -45,6 +45,12 @@ ariesxpert-backend/
 ariesxpertv2/
 goblin-ai/
 scratch/
+output/
+Portrait\ Expert\ Images
+packages/assets/portraits/*.png
+packages/assets/portraits/*.jpg
+packages/assets/portraits/*.jpeg
+
 
 # ide and tooling
 .cursor/

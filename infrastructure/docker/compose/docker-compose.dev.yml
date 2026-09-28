@@ -1,0 +1,170 @@
+# ==============================================================================
+# ARIES HEALTHCARE ECO-SYSTEM — ROOT DEVELOPMENT DOCKER COMPOSE ORCHESTRATION
+# ==============================================================================
+# Purpose: Orchestrates local development infrastructure across Core, AI, and Avatar tiers.
+#
+# Profiles Available:
+#   --profile core       -> Starts Redis and ariesxpert-backend
+#   --profile ai         -> Starts Redis, Qdrant, and OmniRoute AI Gateway
+#   --profile avatar     -> Starts MinIO, HeyGem render engine & Celery worker (NVIDIA GPU required)
+#   --profile full       -> Starts all non-GPU services (Core + AI + MinIO)
+#
+# Examples:
+#   docker compose -f infrastructure/docker/compose/docker-compose.dev.yml --profile core up -d
+#   docker compose -f infrastructure/docker/compose/docker-compose.dev.yml --profile core --profile ai up -d
+# ==============================================================================
+
+networks:
+  aries-core:
+    driver: bridge
+    name: aries-core-network
+  aries-ai:
+    driver: bridge
+    name: aries-ai-network
+  aries-data:
+    driver: bridge
+    name: aries-data-network
+
+volumes:
+  aries_redis_data:
+    name: aries-redis-data
+  aries_qdrant_data:
+    name: aries-qdrant-data
+  aries_minio_data:
+    name: aries-minio-data
+
+services:
+  # ============================================================================
+  # 1. CORE CACHE & QUEUE BROKER (Redis 7)
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: aries-shared-redis
+    restart: unless-stopped
+    profiles: ["core", "ai", "avatar", "full"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - aries_redis_data:/data
+    networks:
+      - aries-core
+      - aries-ai
+      - aries-data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # ============================================================================
+  # 2. VECTOR DATABASE (Qdrant)
+  # ============================================================================
+  qdrant:
+    image: qdrant/qdrant:v1.13.2
+    container_name: aries-shared-qdrant
+    restart: unless-stopped
+    profiles: ["ai", "full"]
+    ports:
+      - "6333:6333" # REST API
+      - "6334:6334" # gRPC API
+    volumes:
+      - aries_qdrant_data:/qdrant/storage
+    networks:
+      - aries-ai
+      - aries-data
+    healthcheck:
+      test: ["CMD-SHELL", "cat /dev/null > /dev/tcp/localhost/6333 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ============================================================================
+  # 3. CENTRAL AI ROUTING GATEWAY (OmniRoute)
+  # ============================================================================
+  omniroute:
+    build:
+      context: ../../../OmniRoute
+      dockerfile: Dockerfile
+    container_name: aries-omniroute-gateway
+    restart: unless-stopped
+    profiles: ["ai", "full"]
+    ports:
+      - "20128:20128" # Dashboard / Web Proxy
+      - "20129:20129" # API Port
+    env_file:
+      - ../env/ai.env.example
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - QDRANT_URL=http://qdrant:6333
+      - PORT=20128
+      - API_PORT=20129
+      - API_HOST=0.0.0.0
+    networks:
+      - aries-core
+      - aries-ai
+    depends_on:
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+
+  # ============================================================================
+  # 4. CENTRAL BACKEND SERVICE (AriesXpert Backend)
+  # ============================================================================
+  backend:
+    build:
+      context: ../../../ariesxpert-backend
+      dockerfile: Dockerfile
+    container_name: aries-core-backend
+    restart: unless-stopped
+    profiles: ["core", "full"]
+    ports:
+      - "5001:5001"
+    env_file:
+      - ../env/core.env.example
+    environment:
+      - NODE_ENV=development
+      - PORT=5001
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - BACKEND_URL=http://localhost:5001
+    networks:
+      - aries-core
+      - aries-data
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "cat /dev/null > /dev/tcp/localhost/5001 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # ============================================================================
+  # 5. LOCAL S3 OBJECT STORAGE (MinIO)
+  # ============================================================================
+  minio:
+    image: minio/minio:RELEASE.2024-01-18T22-51-28Z
+    container_name: aries-shared-minio
+    restart: unless-stopped
+    profiles: ["avatar", "full"]
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # Web Console
+    volumes:
+      - aries_minio_data:/data
+    networks:
+      - aries-data
+    healthcheck:
+      test: ["CMD-SHELL", "cat /dev/null > /dev/tcp/localhost/9000 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

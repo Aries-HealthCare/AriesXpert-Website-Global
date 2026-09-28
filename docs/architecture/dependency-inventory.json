@@ -1,0 +1,340 @@
+{
+  "metadata": {
+    "system": "Aries HealthCare Eco-System",
+    "generatedAt": "2026-09-26T14:10:22.651Z",
+    "architect": "Principal Software & Repository Architect",
+    "workspaceRoot": "/Volumes/Personal/Aries-HealthCare-EcoSystem",
+    "totalProjectsAnalyzed": 14
+  },
+  "projects": [
+    {
+      "id": "ariesxpertv2",
+      "name": "AriesXpertV2 (Mobile Application)",
+      "path": "ariesxpertv2",
+      "type": "CORE_APPLICATION",
+      "framework": "Flutter 3.x / Dart ^3.7.0",
+      "role": "Therapist / Expert Mobile Client",
+      "runtimeDependencies": [
+        {
+          "target": "ariesxpert-backend",
+          "type": "REST_AND_WEBSOCKET",
+          "url": "https://api.ariesxpert.com",
+          "auth": "Bearer JWT"
+        },
+        {
+          "target": "Firebase",
+          "type": "PUSH_NOTIFICATIONS_AND_STORAGE",
+          "service": "FCM & Firebase Storage"
+        },
+        {
+          "target": "Google Maps Platform",
+          "type": "SDK",
+          "keyEnv": "GOOGLE_MAPS_API_KEY"
+        },
+        {
+          "target": "Cashfree",
+          "type": "PAYMENT_GATEWAY",
+          "env": "CASHFREE_ENV"
+        },
+        {
+          "target": "Razorpay",
+          "type": "PAYMENT_GATEWAY"
+        },
+        {
+          "target": "Agora / LiveKit",
+          "type": "TELEHEALTH_VIDEO"
+        }
+      ],
+      "stateManagement": "flutter_riverpod ^2.6.1",
+      "networkClients": [
+        "dio ^5.9.1",
+        "http ^1.2.2",
+        "socket_io_client ^2.0.3+1"
+      ]
+    },
+    {
+      "id": "AriesXpert-Admin-Dashboard",
+      "name": "AriesXpert Admin Dashboard",
+      "path": "AriesXpert-Admin-Dashboard",
+      "type": "CORE_APPLICATION",
+      "framework": "Next.js 15.5.9 / React 19.2.1 / TypeScript 5",
+      "role": "Central Business, Clinical, Operational & Executive Administration",
+      "runtimeDependencies": [
+        {
+          "target": "ariesxpert-backend",
+          "type": "REST_PROXY_AND_DIRECT",
+          "url": "https://api.ariesxpert.com/api/v1",
+          "auth": "HTTP Cookie auth_token / Bearer JWT"
+        },
+        {
+          "target": "Google Maps Platform",
+          "type": "MAPS_JAVASCRIPT_API",
+          "keyEnv": "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY"
+        },
+        {
+          "target": "Hostinger",
+          "type": "DEPLOYMENT_HOST",
+          "domain": "https://ariesxpert.com"
+        }
+      ],
+      "modules": [
+        "therapists",
+        "patients",
+        "leads",
+        "finance",
+        "appointments",
+        "whatsapp",
+        "ai",
+        "forms",
+        "reports",
+        "settings",
+        "tasks"
+      ]
+    },
+    {
+      "id": "ariesxpert-backend",
+      "name": "AriesXpert Central Backend Platform",
+      "path": "ariesxpert-backend",
+      "type": "CORE_SERVICE",
+      "framework": "Express.js 4.21.2 / TypeScript 5.9.3 / Node.js >=18",
+      "role": "Central Business APIs, Authentication, Clinical Records, Orchestration, Payments & Sockets",
+      "databaseDependencies": [
+        {
+          "type": "MongoDB",
+          "role": "PRIMARY_DOCUMENT_DATABASE",
+          "env": "MONGODB_URI",
+          "modelsCount": 153
+        },
+        {
+          "type": "Redis",
+          "role": "DISTRIBUTED_LOCK_AND_QUEUES",
+          "env": "REDIS_HOST, REDIS_PORT"
+        },
+        {
+          "type": "Qdrant",
+          "role": "VECTOR_DATABASE",
+          "client": "@qdrant/js-client-rest"
+        }
+      ],
+      "infrastructureDependencies": [
+        {
+          "type": "BullMQ",
+          "role": "BACKGROUND_JOB_PROCESSOR"
+        },
+        {
+          "type": "Socket.IO",
+          "role": "REALTIME_COMMUNICATION"
+        },
+        {
+          "type": "CronManager",
+          "role": "SCHEDULED_TASKS"
+        }
+      ],
+      "externalProviders": [
+        {
+          "name": "Cashfree",
+          "purpose": "Primary Payment Gateway & Payouts"
+        },
+        {
+          "name": "Razorpay",
+          "purpose": "Secondary Payment Gateway"
+        },
+        {
+          "name": "WhatsApp Cloud API",
+          "purpose": "Multi-WABA Operating System & Messaging"
+        },
+        {
+          "name": "AWS S3 & SES",
+          "purpose": "Document Storage & Email Dispatch"
+        },
+        {
+          "name": "SendGrid / SMTP",
+          "purpose": "Transactional Emails"
+        },
+        {
+          "name": "Firebase Admin",
+          "purpose": "Push Notification Gateway"
+        },
+        {
+          "name": "OpenRouter & Gemini",
+          "purpose": "AI Intelligence & Autonomous Agents"
+        }
+      ]
+    },
+    {
+      "id": "AriesXpert-Website-India",
+      "name": "AriesXpert India Country Website",
+      "path": "AriesXpert-Website-India",
+      "type": "COUNTRY_WEBSITE",
+      "framework": "Next.js 15.5.9 / React 19.2.1 / TailwindCSS",
+      "role": "Public Marketing, Clinic Discovery, Localized Lead Generation & SEO (India)",
+      "runtimeDependencies": [
+        {
+          "target": "ariesxpert-backend",
+          "type": "REST_API",
+          "endpoints": [
+            "/api/v1/leads/*",
+            "/api/v1/website/*",
+            "/api/v1/therapists"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AriesXpert-Website-Canada",
+      "name": "AriesXpert Canada Country Website",
+      "path": "AriesXpert-Website-Canada",
+      "type": "COUNTRY_WEBSITE",
+      "framework": "Next.js 15.5.9 / React 19.2.1 / TailwindCSS",
+      "role": "Public Marketing, Service Discovery, Canada Lead Ingestion & SEO",
+      "runtimeDependencies": [
+        {
+          "target": "ariesxpert-backend",
+          "type": "REST_API",
+          "endpoints": [
+            "/api/v1/leads/public/website-lead"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AriesXpert-Website-UK",
+      "name": "AriesXpert UK Country Website",
+      "path": "AriesXpert-Website-UK",
+      "type": "COUNTRY_WEBSITE",
+      "framework": "Next.js 15.5.9 / React 19.2.1 / TailwindCSS",
+      "role": "Public Marketing, Service Discovery, UK Lead Ingestion & SEO",
+      "runtimeDependencies": [
+        {
+          "target": "ariesxpert-backend",
+          "type": "REST_API",
+          "endpoints": [
+            "/api/v1/leads/public/website-lead"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AriesXpert-Website-Global",
+      "name": "AriesXpert Global Website Portal",
+      "path": "AriesXpert-Website-Global",
+      "type": "GLOBAL_WEBSITE",
+      "framework": "Next.js 15.2.1 / React 19.0.0 / Three.js / GSAP",
+      "role": "International Brand Gateway, Country Routing & Selector",
+      "runtimeDependencies": [
+        {
+          "target": "AriesXpert-Website-India",
+          "type": "COUNTRY_REDIRECT"
+        },
+        {
+          "target": "AriesXpert-Website-Canada",
+          "type": "COUNTRY_REDIRECT"
+        },
+        {
+          "target": "AriesXpert-Website-UK",
+          "type": "COUNTRY_REDIRECT"
+        }
+      ]
+    },
+    {
+      "id": "OmniRoute",
+      "name": "OmniRoute AI Gateway & LLM Router",
+      "path": "OmniRoute",
+      "type": "AI_ROUTING_INFRASTRUCTURE",
+      "framework": "Node.js (ESM) / TypeScript / Docker",
+      "role": "Unified AI Gateway with 160+ LLM providers, model fallback, rate limiting, and OpenAI-compatible API layer",
+      "dependencies": [
+        {
+          "target": "Redis",
+          "type": "RATE_LIMITER_AND_CACHE"
+        },
+        {
+          "target": "Qdrant",
+          "type": "SEMANTIC_MEMORY_SIDECAR"
+        },
+        {
+          "target": "Bifrost",
+          "type": "TIER1_ROUTER_SIDECAR"
+        }
+      ],
+      "supportedProviders": [
+        "OpenRouter",
+        "Google Gemini",
+        "Ollama",
+        "Anthropic",
+        "OpenAI",
+        "Groq",
+        "DeepSeek",
+        "Mistral"
+      ]
+    },
+    {
+      "id": "AriesXpert-Web-App",
+      "name": "AriesXpert Web App / PWA (Formerly Parity-App)",
+      "path": "AriesXpert-Web-App",
+      "type": "CORE_APPLICATION",
+      "framework": "Next.js 15.5.9 / React 19.2.1 / TailwindCSS",
+      "role": "Field Therapist Web PWA counterpart to Mobile App",
+      "runtimeDependencies": [
+        {
+          "target": "ariesxpert-backend",
+          "type": "REST_AND_WEBSOCKET",
+          "url": "https://api.ariesxpert.com"
+        }
+      ]
+    },
+    {
+      "id": "aries-avatar-render-engine",
+      "name": "Aries Avatar Render Engine",
+      "path": "aries-avatar-render-engine",
+      "type": "AI_AVATAR_SERVICE",
+      "framework": "Python / FastAPI / PyTorch / Celery",
+      "role": "HeyGem GPU Digital Human Video Synthesis & Rendering Engine",
+      "dependencies": [
+        {
+          "target": "Redis",
+          "type": "CELERY_BROKER"
+        },
+        {
+          "target": "MinIO",
+          "type": "STORAGE_BACKEND"
+        },
+        {
+          "target": "NVIDIA GPU",
+          "type": "CUDA_INFERENCE"
+        }
+      ]
+    },
+    {
+      "id": "Duix-Avatar",
+      "name": "Duix Avatar Digital Human Engine",
+      "path": "Duix-Avatar",
+      "type": "AI_AVATAR_SERVICE",
+      "framework": "Electron / Vite / Vue / Docker",
+      "role": "Real-time Interactive Digital Human Avatar Engine"
+    },
+    {
+      "id": "ai-avatar-system",
+      "name": "AI Avatar System",
+      "path": "ai-avatar-system",
+      "type": "AI_AVATAR_SERVICE",
+      "framework": "Python / FastAPI / Docker",
+      "role": "Avatar pipeline and synchronization platform"
+    },
+    {
+      "id": "goblin-ai",
+      "name": "Goblin AI",
+      "path": "goblin-ai",
+      "type": "DEVELOPMENT_TOOL",
+      "framework": "Python package / CLI",
+      "role": "Unlimited Neural Image Generation & ESRGAN Super-Resolution Tool for assets"
+    },
+    {
+      "id": "WhatsApp-Bot",
+      "name": "WhatsApp Bot Documentation & Catalog",
+      "path": "WhatsApp Bot",
+      "type": "DOCUMENTATION_AND_ASSETS",
+      "role": "Enterprise WhatsApp bot specifications, role manuals, and template master catalogs"
+    }
+  ]
+}
