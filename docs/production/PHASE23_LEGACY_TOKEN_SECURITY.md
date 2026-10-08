@@ -62,13 +62,10 @@ All legacy authentication tokens extracted from `/data/user/0/com.ariesphysiocar
 ### 2.1 Backend Implementation Details (`authCompatibility.routes.ts`)
 1. **Trusted Historical Secret Chain:**
    ```typescript
-   const TRUSTED_LEGACY_SECRETS = [
-     process.env.LEGACY_JWT_SECRET,
-     process.env.JWT_SECRET,
-     config.jwtSecret,
-     "ariesxpert_jwt_production_secret_key_secure_2026",
-     "ariesphysiocare_therapist_jwt_production_key",
-   ].filter((s): s is string => Boolean(s && s.length > 0));
+   // Phase 24 Remediation Note: Literal keys have been completely removed
+   // and replaced by explicit server-side environment key rings (LEGACY_JWT_KEY_RING_JSON)
+   // and separate purpose-specific secrets. Current session keys are never used as legacy fallback.
+   const legacyKeys = getLoadedLegacyKeys(); // Loaded securely from isolated environment key ring
    ```
 2. **Algorithm & Expiry Enforcement:**  
    Tokens are verified with strict algorithm restrictions (`HS256`, `HS384`, `HS512`). Algorithm `none` attacks are rejected outright.
