@@ -7,7 +7,7 @@
 - Root Repository: [`82a5fd1`](file:///Volumes/Personal/Aries-HealthCare-EcoSystem)
 - Mobile App (`ariesxpertv2`): [`aa75687`](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2)
 - Backend Core (`ariesxpert-backend`): [`0001e1d`](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpert-backend)
-- Web Platform (`AriesXpert-Web-App`): [`55318fd`](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/AriesXpert-Web-App)
+- Web Platform (`AriesXpert-Web-App`): [`94cb298`](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/AriesXpert-Web-App)
 - Admin Portal (`AriesXpert-Admin-Dashboard`): [`32f8b05`](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/AriesXpert-Admin-Dashboard)
 - PhysioCare Portal (`Aries-PhysioCare-Parity-App`): [`4b6a3a2`](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/Aries-PhysioCare-Parity-App)
 **Audit Date:** October 8, 2026 — 22:25:00 IST  
