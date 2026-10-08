@@ -3,8 +3,8 @@
 **Ecosystem:** AriesXpert Healthcare Multi-Platform Ecosystem  
 **Target Release Artifacts:** Backend Core API, 7 Next.js Frontends, AriesXpertV2 Mobile AAB  
 **Release Candidate Branch:** `release-candidate-production-hardening`  
-**Git Commit Hashes:** `678f97c` (`ariesxpertv2`), `a088488` (`backend`), `32f8b05` (`admin`), `af474de` (`root`)  
-**Audit Timestamp:** October 8, 2026 — 21:50:00 IST  
+**Git Commit Hashes:** `1595aa0` (`ariesxpertv2`), `a088488` (`backend`), `32f8b05` (`admin`), `af474de` (`root`)  
+**Audit Timestamp:** October 8, 2026 — 21:58:00 IST  
 **Auditor:** Antigravity Autonomous Enterprise Engineering Agent  
 **Final Release Decision:** **INTERNAL TESTING & STAGING AUTHORIZED — PUBLIC ROLLOUT GATED**  
 
@@ -17,9 +17,9 @@ In accordance with Phase 18 Priority 7 directives:
 
 | Release Channel | Target Environment | Verified Commit | Channel Status | Actionable Gate Required for Promotion |
 |---|---|---|---|---|
-| **Android Internal Testing Track** | Google Play Internal App Sharing / Closed Alpha | `678f97c` | **AUTHORIZED (GO)** | Upload `app-release.aab` (313.40 MB) to Play Console internal test track. |
-| **Android Public Store Rollout** | Google Play Production Track | `678f97c` | **GATED** | Complete 15-minute physical device smoke test (19 gates) + release-owner sign-off. |
-| **iOS Production Rollout** | Apple App Store / TestFlight | `678f97c` | **BLOCKED** | Install Apple Developer Distribution Certificate & provisioning profile. |
+| **Android Internal Testing Track** | Google Play Internal App Sharing / Closed Alpha | `1595aa0` | **AUTHORIZED (GO)** | Upload `app-release.aab` (313.40 MB) to Play Console internal test track. |
+| **Android Public Store Rollout** | Google Play Production Track | `1595aa0` | **GATED** | Complete 15-minute physical device smoke test (19 gates) + release-owner sign-off. |
+| **iOS Production Rollout** | Apple App Store / TestFlight | `1595aa0` | **BLOCKED** | Install Apple Developer Distribution Certificate & provisioning profile. |
 | **Web Fleet & Staging Backend** | Deployed Staging VPS (`157.173.218.56`) & Vercel | `a088488` | **AUTHORIZED (GO)** | Deploy commit `a088488` to staging infrastructure. |
 | **Production Web & Backend** | Production Cloud Fleet | `a088488` | **GATED** | Run final post-deployment smoke verification + release-owner sign-off. |
 
