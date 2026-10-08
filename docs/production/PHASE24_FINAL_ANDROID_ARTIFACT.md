@@ -107,3 +107,23 @@ $ keytool -printcert -jarfile ariesxpertv2/build/app/outputs/bundle/release/app-
    `android:usesCleartextTraffic="false"` and strict HTTPS enforced in release variant.
 6. **In-Place Upgrade Lineage:**
    Retains the existing Google Play application ID `com.ariesphysiocare.ariesexpert`, ensuring seamless in-place upgrade for all existing users without data loss or creating a secondary listing.
+
+---
+
+## 6. COMPANION RELEASE APK (SIDELOAD & PHYSICAL DEVICE TESTING)
+
+In addition to the Google Play Store App Bundle (AAB), a standalone signed release APK was compiled for direct physical handset QA testing:
+
+| Attribute | Verified Value | Inspection Tool / Authority |
+| :--- | :--- | :--- |
+| **Artifact Path** | [app-release.apk](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/build/app/outputs/flutter-apk/app-release.apk) | Filesystem |
+| **Exact Byte Size** | `455,917,393` bytes (~434.79 MB universal fat APK) | macOS `stat` / `ls -l` |
+| **SHA-256 Checksum** | `182f1764497a8d88dd304e69a250351431012c9e370590eea845f8ee7ec1c5c3` | `shasum -a 256` |
+| **Package Name** | `com.ariesphysiocare.ariesexpert` | Android SDK `aapt2 dump badging` |
+| **Version Code** | `33000` | Android SDK `aapt2 dump badging` |
+| **Version Name** | `2.0.0` | Android SDK `aapt2 dump badging` |
+| **Target SDK / Compile SDK** | `36` / `36` (Android 16 API Level 36) | Android SDK `aapt2 dump badging` |
+| **Min SDK** | `26` (Android 8.0 Oreo) | Android SDK `aapt2 dump badging` |
+| **Signature Scheme** | APK Signature Scheme v2 (`Verifies: true`) | Android SDK `apksigner verify` |
+| **Signer Certificate SHA-256** | `06:CE:BF:2A:C3:D8:41:0C:06:6B:ED:CD:0C:96:EA:7A:98:71:5E:1A:A6:C1:49:6D:0F:A2:CE:08:4A:52:85:9E` | Android SDK `apksigner verify` |
+
