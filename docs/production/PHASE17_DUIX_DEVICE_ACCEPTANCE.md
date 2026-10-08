@@ -49,9 +49,9 @@ java -jar /Volumes/Personal/bundletool.jar build-apks \
   --bundle=build/app/outputs/bundle/release/app-release.aab \
   --output=/Volumes/Personal/.tmp/app-release.apks \
   --ks=android/upload-keystore.jks \
-  --ks-pass=pass:ariesxpert2026 \
+  --ks-pass=env:ANDROID_STORE_PASSWORD \
   --ks-key-alias=upload \
-  --key-pass=pass:ariesxpert2026 \
+  --key-pass=env:ANDROID_KEY_PASSWORD \
   --overwrite
 
 # Deploy split APKs to connected device
