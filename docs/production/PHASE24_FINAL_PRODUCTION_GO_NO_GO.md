@@ -1,22 +1,29 @@
 # PHASE 24 — FINAL PRODUCTION GO / NO-GO & RELEASE HANDOVER
 
-**Execution Date:** 2026-10-09T00:46:30+05:30  
+**Execution Date:** 2026-10-09T01:02:00+05:30  
 **Target Branch:** `release-candidate-production-hardening`  
 **Application ID:** `com.ariesphysiocare.ariesexpert`  
+**Product:** AriesXpert  
+**Major Release:** `2.0.0` (Build `33000`)  
 **Target SDK:** `36` (Android 16 API Level 36)  
-**Version:** `3.3.0` (Build `33000`)  
 **Strict Avatar Boundary:** ONLY AriesXpertV2 Flutter DUIX Mobile Avatar ([packages/aries_duix](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/packages/aries_duix)). Web digital humans, Admin Avatar Studio, remote GPU render server, and HeyGem remain **DEFERRED**.
 
 ---
 
 ## 1. DEFINITIVE EXECUTIVE VERDICT
 
-### Decision: **CONDITIONAL RELEASE CANDIDATE (GATED ON PLAY CONSOLE UPLOAD & PHYSICAL DEVICE SMOKE RUN)**
+### Decision: **CONDITIONAL RELEASE CANDIDATE (GATED ON PLAY CONSOLE UPLOAD, BACKEND STAGING VALIDATION & PHYSICAL DEVICE SMOKE RUN)**
 
-All code-level vulnerabilities, hardcoded secret risks, authentication migration weaknesses, replay attack vectors, and deletion challenge flaws have been **100% remediated and independently verified**. The software build is technically certified. Public production distribution is held solely on external human-operated gates:
-1. Google Play Console internal testing track submission by the Release Owner.
-2. In-place update validation on a physical Android handset running the published app.
-3. Release Owner formal sign-off for public promotion.
+All code-level vulnerabilities, hardcoded secret risks, authentication migration weaknesses, replay attack vectors, deletion challenge flaws, and application versioning have been **100% remediated, rebuilt, and independently verified**. 
+
+The software build is technically certified as **AriesXpert 2.0.0 (33000)**. 
+
+Public production distribution is held solely on external human-operated gates:
+1. Verification of Google Play Console upload-key compatibility and version code monotonically exceeding all existing tracks.
+2. Submission of the AriesXpert 2.0.0 AAB to the original application's Internal Testing track after Release-Owner approval.
+3. In-place upgrade validation on a physical Android handset running the published app to confirm patient/therapist continuity and mobile DUIX functionality.
+4. Independent validation and Release-Owner authorized deployment of backend commit `2d11247` to the independently hosted backend.
+5. Explicit production release approval from the Release Owner.
 
 ---
 
@@ -24,6 +31,8 @@ All code-level vulnerabilities, hardcoded secret risks, authentication migration
 
 | Component / Subsystem | Technical Claim | Status | Evidentiary Basis |
 | :--- | :--- | :---: | :--- |
+| **Official Version** | Application release name is AriesXpert 2.0.0 (33000) | **Implemented & Independently Tested** | Verified in `pubspec.yaml` and via `bundletool dump manifest` (`versionName="2.0.0"`). |
+| **Separately Hosted Backend** | Existing backend hosted independently at `api.ariesxpert.com` | **Verified & Isolated** | Probe confirms live API at `https://api.ariesxpert.com/status` (v3.1.0); zero automated deployment from mobile build. |
 | **Hardcoded Secrets** | Literal JWT signing secrets eliminated from source and docs | **Implemented & Independently Tested** | Literal strings removed from [authCompatibility.routes.ts](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpert-backend/src/routes/authCompatibility.routes.ts) and sanitized in docs. |
 | **Legacy Trust Model** | Explicit server-side key ring; fail-closed when unconfigured | **Implemented & Independently Tested** | [legacyAuthKeyManager.ts](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpert-backend/src/services/legacyAuthKeyManager.ts) loaded from env; 26/26 tests passed in `test_phase24_security_assertions.js`. |
 | **Algorithmic Whitelist** | Strict HMAC whitelist; rejects `none` and asymmetric confusion | **Implemented & Independently Tested** | Verified rejection of `none` and `RS256` in automated tests. |
@@ -49,7 +58,7 @@ All 9 workspaces on branch `release-candidate-production-hardening` are clean an
 | Workspace | Repository Path | Git Commit SHA | Status |
 | :--- | :--- | :--- | :---: |
 | **Backend API Cluster** | `ariesxpert-backend` | `2d11247` | **CLEAN / COMPILED (26/26 Tests Pass)** |
-| **Mobile Flutter App** | `ariesxpertv2` | `9a14ed9` | **CLEAN / COMPILED (34/34 Tests Pass)** |
+| **Mobile Flutter App** | `ariesxpertv2` | `2c97fd3` | **CLEAN / COMPILED (AAB 2.0.0+33000 Ready)** |
 | **Admin Operations Dashboard** | `AriesXpert-Admin-Dashboard` | `32f8b050` | **CLEAN / READY** |
 | **Web Patient App** | `AriesXpert-Web-App` | `90df405` | **CLEAN / READY** |
 | **Cross-Platform Parity App** | `Aries-PhysioCare-Parity-App` | `4b6a3a2` | **CLEAN / READY** |
@@ -62,37 +71,54 @@ All 9 workspaces on branch `release-candidate-production-hardening` are clean an
 
 ## 4. CANONICAL RELEASE ARTIFACT
 
-- **File Path:** [ariesxpertv2/build/app/outputs/bundle/release/app-release.aab](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/build/app/outputs/bundle/release/app-release.aab)
-- **Exact File Size:** `313,447,999` bytes (~298.93 MB)
+- **Product:** AriesXpert  
+- **Major Release:** 2.0.0  
+- **File Path:** [ariesxpertv2/build/app/outputs/bundle/release/app-release.aab](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/build/app/outputs/bundle/release/app-release.aab)  
+- **Exact File Size:** `313,447,999` bytes (~298.93 MB)  
 - **SHA-256 Checksum:**  
-  `3e96c6509d8423e33e833564dcd5d91762e33e915baee2bb12719b37b807f9ce`
-- **Application ID:** `com.ariesphysiocare.ariesexpert`
-- **Version Code / Name:** `33000` / `3.3.0`
-- **Target SDK / Compile SDK:** `36` / `36` (Android 16 API Level 36)
-- **Min SDK:** `26` (Android 8.0 Oreo)
-- **Signer Serial Number:** `85789d0e5992f299`
+  `c485144dd12b4f0a037179d68e6537448dde74b38a68529e5740d3070dddf77b`  
+- **Application ID:** `com.ariesphysiocare.ariesexpert`  
+- **Version Code / Name:** `33000` / `2.0.0`  
+- **Target SDK / Compile SDK:** `36` / `36` (Android 16 API Level 36)  
+- **Min SDK:** `26` (Android 8.0 Oreo)  
+- **Signer Serial Number:** `85789d0e5992f299`  
 - **Signer SHA-256 Fingerprint:**  
-  `06:CE:BF:2A:C3:D8:41:0C:06:6B:ED:CD:0C:96:EA:7A:98:71:5E:1A:A6:C1:49:6D:0F:A2:CE:08:4A:52:85:9E`
+  `06:CE:BF:2A:C3:D8:41:0C:06:6B:ED:CD:0C:96:EA:7A:98:71:5E:1A:A6:C1:49:6D:0F:A2:CE:08:4A:52:85:9E`  
 
 ---
 
-## 5. RELEASE OWNER OPERATIONAL ACTION CHECKLIST
+## 5. SEPARATELY HOSTED BACKEND & OPERATIONAL PLAN
 
-The Release Owner should execute the following non-delegable operational steps:
+The AriesXpert backend is hosted independently at `https://api.ariesxpert.com` (Ubuntu Linux / Nginx / PM2 cluster).
 
-1. **Staging Environment Configuration:**
-   - In staging server `.env`, set:
-     ```bash
-     DELETION_HMAC_SECRET="<generate-random-32-char-secret>"
-     LEGACY_JWT_SECRET="<historical-signing-secret>"
-     ```
-   - Deploy backend commit `2d11247` to staging cluster.
-2. **Google Play Console Release:**
-   - Open Google Play Console -> application `com.ariesphysiocare.ariesexpert`.
-   - Create a release on **Internal Testing** track and upload [app-release.aab](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/build/app/outputs/bundle/release/app-release.aab).
-   - If prompted for upload key reset, submit [upload_certificate.pem](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/android/upload_certificate.pem).
-3. **Physical Handset Smoke Run:**
-   - On an Android phone running the currently published app, open the internal test track link and update in-place.
-   - Confirm session migration (or phone OTP recovery), appointment history continuity, medical records presence, and Tanya DUIX avatar lip-sync.
-4. **Public Rollout Authorization:**
-   - After confirming smoke test success, promote the release to Production in Google Play Console.
+1. **Isolation:** The mobile application build does **not** deploy backend changes.
+2. **Current Hosted Endpoint:** `https://api.ariesxpert.com` is live and currently running version `3.1.0`.
+3. **Phase 23/24 Endpoints Pending Backend Deployment:**
+   - `POST /api/v1/auth/legacy-migrate` (legacy JWT session migration).
+   - Keyed HMAC deletion verifier with dedicated `DELETION_HMAC_SECRET`.
+   - Permanent MongoDB replay tracking via `legacy_migration_replays`.
+4. **Independent Deployment Plan:** Documented in [PHASE24_BACKEND_ARCHITECTURE_AND_DEPLOYMENT_PLAN.md](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/docs/production/PHASE24_BACKEND_ARCHITECTURE_AND_DEPLOYMENT_PLAN.md). Deployment requires:
+   - Setting `DELETION_HMAC_SECRET` and `LEGACY_JWT_SECRET` in environment.
+   - Independent staging verification.
+   - Release Owner authorization prior to executing `pm2 reload` on production host `157.173.218.56`.
+5. **Data & Credential Integrity:** Production databases will NOT be reset, and third-party credentials will not be altered.
+6. **Backward Compatibility:** All existing endpoints remain backward compatible with legacy published app versions.
+
+---
+
+## 6. RELEASE ACCEPTANCE GATES & CHECKLIST
+
+The Release Owner should execute the following operational steps:
+
+1. **Verify Play Console Upload-Key Compatibility:**
+   - Confirm upload key fingerprint matches or submit [upload_certificate.pem](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/android/upload_certificate.pem) for upload key reset.
+   - Confirm `versionCode: 33000` exceeds all previously uploaded track versions.
+2. **Internal Testing Track Upload:**
+   - Upload [app-release.aab](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/build/app/outputs/bundle/release/app-release.aab) to the Internal Testing track of `com.ariesphysiocare.ariesexpert`.
+3. **Physical Handset In-Place Upgrade Smoke Run:**
+   - Update an existing physical Android device from the published Play Store version to `2.0.0 (33000)`.
+   - Confirm patient and therapist data continuity, past appointment records, and mobile DUIX Tanya avatar performance.
+4. **Staging & Backend Deployment Authorization:**
+   - Review and authorize backend deployment plan according to [PHASE24_BACKEND_ARCHITECTURE_AND_DEPLOYMENT_PLAN.md](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/docs/production/PHASE24_BACKEND_ARCHITECTURE_AND_DEPLOYMENT_PLAN.md).
+5. **Final Production Promotion:**
+   - Promote Internal Testing release to Production only after all physical device and backend checks pass.

@@ -1,8 +1,10 @@
 # PHASE 24 — GOOGLE PLAY CONSOLE & HARDWARE ACCEPTANCE AUDIT
 
-**Execution Date:** 2026-10-09T00:46:00+05:30  
+**Execution Date:** 2026-10-09T01:03:00+05:30  
 **Target Branch:** `release-candidate-production-hardening`  
 **Application ID:** `com.ariesphysiocare.ariesexpert`  
+**Product:** AriesXpert  
+**Major Release:** `2.0.0` (Build `33000`)  
 **Host Hardware Status:** `adb devices -l` = **0 Attached Devices**  
 **Gate Status:** **PLAY CONSOLE & PHYSICAL HARDWARE GATED (BLOCKED)**
 
@@ -29,9 +31,10 @@ Because zero physical Android handsets are connected to the build environment:
 For the authorized Release Owner:
 1. Log into [Google Play Console](https://play.google.com/console).
 2. Select the published application: **AriesXpert** (`com.ariesphysiocare.ariesexpert`).
-3. Navigate to **Testing** -> **Internal testing** -> **Create new release**.
-4. Upload candidate artifact: [app-release.aab](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/build/app/outputs/bundle/release/app-release.aab) (`3e96c650...`).
-5. **Upload Key Handling:**
+3. Confirm that `versionCode: 33000` is strictly higher than all existing releases across Internal, Closed, Open, and Production tracks.
+4. Navigate to **Testing** -> **Internal testing** -> **Create new release**.
+5. Upload candidate artifact: [app-release.aab](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/build/app/outputs/bundle/release/app-release.aab) (SHA-256: `c485144dd12b4f0a037179d68e6537448dde74b38a68529e5740d3070dddf77b`).
+6. **Upload Key Handling:**
    - **Scenario A (Upload Key Accepted):** If Play Console accepts the upload certificate, save and roll out to internal testers.
    - **Scenario B (Upload Key Reset Required):** If Play Console indicates an upload certificate mismatch, navigate to **Setup** -> **App signing** -> **Request upload key reset**, and upload [upload_certificate.pem](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/android/upload_certificate.pem).
    - *Note:* Google Play App Signing preserves the end-user signing key regardless of upload key resets. Installed user data and app signature continuity will remain intact.
@@ -47,7 +50,7 @@ Once the candidate release is live on the Google Play Internal Testing track, th
 | **1** | **Original App State** | Open published app installed from Play Store | Logged into synthetic therapist account | **BLOCKED ON HARDWARE** |
 | **2** | **Seed Consultation** | Schedule test appointment & note | Saved to MongoDB with current therapist ID | **BLOCKED ON HARDWARE** |
 | **3** | **Play Store Update** | Open Internal Testing link & tap "Update" | Android Package Manager updates in place (no uninstall) | **BLOCKED ON PLAY CONSOLE** |
-| **4** | **Launch & Migration** | Launch AriesXpertV2 v3.3.0 | Calls `/migrate-legacy-session`, saves token, purges legacy file | **BLOCKED ON HARDWARE** |
+| **4** | **Launch & Migration** | Launch AriesXpert 2.0.0 | Calls `/migrate-legacy-session` (or OTP recovery), purges legacy file | **BLOCKED ON HARDWARE** |
 | **5** | **Account Continuity** | Inspect logged-in therapist profile | Exact user ID and therapist profile match original account | **BLOCKED ON HARDWARE** |
 | **6** | **Records Integrity** | Check "My Appointments" and "Medical Records" | Past consultations and clinical notes present | **BLOCKED ON HARDWARE** |
 | **7** | **Push Delivery** | Dispatch background alert from staging backend | Notification banner appears in notification tray | **BLOCKED ON HARDWARE** |
