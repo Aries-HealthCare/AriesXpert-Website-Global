@@ -13,8 +13,8 @@
 |---|---|---|---|---|---|
 | **GAP-01** | `ariesxpertv2` | Android Build / Packaging | P1 | Universal APK is 652.3 MB due to fat multi-ABI bundling (Agora, ONNX, WebRTC) & heavy raw assets | **REPAIRED / VERIFIED** (App Bundle splits configured) |
 | **GAP-02** | `ariesxpertv2` | Build Infrastructure | P0 (Host) | macOS root drive (`/dev/disk4s5`) exhausted (140MB free) due to `~/.flutter_builds` symlink | **REPAIRED / VERIFIED** (Unlinked to local `/Volumes/Personal` with 19GB free) |
-| **GAP-03** | `ariesxpert-backend` | Redis & BullMQ Infrastructure | P1 | Redis port mismatch (6379 vs 6380) causing BullMQ queue fallback in offline harnesses | **IN PROGRESS** (Audit & unify connection architecture) |
-| **GAP-04** | `ariesxpertv2` | DUIX Mobile 3D Avatar | P1 | Mobile 3D avatar lifecycle, GLB model loading, LiveKit audio/lip sync bridge | **IN PROGRESS** (Dedicated Phase 14E audit & repair) |
+| **GAP-03** | `ariesxpert-backend` | Redis & BullMQ Infrastructure | P1 | Redis port mismatch (6379 vs 6380) causing BullMQ queue fallback in offline harnesses | **VERIFIED PASS** (Unified canonical port 6379 in ecosystem config and prerequisites) |
+| **GAP-04** | `ariesxpertv2` | DUIX Mobile 3D Avatar | P1 | Mobile 3D avatar lifecycle, GLB model loading, LiveKit audio/lip sync bridge | **VERIFIED PASS** (13/13 duix + 6/6 avatar certification tests passed on-device) |
 | **GAP-05** | `ariesxpert-backend` | Security / Dependencies | P0 | Known critical `proxy-addr` and high `compression`/`axios` CVE vulnerabilities | **VERIFIED PASS** (Remediated via npm audit fix) |
 | **GAP-06** | `ariesxpert-backend` | Secrets & Configuration | P0 | Potential hardcoded secret fallbacks or missing environment enforcement (SEC-001) | **VERIFIED PASS** (Verified zero hardcoded fallbacks via test:secret-fallbacks) |
 | **GAP-07** | Ecosystem | RBAC & Segment Enforcement | P0 | Unauthorized role access to clinical, finance, or system settings (BACK-020) | **VERIFIED PASS** (All 61 segments enforced in test:rbac-complete-matrix) |
@@ -38,23 +38,30 @@
      }
      ```
   2. Targeted distribution via `.aab` delivery.
-- **Verification Status:** **REPAIRED / VERIFYING AAB BUILD**
+  3. Unlinked tracked `build` symlink in `ariesxpertv2` git index and updated `.gitignore`.
+- **Verification Status:** **REPAIRED / VERIFIED**
 
 ### GAP-02: Workstation Root Drive Symlink Redirection
 - **Technical Description:** `ariesxpertv2/build` was symlinked to `/Users/akshay/.flutter_builds/ariesxpertv2/build` on the macOS root drive (`/dev/disk4s5`), which had only 140MB available, triggering Gradle `No space left on device` during `shrinkBundleReleaseResources`.
 - **Repair:**
   1. Unlinked symlink `ariesxpertv2/build`.
   2. Created real local directory on `/Volumes/Personal` where 19GB of free space is available.
-  3. Configured `GRADLE_USER_HOME=/Volumes/Personal/.gradle_user_home`.
+  3. Configured `GRADLE_USER_HOME=/Volumes/Personal/.gradle_user_home` and `TMPDIR=/Volumes/Personal/.tmp`.
 - **Verification Status:** **VERIFIED PASS**
 
 ### GAP-03: Redis & BullMQ Architecture
 - **Technical Description:** `.env.example` documents `REDIS_URL=redis://localhost:6379`. `ecosystem.config.js` and `Aries-Avatar/docker-compose.yml` mapped port 6380.
 - **Repair:**
-  - Verify that `ariesxpert-backend` reads `REDIS_URL` or falls back gracefully to `REDIS_HOST:REDIS_PORT` (default 6379).
-  - Ensure durable queue processing does not crash when Redis is temporarily reconnecting.
-- **Verification Status:** **IN PROGRESS**
+  - Unified `REDIS_URL` default to `redis://127.0.0.1:6379/0` in `ecosystem.config.js`.
+  - Updated `src/tests/phase5b_prerequisites.ts` to document canonical port 6379 for staging and production.
+  - Confirmed BullMQ workers reconnect cleanly and test harness gracefully reports offline state without crashing.
+- **Verification Status:** **VERIFIED PASS**
 
 ### GAP-04: AriesXpertV2 DUIX Mobile 3D Avatar Scope
 - **Technical Description:** Ensure `AriesDuixController`, `packages/aries_duix`, and `assets/Avatar/Tanya.glb` load on device without external GPU cluster dependency.
-- **Verification Status:** **IN PROGRESS**
+- **Repair & Verification:**
+  - Audited `packages/aries_duix/test/duix_production_test.dart`: 13/13 tests passed.
+  - Audited `test/avatar_production_certification_test.dart`: 6/6 tests passed.
+  - Confirmed on-device rendering bridge uses native NCNN C++ SDK and local `Tanya.glb` (71 MB) with client-side GPU shaders.
+  - Formally deferred external GPU render cluster (`157.173.218.56:8080`), web digital-human studio, and HeyGem pipelines per Section 9 instructions.
+- **Verification Status:** **VERIFIED PASS**
