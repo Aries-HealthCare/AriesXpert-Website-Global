@@ -208,7 +208,7 @@ export default function DieticianClient() {
 
                         <div className="grid md:grid-cols-2 gap-16 items-center relative z-10">
                             <div className="space-y-10">
-                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest text-white">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest">
                                     <Scale className="w-4 h-4" /> The Assessment Process
                                 </div>
                                 <h2 className="font-headline text-4xl md:text-6xl font-black leading-tight">Beyond just <br /><span className="text-primary">Counting Calories.</span></h2>

@@ -209,7 +209,7 @@ export default function HomeNursingClient() {
 
                         <div className="grid md:grid-cols-2 gap-16 items-center relative z-10">
                             <div className="space-y-10">
-                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest text-white">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest">
                                     <ShieldCheck className="w-4 h-4" /> Quality Assurance
                                 </div>
                                 <h2 className="font-headline text-4xl md:text-6xl font-black leading-tight">Safety in Every <br /><span className="text-primary">Clinical Action.</span></h2>
