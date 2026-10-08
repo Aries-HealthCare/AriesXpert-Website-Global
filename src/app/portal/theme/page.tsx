@@ -345,7 +345,7 @@ export default function WebsiteThemePage() {
             {filtered.length === 0 && (
                 <div className="text-center py-16 text-muted-foreground">
                     <Palette className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p>No palettes found for "{searchQ}"</p>
+                    <p>No palettes found for &ldquo;{searchQ}&rdquo;</p>
                     <Button variant="ghost" size="sm" onClick={() => { setSearchQ(''); setActiveCategory('All'); }} className="mt-3">
                         Clear filters
                     </Button>
@@ -415,7 +415,7 @@ export default function WebsiteThemePage() {
                 <ul className="text-sm text-muted-foreground space-y-1.5 list-none">
                     <li>• <strong>Instant preview</strong> — Changes apply to the entire website immediately via CSS variables</li>
                     <li>• <strong>Persistent</strong> — Your chosen theme is saved in the browser and restored on every visit</li>
-                    <li>• <strong>Permanent change?</strong> — Click "Copy CSS" and paste the --primary value into <code>globals.css</code> to bake it into the build</li>
+                    <li>• <strong>Permanent change?</strong> — Click &ldquo;Copy CSS&rdquo; and paste the --primary value into <code>globals.css</code> to bake it into the build</li>
                     <li>• <strong>Dark mode compatible</strong> — Each palette includes separate light and dark primary values</li>
                 </ul>
             </div>

@@ -86,26 +86,18 @@ export default function ServiceLocationClient({ serviceSlug, location }: Service
     const [isVerifying, setIsVerifying] = useState(false);
     const [therapists, setTherapists] = useState<any[]>([]);
 
-    if (!service || !geoPath || !(geoPath.country || geoPath.state || geoPath.city || geoPath.area)) {
-        return null;
-    }
-
-    const cityName = geoPath.city?.name || 'Mumbai';
-    const areaName = geoPath.area?.name || cityName;
-    const subAreaName = geoPath.subArea?.name || areaName;
+    const cityName = geoPath?.city?.name || 'Mumbai';
+    const areaName = geoPath?.area?.name || cityName;
+    const subAreaName = geoPath?.subArea?.name || areaName;
     const capitalizedArea = capitalize(subAreaName);
     const capitalizedCity = capitalize(cityName);
-    const stateName = geoPath.state?.name || 'Maharashtra';
+    const stateName = geoPath?.state?.name || 'Maharashtra';
     const capitalizedState = capitalize(stateName);
-    const serviceName = service.name;
 
     // Display location string: e.g. "Mumbai, Maharashtra" or "Grant Road, Mumbai"
     const locationDisplay = subAreaName.toLowerCase() === cityName.toLowerCase()
         ? `${capitalizedCity}, ${capitalizedState}`
         : `${capitalizedArea}, ${capitalizedCity}`;
-
-    const areaContext = getAreaSpecificContext(geoPath);
-    const faqs = getLocalizedFaqs(geoPath, serviceSlug);
 
     const form = useForm<LeadFormValues>({
         resolver: zodResolver(leadSchema),
@@ -146,6 +138,14 @@ export default function ServiceLocationClient({ serviceSlug, location }: Service
             }
         })();
     }, [spec, capitalizedCity]);
+
+    if (!service || !geoPath || !(geoPath.country || geoPath.state || geoPath.city || geoPath.area)) {
+        return null;
+    }
+
+    const serviceName = service.name;
+    const areaContext = getAreaSpecificContext(geoPath);
+    const faqs = getLocalizedFaqs(geoPath, serviceSlug);
 
     const handleSendOtp = () => {
         const phoneVal = form.getValues('phone');

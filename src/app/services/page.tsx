@@ -145,7 +145,7 @@ export default function AllServicesPage() {
                 Why We Lead in <br />Home Healthcare Excellence
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Aries PhysioCare (a division of Aries HealthCare International Pvt Ltd) is built on a foundation of clinical rigor and technological innovation. We don't just provide visits; we deliver hospital-grade recovery programs.
+                Aries PhysioCare (a division of Aries HealthCare International Pvt Ltd) is built on a foundation of clinical rigor and technological innovation. We don&apos;t just provide visits; we deliver hospital-grade recovery programs.
               </p>
               <div className="grid sm:grid-cols-2 gap-8">
                 {[
@@ -174,7 +174,7 @@ export default function AllServicesPage() {
               <div className="absolute inset-0 bg-primary/10 mix-blend-overlay" />
               <div className="absolute bottom-8 left-8 right-8 glassmorphic p-6 rounded-2xl border-white/20">
                 <p className="text-white text-sm italic font-medium leading-relaxed">
-                  "Our mission is to bridge the gap between hospital treatment and home recovery through structured, expert-led clinical intervention."
+                  &ldquo;Our mission is to bridge the gap between hospital treatment and home recovery through structured, expert-led clinical intervention.&rdquo;
                 </p>
                 <p className="text-accent text-xs font-bold mt-4 uppercase tracking-widest">— Aries Clinical Directorate</p>
               </div>

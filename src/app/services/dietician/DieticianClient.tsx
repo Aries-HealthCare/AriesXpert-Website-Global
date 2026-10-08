@@ -116,7 +116,7 @@ export default function DieticianClient() {
                                 <h2 className="font-headline text-4xl md:text-6xl font-bold tracking-tight">Food is your <span className="text-primary">Medical</span> cornerstone.</h2>
                             </div>
                             <p className="text-xl text-muted-foreground leading-relaxed font-medium">
-                                At Aries PhysioCare, we don't believe in "diets." We believe in <span className="text-foreground font-bold">Medical Nutrition Therapy (MNT).</span> Our clinical dieticians understand the complex relationship between nutrients and disease recovery, providing you with a biological roadmap to health.
+                                At Aries PhysioCare, we don&apos;t believe in &ldquo;diets.&rdquo; We believe in <span className="text-foreground font-bold">Medical Nutrition Therapy (MNT).</span> Our clinical dieticians understand the complex relationship between nutrients and disease recovery, providing you with a biological roadmap to health.
                             </p>
 
                             <div className="grid sm:grid-cols-2 gap-6">

@@ -159,7 +159,7 @@ export default function TherapyDetailPage() {
                 </div>
                 <div className="max-w-3xl prose prose-xl dark:prose-invert text-muted-foreground">
                   <p className="leading-relaxed italic">
-                    "{therapy.howItWorks}"
+                    &ldquo;{therapy.howItWorks}&rdquo;
                   </p>
                 </div>
               </div>

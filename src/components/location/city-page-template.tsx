@@ -273,7 +273,7 @@ export default function CityLandingPageTemplate({ city }: CityLandingPageTemplat
                             Book Your Session in<br />{city.cityName} Today
                         </h2>
                         <p className="text-white/80 text-lg mb-8 leading-relaxed">
-                            Join thousands across {city.cityName} who've experienced hospital-grade physiotherapy at home.
+                            Join thousands across {city.cityName} who&apos;ve experienced hospital-grade physiotherapy at home.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <BookAppointmentButton size="lg" className="h-14 px-10 text-base font-bold neon-accent-border shadow-accent/30 shadow-xl">

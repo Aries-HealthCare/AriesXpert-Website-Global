@@ -92,7 +92,7 @@ export default function RecoveryPage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground italic leading-relaxed">
-                "Consistency is the key to cellular repair. Even on days when you feel 100%, completing your basic mobilization prevents future micro-trauma."
+                &ldquo;Consistency is the key to cellular repair. Even on days when you feel 100%, completing your basic mobilization prevents future micro-trauma.&rdquo;
               </p>
               <p className="text-xs font-bold text-accent-foreground mt-4">— Aries Clinical Team</p>
             </CardContent>

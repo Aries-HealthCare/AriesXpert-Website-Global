@@ -243,7 +243,7 @@ export default function ServiceOfferedDetailPage() {
                 </div>
                 <div className="max-w-3xl prose prose-xl dark:prose-invert text-muted-foreground">
                   <p className="leading-relaxed italic">
-                    "{service.approach}"
+                    &ldquo;{service.approach}&rdquo;
                   </p>
                 </div>
               </div>

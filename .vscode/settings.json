@@ -4,5 +4,9 @@
     "less.lint.unknownAtRules": "ignore",
     "files.associations": {
         "*.css": "tailwindcss"
+    },
+    "sonarlint.connectedMode.project": {
+        "connectionId": "diegosouzapw",
+        "projectKey": "diegosouzapw_OmniRoute"
     }
 }

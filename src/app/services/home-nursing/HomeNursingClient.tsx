@@ -117,7 +117,7 @@ export default function HomeNursingClient() {
                                 <h2 className="font-headline text-4xl md:text-6xl font-bold tracking-tight">Professional <span className="text-primary">Clinical</span> Oversight.</h2>
                             </div>
                             <p className="text-xl text-muted-foreground leading-relaxed font-medium">
-                                Home nursing at Aries PhysioCare isn't just about attendance; it's about <span className="text-foreground font-bold">medical safety.</span> Our nurses are trained in critical care, wound management, and geriatric protocols to ensure your recovery is monitored with the same precision as a hospital.
+                                Home nursing at Aries PhysioCare isn&apos;t just about attendance; it&apos;s about <span className="text-foreground font-bold">medical safety.</span> Our nurses are trained in critical care, wound management, and geriatric protocols to ensure your recovery is monitored with the same precision as a hospital.
                             </p>
 
                             <div className="grid sm:grid-cols-2 gap-6">

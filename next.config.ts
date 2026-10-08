@@ -3,12 +3,6 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   /* config options here */
   serverExternalPackages: ['@genkit-ai/google-genai', 'genkit', 'google-auth-library', 'gtoken'],
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   poweredByHeader: false,
   compress: true,
   productionBrowserSourceMaps: false,

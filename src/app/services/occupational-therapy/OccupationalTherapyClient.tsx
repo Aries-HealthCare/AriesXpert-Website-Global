@@ -116,7 +116,7 @@ export default function OccupationalTherapyClient() {
                                 <h2 className="font-headline text-4xl md:text-6xl font-bold tracking-tight">Focusing on your <span className="text-primary">Occupations.</span></h2>
                             </div>
                             <p className="text-xl text-muted-foreground leading-relaxed font-medium">
-                                Occupational Therapy isn't just about physical recovery; it's about <span className="text-foreground font-bold">regaining your identity.</span> Whether it's a child learning to focus, an adult recovering from a stroke, or a senior wanting to navigate their home safely—we provide the tools to make it happen.
+                                Occupational Therapy isn&apos;t just about physical recovery; it&apos;s about <span className="text-foreground font-bold">regaining your identity.</span> Whether it&apos;s a child learning to focus, an adult recovering from a stroke, or a senior wanting to navigate their home safely—we provide the tools to make it happen.
                             </p>
 
                             <div className="grid sm:grid-cols-2 gap-6">

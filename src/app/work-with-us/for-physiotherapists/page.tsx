@@ -336,7 +336,7 @@ export default function ForPhysiotherapistsPage() {
               <div className="text-center py-20 glassmorphic rounded-[2rem] border-dashed border-primary/20 animate-reveal-up">
                 <Search className="mx-auto w-12 h-12 text-primary/20 mb-4" />
                 <h3 className="text-xl font-bold font-headline">No matching openings found</h3>
-                <p className="text-muted-foreground mt-2 max-w-sm mx-auto">We're always looking for elite talent. Submit a general enquiry and we'll keep your profile in our registry.</p>
+                <p className="text-muted-foreground mt-2 max-w-sm mx-auto">We&apos;re always looking for elite talent. Submit a general enquiry and we&apos;ll keep your profile in our registry.</p>
                 <Button className="mt-6 neon-accent-border" asChild>
                   <Link href="/contact">General Application</Link>
                 </Button>

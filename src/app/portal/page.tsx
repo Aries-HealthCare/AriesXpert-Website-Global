@@ -59,7 +59,7 @@ export default function PortalDashboard() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold font-headline">Welcome back! 👋</h1>
-          <p className="text-muted-foreground mt-1">Here's your recovery overview for this week.</p>
+          <p className="text-muted-foreground mt-1">Here&apos;s your recovery overview for this week.</p>
         </div>
         <BookAppointmentButton size="sm" className="font-bold px-6">
           Book Next Session

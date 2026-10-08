@@ -254,7 +254,7 @@ export default function TherapistsPage() {
                         </div>
                         <h2 className="font-headline text-2xl md:text-3xl font-bold mb-4">Join the Aries PhysioCare Network</h2>
                         <p className="text-muted-foreground mb-6 leading-relaxed text-sm">
-                            Be part of India's fastest-growing home healthcare network. Get consistent bookings, flexible timing, and a premium brand behind you.
+                            Be part of India&apos;s fastest-growing home healthcare network. Get consistent bookings, flexible timing, and a premium brand behind you.
                         </p>
                         <Button asChild size="lg" className="h-12 px-8 font-bold">
                             <Link href="/work-with-us/for-physiotherapists">Apply as a Therapist</Link>
