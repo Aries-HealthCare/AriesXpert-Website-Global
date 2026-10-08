@@ -1,12 +1,13 @@
-# PHASE 24 — FINAL ANDROID RELEASE ARTIFACT AUDIT
+# PHASE 24 — FINAL ANDROID RELEASE ARTIFACT MANIFEST
 
-**Execution Date:** 2026-10-09T01:00:00+05:30  
+**Execution Date:** 2026-10-09T01:30:00+05:30  
 **Target Branch:** `release-candidate-production-hardening`  
 **Application ID:** `com.ariesphysiocare.ariesexpert`  
 **Product:** AriesXpert  
 **Major Release:** `2.0.0` (Build `33000`)  
+**Git Provenance Commit:** `542f1ced91ee274e486d65e6b516ffd9a066c349` (`542f1ce`)  
 **Candidate Artifact:** [ariesxpertv2/build/app/outputs/bundle/release/app-release.aab](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/build/app/outputs/bundle/release/app-release.aab)  
-**Status:** **COMPILED FRESH, INSPECTED & READY FOR PLAY CONSOLE INTERNAL TRACK**
+**Status:** **FINAL RECONCILED PRODUCTION CANDIDATE — CERTIFIED & READY FOR PLAY INTERNAL TESTING**
 
 ---
 
@@ -16,8 +17,8 @@
 | :--- | :--- | :--- |
 | **Product Name** | `AriesXpert` | [pubspec.yaml](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/pubspec.yaml) / Brand Identity |
 | **Artifact Path** | `ariesxpertv2/build/app/outputs/bundle/release/app-release.aab` | Filesystem |
-| **Exact Byte Size** | `313,447,999` bytes (~298.93 MB) | macOS `stat` / `ls -l` |
-| **SHA-256 Checksum** | `c485144dd12b4f0a037179d68e6537448dde74b38a68529e5740d3070dddf77b` | `shasum -a 256` |
+| **Exact Byte Size** | `313,450,683` bytes (~298.93 MB) | macOS `stat` / `ls -l` |
+| **SHA-256 Checksum** | `df5fb20824c380c96d7e0754c6850ce5b03bf46408e4ed9196bbc5ea337e866c` | `shasum -a 256` |
 | **Package Name** | `com.ariesphysiocare.ariesexpert` | `bundletool dump manifest` |
 | **Version Code** | `33000` | `bundletool dump manifest` |
 | **Version Name** | `2.0.0` | `bundletool dump manifest` |
@@ -28,12 +29,25 @@
 
 ---
 
-## 2. MANIFEST EXTRACTION VIA GOOGLE BUNDLETOOL
+## 2. ARTIFACT HASH SUPERSEDED LEDGER
 
-Extracted directly from the compiled release bundle using standalone Google `bundletool` (`/Volumes/Personal/bundletool.jar`):
+To eliminate ambiguity across prior audit cycles, earlier artifact checksums are cataloged and explicitly marked **SUPERSEDED**:
+
+| Build Stage / Event | Git Commit | Checksum (SHA-256) | Status | Rationale |
+| :--- | :--- | :--- | :---: | :--- |
+| **Phase 23 Candidate** | `b84088b` | `3e96c6509d8423e33e833564dcd5d91762e33e915baee2bb12719b37b807f9ce` | **SUPERSEDED** | Replaced due to version correction to 2.0.0 and auth secret remediation. |
+| **Phase 24 Interim** | `2c97fd3` | `c485144dd12b4f0a037179d68e6537448dde74b38a68529e5740d3070dddf77b` | **SUPERSEDED** | Replaced following Task 1 migration route reconciliation and fallback wiring. |
+| **Phase 24 Final Certified** | `542f1ce` | `df5fb20824c380c96d7e0754c6850ce5b03bf46408e4ed9196bbc5ea337e866c` | **CANONICAL CURRENT** | **Official candidate for Google Play Console Internal Testing upload.** |
+
+---
+
+## 3. INDEPENDENT BINARY INSPECTION VIA BUNDLETOOL
+
+Extracted from the compiled binary using Google's official standalone `bundletool` (`/Volumes/Personal/bundletool.jar`):
 
 ```bash
-$ java -jar /Volumes/Personal/bundletool.jar dump manifest --bundle=ariesxpertv2/build/app/outputs/bundle/release/app-release.aab
+$ java -jar /Volumes/Personal/bundletool.jar dump manifest \
+    --bundle=ariesxpertv2/build/app/outputs/bundle/release/app-release.aab
 ```
 
 ```xml
@@ -53,7 +67,7 @@ $ java -jar /Volumes/Personal/bundletool.jar dump manifest --bundle=ariesxpertv2
 
 ---
 
-## 3. SIGNING CERTIFICATE LEDGER
+## 4. SIGNING CERTIFICATE LEDGER
 
 Extracted directly from the compiled release bundle using JDK `keytool`:
 
@@ -79,16 +93,16 @@ $ keytool -printcert -jarfile ariesxpertv2/build/app/outputs/bundle/release/app-
 
 ---
 
-## 4. PLAY STORE COMPLIANCE & UPGRADE INVARIANTS
+## 5. RECONCILED GOOGLE PLAY RELEASE GATES
 
 1. **Monotonic Version Progression:**
    Legacy published app has `versionCode: 1`. Candidate AAB has `versionCode: 33000`. Exceeds historical versions across all tracks, subject to final Play Console confirmation.
 2. **Major Version Alignment:**
-   Official application version name is **`2.0.0`**, representing the new major architecture release.
+   Official application version name is **`2.0.0`**, representing the major architecture release.
 3. **Android 16 / API 36 Target SDK:**
    Fully meets the latest Google Play target API policy with `targetSdkVersion="36"`.
 4. **Dynamic Delivery Size:**
-   While the universal bundle is ~298.93 MB, `bundletool build-apks` confirms optimized per-device download size is **121.19–153.99 MB**, safely within Play limits.
+   While the universal bundle is `313,450,683` bytes (~298.93 MB), `bundletool build-apks` confirms optimized per-device download size is **121.19–153.99 MB**, safely within Google Play limits.
 5. **Network Security:**
    `android:usesCleartextTraffic="false"` and strict HTTPS enforced in release variant.
 6. **In-Place Upgrade Lineage:**

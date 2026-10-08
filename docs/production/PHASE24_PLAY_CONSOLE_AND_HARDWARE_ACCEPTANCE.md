@@ -1,6 +1,6 @@
 # PHASE 24 — GOOGLE PLAY CONSOLE & HARDWARE ACCEPTANCE AUDIT
 
-**Execution Date:** 2026-10-09T01:03:00+05:30  
+**Execution Date:** 2026-10-09T01:33:00+05:30  
 **Target Branch:** `release-candidate-production-hardening`  
 **Application ID:** `com.ariesphysiocare.ariesexpert`  
 **Product:** AriesXpert  
@@ -33,7 +33,7 @@ For the authorized Release Owner:
 2. Select the published application: **AriesXpert** (`com.ariesphysiocare.ariesexpert`).
 3. Confirm that `versionCode: 33000` is strictly higher than all existing releases across Internal, Closed, Open, and Production tracks.
 4. Navigate to **Testing** -> **Internal testing** -> **Create new release**.
-5. Upload candidate artifact: [app-release.aab](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/build/app/outputs/bundle/release/app-release.aab) (SHA-256: `c485144dd12b4f0a037179d68e6537448dde74b38a68529e5740d3070dddf77b`).
+5. Upload candidate artifact: [app-release.aab](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/build/app/outputs/bundle/release/app-release.aab) (Exact SHA-256: `df5fb20824c380c96d7e0754c6850ce5b03bf46408e4ed9196bbc5ea337e866c`, Size: `313,450,683` bytes).
 6. **Upload Key Handling:**
    - **Scenario A (Upload Key Accepted):** If Play Console accepts the upload certificate, save and roll out to internal testers.
    - **Scenario B (Upload Key Reset Required):** If Play Console indicates an upload certificate mismatch, navigate to **Setup** -> **App signing** -> **Request upload key reset**, and upload [upload_certificate.pem](file:///Volumes/Personal/Aries-HealthCare-EcoSystem/ariesxpertv2/android/upload_certificate.pem).
