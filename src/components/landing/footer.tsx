@@ -76,7 +76,7 @@ export default function Footer() {
             <ul className="space-y-4">
               <li><Link href="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">About Aries PhysioCare</Link></li>
               <li><Link href="/therapist" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">Our Expert Therapists</Link></li>
-              <li><Link href="/clinic" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200 font-semibold text-primary">Our Clinic (Borivali West)</Link></li>
+              <li><Link href="/physiotherapy-clinic-borivali-west" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors inline-block hover:translate-x-1 duration-200">Our Clinic (Borivali West)</Link></li>
               <li><Link href="/blogs" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">Health Insights Blog</Link></li>
               <li><Link href="/work-with-us" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block hover:translate-x-1 duration-200">Work With Us</Link></li>
               <li><Link href="/login" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors inline-block hover:translate-x-1 duration-200">AriesXpert Provider Login</Link></li>

@@ -54,7 +54,7 @@ Below is the definitive, machine-derived repository inventory extracted directly
      * Includes DUIX Tanya        - AriesXpert-Website-India          - Aries-PhysioCare-Parity-App
        mobile avatar                (ariesxpert.in)                     (therapist.ariesxpert.com)
                                   - AriesXpert-Website-UK             - AriesXpert-Admin-Dashboard
-                                    (ariesxpert.co.uk)                  (admin.ariesxpert.com)
+                                    (ariesxpert.co.uk)                  (ariesxpert.com)
                                   - AriesXpert-Website-Canada
                                     (ariesxpert.ca)
                                             |

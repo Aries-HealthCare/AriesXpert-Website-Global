@@ -26,6 +26,10 @@ const appointmentSchema = leadAttributionSchema.merge(
   }),
 );
 
+function extractReferenceCode(response: any): string | undefined {
+  return response?.referenceCode || response?.data?.referenceCode || response?.lead?.referenceCode;
+}
+
 export async function submitAppointmentLead(data: z.infer<typeof appointmentSchema>) {
   try {
     const validatedData = appointmentSchema.parse(data);
@@ -48,7 +52,11 @@ export async function submitAppointmentLead(data: z.infer<typeof appointmentSche
       attribution: attr,
     });
 
-    return { success: true, data: response };
+    return {
+      success: true,
+      data: response,
+      referenceCode: extractReferenceCode(response),
+    };
   } catch (error) {
     console.error('Error submitting appointment lead:', error);
     return {

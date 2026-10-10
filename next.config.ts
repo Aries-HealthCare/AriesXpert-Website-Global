@@ -11,8 +11,8 @@ const nextConfig: NextConfig = {
   // SEO CRITICAL: 301 Redirects from old WordPress URLs
   // Preserves all link juice and rankings from ariesphysiocare.com
   // ============================================================
-  async redirects() {
-    return [
+  redirects() {
+    return Promise.resolve([
       // ── Core page redirects ──────────────────────────────────
       { source: '/about-us', destination: '/about', permanent: true },
       { source: '/about-us/', destination: '/about', permanent: true },
@@ -128,6 +128,10 @@ const nextConfig: NextConfig = {
       { source: '/terms-conditions', destination: '/terms-of-service', permanent: true },
       { source: '/terms-conditions/', destination: '/terms-of-service', permanent: true },
 
+      // ── Admin Dashboard Redirects ─────────────────────────────
+      { source: '/admin', destination: 'https://ariesxpert.com', permanent: false },
+      { source: '/admin/:path*', destination: 'https://ariesxpert.com/:path*', permanent: false },
+
       // ── Parity App Subdomain Redirects ───────────────────────
       { source: '/app', destination: 'https://app.ariesphysiocare.com', permanent: true },
       { source: '/app/:path*', destination: 'https://app.ariesphysiocare.com/:path*', permanent: true },
@@ -145,12 +149,12 @@ const nextConfig: NextConfig = {
       { source: '/dashboard/:path*', destination: 'https://app.ariesphysiocare.com/:path*', permanent: true },
       { source: '/register', destination: 'https://app.ariesphysiocare.com/onboarding', permanent: true },
       { source: '/register/', destination: 'https://app.ariesphysiocare.com/onboarding', permanent: true },
-    ];
+    ]);
   },
 
-  async rewrites() {
+  rewrites() {
     const backendUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://api.ariesxpert.com').replace(/\/$/, '');
-    return [
+    return Promise.resolve([
       {
         source: '/api/app/:path*',
         destination: `${backendUrl}/api/app/:path*`,
@@ -163,7 +167,7 @@ const nextConfig: NextConfig = {
         source: '/uploads/:path*',
         destination: `${backendUrl}/uploads/:path*`,
       },
-    ];
+    ]);
   },
 
   compiler: {
@@ -187,8 +191,8 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  async headers() {
-    return [
+  headers() {
+    return Promise.resolve([
       {
         source: '/:all*(svg|jpg|jpeg|png|webp|avif|gif|ico|woff|woff2|ttf|eot)',
         headers: [
@@ -253,7 +257,7 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-    ];
+    ]);
   },
 
   images: {

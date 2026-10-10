@@ -46,7 +46,8 @@ status.redis = {
 
 ### B. CORS & Cookie Security
 - **CORS Allowlist:** Restricted strictly to authorized origins:
-  - `https://admin.ariesxpert.com`
+  - `https://ariesxpert.com` (Primary Admin Dashboard)
+  - `https://admin.ariesxpert.com` (Legacy Alias)
   - `https://app.ariesxpert.com`
   - `https://parity.ariesxpert.com`
   - Regional websites (`ariesxpert.in`, `ariesxpert.co.uk`, `ariesxpert.ca`, `ariesxpert.com`)

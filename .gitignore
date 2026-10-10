@@ -57,3 +57,5 @@ packages/assets/portraits/*.jpeg
 .freebuff/
 .kilo/
 .release-credentials-backup/
+.tmp/
+
