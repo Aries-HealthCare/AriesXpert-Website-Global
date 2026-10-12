@@ -7,84 +7,81 @@ export const revalidate = 86400; // Daily ISR
 
 export function generateMetadata(): Metadata {
   const siteUrl = getSiteUrl();
-  const canonicalUrl = `${siteUrl}/physiotherapy-clinic-borivali-west`;
+  const canonicalUrl = `${siteUrl}/locations/mumbai/aries-physiocare-expert-physiotherapy-wellness-center-borivali`;
 
   return {
-    title: 'Physiotherapy Clinic in Borivali West, Mumbai | Aries PhysioCare',
+    title: 'Aries PhysioCare Borivali West Center | Expert Physiotherapy & Integrated Wellness Clinic',
     description:
-      'Premier physiotherapy clinic in Borivali West at New MHB Colony, Opp. New MHB Ground. Specialized in knee pain, back pain, sciatica, post-surgical rehab, stroke care & sports injuries. Call +91 8591981880.',
+      'Premier hospital-grade physiotherapy clinic in Borivali West at New Mhatre Colony, Opp. New Mhatre Ground. Specialized in knee pain, back pain, sciatica, TKR/THR rehab, laser therapy & sports injuries. Book online with ₹250 deposit or call +91 8591981880.',
     keywords: [
       'physiotherapy clinic in borivali west',
       'physiotherapist in borivali west',
-      'physiotherapy near new mhb colony',
-      'physiotherapy near new mhb ground',
-      'physiotherapist near me',
-      'home physiotherapy in borivali west',
-      'knee pain physiotherapy in borivali west',
-      'back pain physiotherapy in borivali west',
-      'post-surgery physiotherapy in borivali west',
-      'neurological physiotherapy in borivali west',
-      'sports injury physiotherapy in borivali west',
-      'elderly physiotherapy in borivali west',
+      'best physiotherapist borivali west',
       'aries physiocare borivali',
+      'knee pain clinic borivali west',
+      'sciatica treatment borivali',
+      'back pain physiotherapist borivali west',
+      'laser therapy clinic borivali',
+      'sports injury rehab borivali',
+      'new mhatre colony clinic',
+      'parrk riviera borivali',
+      'home physiotherapy in borivali west',
     ],
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
-      title: 'Physiotherapy Clinic in Borivali West, Mumbai | Aries PhysioCare',
+      title: 'Aries PhysioCare Borivali West Center | Expert Physiotherapy & Integrated Wellness',
       description:
-        'Personalized physiotherapy & rehabilitation at Aries PhysioCare Borivali West. 1-on-1 care, modern electrotherapy, Class-IV laser, and experienced specialists.',
+        'Hospital-grade integrated physiotherapy, Class-IV laser, spinal traction, and expert specialists at Shop No. 7, Parrk Riviera, Borivali West.',
       url: canonicalUrl,
       siteName: 'Aries PhysioCare India',
       locale: 'en_IN',
       type: 'website',
       images: [
         {
-          url: '/images/clinics/flagship-clinic-main.png',
+          url: '/images/clinics/borivali-clinic-interior.jpg',
           width: 1200,
-          height: 630,
-          alt: 'Aries PhysioCare Borivali West Clinic Entrance & Reception',
+          height: 900,
+          alt: 'Aries PhysioCare Borivali West Center Clinic Interior',
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Physiotherapy Clinic in Borivali West, Mumbai | Aries PhysioCare',
+      title: 'Aries PhysioCare Borivali West Center | Expert Physiotherapy',
       description:
-        'Expert physiotherapy & rehabilitation at Shop No. 7, Parrk Riviera, New MHB Colony, Borivali West. Call +91 8591981880.',
-      images: ['/images/clinics/flagship-clinic-main.png'],
+        'Premier clinic in Borivali West at Shop No. 7, Parrk Riviera. Call +91 8591981880 or book appointment online with ₹250 deposit.',
+      images: ['/images/clinics/borivali-clinic-interior.jpg'],
     },
   };
 }
 
 export default function BorivaliClinicPage() {
   const siteUrl = getSiteUrl();
-  const pageUrl = `${siteUrl}/physiotherapy-clinic-borivali-west`;
+  const pageUrl = `${siteUrl}/locations/mumbai/aries-physiocare-expert-physiotherapy-wellness-center-borivali`;
 
   const clinicSchema = {
     '@context': 'https://schema.org',
     '@type': ['MedicalClinic', 'LocalBusiness'],
     '@id': `${pageUrl}/#clinic`,
     name: 'Aries PhysioCare : Expert Physiotherapy Center | Integrated Wellness Center',
-    alternateName: 'Aries PhysioCare Borivali West',
+    alternateName: 'Aries PhysioCare Borivali West Center',
     legalName: 'Aries HealthCare International Pvt Ltd',
     url: pageUrl,
     logo: `${siteUrl}/logo.png`,
     image: [
-      `${siteUrl}/images/clinics/flagship-clinic-main.png`,
-      `${siteUrl}/images/clinics/aries-flagship-reception.jpg`,
-      `${siteUrl}/images/clinics/flagship-treatment-2.png`,
-      `${siteUrl}/images/clinics/flagship-consult-3.png`,
-      `${siteUrl}/images/clinics/flagship-spinal-4.png`,
+      `${siteUrl}/images/clinics/borivali-clinic-interior.jpg`,
+      `${siteUrl}/images/clinics/borivali-shoulder-therapy.jpg`,
+      `${siteUrl}/images/clinics/borivali-equipment-gym.jpg`,
     ],
     telephone: '+91 8591981880',
-    priceRange: '₹800 - ₹19500',
+    priceRange: '₹250 - ₹19500',
     currenciesAccepted: 'INR',
-    paymentAccepted: 'Cash, Credit Card, Debit Card, UPI, Net Banking',
+    paymentAccepted: 'Cash, Credit Card, Debit Card, UPI, Net Banking, Razorpay',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Shop No. 7, Parrk Riviera, New MHB Colony, Opp. New MHB Ground',
+      streetAddress: 'Shop No. 7, Parrk Riviera, New Mhatre Colony, Opp. New Mhatre Ground',
       addressLocality: 'Borivali West',
       addressRegion: 'Maharashtra',
       postalCode: '400091',
@@ -98,13 +95,13 @@ export default function BorivaliClinicPage() {
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         opens: '08:00',
         closes: '13:00',
       },
       {
         '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         opens: '16:00',
         closes: '21:00',
       },

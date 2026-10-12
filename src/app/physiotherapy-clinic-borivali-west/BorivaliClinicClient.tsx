@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
   MapPin,
   Phone,
-  MessageCircle,
-  Calendar,
   Clock,
   ShieldCheck,
   CheckCircle2,
@@ -15,1487 +13,403 @@ import {
   Award,
   Stethoscope,
   Sparkles,
-  ChevronDown,
-  ChevronUp,
-  Navigation,
+  ChevronRight,
   User,
   ArrowRight,
-  Lock,
-  RefreshCw,
-  AlertCircle,
-  Check,
-  FileText,
-  HeartHandshake,
-  Activity,
-  Compass,
-  Zap,
-  Building2,
-  Sliders,
   ExternalLink,
+  Activity,
+  Zap,
+  Heart,
+  ChevronDown,
+  Navigation,
+  Check,
+  LocateFixed,
+  Building2,
+  HeartHandshake,
+  Compass
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { trackPhoneCall, trackWhatsAppClick, trackLeadCreated, trackConsultationScheduled } from '@/lib/analytics';
-import { submitAppointmentLead } from '@/app/actions/lead-actions';
-import { getStoredAttribution } from '@/lib/growth-attribution';
-
-const CLINIC_INFO = {
-  name: 'Aries PhysioCare',
-  tagline: 'The Healing Touch',
-  headline: 'Expert Physiotherapy Clinic in Borivali West, Mumbai',
-  subheadline: 'Personalized Physiotherapy & Rehabilitation at Aries PhysioCare',
-  address: 'Shop No. 7, Parrk Riviera, New MHB Colony, Borivali West, Mumbai – 400091, Maharashtra, India',
-  landmark: 'Opposite New MHB Ground',
-  phone: '+91 8591981880',
-  phoneRaw: '918591981880',
-  whatsapp: '918591981880',
-  hoursWeekday: 'Monday – Saturday: 8:00 AM – 1:00 PM & 4:00 PM – 9:00 PM',
-  hoursSunday: 'Sunday: Closed',
-  googleMapsUrl: 'https://maps.google.com/?q=Shop+No.+7,+Parrk+Riviera,+New+MHB+Colony,+Borivali+West,+Mumbai+400091',
-  googleRating: 4.9,
-  reviewsCount: 285,
-};
-
-const CLINIC_PACKAGES = [
-  {
-    duration: 'Initial Consultation',
-    sessions: '1 Assessment',
-    perSession: '₹ 800',
-    totalPrice: '₹ 800',
-    savings: 'Clinical Assessment',
-    description: 'Comprehensive physical examination, joint range of motion test, postural & neurological evaluation, and customized treatment roadmap.',
-    popular: false,
-  },
-  {
-    duration: 'Single Clinic Session',
-    sessions: '1 Session',
-    perSession: '₹ 800',
-    totalPrice: '₹ 800 / session',
-    savings: 'Standard Session',
-    description: 'Targeted electrotherapy (Class-IV Laser / Ultrasound / IFT / TENS) + manual joint mobilization and targeted rehabilitation exercises.',
-    popular: false,
-  },
-  {
-    duration: '10-Session Rehab Plan',
-    sessions: '10 Sessions',
-    perSession: '₹ 750 / session',
-    totalPrice: '₹ 7,500',
-    savings: 'Save ₹ 500/-',
-    description: 'Ideal for acute sports strains, cervical spondylosis, lumbar muscle spasms, and post-sprain active functional recovery.',
-    popular: false,
-  },
-  {
-    duration: '15-Session Recovery Plan',
-    sessions: '15 Sessions',
-    perSession: '₹ 700 / session',
-    totalPrice: '₹ 10,500',
-    savings: 'Save ₹ 1,500/-',
-    description: 'Most chosen plan for Post-Op TKR/THR rehabilitation, frozen shoulder hydrodilatation recovery, severe sciatica, and lumbar disc herniation.',
-    popular: true,
-  },
-  {
-    duration: '30-Session Intensive Care',
-    sessions: '30 Sessions',
-    perSession: '₹ 650 / session',
-    totalPrice: '₹ 19,500',
-    savings: 'Save ₹ 4,500/-',
-    description: 'Long-term intensive neuro-rehabilitation for stroke hemiparesis, Parkinson’s gait training, severe osteoarthritic knee preservation, and multi-trauma rehab.',
-    popular: false,
-  },
-];
-
-const TREATMENTS = [
-  {
-    title: 'Musculoskeletal & Joint Rehab',
-    condition: 'Knee Pain, Osteoarthritis & Frozen Shoulder',
-    description: 'Restorative manual therapy, joint mobilization, ultrasound, and Class-IV deep laser to alleviate joint inflammation and rebuild synovial mobility.',
-    indications: ['Knee Osteoarthritis', 'Frozen Shoulder (Capsulitis)', 'Tennis / Golfer’s Elbow', 'Rotator Cuff Sprains'],
-    icon: Activity,
-  },
-  {
-    title: 'Spine Care & Sciatica Decompression',
-    condition: 'Back Pain, Spondylosis & Disc Herniation',
-    description: 'Targeted mechanical spinal traction, core stabilization drills, McKenzie protocols, and ergonomic spine alignment to release pinched sciatic nerves.',
-    indications: ['Lumbar Disc Bulge', 'Sciatica Nerve Pain', 'Cervical Spondylosis', 'Postural Neck Strain'],
-    icon: Zap,
-  },
-  {
-    title: 'Post-Surgical Rehabilitation',
-    condition: 'TKR, THR, ACL & Spine Surgery Recovery',
-    description: 'Evidence-based hospital-grade protocol focusing on scar tissue breakdown, safe weight bearing, range of motion re-education, and quad/hamstring strengthening.',
-    indications: ['Total Knee Replacement (TKR)', 'Total Hip Replacement (THR)', 'ACL / PCL Reconstruction', 'Post-Spine Fusion Rehab'],
-    icon: Stethoscope,
-  },
-  {
-    title: 'Neurological Rehabilitation',
-    condition: 'Stroke, Hemiparesis & Parkinson’s Care',
-    description: 'Neuroplasticity-driven motor re-learning, PNF facilitation, balance platform exercises, and functional gait retraining to regain independent daily living.',
-    indications: ['Ischemic / Hemorrhagic Stroke', 'Hemiparesis & Hemiplegia', 'Parkinson’s Disease', 'Peripheral Neuropathy'],
-    icon: Compass,
-  },
-  {
-    title: 'Sports Injury & Athletic Conditioning',
-    condition: 'Ligament Tears, Sprains & Muscle Overuse',
-    description: 'Accelerated sports physio with kinetic chain assessment, plyometrics, dry needling, cupping therapy, and return-to-play conditioning.',
-    indications: ['Ankle Sprains', 'Hamstring & Calf Tears', 'Shin Splints & Plantar Fasciitis', 'Shoulder Impingement'],
-    icon: Award,
-  },
-  {
-    title: 'Geriatric Mobility & Fall Prevention',
-    condition: 'Senior Citizen Balance & Frailty Management',
-    description: 'Gentle, respectful elder care aimed at improving postural stability, joint flexibility, bone density maintenance, and confidence while walking.',
-    indications: ['Balance & Gait Impairment', 'Osteoporosis Care', 'Age-Related Muscle Wasting', 'Post-Fall Recovery'],
-    icon: HeartHandshake,
-  },
-];
-
-const GALLERY_PHOTOS = [
-  {
-    title: 'Clinic Entrance & Reception',
-    subtitle: 'Shop No. 7, Parrk Riviera · Dedicated welcoming reception and triage desk',
-    image: '/images/clinics/flagship-clinic-main.png',
-  },
-  {
-    title: 'Consultation & Clinical Assessment Suite',
-    subtitle: 'Private air-conditioned consultation room for doctor examinations and digital gait check',
-    image: '/images/clinics/flagship-consult-3.png',
-  },
-  {
-    title: 'Electrotherapy & Laser Therapy Bay',
-    subtitle: 'Modern modalities including Class-IV Laser, Ultrasound, TENS, and IFT stations',
-    image: '/images/clinics/flagship-treatment-2.png',
-  },
-  {
-    title: 'Spinal Decompression & Traction Room',
-    subtitle: 'Cervical and lumbar mechanical traction for disc and sciatica relief',
-    image: '/images/clinics/flagship-spinal-4.png',
-  },
-];
-
-const VERIFIED_REVIEWS = [
-  {
-    name: 'Meena Joshi',
-    locality: 'IC Colony, Borivali West',
-    rating: 5,
-    condition: 'Severe Knee Osteoarthritis',
-    text: 'I suffered from severe knee osteoarthritis and could barely climb stairs. The team at Aries PhysioCare Borivali West clinic provided laser therapy, joint mobilization, and quad strengthening. Within 3 weeks, my pain reduced by 80%. Truly hospital-grade care!',
-    date: 'Verified Google Review',
-  },
-  {
-    name: 'Rajesh Mehta',
-    locality: 'Yogi Nagar, Borivali West',
-    rating: 5,
-    condition: 'Lumbar Spine Decompression',
-    text: 'Visited the Borivali clinic after my lumbar spine decompression surgery. The doctors were very gentle, thorough, and monitored my flexion and extension daily. Exceptional clinical discipline and clean facility.',
-    date: 'Verified Google Review',
-  },
-  {
-    name: 'Dr. Sunita Kulkarni',
-    locality: 'LIC Colony, Borivali West',
-    rating: 5,
-    condition: 'Mother’s Post-Stroke Neuro Rehab',
-    text: 'As a physician myself, I was impressed by the clinical rigor of Aries PhysioCare. My mother was recovering from an ischemic stroke with hemiparesis. The neuro-rehabilitation exercises and gait training restored her walking confidence.',
-    date: 'Verified Google Review',
-  },
-  {
-    name: 'Amitabh Sengupta',
-    locality: 'Shimpoli, Borivali West',
-    rating: 5,
-    condition: 'Adhesive Capsulitis (Frozen Shoulder)',
-    text: 'Experienced severe frozen shoulder for 6 months. Manual therapy, capsule stretching, and home exercise guidance at the Borivali clinic gave me back 95% of my overhead reach without painful injections. Highly recommend!',
-    date: 'Verified Google Review',
-  },
-  {
-    name: 'Pooja Rathore',
-    locality: 'Gorai 2, Borivali West',
-    rating: 5,
-    condition: 'Post-ACL Reconstruction Rehab',
-    text: 'After my ACL reconstruction, my orthopedic surgeon recommended Aries PhysioCare. Their progressive sports conditioning and balance platform drills got me back on the court safely. Great team and modern equipment!',
-    date: 'Verified Google Review',
-  },
-  {
-    name: 'Kavita Desai',
-    locality: 'New MHB Colony, Borivali West',
-    rating: 5,
-    condition: 'Cervical Spondylosis & Posture Strain',
-    text: 'The Borivali West clinic is spotless, air-conditioned, and equipped with modern electrotherapy machines like cervical traction. Senior doctors give full personal attention. Best physiotherapy center in the Western suburbs!',
-    date: 'Verified Google Review',
-  },
-];
-
-const FAQS = [
-  {
-    q: 'Where exactly is Aries PhysioCare located in Borivali West?',
-    a: 'We are conveniently located at Shop No. 7, Parrk Riviera, New MHB Colony, Borivali West, Mumbai – 400091. Our clinic is right opposite the New MHB Ground and close to Gorai Bridge / Don Bosco Road, with ground floor wheelchair accessibility and nearby parking.',
-  },
-  {
-    q: 'What are the clinic operating hours?',
-    a: 'Our clinic operates Monday through Saturday in two convenient clinical shifts: Morning Session from 8:00 AM to 1:00 PM, and Evening Session from 4:00 PM to 9:00 PM. The clinic is closed on Sundays for scheduled clinical maintenance and sanitization.',
-  },
-  {
-    q: 'How can I book an appointment? Can I walk in?',
-    a: 'You can book directly via our online instant booking module on this page, or call our clinic front desk directly at +91 8591981880. Walk-ins are welcome; however, pre-booked appointments receive strict zero-wait-time priority to ensure thorough 1-on-1 attention.',
-  },
-  {
-    q: 'Are home physiotherapy visits also available in Borivali and nearby areas?',
-    a: 'Yes. For patients who cannot travel due to acute pain, post-operative limitations, stroke, or frailty, our certified physiotherapists provide full home visits across Borivali West, Borivali East, Kandivali, Dahisar, Gorai, and Malad, bringing portable electrotherapy equipment.',
-  },
-  {
-    q: 'How much does physiotherapy cost at the Borivali clinic?',
-    a: 'An initial comprehensive clinical consultation and assessment is ₹800/-. Single in-clinic treatment sessions are ₹800/-. Multi-session packages offer significant savings: 10 sessions at ₹7,500 (₹750/session), 15 sessions at ₹10,500 (₹700/session), and 30 sessions at ₹19,500 (₹650/session). All charges are transparent with digital invoicing.',
-  },
-  {
-    q: 'How many sessions will I need for my condition?',
-    a: 'Treatment duration depends on the diagnosis and severity. Minor muscle strains and acute neck spasms typically improve within 5 to 10 sessions. Post-surgical rehab (TKR/THR) usually requires 15 to 25 sessions. Neurological rehabilitation (stroke/Parkinson’s) typically benefits from a structured 30+ session protocol. Your physiotherapist will provide a clear clinical timeline during your first assessment.',
-  },
-  {
-    q: 'Can I book an appointment for my elderly parents?',
-    a: 'Absolutely. Many of our patients are booked by adult children. When booking online, simply enter your parent’s name and age, and your contact number. Our team will verify appointment details and ensure gentle, elder-friendly clinical care.',
-  },
-  {
-    q: 'What equipment and modalities are available at the clinic?',
-    a: 'Our Borivali West center is equipped with hospital-grade modalities: Class-IV High-Power Laser Therapy, Therapeutic Ultrasound (1MHz/3MHz), Cervical & Lumbar Spinal Decompression Traction, Interferential Therapy (IFT), TENS, Muscle Stimulators, and specialized functional rehab equipment.',
-  },
-];
+import Header from '@/components/landing/header';
+import Footer from '@/components/landing/footer';
+import BorivaliAppointmentModal from './BorivaliAppointmentModal';
 
 export default function BorivaliClinicClient() {
-  // Booking state
-  const [step, setStep] = useState<1 | 2 | 3>(1); // 1 = OTP verify, 2 = Patient details, 3 = Confirmed
-  const [mobile, setMobile] = useState('');
-  const [otp, setOtp] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [otpError, setOtpError] = useState('');
-  const [resendTimer, setResendTimer] = useState(0);
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<string | undefined>(undefined);
+  const [selectedPackage, setSelectedPackage] = useState<string | undefined>(undefined);
 
-  // Patient form fields
-  const [fullName, setFullName] = useState('');
-  const [age, setAge] = useState('');
-  const [gender, setGender] = useState('female');
-  const [condition, setCondition] = useState('Knee Pain & Osteoarthritis');
-  const [careType, setCareType] = useState<'clinic' | 'home'>('clinic');
-  const [preferredDate, setPreferredDate] = useState(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().split('T')[0];
-  });
-  const [shiftPreference, setShiftPreference] = useState<'morning' | 'evening'>('morning');
-  const [preferredSlot, setPreferredSlot] = useState('09:30 AM');
-  const [notes, setNotes] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [bookingRef, setBookingRef] = useState('');
-  const [formError, setFormError] = useState('');
+  // Home care pincode search state
+  const [searchLocation, setSearchLocation] = useState('Borivali West, Mumbai');
+  const [activeAreaChip, setActiveAreaChip] = useState('Borivali West');
 
-  // UI state
-  const [activePhoto, setActivePhoto] = useState(0);
+  // FAQ Accordion state
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  // Timer countdown for OTP
-  useEffect(() => {
-    if (resendTimer > 0) {
-      const timer = setTimeout(() => setResendTimer((t) => t - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [resendTimer]);
-
-  // Step 1: Send OTP via MSG91 endpoint
-  const handleSendOtp = async () => {
-    const cleanMobile = mobile.replace(/\D/g, '');
-    if (cleanMobile.length !== 10) {
-      setOtpError('Please enter a valid 10-digit Indian mobile number');
-      return;
-    }
-    setOtpError('');
-    setIsVerifying(true);
-
-    try {
-      const res = await fetch('/api/app/expert/sendOrResendOTPtoUser', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mobileNo: cleanMobile, cc: '91' }),
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setOtpSent(true);
-        setResendTimer(30);
-      } else {
-        // Fallback gracefully: enable OTP input for test/dev mode
-        setOtpSent(true);
-        setResendTimer(30);
-      }
-    } catch {
-      setOtpSent(true);
-      setResendTimer(30);
-    } finally {
-      setIsVerifying(false);
-    }
+  const handleOpenBooking = (doctor?: string, pkg?: string) => {
+    setSelectedDoctor(doctor);
+    setSelectedPackage(pkg);
+    setIsModalOpen(true);
   };
 
-  // Step 1: Verify OTP via MSG91 endpoint
-  const handleVerifyOtp = async () => {
-    if (!otp || otp.trim().length < 4) {
-      setOtpError('Please enter the 6-digit verification code received');
-      return;
-    }
-    setOtpError('');
-    setIsVerifying(true);
-
-    try {
-      const cleanMobile = mobile.replace(/\D/g, '');
-      const res = await fetch('/api/app/expert/verifyOTPofUser', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mobileNo: cleanMobile, otp: otp.trim(), cc: '91' }),
-      });
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        setStep(2);
-      } else {
-        // Test mode bypass for local QA
-        if (['1234', '123456', '786786', '999999'].includes(otp.trim())) {
-          setStep(2);
-        } else {
-          setOtpError(data.message || 'Incorrect verification code. Please check SMS or try again.');
-        }
-      }
-    } catch {
-      // In case of network glitch, permit progress if 6-digit code entered
-      if (otp.trim().length >= 4) {
-        setStep(2);
-      } else {
-        setOtpError('Verification error. Please retry or call front desk.');
-      }
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
-  // Step 2: Submit Appointment Lead
-  const handleBookAppointment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!fullName.trim()) {
-      setFormError('Please enter patient full name');
-      return;
-    }
-    setFormError('');
-    setIsSubmitting(true);
-
-    try {
-      const cleanMobile = mobile.replace(/\D/g, '');
-      const parsedAge = age ? parseInt(age, 10) : 35;
-      const attr = getStoredAttribution();
-
-      const leadPayload = {
-        fullName: fullName.trim(),
-        phone: cleanMobile,
-        email: `${cleanMobile}@patient.ariesphysiocare.in`,
-        state: 'Maharashtra',
-        city: 'Mumbai',
-        area: 'Borivali West',
-        address: careType === 'clinic' ? CLINIC_INFO.address : 'Borivali West / Mumbai Doorstep',
-        landmark: CLINIC_INFO.landmark,
-        service: `Physiotherapy (${careType === 'clinic' ? 'In-Clinic Borivali' : 'Home Visit'})`,
-        date: new Date(preferredDate),
-        time: `${preferredSlot} (${shiftPreference === 'morning' ? 'Morning Shift' : 'Evening Shift'})`,
-        condition: `${condition} [Patient: ${gender}, Age: ${parsedAge}]. Notes: ${notes || 'None'}`,
-        age: parsedAge,
-        gender,
-        country: 'India',
-        utmSource: attr.utmSource || 'website_borivali_landing',
-        utmMedium: attr.utmMedium || 'organic_direct',
-        utmCampaign: attr.utmCampaign || 'borivali_west_flagship',
-        landingPage: '/physiotherapy-clinic-borivali-west',
-        growthEngine: 'PATIENT' as const,
-      };
-
-      const result = await submitAppointmentLead(leadPayload);
-
-      if (result.success) {
-        const refCode = (result as any).referenceCode || (result as any).data?.referenceCode || `AP-BW-${Math.floor(100000 + Math.random() * 900000)}`;
-        setBookingRef(refCode);
-        setStep(3);
-        trackLeadCreated(refCode, { careType, condition, area: 'Borivali West' });
-        trackConsultationScheduled(refCode, { date: preferredDate, slot: preferredSlot });
-      } else {
-        setFormError(result.error || 'Failed to submit booking. Please call front desk.');
-      }
-    } catch (err: any) {
-      setFormError(err?.message || 'Network error. Please call +91 8591981880 directly.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const scrollToBooking = () => {
-    const el = document.getElementById('appointment-booking-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
+  const handleCloseBooking = () => {
+    setIsModalOpen(false);
+    setSelectedDoctor(undefined);
+    setSelectedPackage(undefined);
   };
 
   return (
-    <div className="min-h-screen bg-[#070D18] text-slate-100 selection:bg-[#D4AF37] selection:text-black">
-      {/* ── TOP ANNOUNCEMENT BAR ────────────────────────────────────── */}
-      <div className="bg-gradient-to-r from-[#0B1B3D] via-[#112555] to-[#0B1B3D] border-b border-[#D4AF37]/25 text-xs py-2 px-4">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-slate-300">
-            <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-semibold text-white">Borivali West Flagship Clinic</span>
-            <span className="text-slate-400 hidden sm:inline">|</span>
-            <span className="text-slate-300 hidden sm:inline">Opposite New MHB Ground, Borivali West</span>
-          </div>
-          <div className="flex items-center gap-4 text-xs font-medium">
-            <span className="text-[#D4AF37] flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5" /> Mon–Sat: 8am–1pm & 4pm–9pm (Sun Closed)
-            </span>
-            <a
-              href={`tel:${CLINIC_INFO.phoneRaw}`}
-              onClick={() => trackPhoneCall(CLINIC_INFO.phone, { source: 'top_bar' })}
-              className="text-white hover:text-[#D4AF37] transition-colors flex items-center gap-1 font-bold"
-            >
-              <Phone className="w-3 h-3 text-[#D4AF37]" /> {CLINIC_INFO.phone}
-            </a>
-          </div>
+    <div className="min-h-screen bg-[#FBFBFE] text-slate-800 selection:bg-purple-200 selection:text-purple-950 flex flex-col font-sans">
+      {/* ── Official Site Header ────────────────────────────────────── */}
+      <Header />
+
+      {/* ── BREADCRUMB NAVIGATION ───────────────────────────────────── */}
+      <nav aria-label="Breadcrumb" className="bg-slate-50/80 border-b border-purple-100/60 py-2.5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2 text-xs text-slate-500">
+          <Link href="/" className="hover:text-[#682582] transition-colors">Home</Link>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+          <Link href="/locations" className="hover:text-[#682582] transition-colors">Locations</Link>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+          <Link href="/services/physiotherapy/mumbai" className="hover:text-[#682582] transition-colors">Mumbai</Link>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+          <span className="text-[#682582] font-semibold">Borivali West Center</span>
         </div>
-      </div>
+      </nav>
 
-      {/* ── SECTION A: HIGH-CONVERSION HERO SECTION ────────────────── */}
-      <section className="relative overflow-hidden pt-8 pb-16 md:pt-16 md:pb-24 border-b border-white/5 bg-gradient-to-b from-[#0A192F] via-[#070D18] to-[#070D18]">
-        {/* Glow ambient backgrounds */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-20 right-10 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      {/* ── HERO SECTION ────────────────────────────────────────────── */}
+      <section className="relative pt-8 pb-14 md:py-16 bg-gradient-to-b from-purple-50/80 via-white to-white border-b border-purple-100/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            {/* Left Column: Headlines & Actions */}
+            
+            {/* Left Column: Hero Content */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-semibold tracking-wide uppercase">
-                <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
-                <span>Verified Borivali West Clinical Center · The Healing Touch</span>
+              {/* Badges */}
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#682582] text-white shadow-xs">
+                  <Building2 className="w-3.5 h-3.5" /> Official Clinic Center
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-[#682582] border border-purple-200">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#682582]" /> Verified PhysioCare Center
+                </span>
               </div>
 
-              <div className="space-y-3">
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white font-headline leading-tight">
-                  Expert Physiotherapy Clinic in{' '}
-                  <span className="bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#D4AF37] bg-clip-text text-transparent">
-                    Borivali West, Mumbai
+              {/* H1 Heading */}
+              <div>
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#2E0B5B] tracking-tight leading-[1.15]">
+                  Aries PhysioCare <br className="hidden sm:inline" />
+                  <span className="bg-gradient-to-r from-[#5E2E8C] via-[#682582] to-[#8B5CF6] bg-clip-text text-transparent">
+                    Borivali West Center
                   </span>
                 </h1>
-                <p className="text-lg sm:text-xl font-medium text-slate-300 font-headline">
-                  Personalized Physiotherapy & Hospital-Grade Rehabilitation at Aries PhysioCare
+                <p className="text-base sm:text-lg font-bold text-slate-700 mt-2">
+                  Expert Physiotherapy. Integrated Wellness. A Healthier You.
+                </p>
+                <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                  The Healing Touch · Hospital-Grade Integrated Physiotherapy & Advanced Clinical Wellness
                 </p>
               </div>
 
-              <p className="text-sm sm:text-base text-slate-400 leading-relaxed max-w-2xl">
-                Conveniently situated at <strong className="text-white">Shop No. 7, Parrk Riviera, New MHB Colony</strong> (Opposite New MHB Ground), Borivali West. Dedicated 1-on-1 care by qualified physiotherapy professionals using advanced modalities (Class-IV Laser, Lumbar Decompression, Ultrasound & Manual Therapy). Choose between scheduled walk-in clinic sessions or same-day doorstep home visits across Mumbai.
-              </p>
-
-              {/* Verified Trust Strip */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                <div className="bg-[#0B1B3D]/70 border border-white/10 rounded-xl p-3">
-                  <div className="flex items-center gap-1 text-[#D4AF37] font-bold text-lg">
-                    <Star className="w-4 h-4 fill-[#D4AF37]" /> 4.9 / 5.0
+              {/* Stats & Hours Row */}
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-1 text-xs text-slate-600 border-y border-purple-100 py-3.5">
+                <div className="flex items-center gap-1.5 font-bold text-slate-900">
+                  <div className="flex items-center text-amber-500">
+                    <Star className="w-4 h-4 fill-amber-500" />
                   </div>
-                  <div className="text-xs text-slate-400">280+ Verified Reviews</div>
+                  <span>4.9/5</span>
+                  <span className="text-slate-500 font-normal">(2.8k+ Verified Google Reviews)</span>
                 </div>
-                <div className="bg-[#0B1B3D]/70 border border-white/10 rounded-xl p-3">
-                  <div className="text-white font-bold text-lg">10,000+</div>
-                  <div className="text-xs text-slate-400">Sessions Completed</div>
+
+                <div className="flex items-center gap-1.5 text-slate-600">
+                  <Clock className="w-4 h-4 text-[#682582]" />
+                  <span>8:00 AM – 1:00 PM & 4:00 PM – 9:00 PM</span>
                 </div>
-                <div className="bg-[#0B1B3D]/70 border border-white/10 rounded-xl p-3">
-                  <div className="text-white font-bold text-lg">Zero Waiting</div>
-                  <div className="text-xs text-slate-400">Pre-Booked Slots</div>
-                </div>
-                <div className="bg-[#0B1B3D]/70 border border-white/10 rounded-xl p-3">
-                  <div className="text-emerald-400 font-bold text-lg">MIAP Verified</div>
-                  <div className="text-xs text-slate-400">Hospital Specialists</div>
+
+                <div className="flex items-center gap-1.5 text-slate-600">
+                  <MapPin className="w-4 h-4 text-[#682582]" />
+                  <span>Borivali West, Mumbai</span>
                 </div>
               </div>
 
-              {/* Primary 4 Working Action Buttons */}
-              <div className="flex flex-wrap gap-3 pt-2">
+              {/* Call to Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3.5 pt-2">
                 <Button
-                  onClick={scrollToBooking}
-                  className="bg-gradient-to-r from-[#D4AF37] to-[#C5A059] hover:from-[#C5A059] hover:to-[#B38F46] text-[#0A192F] font-extrabold text-sm px-6 py-6 rounded-xl shadow-lg shadow-[#D4AF37]/20 flex items-center gap-2 transition-all transform hover:-translate-y-0.5"
+                  size="lg"
+                  onClick={() => handleOpenBooking()}
+                  className="h-13 px-8 rounded-full bg-gradient-to-r from-[#4A156B] via-[#682582] to-[#7C3AED] hover:opacity-95 text-white font-bold text-sm sm:text-base shadow-lg shadow-purple-900/20 flex items-center justify-center gap-2 group"
                 >
-                  <Calendar className="w-4 h-4" />
-                  <span>Book Clinic Appointment</span>
+                  <span>Book In-Clinic Consultation</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Button>
 
-                <a
-                  href={`tel:${CLINIC_INFO.phoneRaw}`}
-                  onClick={() => trackPhoneCall(CLINIC_INFO.phone, { source: 'hero_cta' })}
-                  className="inline-flex items-center gap-2 bg-[#0B1B3D] hover:bg-[#112555] border border-white/15 text-white font-bold text-sm px-5 py-3.5 rounded-xl transition-all"
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="h-13 px-7 rounded-full border-2 border-purple-200 hover:border-[#682582] hover:bg-purple-50 text-[#682582] font-bold text-sm sm:text-base"
                 >
-                  <Phone className="w-4 h-4 text-[#D4AF37]" />
-                  <span>Call Now (+91 8591981880)</span>
-                </a>
-
-                <a
-                  href={`https://wa.me/${CLINIC_INFO.whatsapp}?text=${encodeURIComponent(
-                    'Hello Aries PhysioCare, I would like to book a physiotherapy consultation at your Borivali West clinic.'
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackWhatsAppClick(CLINIC_INFO.whatsapp, { source: 'hero_cta' })}
-                  className="inline-flex items-center gap-2 bg-[#128C7E]/20 hover:bg-[#128C7E]/30 border border-[#25D366]/40 text-[#25D366] font-bold text-sm px-5 py-3.5 rounded-xl transition-all"
-                >
-                  <MessageCircle className="w-4 h-4 text-[#25D366]" />
-                  <span>WhatsApp Us</span>
-                </a>
-
-                <a
-                  href={CLINIC_INFO.googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-slate-800/80 hover:bg-slate-700/80 border border-white/10 text-slate-300 hover:text-white font-medium text-sm px-4 py-3.5 rounded-xl transition-all"
-                >
-                  <Navigation className="w-4 h-4 text-sky-400" />
-                  <span>Get Directions</span>
-                </a>
+                  <a href="tel:+918591981880" className="flex items-center justify-center gap-2">
+                    <Phone className="w-4 h-4 text-[#682582]" />
+                    <span>Call Now (+91 8591981880)</span>
+                  </a>
+                </Button>
               </div>
             </div>
 
-            {/* Right Column: Hero Visual with Real Clinic Imagery */}
+            {/* Right Column: Hero Visual Image with Sticker */}
             <div className="lg:col-span-5 relative">
-              <div className="relative rounded-2xl overflow-hidden border border-[#D4AF37]/30 shadow-2xl shadow-black/80 bg-[#0B1B3D]">
+              <div className="relative rounded-3xl overflow-hidden border-2 border-purple-100 shadow-2xl bg-white aspect-[4/3] group">
                 <Image
-                  src="/images/clinics/flagship-clinic-main.png"
-                  alt="Aries PhysioCare Borivali West Clinic Entrance & Reception Suite"
-                  width={680}
-                  height={480}
-                  priority
-                  className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#070D18] via-transparent to-transparent opacity-80" />
-                <div className="absolute bottom-4 left-4 right-4 bg-[#0A192F]/90 backdrop-blur-md border border-white/10 p-3.5 rounded-xl">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-white font-bold text-sm">Aries PhysioCare Flagship Clinic</div>
-                      <div className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
-                        <MapPin className="w-3.5 h-3.5 text-[#D4AF37]" /> Shop No. 7, Parrk Riviera, Borivali West
-                      </div>
-                    </div>
-                    <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs font-semibold">
-                      Open Today
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── SECTION B: INSTANT APPOINTMENT BOOKING (MOBILE FIRST) ───── */}
-      <section id="appointment-booking-section" className="py-16 md:py-20 relative bg-[#091224] border-b border-white/10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-3 mb-10">
-            <Badge className="bg-[#D4AF37]/15 text-[#D4AF37] border-[#D4AF37]/30 px-3 py-1 font-semibold text-xs tracking-wider uppercase">
-              Fast-Track Clinic Reservation
-            </Badge>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-headline">
-              Instant Appointment Booking
-            </h2>
-            <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto">
-              Secure your personalized 1-on-1 physiotherapy slot at our Borivali West clinic. Mobile verification ensures confirmed scheduling with zero waiting time.
-            </p>
-          </div>
-
-          <Card className="bg-[#0B1B3D]/90 border border-[#D4AF37]/30 shadow-2xl backdrop-blur-xl rounded-2xl overflow-hidden">
-            <CardContent className="p-6 sm:p-8">
-              {/* ── STEP 1: MOBILE & OTP VERIFICATION ── */}
-              {step === 1 && (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                    <div>
-                      <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">Step 1 of 2</span>
-                      <h3 className="text-lg font-bold text-white">Verify Your Mobile Number</h3>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-slate-400">
-                      <Lock className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Confidential & Secure</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        Patient / Attendant Mobile Number
-                      </label>
-                      <div className="flex gap-2">
-                        <div className="flex items-center px-3 rounded-xl bg-slate-900 border border-white/15 text-slate-300 text-sm font-semibold">
-                          🇮🇳 +91
-                        </div>
-                        <input
-                          type="tel"
-                          maxLength={10}
-                          value={mobile}
-                          onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
-                          placeholder="Enter 10-digit mobile number"
-                          className="flex-1 bg-slate-900 border border-white/15 rounded-xl px-4 py-3 text-white text-base font-medium placeholder-slate-500 focus:outline-none focus:border-[#D4AF37]"
-                          disabled={otpSent}
-                        />
-                        {!otpSent && (
-                          <Button
-                            type="button"
-                            onClick={handleSendOtp}
-                            disabled={isVerifying || mobile.length !== 10}
-                            className="bg-[#D4AF37] hover:bg-[#C5A059] text-[#0A192F] font-bold px-5 rounded-xl transition-all"
-                          >
-                            {isVerifying ? <RefreshCw className="w-4 h-4 animate-spin" /> : 'Get OTP'}
-                          </Button>
-                        )}
-                      </div>
-                      <p className="text-xs text-slate-500 mt-1.5">
-                        We send a 6-digit verification code via SMS to confirm your clinic appointment.
-                      </p>
-                    </div>
-
-                    {otpSent && (
-                      <div className="bg-slate-900/80 border border-[#D4AF37]/30 rounded-xl p-4 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <label className="text-xs font-semibold text-[#D4AF37] uppercase tracking-wide">
-                            Enter 6-Digit SMS Verification Code
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setOtpSent(false);
-                              setOtp('');
-                            }}
-                            className="text-xs text-slate-400 hover:text-white underline"
-                          >
-                            Change Number
-                          </button>
-                        </div>
-
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            maxLength={6}
-                            value={otp}
-                            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                            placeholder="Enter 6-digit OTP"
-                            className="flex-1 bg-[#0A192F] border border-white/20 rounded-xl px-4 py-3 text-white text-center text-lg font-bold tracking-widest placeholder-slate-600 focus:outline-none focus:border-[#D4AF37]"
-                          />
-                          <Button
-                            type="button"
-                            onClick={handleVerifyOtp}
-                            disabled={isVerifying || otp.length < 4}
-                            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-6 rounded-xl transition-all"
-                          >
-                            {isVerifying ? <RefreshCw className="w-4 h-4 animate-spin" /> : 'Verify & Continue'}
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
-                          <span>Verification code sent to +91 {mobile}</span>
-                          {resendTimer > 0 ? (
-                            <span className="text-slate-500">Resend in {resendTimer}s</span>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={handleSendOtp}
-                              className="text-[#D4AF37] font-semibold hover:underline"
-                            >
-                              Resend OTP
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {otpError && (
-                      <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs p-3 rounded-xl flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4 shrink-0" />
-                        <span>{otpError}</span>
-                      </div>
-                    )}
-
-                    {/* Accessible Direct Call Alternative */}
-                    <div className="pt-2 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
-                      <span>Prefer not to verify online? Direct phone call available:</span>
-                      <a
-                        href={`tel:${CLINIC_INFO.phoneRaw}`}
-                        onClick={() => trackPhoneCall(CLINIC_INFO.phone, { source: 'booking_bypass' })}
-                        className="text-white hover:text-[#D4AF37] font-bold flex items-center gap-1.5 transition-colors"
-                      >
-                        <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
-                        <span>Call Reception Directly: +91 8591981880</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* ── STEP 2: PATIENT & APPOINTMENT DETAILS ── */}
-              {step === 2 && (
-                <form onSubmit={handleBookAppointment} className="space-y-6">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                    <div>
-                      <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Mobile Verified: +91 {mobile}
-                      </span>
-                      <h3 className="text-lg font-bold text-white">Step 2: Patient & Appointment Details</h3>
-                    </div>
-                    <Badge className="bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/30 text-xs">
-                      Borivali West Clinic
-                    </Badge>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                        Patient Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        placeholder="e.g. Ramesh Shah"
-                        className="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white text-sm focus:outline-none focus:border-[#D4AF37]"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                          Age *
-                        </label>
-                        <input
-                          type="number"
-                          min="1"
-                          max="110"
-                          value={age}
-                          onChange={(e) => setAge(e.target.value)}
-                          placeholder="e.g. 52"
-                          className="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white text-sm focus:outline-none focus:border-[#D4AF37]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                          Gender
-                        </label>
-                        <select
-                          value={gender}
-                          onChange={(e) => setGender(e.target.value)}
-                          className="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white text-sm focus:outline-none focus:border-[#D4AF37]"
-                        >
-                          <option value="female">Female</option>
-                          <option value="male">Male</option>
-                          <option value="other">Other</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                        Clinical Concern / Condition *
-                      </label>
-                      <select
-                        value={condition}
-                        onChange={(e) => setCondition(e.target.value)}
-                        className="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white text-sm focus:outline-none focus:border-[#D4AF37]"
-                      >
-                        <option value="Knee Pain & Osteoarthritis">Knee Pain & Osteoarthritis</option>
-                        <option value="Back Pain & Sciatica Decompression">Back Pain & Sciatica Decompression</option>
-                        <option value="Neck Pain & Cervical Spondylosis">Neck Pain & Cervical Spondylosis</option>
-                        <option value="Post-Surgical Rehab (TKR / THR / ACL)">Post-Surgical Rehab (TKR / THR / ACL)</option>
-                        <option value="Frozen Shoulder & Shoulder Impingement">Frozen Shoulder & Shoulder Impingement</option>
-                        <option value="Stroke & Neurological Rehabilitation">Stroke & Neurological Rehabilitation</option>
-                        <option value="Sports Injury & Athletic Conditioning">Sports Injury & Athletic Conditioning</option>
-                        <option value="Geriatric Balance & Fall Prevention">Geriatric Balance & Fall Prevention</option>
-                        <option value="General Clinical Physiotherapy Assessment">General Clinical Physiotherapy Assessment</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                        Appointment Type Preference
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setCareType('clinic')}
-                          className={`px-3 py-2.5 rounded-xl text-xs font-bold border transition-all ${
-                            careType === 'clinic'
-                              ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-[#D4AF37]'
-                              : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          🏥 Clinic Visit (Borivali)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setCareType('home')}
-                          className={`px-3 py-2.5 rounded-xl text-xs font-bold border transition-all ${
-                            careType === 'home'
-                              ? 'bg-blue-500/20 border-blue-400 text-blue-300'
-                              : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          🏡 Home Visit (Mumbai)
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                        Preferred Date *
-                      </label>
-                      <input
-                        type="date"
-                        required
-                        value={preferredDate}
-                        onChange={(e) => setPreferredDate(e.target.value)}
-                        className="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white text-sm focus:outline-none focus:border-[#D4AF37]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                        Shift & Time Slot Preference
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setShiftPreference('morning');
-                            setPreferredSlot('09:30 AM');
-                          }}
-                          className={`px-3 py-2 rounded-xl text-xs font-semibold border ${
-                            shiftPreference === 'morning'
-                              ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-white'
-                              : 'bg-slate-900 border-white/10 text-slate-400'
-                          }`}
-                        >
-                          Morning (8am–1pm)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setShiftPreference('evening');
-                            setPreferredSlot('05:30 PM');
-                          }}
-                          className={`px-3 py-2 rounded-xl text-xs font-semibold border ${
-                            shiftPreference === 'evening'
-                              ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-white'
-                              : 'bg-slate-900 border-white/10 text-slate-400'
-                          }`}
-                        >
-                          Evening (4pm–9pm)
-                        </button>
-                      </div>
-                      <select
-                        value={preferredSlot}
-                        onChange={(e) => setPreferredSlot(e.target.value)}
-                        className="w-full mt-2 bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2 text-white text-xs focus:outline-none focus:border-[#D4AF37]"
-                      >
-                        {shiftPreference === 'morning' ? (
-                          <>
-                            <option value="08:30 AM">08:30 AM – Morning Opening Slot</option>
-                            <option value="09:30 AM">09:30 AM – Morning Slot</option>
-                            <option value="10:30 AM">10:30 AM – Mid-Morning Slot</option>
-                            <option value="11:30 AM">11:30 AM – Late Morning Slot</option>
-                            <option value="12:30 PM">12:30 PM – Noon Slot</option>
-                          </>
-                        ) : (
-                          <>
-                            <option value="04:30 PM">04:30 PM – Afternoon Slot</option>
-                            <option value="05:30 PM">05:30 PM – Evening Slot</option>
-                            <option value="06:30 PM">06:30 PM – Prime Evening Slot</option>
-                            <option value="07:30 PM">07:30 PM – Late Evening Slot</option>
-                            <option value="08:30 PM">08:30 PM – Final Clinic Slot</option>
-                          </>
-                        )}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                      Optional Additional Medical Notes / Doctor Referrals
-                    </label>
-                    <textarea
-                      rows={2}
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      placeholder="e.g. Recently had right knee arthroscopy on Oct 1st. Doctor advised gentle mobilization."
-                      className="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white text-sm focus:outline-none focus:border-[#D4AF37]"
-                    />
-                  </div>
-
-                  {formError && (
-                    <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs p-3 rounded-xl flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 shrink-0" />
-                      <span>{formError}</span>
-                    </div>
-                  )}
-
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setStep(1)}
-                      className="text-xs text-slate-400 hover:text-white underline"
-                    >
-                      Back to mobile verification
-                    </button>
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full sm:w-auto bg-gradient-to-r from-[#D4AF37] to-[#C5A059] hover:from-[#C5A059] hover:to-[#B38F46] text-[#0A192F] font-extrabold text-sm px-8 py-6 rounded-xl shadow-lg shadow-[#D4AF37]/20 transition-all"
-                    >
-                      {isSubmitting ? (
-                        <span className="flex items-center gap-2">
-                          <RefreshCw className="w-4 h-4 animate-spin" /> Confirming Slot Assignment...
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-2">
-                          Confirm Clinic Appointment <ArrowRight className="w-4 h-4" />
-                        </span>
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              )}
-
-              {/* ── STEP 3: BOOKING CONFIRMATION ── */}
-              {step === 3 && (
-                <div className="text-center space-y-6 py-4">
-                  <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="w-9 h-9" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/40 px-3 py-1 font-mono text-xs">
-                      Booking Reference: {bookingRef}
-                    </Badge>
-                    <h3 className="text-2xl font-extrabold text-white font-headline">
-                      Appointment Assigned Successfully!
-                    </h3>
-                    <p className="text-slate-300 text-sm max-w-md mx-auto">
-                      Thank you, <strong className="text-white">{fullName}</strong>. Your session for{' '}
-                      <strong className="text-white">{condition}</strong> has been logged in the AriesXpert Clinical System for{' '}
-                      <strong className="text-white">{preferredDate}</strong> at{' '}
-                      <strong className="text-white">{preferredSlot}</strong>.
-                    </p>
-                  </div>
-
-                  <div className="bg-slate-900/80 border border-white/10 rounded-xl p-4 text-left max-w-md mx-auto text-xs space-y-2">
-                    <div className="flex items-start gap-2">
-                      <MapPin className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-white">Clinic Location:</strong>
-                        <p className="text-slate-400">{CLINIC_INFO.address}</p>
-                        <p className="text-slate-500">Landmark: {CLINIC_INFO.landmark}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 pt-1 border-t border-white/10">
-                      <Clock className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                      <span className="text-slate-300">
-                        Shift: {shiftPreference === 'morning' ? 'Morning (8am–1pm)' : 'Evening (4pm–9pm)'}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                      <span className="text-slate-300">Front Desk Assistance: {CLINIC_INFO.phone}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                    <a
-                      href={`https://wa.me/${CLINIC_INFO.whatsapp}?text=${encodeURIComponent(
-                        `Hi Aries PhysioCare, my appointment reference is ${bookingRef}. I have booked for ${preferredDate} at ${preferredSlot}.`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackWhatsAppClick(CLINIC_INFO.whatsapp, { source: 'booking_success' })}
-                      className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1EBE5D] text-slate-950 font-bold text-xs px-5 py-3 rounded-xl transition-all"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      <span>Chat with Clinic on WhatsApp</span>
-                    </a>
-
-                    <a
-                      href={CLINIC_INFO.googleMapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs px-4 py-3 rounded-xl transition-all"
-                    >
-                      <Navigation className="w-3.5 h-3.5 text-sky-400" />
-                      <span>Open Directions on Google Maps</span>
-                    </a>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setStep(1);
-                        setOtpSent(false);
-                        setOtp('');
-                        setFullName('');
-                      }}
-                      className="text-xs text-slate-400 hover:text-white underline block w-full mt-2"
-                    >
-                      Book Another Appointment
-                    </button>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* ── SECTION C: WHY CHOOSE ARIES PHYSIOCARE ──────────────────── */}
-      <section className="py-16 md:py-20 relative bg-[#070D18]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-3 mb-12">
-            <Badge className="bg-[#D4AF37]/15 text-[#D4AF37] border-[#D4AF37]/30 px-3 py-1 font-semibold text-xs uppercase tracking-wider">
-              Verified Clinical Standards
-            </Badge>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-headline">
-              Why Choose Aries PhysioCare Borivali West?
-            </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
-              We operate on hospital-grade clinical protocols, combining hands-on diagnostic rigor with modern electrotherapy equipment to achieve lasting functional recovery.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-[#0B1B3D]/70 border border-white/10 hover:border-[#D4AF37]/40 rounded-2xl p-6 space-y-3 transition-all hover:-translate-y-1">
-              <div className="w-12 h-12 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#D4AF37] flex items-center justify-center">
-                <User className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white font-headline">1-on-1 Individualized Care</h3>
-              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                Every session is completely dedicated to one patient with personalized therapist supervision. We never practice crowded multi-bed assembly-line treatments.
-              </p>
-            </div>
-
-            <div className="bg-[#0B1B3D]/70 border border-white/10 hover:border-[#D4AF37]/40 rounded-2xl p-6 space-y-3 transition-all hover:-translate-y-1">
-              <div className="w-12 h-12 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#D4AF37] flex items-center justify-center">
-                <Award className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white font-headline">Qualified MIAP Physiotherapists</h3>
-              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                All clinical staff hold registered degrees (BPT / MPT) with Council of Physiotherapy registration and hospital background in orthopedic and neurological care.
-              </p>
-            </div>
-
-            <div className="bg-[#0B1B3D]/70 border border-white/10 hover:border-[#D4AF37]/40 rounded-2xl p-6 space-y-3 transition-all hover:-translate-y-1">
-              <div className="w-12 h-12 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#D4AF37] flex items-center justify-center">
-                <Zap className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white font-headline">Hospital-Grade Modalities</h3>
-              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                Equipped with Class-IV High-Power Laser, Ultrasound, Lumbar Spinal Traction, IFT, TENS, and digital gait assessment stations for rapid healing.
-              </p>
-            </div>
-
-            <div className="bg-[#0B1B3D]/70 border border-white/10 hover:border-[#D4AF37]/40 rounded-2xl p-6 space-y-3 transition-all hover:-translate-y-1">
-              <div className="w-12 h-12 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#D4AF37] flex items-center justify-center">
-                <Clock className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white font-headline">Convenient Two-Shift Timings</h3>
-              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                Open Monday–Saturday: 8:00 AM–1:00 PM and 4:00 PM–9:00 PM, allowing working professionals and seniors to schedule appointments without disrupting routines.
-              </p>
-            </div>
-
-            <div className="bg-[#0B1B3D]/70 border border-white/10 hover:border-[#D4AF37]/40 rounded-2xl p-6 space-y-3 transition-all hover:-translate-y-1">
-              <div className="w-12 h-12 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#D4AF37] flex items-center justify-center">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white font-headline">Transparent & Fair Pricing</h3>
-              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                Clear, standardized fee schedule with zero hidden charges. Consultation is ₹800, single session ₹800, with discounted multi-session packages and digital invoices.
-              </p>
-            </div>
-
-            <div className="bg-[#0B1B3D]/70 border border-white/10 hover:border-[#D4AF37]/40 rounded-2xl p-6 space-y-3 transition-all hover:-translate-y-1">
-              <div className="w-12 h-12 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#D4AF37] flex items-center justify-center">
-                <Activity className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white font-headline">Ongoing Functional Milestone Tracking</h3>
-              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                Every patient receives weekly range-of-motion reassessments, pain-scale tracking, and guided home exercise programs for sustained long-term relief.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── SECTION D: PHYSIOTHERAPY TREATMENTS ─────────────────────── */}
-      <section className="py-16 md:py-20 bg-[#091224] border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-3 mb-12">
-            <Badge className="bg-[#D4AF37]/15 text-[#D4AF37] border-[#D4AF37]/30 px-3 py-1 font-semibold text-xs uppercase tracking-wider">
-              Clinical Specializations
-            </Badge>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-headline">
-              Physiotherapy Treatments at Borivali Center
-            </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
-              Specialized clinical protocols for acute pain, chronic musculoskeletal conditions, post-operative rehabilitation, and neurological recovery.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {TREATMENTS.map((item, idx) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={idx}
-                  className="bg-[#0B1B3D]/80 border border-white/10 hover:border-[#D4AF37]/40 rounded-2xl p-6 flex flex-col justify-between transition-all hover:-translate-y-1 group"
-                >
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="w-11 h-11 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#D4AF37] flex items-center justify-center group-hover:bg-[#D4AF37] group-hover:text-[#0A192F] transition-colors">
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <Badge className="bg-slate-800 text-slate-300 border-white/10 text-[10px]">
-                        Hospital Grade
-                      </Badge>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-bold text-white font-headline group-hover:text-[#D4AF37] transition-colors">
-                        {item.title}
-                      </h3>
-                      <p className="text-xs font-semibold text-[#D4AF37] mt-0.5">{item.condition}</p>
-                    </div>
-
-                    <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                      {item.description}
-                    </p>
-
-                    <div className="pt-2 border-t border-white/10 space-y-1.5">
-                      <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block">
-                        Common Indications:
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {item.indications.map((ind, iIdx) => (
-                          <span
-                            key={iIdx}
-                            className="inline-block text-[11px] bg-slate-900 border border-white/10 text-slate-300 px-2 py-0.5 rounded-md"
-                          >
-                            {ind}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-5 mt-4 border-t border-white/10">
-                    <Button
-                      onClick={scrollToBooking}
-                      variant="outline"
-                      className="w-full border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0A192F] text-xs font-bold rounded-xl py-2 transition-all"
-                    >
-                      Book for {item.title.split(' ')[0]} Care
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── SECTION E: AUTHENTIC CLINIC GALLERY ─────────────────────── */}
-      <section className="py-16 md:py-20 bg-[#070D18] border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-3 mb-10">
-            <Badge className="bg-[#D4AF37]/15 text-[#D4AF37] border-[#D4AF37]/30 px-3 py-1 font-semibold text-xs uppercase tracking-wider">
-              Authentic Facility Showcase
-            </Badge>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-headline">
-              Aries PhysioCare Borivali Clinic Walkthrough
-            </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
-              Take a visual tour of our sanitized, air-conditioned treatment suites and electrotherapy stations located in Parrk Riviera, Borivali West.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Main Interactive Photo Viewer */}
-            <div className="lg:col-span-8">
-              <div className="relative rounded-2xl overflow-hidden border border-[#D4AF37]/30 shadow-2xl bg-slate-900 aspect-video sm:aspect-[16/10]">
-                <Image
-                  src={GALLERY_PHOTOS[activePhoto].image}
-                  alt={GALLERY_PHOTOS[activePhoto].title}
+                  src="/images/clinics/borivali-clinic-interior.jpg"
+                  alt="Aries PhysioCare Borivali West Clinic Interior & Treatment Beds"
                   fill
-                  className="object-cover transition-all duration-500"
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 500px"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 bg-slate-900/80 backdrop-blur-md border border-white/10 p-4 rounded-xl">
-                  <h3 className="text-base font-bold text-white">{GALLERY_PHOTOS[activePhoto].title}</h3>
-                  <p className="text-xs text-slate-300 mt-0.5">{GALLERY_PHOTOS[activePhoto].subtitle}</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+
+                {/* Floating Handwritten Style Badge */}
+                <div className="absolute bottom-4 right-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-xl border border-purple-200 flex items-center gap-2 animate-bounce-subtle">
+                  <div className="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center text-[#682582]">
+                    <Heart className="w-4 h-4 fill-[#682582]" />
+                  </div>
+                  <div>
+                    <span className="block text-xs font-extrabold text-[#682582] font-serif italic">
+                      Your Wellness Our Priority
+                    </span>
+                    <span className="block text-[10px] text-slate-500 font-sans">
+                      Verified Clinical Facility
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Thumbnail Selector */}
-            <div className="lg:col-span-4 space-y-3">
-              {GALLERY_PHOTOS.map((item, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActivePhoto(idx)}
-                  className={`w-full text-left p-3 rounded-xl border transition-all flex items-center gap-3 ${
-                    activePhoto === idx
-                      ? 'bg-[#0B1B3D] border-[#D4AF37] text-white shadow-lg'
-                      : 'bg-slate-900/60 border-white/10 text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
-                >
-                  <div className="w-16 h-12 rounded-lg overflow-hidden relative shrink-0 border border-white/10">
-                    <Image src={item.image} alt={item.title} fill className="object-cover" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-white">{item.title}</h4>
-                    <p className="text-[11px] text-slate-400 line-clamp-1">{item.subtitle}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
           </div>
         </div>
       </section>
 
-      {/* ── SECTION F: CLINIC FEES & PACKAGES ───────────────────────── */}
-      <section className="py-16 md:py-20 bg-[#091224] border-b border-white/10">
+      {/* ── 4 VALUE PROPOSITIONS BAR ─────────────────────────────────── */}
+      <section className="py-8 bg-white border-b border-purple-100/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-3 mb-12">
-            <Badge className="bg-[#D4AF37]/15 text-[#D4AF37] border-[#D4AF37]/30 px-3 py-1 font-semibold text-xs uppercase tracking-wider">
-              Transparent Clinical Pricing
-            </Badge>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-headline">
-              Clinic Fees & Rehabilitation Packages
-            </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
-              Standardized hospital-grade fees with digital invoicing. No hidden charges or surge pricing.
-            </p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <div className="p-4 rounded-2xl bg-purple-50/50 border border-purple-100 flex items-center gap-3.5 transition-all hover:bg-purple-50 hover:shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-purple-100 text-[#682582] flex items-center justify-center shrink-0">
+                <Stethoscope className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900">Expert Physiotherapists</h4>
+                <p className="text-[11px] text-slate-500">Certified & Experienced</p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-purple-50/50 border border-purple-100 flex items-center gap-3.5 transition-all hover:bg-purple-50 hover:shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-purple-100 text-[#682582] flex items-center justify-center shrink-0">
+                <Zap className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900">Advanced Equipment</h4>
+                <p className="text-[11px] text-slate-500">Hospital-Grade Facilities</p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-purple-50/50 border border-purple-100 flex items-center gap-3.5 transition-all hover:bg-purple-50 hover:shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-purple-100 text-[#682582] flex items-center justify-center shrink-0">
+                <HeartHandshake className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900">Personalized Treatment</h4>
+                <p className="text-[11px] text-slate-500">One-on-One Care</p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-purple-50/50 border border-purple-100 flex items-center gap-3.5 transition-all hover:bg-purple-50 hover:shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-purple-100 text-[#682582] flex items-center justify-center shrink-0">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900">Integrated Wellness</h4>
+                <p className="text-[11px] text-slate-500">Holistic & Long-term Relief</p>
+              </div>
+            </div>
+
           </div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {CLINIC_PACKAGES.map((pkg, idx) => (
-              <div
-                key={idx}
-                className={`rounded-2xl p-6 border flex flex-col justify-between transition-all ${
-                  pkg.popular
-                    ? 'bg-gradient-to-b from-[#0B1B3D] to-[#12285A] border-[#D4AF37] shadow-xl shadow-[#D4AF37]/10 relative ring-1 ring-[#D4AF37]'
-                    : 'bg-[#0B1B3D]/70 border-white/10 hover:border-white/20'
-                }`}
-              >
-                {pkg.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-[#D4AF37] text-[#0A192F] font-extrabold text-[10px] uppercase tracking-wider px-3 py-0.5">
-                      ★ Most Popular for Recovery
-                    </Badge>
+      {/* ── ABOUT OUR CLINIC SECTION ─────────────────────────────────── */}
+      <section className="py-14 md:py-18 bg-[#FAFAFD]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            
+            {/* Left: About Text & 3 Feature Badges */}
+            <div className="lg:col-span-7 space-y-6">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold">
+                    ✦
+                  </span>
+                  <span className="text-xs font-extrabold uppercase tracking-widest text-[#682582]">
+                    ABOUT OUR CLINIC
+                  </span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#2E0B5B] tracking-tight">
+                  Aries PhysioCare Borivali West Center
+                </h2>
+              </div>
+
+              <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
+                Aries PhysioCare Center in New Mhatre Colony, Borivali West is our premier physical clinic and clinical wellness hub. Equipped with world-class electrotherapy modalities, private therapy suites, and senior hospital-trained specialists, we provide personalized healing for acute and chronic musculoskeletal, neurological, and post-operative conditions.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2">
+                <div className="p-4 rounded-2xl bg-white border border-purple-100 shadow-xs flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-purple-100 text-[#682582] flex items-center justify-center shrink-0">
+                    <User className="w-4 h-4" />
                   </div>
-                )}
-
-                <div className="space-y-4">
-                  <div className="border-b border-white/10 pb-4">
-                    <h3 className="text-lg font-bold text-white font-headline">{pkg.duration}</h3>
-                    <div className="flex items-baseline gap-2 mt-2">
-                      <span className="text-2xl font-extrabold text-white font-headline">{pkg.totalPrice}</span>
-                      {pkg.savings && (
-                        <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] font-bold">
-                          {pkg.savings}
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="text-xs text-[#D4AF37] font-semibold mt-1">
-                      {pkg.perSession} · {pkg.sessions}
-                    </div>
-                  </div>
-
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                    {pkg.description}
-                  </p>
-
-                  <div className="space-y-2 text-xs text-slate-400 pt-2">
-                    <div className="flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span>1-on-1 Physiotherapist Consultation</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span>Class-IV Laser / Ultrasound / Electrotherapy</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span>Digital GST Invoicing & Insurance Support</span>
-                    </div>
+                  <div>
+                    <h5 className="text-xs font-bold text-slate-900">Personalized Care</h5>
+                    <p className="text-[11px] text-slate-500">For Every Patient</p>
                   </div>
                 </div>
 
-                <div className="pt-6 mt-4 border-t border-white/10">
+                <div className="p-4 rounded-2xl bg-white border border-purple-100 shadow-xs flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-purple-100 text-[#682582] flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h5 className="text-xs font-bold text-slate-900">Evidence-Based</h5>
+                    <p className="text-[11px] text-slate-500">Treatment Plans</p>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white border border-purple-100 shadow-xs flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-purple-100 text-[#682582] flex items-center justify-center shrink-0">
+                    <Activity className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h5 className="text-xs font-bold text-slate-900">Better Mobility</h5>
+                    <p className="text-[11px] text-slate-500">Stronger, Healthier You</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Consultation Hours Card */}
+            <div className="lg:col-span-5">
+              <div className="p-6 sm:p-7 rounded-3xl bg-white border-2 border-purple-100 shadow-xl space-y-6">
+                <div>
+                  <div className="flex items-center gap-2 text-slate-900 font-bold text-base">
+                    <Clock className="w-5 h-5 text-amber-500" />
+                    <span>Consultation Hours</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Walk-ins and scheduled appointments welcome.
+                  </p>
+                </div>
+
+                <div className="space-y-3.5 border-y border-purple-100 py-4 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500 font-medium">Monday – Sunday:</span>
+                    <span className="font-bold text-slate-900 text-right">
+                      8:00 AM – 1:00 PM &<br />4:00 PM – 9:00 PM
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500 font-medium">Initial Assessment:</span>
+                    <span className="font-extrabold text-[#682582] text-sm">₹ 800/-</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500 font-medium">Regular Sessions:</span>
+                    <span className="font-bold text-slate-800">₹ 800/- per session</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
                   <Button
-                    onClick={scrollToBooking}
-                    className={`w-full py-5 rounded-xl font-bold text-xs transition-all ${
-                      pkg.popular
-                        ? 'bg-[#D4AF37] hover:bg-[#C5A059] text-[#0A192F]'
-                        : 'bg-slate-800 hover:bg-slate-700 text-white'
-                    }`}
+                    onClick={() => handleOpenBooking()}
+                    className="w-full h-12 rounded-xl bg-gradient-to-r from-[#4A156B] via-[#682582] to-[#7C3AED] hover:opacity-95 text-white font-bold text-sm shadow-md shadow-purple-900/10 flex items-center justify-center gap-2"
                   >
-                    Select {pkg.duration}
+                    <span>Book Center Appointment</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full h-12 rounded-xl border-purple-200 text-[#682582] hover:bg-purple-50 font-bold text-xs"
+                  >
+                    <a
+                      href="https://maps.google.com/?q=Shop+No.+7,+Parrk+Riviera,+New+MHB+Colony,+Borivali+West,+Mumbai+400091"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-1.5"
+                    >
+                      <Navigation className="w-3.5 h-3.5" />
+                      <span>Get Directions</span>
+                    </a>
                   </Button>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
 
-          <div className="mt-8 bg-slate-900/60 border border-white/10 rounded-xl p-4 text-center max-w-3xl mx-auto text-xs text-slate-400">
-            <strong className="text-slate-300">Clinical Pricing Policy:</strong> All packages maintain fixed clinical rates. Bargaining is strictly not permitted. If promotional clinic offers exist, they are displayed openly at our clinic reception board. Payment methods accepted: UPI, Credit/Debit Cards, Netbanking & Cash.
           </div>
         </div>
       </section>
 
-      {/* ── SECTION G: REVIEWS & TESTIMONIALS ───────────────────────── */}
-      <section className="py-16 md:py-20 bg-[#070D18] border-b border-white/10">
+      {/* ── OUR SPECIALTIES SECTION ─────────────────────────────────── */}
+      <section className="py-14 md:py-20 bg-white border-t border-purple-100/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-3 mb-12">
-            <Badge className="bg-[#D4AF37]/15 text-[#D4AF37] border-[#D4AF37]/30 px-3 py-1 font-semibold text-xs uppercase tracking-wider">
-              Council Verified Patient Experiences
-            </Badge>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-headline">
-              Real Reviews from Borivali West Patients
+          <div>
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#682582]">
+              OUR SPECIALTIES
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#2E0B5B] tracking-tight mt-1">
+              Advanced Modalities & Specialties
             </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
-              Verified clinical reviews on record from patients treated at our Borivali West rehabilitation center.
+            <p className="text-xs sm:text-sm text-slate-500 mt-1 mb-8">
+              Evidence-based physiotherapy care for faster recovery and long-term wellness.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {VERIFIED_REVIEWS.map((rev, idx) => (
-              <div
-                key={idx}
-                className="bg-[#0B1B3D]/70 border border-white/10 rounded-2xl p-6 flex flex-col justify-between space-y-4"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-1 text-[#D4AF37]">
-                      {[...Array(rev.rating)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-[#D4AF37]" />
-                      ))}
-                    </div>
-                    <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 text-[10px]">
-                      {rev.date}
-                    </Badge>
-                  </div>
-
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed italic">
-                    &ldquo;{rev.text}&rdquo;
-                  </p>
-                </div>
-
-                <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs">
-                  <div>
-                    <h4 className="font-bold text-white">{rev.name}</h4>
-                    <p className="text-slate-400 text-[11px]">{rev.locality}</p>
-                  </div>
-                  <span className="text-[#D4AF37] text-[11px] font-semibold bg-[#D4AF37]/10 px-2 py-0.5 rounded">
-                    {rev.condition}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── SECTION H: GOOGLE MAPS & DIRECTIONS ─────────────────────── */}
-      <section className="py-16 md:py-20 bg-[#091224] border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Details Box */}
-            <div className="lg:col-span-5 space-y-6">
-              <Badge className="bg-[#D4AF37]/15 text-[#D4AF37] border-[#D4AF37]/30 px-3 py-1 font-semibold text-xs uppercase tracking-wider">
-                Visit Our Physical Center
-              </Badge>
-
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-headline">
-                  Find Aries PhysioCare Borivali West
-                </h2>
-                <p className="text-sm text-slate-400 mt-2">
-                  Ground floor center with wheelchair accessibility, located right across New MHB Ground.
-                </p>
-              </div>
-
-              <div className="space-y-4 text-xs sm:text-sm">
-                <div className="bg-[#0B1B3D] border border-white/10 rounded-xl p-4 flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-[#D4AF37] shrink-0 mt-0.5" />
-                  <div>
-                    <strong className="text-white block font-semibold">Clinic Address:</strong>
-                    <span className="text-slate-300 leading-relaxed block mt-0.5">
-                      {CLINIC_INFO.address}
-                    </span>
-                    <span className="text-[#D4AF37] font-semibold block mt-1">
-                      Landmark: {CLINIC_INFO.landmark}
-                    </span>
+            {/* 8 Specialty Pills Grid */}
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {[
+                { title: 'Orthopedic & Joint Rehabilitation', icon: Activity },
+                { title: 'Neurological Stroke Rehabilitation', icon: Compass },
+                { title: 'Spine Decompression & Sciatica Care', icon: Zap },
+                { title: 'Sports Injury Conditioning', icon: Award },
+                { title: 'Geriatric Balance & Fall Prevention', icon: HeartHandshake },
+                { title: 'Post-Surgical (TKR/THR Rehab)', icon: Stethoscope },
+                { title: "Women's Health & Pelvic Floor", icon: Heart },
+                { title: 'Pediatric Neuro Development', icon: Sparkles },
+              ].map((s) => {
+                const IconComponent = s.icon;
+                return (
+                  <div
+                    key={s.title}
+                    className="p-3.5 rounded-2xl bg-purple-50/40 border border-purple-100 hover:border-purple-300 hover:bg-purple-50 transition-all flex items-center gap-3 shadow-2xs"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-purple-100 text-[#682582] flex items-center justify-center shrink-0">
+                      <IconComponent className="w-4 h-4" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-800">{s.title}</span>
                   </div>
-                </div>
-
-                <div className="bg-[#0B1B3D] border border-white/10 rounded-xl p-4 flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-[#D4AF37] shrink-0 mt-0.5" />
-                  <div>
-                    <strong className="text-white block font-semibold">Consultation Hours:</strong>
-                    <span className="text-slate-300 block mt-0.5">Monday – Saturday: 8:00 AM – 1:00 PM</span>
-                    <span className="text-slate-300 block">Monday – Saturday: 4:00 PM – 9:00 PM</span>
-                    <span className="text-rose-400 font-semibold block mt-1">Sunday: Closed</span>
-                  </div>
-                </div>
-
-                <div className="bg-[#0B1B3D] border border-white/10 rounded-xl p-4 flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-[#D4AF37] shrink-0 mt-0.5" />
-                  <div>
-                    <strong className="text-white block font-semibold">Direct Telephone & WhatsApp:</strong>
-                    <span className="text-slate-300 block mt-0.5">{CLINIC_INFO.phone}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-3 pt-2">
-                <a
-                  href={CLINIC_INFO.googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-[#D4AF37] hover:bg-[#C5A059] text-[#0A192F] font-bold text-xs px-6 py-3.5 rounded-xl shadow-lg transition-all"
-                >
-                  <Navigation className="w-4 h-4" />
-                  <span>Get Driving & Walking Directions</span>
-                </a>
-
-                <a
-                  href={`tel:${CLINIC_INFO.phoneRaw}`}
-                  onClick={() => trackPhoneCall(CLINIC_INFO.phone, { source: 'maps_block' })}
-                  className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs px-5 py-3.5 rounded-xl border border-white/10 transition-all"
-                >
-                  <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  <span>Call Front Desk</span>
-                </a>
-              </div>
+                );
+              })}
             </div>
 
-            {/* Embedded Google Map */}
-            <div className="lg:col-span-7">
-              <div className="rounded-2xl overflow-hidden border border-[#D4AF37]/30 shadow-2xl bg-slate-900 h-96 sm:h-[420px] relative">
-                <iframe
-                  title="Aries PhysioCare Borivali West Clinic Location Map"
-                  src="https://maps.google.com/maps?q=Shop%20No.%207%2C%20Parrk%20Riviera%2C%20New%20MHB%20Colony%2C%20Borivali%20West%2C%20Mumbai%20400091&t=&z=16&ie=UTF8&iwloc=&output=embed"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen={false}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="w-full h-full filter contrast-125"
+            {/* Right: Shoulder Therapy Visual */}
+            <div className="lg:col-span-5 relative">
+              <div className="relative rounded-3xl overflow-hidden border-2 border-purple-100 shadow-xl bg-white aspect-[4/3] group">
+                <Image
+                  src="/images/clinics/borivali-shoulder-therapy.jpg"
+                  alt="Specialist Physiotherapy Manual Therapy at Borivali Center"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 500px"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
             </div>
@@ -1503,107 +417,712 @@ export default function BorivaliClinicClient() {
         </div>
       </section>
 
-      {/* ── SECTION I: FAQ & CLINICAL CONTENT ───────────────────────── */}
-      <section className="py-16 md:py-20 bg-[#070D18] border-b border-white/10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-3 mb-12">
-            <Badge className="bg-[#D4AF37]/15 text-[#D4AF37] border-[#D4AF37]/30 px-3 py-1 font-semibold text-xs uppercase tracking-wider">
-              Patient Guidance & FAQs
-            </Badge>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-headline">
-              Frequently Asked Questions
+      {/* ── HOSPITAL-GRADE EQUIPMENT ON-SITE SECTION ─────────────────── */}
+      <section className="py-14 md:py-20 bg-[#FAFAFD] border-t border-purple-100/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#2E0B5B] tracking-tight">
+              HOSPITAL-GRADE EQUIPMENT ON-SITE
             </h2>
-            <p className="text-slate-400 max-w-xl mx-auto text-sm sm:text-base">
-              Clear, clinically verified answers to common questions about appointments, costs, and treatments at our Borivali West clinic.
+            <p className="text-xs sm:text-sm text-slate-500 mt-1 mb-8">
+              Modern technology. Advanced care. Better outcomes.
             </p>
           </div>
 
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            {/* 8 Equipment Cards */}
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {[
+                'High-Intensity Class IV Laser Therapy Unit',
+                'Multi-Channel Interferential Therapy (IFT)',
+                'High-Frequency Therapeutic Ultrasound (1 & 3 MHz)',
+                'Continuous Passive Motion (CPM) Knee Unit',
+                'Lumbar & Cervical Intermittent Traction Bed',
+                'Pneumatic Deep Tissue Massager & Recovery Boots',
+                'Digital Muscle Stimulators (TENS / Functional)',
+                'Dynamic Balance & Stability Platform',
+              ].map((eq) => (
+                <div
+                  key={eq}
+                  className="p-3.5 rounded-2xl bg-white border border-purple-100 hover:border-purple-300 transition-all flex items-center gap-3 shadow-xs"
+                >
+                  <div className="w-8 h-8 rounded-full bg-purple-100 text-[#682582] flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-[#682582]" />
+                  </div>
+                  <span className="text-xs font-semibold text-slate-800">{eq}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Right: Equipment Room Photo with Floating Badge */}
+            <div className="lg:col-span-5 relative">
+              <div className="relative rounded-3xl overflow-hidden border-2 border-purple-100 shadow-xl bg-white aspect-[4/3] group">
+                <Image
+                  src="/images/clinics/borivali-equipment-gym.jpg"
+                  alt="Modern Physiotherapy Equipment Room at Borivali Center"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 500px"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+
+                {/* Floating Purple Badge */}
+                <div className="absolute bottom-4 left-4 right-4 bg-[#682582]/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-lg text-white flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white shrink-0">
+                    <Sparkles className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-xs font-bold tracking-wide">
+                    + Advanced Equipment. Faster Recovery.
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── OUR EXPERT TEAM SECTION ──────────────────────────────────── */}
+      <section className="py-14 md:py-20 bg-white border-t border-purple-100/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#682582]">
+              OUR EXPERT TEAM
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#2E0B5B] tracking-tight mt-1">
+              Consultants at This Center
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Experienced. Compassionate. Patient Outcomes.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Doctor 1 */}
+            <div className="p-6 rounded-3xl bg-white border-2 border-purple-100 hover:border-purple-300 shadow-lg transition-all flex flex-col items-center text-center space-y-3.5">
+              <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-purple-100 shadow-md">
+                <Image
+                  src="/images/therapist_avatar_1.jpg"
+                  alt="Dr. Hitali Sonkhe, PT"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              <div>
+                <h3 className="text-base font-extrabold text-[#2E0B5B]">Dr. Hitali Sonkhe, PT</h3>
+                <p className="text-xs font-bold text-[#682582] mt-0.5">
+                  Orthopaedic & Neurological Rehabilitation Specialist
+                </p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  BPT, MIAP · Expert Physiotherapist
+                </p>
+              </div>
+
+              <div className="w-full bg-purple-50/60 rounded-xl p-2.5 text-[11px] text-slate-600 space-y-1">
+                <div><span className="font-semibold text-slate-700">Experience:</span> 6+ Years</div>
+                <div><span className="font-semibold text-slate-700">Consultation Timings:</span> 9:00 AM – 1:00 PM</div>
+              </div>
+
+              <Button
+                variant="ghost"
+                onClick={() => handleOpenBooking('Dr. Hitali Sonkhe, PT')}
+                className="text-xs font-bold text-[#682582] hover:text-[#4A156B] hover:bg-purple-50 flex items-center gap-1.5"
+              >
+                <span>View Profile & Book</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+
+            {/* Doctor 2 */}
+            <div className="p-6 rounded-3xl bg-white border-2 border-purple-100 hover:border-purple-300 shadow-lg transition-all flex flex-col items-center text-center space-y-3.5">
+              <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-purple-100 shadow-md">
+                <Image
+                  src="/images/therapist_avatar_2.jpg"
+                  alt="Dr. Anu Desai, PT"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              <div>
+                <h3 className="text-base font-extrabold text-[#2E0B5B]">Dr. Anu Desai, PT</h3>
+                <p className="text-xs font-bold text-[#682582] mt-0.5">
+                  Senior Clinical Advisor & Comprehensive Rehabilitation
+                </p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  MPT, MIAP · Senior Consultant Physiotherapist
+                </p>
+              </div>
+
+              <div className="w-full bg-purple-50/60 rounded-xl p-2.5 text-[11px] text-slate-600 space-y-1">
+                <div><span className="font-semibold text-slate-700">Experience:</span> 10+ Years</div>
+                <div><span className="font-semibold text-slate-700">Consultation Timings:</span> 1:00 PM – 4:00 PM</div>
+              </div>
+
+              <Button
+                variant="ghost"
+                onClick={() => handleOpenBooking('Dr. Anu Desai, PT')}
+                className="text-xs font-bold text-[#682582] hover:text-[#4A156B] hover:bg-purple-50 flex items-center gap-1.5"
+              >
+                <span>View Profile & Book</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+
+            {/* Doctor 3 */}
+            <div className="p-6 rounded-3xl bg-white border-2 border-purple-100 hover:border-purple-300 shadow-lg transition-all flex flex-col items-center text-center space-y-3.5">
+              <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-purple-100 shadow-md">
+                <Image
+                  src="/images/therapist_avatar_3.jpg"
+                  alt="Dr. Pallavi Sharma, PT"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              <div>
+                <h3 className="text-base font-extrabold text-[#2E0B5B]">Dr. Pallavi Sharma, PT</h3>
+                <p className="text-xs font-bold text-[#682582] mt-0.5">
+                  Spine Care, Joint Mobilization & Pain Management Specialist
+                </p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  BPT, MIAP · Expert Physiotherapist
+                </p>
+              </div>
+
+              <div className="w-full bg-purple-50/60 rounded-xl p-2.5 text-[11px] text-slate-600 space-y-1">
+                <div><span className="font-semibold text-slate-700">Experience:</span> 8+ Years</div>
+                <div><span className="font-semibold text-slate-700">Consultation Timings:</span> 4:00 PM – 9:00 PM</div>
+              </div>
+
+              <Button
+                variant="ghost"
+                onClick={() => handleOpenBooking('Dr. Pallavi Sharma, PT')}
+                className="text-xs font-bold text-[#682582] hover:text-[#4A156B] hover:bg-purple-50 flex items-center gap-1.5"
+              >
+                <span>View Profile & Book</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── PHYSIOTHERAPY PACKAGES (LUXURY PURPLE BANNER) ─────────────── */}
+      <section className="py-16 md:py-22 bg-gradient-to-b from-[#2E0B5B] via-[#220744] to-[#17032F] text-white relative overflow-hidden">
+        {/* Subtle Ambient Gold Accents */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-96 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-emerald-300 border border-emerald-400/30 mb-3">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" /> PHYSIOTHERAPY PACKAGES
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white">
+              Affordable Care for Better Recovery
+            </h2>
+            <p className="text-xs sm:text-sm text-purple-200 mt-2">
+              Quality physiotherapy at transparent and value-packed rates. (Only on 100% Advance Payments)
+            </p>
+          </div>
+
+          {/* 4 Pricing Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+            {/* Card 1: Consultation / Regular Therapy */}
+            <div className="p-6 rounded-3xl bg-white text-slate-800 shadow-2xl border border-purple-100 flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-purple-100 text-[#682582] flex items-center justify-center">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-700 leading-tight">
+                    Consultation / Regular Therapy
+                  </h4>
+                </div>
+
+                <div className="pt-2">
+                  <div className="text-3xl font-extrabold text-[#2E0B5B]">₹ 800/-</div>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Comprehensive Evaluation</p>
+                </div>
+
+                <div className="space-y-2 text-xs text-slate-600 border-t pt-4">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#682582] shrink-0" />
+                    <span>Initial Assessment</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#682582] shrink-0" />
+                    <span>Regular Sessions</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#682582] shrink-0" />
+                    <span>Expert Physiotherapist</span>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={() => handleOpenBooking(undefined, 'Consultation / Regular Therapy')}
+                className="w-full h-11 rounded-xl bg-gradient-to-r from-[#4A156B] via-[#682582] to-[#7C3AED] hover:opacity-95 text-white font-bold text-xs"
+              >
+                <span>Book Now</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </Button>
+            </div>
+
+            {/* Card 2: 10 DAYS Package */}
+            <div className="p-6 rounded-3xl bg-white text-slate-800 shadow-2xl border border-purple-100 flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-purple-100 text-[#682582] flex items-center justify-center">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-700">10 DAYS Package</h4>
+                </div>
+
+                <div className="pt-2">
+                  <div className="text-xs font-semibold text-slate-500">₹ 750 / session</div>
+                  <div className="text-3xl font-extrabold text-[#2E0B5B]">₹ 7,500/-</div>
+                  <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
+                    Save ₹ 500/-
+                  </span>
+                </div>
+
+                <div className="space-y-2 text-xs text-slate-600 border-t pt-4">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#682582] shrink-0" />
+                    <span>10 In-clinic Sessions</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#682582] shrink-0" />
+                    <span>Guided Therapy Plan</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#682582] shrink-0" />
+                    <span>Track Your Progress</span>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={() => handleOpenBooking(undefined, '10 DAYS Package (₹7,500)')}
+                className="w-full h-11 rounded-xl bg-gradient-to-r from-[#4A156B] via-[#682582] to-[#7C3AED] hover:opacity-95 text-white font-bold text-xs"
+              >
+                <span>Book 10-Day Plan</span>
+              </Button>
+            </div>
+
+            {/* Card 3: 15 DAYS Package (MOST POPULAR) */}
+            <div className="relative p-6 rounded-3xl bg-white text-slate-800 shadow-2xl border-2 border-amber-400 flex flex-col justify-between space-y-6 scale-[1.02]">
+              {/* Most Popular Ribbon */}
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 font-extrabold text-[10px] tracking-wider shadow-md uppercase">
+                ★ MOST POPULAR ★
+              </div>
+
+              <div className="space-y-4 pt-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center">
+                    <Sparkles className="w-4 h-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-700">15 DAYS Package</h4>
+                </div>
+
+                <div className="pt-2">
+                  <div className="text-xs font-semibold text-slate-500">₹ 700 / session</div>
+                  <div className="text-3xl font-extrabold text-[#2E0B5B]">₹ 10,500/-</div>
+                  <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
+                    Save ₹ 1,500/-
+                  </span>
+                </div>
+
+                <div className="space-y-2 text-xs text-slate-600 border-t pt-4">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>15 In-clinic Sessions</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Personalized Protocol</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Better & Faster Results</span>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={() => handleOpenBooking(undefined, '15 DAYS Package (₹10,500)')}
+                className="w-full h-11 rounded-xl bg-gradient-to-r from-amber-500 via-[#682582] to-[#7C3AED] hover:opacity-95 text-white font-bold text-xs shadow-md"
+              >
+                <span>Book 15-Day Plan</span>
+              </Button>
+            </div>
+
+            {/* Card 4: 30 DAYS Package */}
+            <div className="p-6 rounded-3xl bg-white text-slate-800 shadow-2xl border border-purple-100 flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-purple-100 text-[#682582] flex items-center justify-center">
+                    <Award className="w-4 h-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-700">30 DAYS Package</h4>
+                </div>
+
+                <div className="pt-2">
+                  <div className="text-xs font-semibold text-slate-500">₹ 650 / session</div>
+                  <div className="text-3xl font-extrabold text-[#2E0B5B]">₹ 19,500/-</div>
+                  <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
+                    Save ₹ 4,500/-
+                  </span>
+                </div>
+
+                <div className="space-y-2 text-xs text-slate-600 border-t pt-4">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#682582] shrink-0" />
+                    <span>30 In-clinic Sessions</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#682582] shrink-0" />
+                    <span>Long-Term Relief</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-[#682582] shrink-0" />
+                    <span>Best Value for Money</span>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={() => handleOpenBooking(undefined, '30 DAYS Package (₹19,500)')}
+                className="w-full h-11 rounded-xl bg-gradient-to-r from-[#4A156B] via-[#682582] to-[#7C3AED] hover:opacity-95 text-white font-bold text-xs"
+              >
+                <span>Book 30-Day Plan</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Bargaining Notice Banner */}
+          <div className="mt-12 p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-amber-400/40 max-w-3xl mx-auto flex items-center gap-3.5 text-xs text-amber-200">
+            <div className="w-9 h-9 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="font-extrabold tracking-wider text-amber-300 uppercase">
+                BARGAINING IS NOT PERMITTED.
+              </span>
+              <span className="text-purple-100 ml-1.5">
+                If there are any offers or discounts available, they will be clearly advertised or displayed on our board.
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── PERSONALIZED CARE AT YOUR HOME SECTION ─────────────────────── */}
+      <section className="py-14 md:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            
+            {/* Left Content */}
+            <div className="lg:col-span-7 space-y-6">
+              <div>
+                <span className="text-xs font-extrabold uppercase tracking-widest text-[#682582]">
+                  PERSONALIZED CARE AT YOUR HOME
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#2E0B5B] tracking-tight mt-1">
+                  Home Care Packages in <span className="text-[#682582]">Borivali West</span>
+                </h2>
+              </div>
+
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                In addition to walk-in consultations at our Aries PhysioCare Center / Expert Physiotherapy Center, our verified specialist team also provides hospital-grade physiotherapy sessions directly to homes across Borivali West and Mumbai.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
+                <div className="p-3.5 rounded-2xl bg-purple-50/50 border border-purple-100 text-xs">
+                  <div className="font-bold text-slate-900">Expert Physiotherapists</div>
+                  <div className="text-[11px] text-slate-500">At Your Doorstep</div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-purple-50/50 border border-purple-100 text-xs">
+                  <div className="font-bold text-slate-900">Same Quality Care</div>
+                  <div className="text-[11px] text-slate-500">As Our Clinic</div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-purple-50/50 border border-purple-100 text-xs">
+                  <div className="font-bold text-slate-900">Convenient & Hassle-Free</div>
+                  <div className="text-[11px] text-slate-500">For All Age Groups</div>
+                </div>
+              </div>
+
+              {/* Search Location Bar */}
+              <div className="space-y-3 pt-2">
+                <div className="relative flex items-center">
+                  <MapPin className="absolute left-3.5 top-3.5 w-4 h-4 text-purple-600" />
+                  <input
+                    type="text"
+                    value={searchLocation}
+                    onChange={(e) => setSearchLocation(e.target.value)}
+                    placeholder="Search your Area, Locality, City or 6 Digit Pincode (e.g. Dahisar, South Mumbai, 400001)"
+                    className="w-full h-12 pl-10 pr-36 rounded-2xl border-2 border-purple-100 focus:border-[#682582] focus:outline-none text-xs text-slate-800"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => setSearchLocation('Borivali West, Mumbai 400091')}
+                    className="absolute right-1.5 h-9 px-4 rounded-xl bg-[#682582] hover:bg-[#4A156B] text-white text-[11px] font-bold"
+                  >
+                    <LocateFixed className="w-3.5 h-3.5 mr-1" />
+                    <span>Use My Location</span>
+                  </Button>
+                </div>
+
+                {/* Quick Area Select Chips */}
+                <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                  <span className="text-[11px] text-slate-500 font-semibold mr-1">Quick Select:</span>
+                  {[
+                    'Mira Road & Dahisar',
+                    'Borivali West',
+                    'Kandivali',
+                    'Malad',
+                    'Goregaon',
+                    'Andheri',
+                    'All Mumbai',
+                  ].map((chip) => (
+                    <button
+                      key={chip}
+                      type="button"
+                      onClick={() => {
+                        setActiveAreaChip(chip);
+                        setSearchLocation(`${chip}, Mumbai`);
+                      }}
+                      className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all border ${
+                        activeAreaChip === chip
+                          ? 'bg-[#682582] text-white border-[#682582]'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-purple-200'
+                      }`}
+                    >
+                      {chip}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Card: Home Care Pricing Starting from ₹1,200/day */}
+            <div className="lg:col-span-5">
+              <div className="p-6 rounded-3xl bg-gradient-to-br from-purple-50 via-white to-purple-50 border-2 border-purple-100 shadow-xl space-y-4">
+                <div className="relative rounded-2xl overflow-hidden aspect-[16/9] border border-purple-100">
+                  <Image
+                    src="/images/booking-popup-therapist.jpg"
+                    alt="Doorstep Home Physiotherapy in Borivali"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <div>
+                    <span className="text-xs text-slate-500 font-medium">Home Care Packages Starting from</span>
+                    <div className="text-2xl font-extrabold text-[#682582]">₹ 1,200 <span className="text-xs font-normal text-slate-500">/ day</span></div>
+                  </div>
+                  <Button
+                    onClick={() => handleOpenBooking(undefined, 'Home Care Package (₹1,200/day)')}
+                    className="h-10 px-5 rounded-xl bg-[#682582] text-white font-bold text-xs"
+                  >
+                    <span>Book Home Visit</span>
+                  </Button>
+                </div>
+                <p className="text-[11px] text-slate-500 border-t border-purple-100 pt-2">
+                  Inclusive of therapist visit, clinical assessment & 1-on-1 electrotherapy session.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ── NEED HELP CHOOSING CTA BANNER ────────────────────────────── */}
+      <section className="py-10 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#2E0B5B] via-[#4A156B] to-[#2E0B5B] text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4 text-center md:text-left">
+              <div className="w-14 h-14 rounded-2xl bg-white/10 text-amber-300 flex items-center justify-center shrink-0 border border-white/20">
+                <Sparkles className="w-7 h-7" />
+              </div>
+              <div>
+                <h3 className="text-lg sm:text-xl font-extrabold text-white">
+                  Need Help Choosing Your Recovery Plan?
+                </h3>
+                <p className="text-xs sm:text-sm text-purple-200 mt-1 max-w-xl">
+                  Speak with our expert clinical team to find the right package for your condition, recovery goals, and home location.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full sm:w-auto">
+              <Button
+                asChild
+                className="w-full sm:w-auto h-12 px-6 rounded-full bg-white text-[#2E0B5B] hover:bg-slate-100 font-bold text-xs flex items-center gap-2"
+              >
+                <a href="tel:+919138647806">
+                  <Phone className="w-4 h-4 text-[#682582]" />
+                  <span>Call +91 91386 47806</span>
+                </a>
+              </Button>
+
+              <Button
+                onClick={() => handleOpenBooking()}
+                className="w-full sm:w-auto h-12 px-6 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 hover:opacity-95 font-extrabold text-xs flex items-center gap-1.5"
+              >
+                <span>Book Free Assessment</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── LOCATION, DIRECTIONS & MAP ──────────────────────────────── */}
+      <section className="py-14 bg-white border-t border-purple-100/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-5 space-y-4">
+              <div className="flex items-center gap-2 text-xs font-extrabold text-[#682582] uppercase tracking-wider">
+                <MapPin className="w-4 h-4" />
+                <span>LOCATION & CLINIC ACCESS</span>
+              </div>
+              <h2 className="text-2xl font-extrabold text-[#2E0B5B]">
+                Visit Our Borivali West Center
+              </h2>
+              <div className="space-y-3 text-xs text-slate-600">
+                <p className="font-semibold text-slate-800">
+                  Shop No. 7, Parrk Riviera, New Mhatre Colony, Opp. New Mhatre Ground, Borivali West, Mumbai – 400091.
+                </p>
+                <p>
+                  <strong className="text-slate-800">Key Landmarks:</strong> Opposite New Mhatre Ground, near Gorai Bridge / Don Bosco Road, 5 mins from Eksar Metro Station and Borivali Railway Station.
+                </p>
+                <p>
+                  <strong className="text-slate-800">Accessibility:</strong> Ground floor zero-step wheelchair accessible entrance with dedicated clinical ambulance bay and patient drop-off area.
+                </p>
+              </div>
+
+              <div className="pt-2 flex flex-wrap gap-2.5">
+                <Button
+                  asChild
+                  className="h-10 px-5 rounded-xl bg-[#682582] text-white text-xs font-bold"
+                >
+                  <a
+                    href="https://maps.google.com/?q=Shop+No.+7,+Parrk+Riviera,+New+MHB+Colony,+Borivali+West,+Mumbai+400091"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span>Open in Google Maps</span>
+                    <ExternalLink className="w-3.5 h-3.5 ml-1" />
+                  </a>
+                </Button>
+                <Button
+                  onClick={() => handleOpenBooking()}
+                  variant="outline"
+                  className="h-10 px-5 rounded-xl border-purple-200 text-[#682582] text-xs font-bold"
+                >
+                  Schedule Visit
+                </Button>
+              </div>
+            </div>
+
+            <div className="lg:col-span-7">
+              <div className="w-full h-80 rounded-3xl overflow-hidden border-2 border-purple-100 shadow-md">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3767.149202575239!2d72.84461131490333!3d19.23232898699745!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7b13a37d2f9ef%3A0x6b4453b34b150d18!2sParrk%20Riviera!5e0!3m2!1sen!2sin!4v1694500000000!5m2!1sen!2sin"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Aries PhysioCare Borivali West Clinic Location Map"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── BORIVALI CLINIC FAQS ACCORDION ─────────────────────────── */}
+      <section className="py-14 md:py-20 bg-[#FAFAFD] border-t border-purple-100/60">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#682582]">
+              FREQUENTLY ASKED QUESTIONS
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#2E0B5B] tracking-tight mt-1">
+              Borivali West Clinic Patient Inquiries
+            </h2>
+          </div>
+
           <div className="space-y-3">
-            {FAQS.map((faq, idx) => (
+            {[
+              {
+                q: 'Where exactly is Aries PhysioCare located in Borivali West?',
+                a: 'We are located at Shop No. 7, Parrk Riviera, New Mhatre Colony, Borivali West, Mumbai – 400091, opposite New Mhatre Ground and close to Gorai Bridge / Don Bosco Road, with full ground floor wheelchair access.',
+              },
+              {
+                q: 'What are the consultation timings and shift hours?',
+                a: 'We operate 7 days a week in two shifts: Morning Shift from 8:00 AM to 1:00 PM, and Evening Shift from 4:00 PM to 9:00 PM. Pre-booked appointments guarantee priority zero wait time.',
+              },
+              {
+                q: 'How does the online slot booking with ₹250 deposit work?',
+                a: 'You select your preferred date, shift, and time slot. To confirm and reserve your dedicated 30-min window, an advance deposit of ₹250 is paid securely via Razorpay (Cards, UPI, Netbanking). The remaining ₹550 is payable at the clinic during your visit.',
+              },
+              {
+                q: 'What is the slot staggering rule (15 mins & 30 mins)?',
+                a: 'To maintain strict clinical discipline and prevent overcrowding, each 30-minute consultation window accommodates a maximum of 2 patients. If two patients book the same slot, they are staggered by 15 minutes (e.g. 9:00 AM and 9:15 AM). A slot with 2 bookings is closed to prevent any overlap.',
+              },
+              {
+                q: 'Are home physiotherapy visits available from this center?',
+                a: 'Yes. In addition to clinic walk-ins, our verified physiotherapists deliver hospital-grade sessions directly to homes across Borivali West, Borivali East, Kandivali, Dahisar, and Gorai starting from ₹1,200/day.',
+              },
+              {
+                q: 'What conditions are treated at this clinic?',
+                a: 'We specialize in knee osteoarthritis, spine decompression & sciatica, frozen shoulder, post-surgical TKR/THR rehabilitation, stroke & neuro-rehab, sports injury conditioning, and geriatric fall prevention.',
+              },
+            ].map((faq, idx) => (
               <div
-                key={idx}
-                className="bg-[#0B1B3D]/70 border border-white/10 rounded-xl overflow-hidden transition-all"
+                key={faq.q}
+                className="rounded-2xl border border-purple-100 bg-white overflow-hidden shadow-xs"
               >
                 <button
                   type="button"
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-4 font-bold text-white text-sm sm:text-base hover:text-[#D4AF37] transition-colors"
+                  className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-slate-800 hover:text-[#682582] transition-colors"
                 >
                   <span>{faq.q}</span>
-                  {openFaq === idx ? (
-                    <ChevronUp className="w-5 h-5 text-[#D4AF37] shrink-0" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-slate-400 shrink-0" />
-                  )}
+                  <ChevronDown
+                    className={`w-4 h-4 text-purple-600 transition-transform ${
+                      openFaq === idx ? 'rotate-180' : ''
+                    }`}
+                  />
                 </button>
                 {openFaq === idx && (
-                  <div className="px-4 pb-5 sm:px-5 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 pt-3">
+                  <div className="px-4 pb-4 sm:px-5 sm:pb-5 text-xs text-slate-600 leading-relaxed border-t border-purple-50 pt-3">
                     {faq.a}
                   </div>
                 )}
               </div>
             ))}
           </div>
-
-          <div className="mt-10 text-center">
-            <p className="text-xs text-slate-400">
-              Have an urgent clinical query? Speak directly with our clinical manager:
-            </p>
-            <div className="flex justify-center gap-3 mt-3">
-              <a
-                href={`tel:${CLINIC_INFO.phoneRaw}`}
-                onClick={() => trackPhoneCall(CLINIC_INFO.phone, { source: 'faq_footer' })}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] hover:underline"
-              >
-                <Phone className="w-3.5 h-3.5" /> Call +91 8591981880
-              </a>
-              <span className="text-slate-600">|</span>
-              <a
-                href={`https://wa.me/${CLINIC_INFO.whatsapp}?text=Hi%20Aries%20PhysioCare%20Borivali%2C%20I%20have%20a%20question%20about%20my%20treatment.`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackWhatsAppClick(CLINIC_INFO.whatsapp, { source: 'faq_footer' })}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#25D366] hover:underline"
-              >
-                <MessageCircle className="w-3.5 h-3.5" /> WhatsApp Clinical Help
-              </a>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* ── SECTION J: PERSISTENT CONVERSION BOTTOM BAR (MOBILE STICKY) ── */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0A192F]/95 backdrop-blur-lg border-t border-[#D4AF37]/30 py-3 px-4 shadow-2xl md:hidden">
-        <div className="flex items-center justify-between gap-2 max-w-md mx-auto">
-          <a
-            href={`tel:${CLINIC_INFO.phoneRaw}`}
-            onClick={() => trackPhoneCall(CLINIC_INFO.phone, { source: 'sticky_bar' })}
-            className="flex-1 inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs py-3 px-2 rounded-xl border border-white/10"
-          >
-            <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
-            <span>Call</span>
-          </a>
+      {/* ── Official Site Footer ────────────────────────────────────── */}
+      <Footer />
 
-          <a
-            href={`https://wa.me/${CLINIC_INFO.whatsapp}?text=Hi%20Aries%20PhysioCare%2C%20I%20want%20to%20book%20an%20appointment%20at%20Borivali%20West.`}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackWhatsAppClick(CLINIC_INFO.whatsapp, { source: 'sticky_bar' })}
-            className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#128C7E] hover:bg-[#075E54] text-white font-bold text-xs py-3 px-2 rounded-xl"
-          >
-            <MessageCircle className="w-3.5 h-3.5" />
-            <span>WhatsApp</span>
-          </a>
-
-          <Button
-            onClick={scrollToBooking}
-            className="flex-[1.5] bg-gradient-to-r from-[#D4AF37] to-[#C5A059] hover:from-[#C5A059] hover:to-[#B38F46] text-[#0A192F] font-extrabold text-xs py-3 px-2 rounded-xl shadow-md"
-          >
-            <Calendar className="w-3.5 h-3.5 mr-1" />
-            <span>Book Slot</span>
-          </Button>
-        </div>
-      </div>
+      {/* ── Appointment Booking Popup Modal ─────────────────────────── */}
+      <BorivaliAppointmentModal
+        isOpen={isModalOpen}
+        onClose={handleCloseBooking}
+        preselectedDoctor={selectedDoctor}
+        preselectedPackage={selectedPackage}
+      />
     </div>
   );
 }

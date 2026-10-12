@@ -39,6 +39,8 @@ import Header from '@/components/landing/header';
 import Footer from '@/components/landing/footer';
 import PricingPackagesSection from '@/components/landing/pricing-packages-section';
 import { cn } from '@/lib/utils';
+import { getSiteUrl } from '@/lib/seo/urls';
+import BorivaliClinicClient from '@/app/physiotherapy-clinic-borivali-west/BorivaliClinicClient';
 
 interface ClinicPageProps {
   params: Promise<{ citySlug: string; clinicSlug: string }>;
@@ -53,13 +55,65 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: ClinicPageProps): Promise<Metadata> {
   const { citySlug, clinicSlug } = await params;
+  const siteUrl = getSiteUrl();
+
+  if (clinicSlug === 'aries-physiocare-expert-physiotherapy-wellness-center-borivali') {
+    const canonicalUrl = `${siteUrl}/locations/mumbai/aries-physiocare-expert-physiotherapy-wellness-center-borivali`;
+    return {
+      title: 'Aries PhysioCare Borivali West Center | Expert Physiotherapy & Integrated Wellness Clinic',
+      description:
+        'Premier hospital-grade physiotherapy clinic in Borivali West at New Mhatre Colony, Opp. New Mhatre Ground. Specialized in knee pain, back pain, sciatica, TKR/THR rehab, laser therapy & sports injuries. Book online with ₹250 deposit or call +91 8591981880.',
+      keywords: [
+        'physiotherapy clinic in borivali west',
+        'physiotherapist in borivali west',
+        'best physiotherapist borivali west',
+        'aries physiocare borivali',
+        'knee pain clinic borivali west',
+        'sciatica treatment borivali',
+        'back pain physiotherapist borivali west',
+        'laser therapy clinic borivali',
+        'sports injury rehab borivali',
+        'new mhatre colony clinic',
+        'parrk riviera borivali',
+        'home physiotherapy in borivali west',
+      ],
+      alternates: {
+        canonical: canonicalUrl,
+      },
+      openGraph: {
+        title: 'Aries PhysioCare Borivali West Center | Expert Physiotherapy & Integrated Wellness',
+        description:
+          'Hospital-grade integrated physiotherapy, Class-IV laser, spinal traction, and expert specialists at Shop No. 7, Parrk Riviera, Borivali West.',
+        url: canonicalUrl,
+        siteName: 'Aries PhysioCare India',
+        locale: 'en_IN',
+        type: 'website',
+        images: [
+          {
+            url: '/images/clinics/borivali-clinic-interior.jpg',
+            width: 1200,
+            height: 900,
+            alt: 'Aries PhysioCare Borivali West Center Clinic Interior',
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'Aries PhysioCare Borivali West Center | Expert Physiotherapy',
+        description:
+          'Premier clinic in Borivali West at Shop No. 7, Parrk Riviera. Call +91 8591981880 or book appointment online with ₹250 deposit.',
+        images: ['/images/clinics/borivali-clinic-interior.jpg'],
+      },
+    };
+  }
+
   const clinic = ARIES_CLINICS_DIRECTORY.find((c) => c.slug === clinicSlug) || ARIES_CLINICS_DIRECTORY[0];
 
   if (!clinic) {
     return { title: 'Clinic Not Found | Aries PhysioCare' };
   }
 
-  const canonicalUrl = `https://www.ariesphysiocare.com/locations/${citySlug}/${clinic.slug}`;
+  const canonicalUrl = `${siteUrl}/locations/${citySlug}/${clinic.slug}`;
 
   return {
     title: `${clinic.name} | Top Physiotherapy Center in ${clinic.subArea}`,
@@ -69,7 +123,7 @@ export async function generateMetadata({ params }: ClinicPageProps): Promise<Met
       `best physiotherapist ${clinic.subArea}`,
       `physiotherapy center ${clinic.city}`,
       'aries physiocare clinic',
-      clinic.name
+      clinic.name,
     ],
     alternates: {
       canonical: canonicalUrl,
@@ -79,12 +133,99 @@ export async function generateMetadata({ params }: ClinicPageProps): Promise<Met
       description: `${clinic.tagline} · ${clinic.address}`,
       url: canonicalUrl,
       images: [{ url: clinic.imageUrl, width: 1200, height: 630, alt: clinic.name }],
-    }
+    },
   };
 }
 
 export default async function PhysicalClinicPage({ params }: ClinicPageProps) {
   const { citySlug, clinicSlug } = await params;
+
+  // Render the dedicated redesigned Borivali clinic experience
+  if (clinicSlug === 'aries-physiocare-expert-physiotherapy-wellness-center-borivali') {
+    const siteUrl = getSiteUrl();
+    const pageUrl = `${siteUrl}/locations/mumbai/aries-physiocare-expert-physiotherapy-wellness-center-borivali`;
+
+    const borivaliSchema = {
+      '@context': 'https://schema.org',
+      '@type': ['MedicalClinic', 'LocalBusiness'],
+      '@id': `${pageUrl}/#clinic`,
+      name: 'Aries PhysioCare : Expert Physiotherapy Center | Integrated Wellness Center',
+      alternateName: 'Aries PhysioCare Borivali West Center',
+      legalName: 'Aries HealthCare International Pvt Ltd',
+      url: pageUrl,
+      logo: `${siteUrl}/logo.png`,
+      image: [
+        `${siteUrl}/images/clinics/borivali-clinic-interior.jpg`,
+        `${siteUrl}/images/clinics/borivali-shoulder-therapy.jpg`,
+        `${siteUrl}/images/clinics/borivali-equipment-gym.jpg`,
+      ],
+      telephone: '+91 8591981880',
+      priceRange: '₹250 - ₹19500',
+      currenciesAccepted: 'INR',
+      paymentAccepted: 'Cash, Credit Card, Debit Card, UPI, Net Banking, Razorpay',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Shop No. 7, Parrk Riviera, New Mhatre Colony, Opp. New Mhatre Ground',
+        addressLocality: 'Borivali West',
+        addressRegion: 'Maharashtra',
+        postalCode: '400091',
+        addressCountry: 'IN',
+      },
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: 19.2312,
+        longitude: 72.8468,
+      },
+      openingHoursSpecification: [
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+          opens: '08:00',
+          closes: '13:00',
+        },
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+          opens: '16:00',
+          closes: '21:00',
+        },
+      ],
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        bestRating: '5',
+        worstRating: '1',
+        ratingCount: '2850',
+      },
+      hasMap: 'https://maps.google.com/?q=Shop+No.+7,+Parrk+Riviera,+New+MHB+Colony,+Borivali+West,+Mumbai+400091',
+    };
+
+    const breadcrumbSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+        { '@type': 'ListItem', position: 2, name: 'Locations', item: `${siteUrl}/locations` },
+        { '@type': 'ListItem', position: 3, name: 'Mumbai', item: `${siteUrl}/locations/mumbai` },
+        { '@type': 'ListItem', position: 4, name: 'Borivali West Center', item: pageUrl },
+      ],
+    };
+
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(borivaliSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
+        <BorivaliClinicClient />
+      </>
+    );
+  }
+
   const clinic = ARIES_CLINICS_DIRECTORY.find((c) => c.slug === clinicSlug);
 
   if (!clinic) {
