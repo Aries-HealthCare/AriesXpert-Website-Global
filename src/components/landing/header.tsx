@@ -243,7 +243,7 @@ function ServicesDropdown() {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/clinic" className="flex items-center gap-2" prefetch={false}>
-            <Building2 className="h-4 w-4 text-primary" /> Our Clinic (Borivali West)
+            <Building2 className="h-4 w-4 text-primary" /> Our Clinics & Regional Hubs
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -338,7 +338,7 @@ function MobileMenu({ currentLocationName }: { currentLocationName: string | nul
                     <Users className="h-4 w-4" /> Our Therapists
                   </Link>
                   <Link href="/clinic" className="text-base font-semibold text-primary transition-colors py-2 flex items-center gap-2" prefetch={false}>
-                    <Building2 className="h-4 w-4" /> Our Clinic (Borivali West)
+                    <Building2 className="h-4 w-4 text-primary" /> Our Clinics & Regional Hubs
                   </Link>
                 </div>
               </CollapsibleContent>
