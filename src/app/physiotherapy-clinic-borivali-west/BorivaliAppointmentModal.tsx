@@ -55,7 +55,7 @@ const COMMON_CONDITIONS = [
   'Other / General Physiotherapy Assessment',
 ];
 
-const CLINIC_ADDRESS = 'Shop No. 7, Parrk Riviera, New Mhatre Colony, Opp. New Mhatre Ground, Borivali West, Mumbai 400091';
+const CLINIC_ADDRESS = 'Shop No. 7, Parrk Riviera, New MHB Colony, Opp. New MHB Ground, Borivali West, Mumbai 400091';
 const CLINIC_PHONE = '+91 8591981880';
 const WHATSAPP_NUM = '918591981880';
 const CONSULTATION_FEE = 800;

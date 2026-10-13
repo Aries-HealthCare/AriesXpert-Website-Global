@@ -12,7 +12,7 @@ export function generateMetadata(): Metadata {
   return {
     title: 'Aries PhysioCare Borivali West Center | Expert Physiotherapy & Integrated Wellness Clinic',
     description:
-      'Premier hospital-grade physiotherapy clinic in Borivali West at New Mhatre Colony, Opp. New Mhatre Ground. Specialized in knee pain, back pain, sciatica, TKR/THR rehab, laser therapy & sports injuries. Book online with ₹250 deposit or call +91 8591981880.',
+      'Premier hospital-grade physiotherapy clinic in Borivali West at New MHB Colony, Opp. New MHB Ground. Specialized in knee pain, back pain, sciatica, TKR/THR rehab, laser therapy & sports injuries. Book online with ₹250 deposit or call +91 8591981880.',
     keywords: [
       'physiotherapy clinic in borivali west',
       'physiotherapist in borivali west',
@@ -23,7 +23,7 @@ export function generateMetadata(): Metadata {
       'back pain physiotherapist borivali west',
       'laser therapy clinic borivali',
       'sports injury rehab borivali',
-      'new mhatre colony clinic',
+      'new mhb colony clinic',
       'parrk riviera borivali',
       'home physiotherapy in borivali west',
     ],
@@ -81,7 +81,7 @@ export default function BorivaliClinicPage() {
     paymentAccepted: 'Cash, Credit Card, Debit Card, UPI, Net Banking, Razorpay',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Shop No. 7, Parrk Riviera, New Mhatre Colony, Opp. New Mhatre Ground',
+      streetAddress: 'Shop No. 7, Parrk Riviera, New MHB Colony, Opp. New MHB Ground',
       addressLocality: 'Borivali West',
       addressRegion: 'Maharashtra',
       postalCode: '400091',

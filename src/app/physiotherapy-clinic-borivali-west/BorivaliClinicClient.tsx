@@ -174,13 +174,13 @@ export default function BorivaliClinicClient() {
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
 
-                {/* Top-Right Script Calligraphy: "Move Better Live Healthier" */}
+                {/* Top-Right Script Calligraphy: "Move Better. Live Healthier." */}
                 <div className="absolute top-4 right-5 text-right select-none pointer-events-none drop-shadow-md">
                   <span className="font-script text-2xl sm:text-3xl font-bold text-[#8C5E28] block leading-tight">
-                    Move Better
+                    Move Better.
                   </span>
                   <span className="font-script text-2xl sm:text-3xl font-bold text-[#8C5E28] block leading-tight">
-                    Live Healthier
+                    Live Healthier.
                   </span>
                 </div>
               </div>
@@ -220,7 +220,7 @@ export default function BorivaliClinicClient() {
 
             <div className="p-3.5 rounded-2xl bg-[#F6EEFA] border border-purple-100 flex items-center gap-3 transition-all hover:bg-purple-100/70">
               <div className="w-10 h-10 rounded-xl bg-purple-200/60 text-[#682582] flex items-center justify-center shrink-0">
-                <Heart className="w-5 h-5" />
+                <Heart className="w-4 h-4" />
               </div>
               <div>
                 <h4 className="text-xs sm:text-sm font-bold text-slate-900 leading-tight">Personalized Treatment</h4>
@@ -261,7 +261,7 @@ export default function BorivaliClinicClient() {
               </div>
 
               <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
-                Aries PhysioCare Center in New Mhatre Colony, Borivali West is our premier physical clinic and clinical wellness hub. Equipped with world-class electrotherapy modalities, private therapy suites, and senior hospital-trained specialists, we provide personalized healing for acute and chronic musculoskeletal, neurological, and post-operative conditions.
+                Aries PhysioCare Center in New MHB Colony, Borivali West is our premier physical clinic and clinical wellness hub. Equipped with world-class electrotherapy modalities, private therapy suites, and senior hospital-trained specialists, we provide personalized healing for acute and chronic musculoskeletal, neurological, and post-operative conditions.
               </p>
 
               {/* 3 Badges */}
@@ -466,7 +466,7 @@ export default function BorivaliClinicClient() {
             <div className="lg:col-span-5 relative">
               <div className="relative rounded-3xl overflow-hidden border-2 border-purple-100 shadow-xl bg-white aspect-[4/3] group">
                 <Image
-                  src="/images/clinics/borivali-equipment-clean.png"
+                  src="/images/clinics/borivali-equipment-gym.jpg"
                   alt="Modern Physiotherapy Rehabilitation Gym & Hospital-Grade Equipment"
                   fill
                   sizes="(max-width: 1024px) 100vw, 500px"
@@ -644,7 +644,7 @@ export default function BorivaliClinicClient() {
             {/* Card 1: Consultation / Regular Therapy */}
             <div className="p-6 rounded-3xl bg-white text-slate-800 shadow-2xl flex flex-col justify-between space-y-5">
               <div className="space-y-3.5 text-center">
-                <div className="w-12 h-12 rounded-full bg-[#EDE4F7] text-[#682582] flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 rounded-full bg-[#2A0845] text-amber-300 border-2 border-amber-400 flex items-center justify-center mx-auto shadow-md">
                   <Stethoscope className="w-6 h-6" />
                 </div>
                 
@@ -684,7 +684,7 @@ export default function BorivaliClinicClient() {
             {/* Card 2: 10 DAYS Package */}
             <div className="p-6 rounded-3xl bg-white text-slate-800 shadow-2xl flex flex-col justify-between space-y-5">
               <div className="space-y-3.5 text-center">
-                <div className="w-12 h-12 rounded-full bg-[#EDE4F7] text-[#682582] flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 rounded-full bg-[#2A0845] text-amber-300 border-2 border-amber-400 flex items-center justify-center mx-auto shadow-md">
                   <Clock className="w-6 h-6" />
                 </div>
                 
@@ -732,7 +732,7 @@ export default function BorivaliClinicClient() {
               </div>
 
               <div className="space-y-3.5 text-center pt-1">
-                <div className="w-12 h-12 rounded-full bg-[#EDE4F7] text-[#682582] flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 rounded-full bg-[#2A0845] text-amber-300 border-2 border-amber-400 flex items-center justify-center mx-auto shadow-md">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 
@@ -775,7 +775,7 @@ export default function BorivaliClinicClient() {
             {/* Card 4: 30 DAYS Package */}
             <div className="p-6 rounded-3xl bg-white text-slate-800 shadow-2xl flex flex-col justify-between space-y-5">
               <div className="space-y-3.5 text-center">
-                <div className="w-12 h-12 rounded-full bg-[#EDE4F7] text-[#682582] flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 rounded-full bg-[#2A0845] text-amber-300 border-2 border-amber-400 flex items-center justify-center mx-auto shadow-md">
                   <Award className="w-6 h-6" />
                 </div>
                 
@@ -1000,11 +1000,11 @@ export default function BorivaliClinicClient() {
 
             <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full md:w-auto">
               <a
-                href="tel:+919138647806"
+                href="tel:+919136647806"
                 className="w-full sm:w-auto h-11 px-5 rounded-full bg-white text-[#260B49] hover:bg-slate-100 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-colors"
               >
                 <Phone className="w-3.5 h-3.5 text-[#682582]" />
-                <span>Call +91 91386 47806</span>
+                <span>Call +91 91366 47806</span>
               </a>
 
               <Button
