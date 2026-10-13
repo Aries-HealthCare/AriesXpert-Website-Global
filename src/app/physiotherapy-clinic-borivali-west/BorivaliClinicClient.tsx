@@ -33,8 +33,6 @@ import {
   Waves
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Header from '@/components/landing/header';
-import Footer from '@/components/landing/footer';
 import BorivaliAppointmentModal from './BorivaliAppointmentModal';
 
 export default function BorivaliClinicClient() {
@@ -61,9 +59,6 @@ export default function BorivaliClinicClient() {
 
   return (
     <div className="min-h-screen bg-[#FBFBFE] text-slate-800 selection:bg-purple-200 selection:text-purple-950 flex flex-col font-sans">
-      {/* ── Official Site Header ────────────────────────────────────── */}
-      <Header />
-
       {/* ── BREADCRUMB NAVIGATION ───────────────────────────────────── */}
       <nav aria-label="Breadcrumb" className="bg-[#FAF8FD] border-b border-purple-100/60 py-2.5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2 text-xs text-slate-500">
@@ -99,15 +94,15 @@ export default function BorivaliClinicClient() {
 
               {/* Main H1 Title */}
               <div className="space-y-1.5">
-                <div className="flex items-baseline gap-2">
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#260B49] tracking-tight leading-[1.12]">
-                    Aries PhysioCare <br />
-                    <span className="text-[#260B49]">Borivali West Center</span>
-                  </h1>
-                  <span className="text-[11px] font-bold text-[#682582] bg-purple-100/80 px-2 py-0.5 rounded-full border border-purple-200">
-                    No. 1
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#260B49] tracking-tight leading-[1.15]">
+                  <span>Aries PhysioCare</span><br />
+                  <span className="inline-flex items-center gap-2">
+                    <span>Borivali West Center</span>
+                    <span className="text-[11px] font-bold text-[#682582] bg-purple-100/90 px-2 py-0.5 rounded-full border border-purple-200 align-middle">
+                      No. 1
+                    </span>
                   </span>
-                </div>
+                </h1>
 
                 <p className="text-base sm:text-lg font-bold text-[#682582] pt-1">
                   Expert Physiotherapy. Integrated Wellness. A Healthier You.
@@ -1018,9 +1013,6 @@ export default function BorivaliClinicClient() {
           </div>
         </div>
       </section>
-
-      {/* ── Official Site Footer ────────────────────────────────────── */}
-      <Footer />
 
       {/* ── Appointment Booking Popup Modal ─────────────────────────── */}
       <BorivaliAppointmentModal
