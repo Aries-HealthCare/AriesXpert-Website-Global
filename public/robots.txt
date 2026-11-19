@@ -16,5 +16,7 @@ Allow: /therapist
 Allow: /clinic
 Allow: /physiotherapy-in-*
 
+Content-Signal: search=yes, ai-train=no
+
 # Sitemap location
 Sitemap: https://www.ariesphysiocare.com/sitemap.xml
